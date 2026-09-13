@@ -51,7 +51,7 @@ validos en ingles, no raices espanolas, y se declaran como excepciones:
 
 ## Renombrado aplicado (2026-09-13)
 
-Se renombraron los identificadores con raiz espanola real detectados por la
+Primera pasada: los identificadores con raiz espanola real detectados por la
 pasada ampliada (tipos, metodos publicos/privados y variables locales
 relacionadas). Sin cambios de contratos externos: rutas, nombres de
 `@RequestParam`, firmas SQL y claims JWT intactos.
@@ -74,6 +74,43 @@ relacionadas). Sin cambios de contratos externos: rutas, nombres de
   `addTable/addRow`, `negrita` -> `bold`, `anchosColumns` -> `columnWidths`
 - Variables locales `esReader` -> `isReader` en `FineService`,
   `LoanService` y `NotificationService`
+
+Segunda pasada (barrido exhaustivo de 282 tipos y 440+ metodos): se
+renombro toda raiz espanola residual en nombres de tipos y metodos,
+incluyendo `MaterialReservadoException` ->
+`ReservedMaterialException`, `ServiceTemporalmenteNotAvailableException`
+-> `ServiceTemporarilyNotAvailableException`,
+`suscribir/desuscribir/notifyDisponibles` ->
+`subscribe/unsubscribe/notifyAvailable`, `sugerir/sugerirByTitle` ->
+`suggest/suggestByTitle`, `searchByTextOIsbnYAuthor` ->
+`searchByTextOrIsbnAndAuthor`, `getMostPedidos*/findMostPedidosAgrupados`
+-> `getMostRequested*/findMostRequestedGrouped`,
+`generateReportSuggestionsMostPedidas` ->
+`generateReportSuggestionsMostRequested`, `estaBlocked/resetear/secondsRestantes/estaRevocado`
+-> `isBlocked/reset/remainingSeconds/isRevoked`,
+`getValueEntero` -> `getIntegerValue`, `paymentParcial` -> `payPartial`,
+`getFileBinario` -> `getFileBinary`, `mapearInput` -> `mapInput`,
+`parsearResponse` -> `parseResponse`, `tieneIntencion*` ->
+`has*Intention`, `validatePropiedadSession` -> `validateSessionOwnership`,
+`construirPromptSystem` -> `buildSystemPrompt`, `truncarText` ->
+`truncateText`, `searchPrimerVolume` -> `searchFirstVolume`,
+`textOAlternativo` -> `textOrAlternative`, `exportarCsv` -> `exportCsv`,
+`executeBackupProgramado` -> `executeScheduledBackup`,
+`initializeTasksProgramadas` -> `initializeScheduledTasks`,
+`notifyNextsAExpire` -> `notifyNextToExpire`,
+`expireReservationsVencidas` -> `expireOverdueReservations`,
+`antesCualquierUpdate` -> `beforeAnyUpdate`, `miCredential` ->
+`myCredential`, `misSubscriptions` -> `mySubscriptions`, `createYSend*`
+-> `createAndSend*`, `generateYSendCode` -> `generateAndSendCode`,
+`getDaysRestantes/renewalsRestantes` -> `getDaysRemaining/renewalsRemaining`
+(wire `@JsonProperty`/SQL intacto), `handleGenerica` -> `handleGeneric`,
+`handleMaterialReservado` -> `handleReservedMaterial`,
+`protegido` -> `protectedEndpoint` (ruta `/protegido` intacta),
+`mostPedidos` -> `mostRequested`.
+
+Quedan como cognados ingleses documentados: `error`,
+`local`, `via`, `principal` (7 metodos, 1,09 % en pasada de 700+ voces;
+0,00 % en el script oficial).
 
 ## Verificacion
 

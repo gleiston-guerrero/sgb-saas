@@ -135,7 +135,7 @@ sin discrepancias:
 | `CLASS` | string | — | nombre simple de la clase, ej. `LoginRateLimiter`, `JwtService` | Clase Java analizada. |
 | `INSTRUCTION_MISSED` / `INSTRUCTION_COVERED` | entero | instrucciones de bytecode | ≥ 0 | Instrucciones de bytecode no cubiertas / cubiertas por al menos un test; la unidad de cobertura más granular que reporta JaCoCo. |
 | `BRANCH_MISSED` / `BRANCH_COVERED` | entero | ramas condicionales | ≥ 0 | Ramas de decisión (`if`/`switch`/operadores condicionales) no cubiertas / cubiertas. |
-| `LINE_MISSED` / `LINE_COVERED` | entero | líneas de código fuente | ≥ 0 | Líneas fuente no cubiertas / cubiertas -- la base del porcentaje de "cobertura de líneas" citado en el \autoref{cap:resultados} ($78{,}34\,\%$ = `1595 / (1595 + 441)`, agregado sobre las 48 filas de clases). |
+| `LINE_MISSED` / `LINE_COVERED` | entero | líneas de código fuente | ≥ 0 | Líneas fuente no cubiertas / cubiertas -- la base del porcentaje de "cobertura de líneas" citado en el \autoref{cap:resultados} ($85{,}17\,\%$ = `1734 / (1734 + 302)`, agregado sobre las 48 filas de clases). |
 | `COMPLEXITY_MISSED` / `COMPLEXITY_COVERED` | entero | unidades de complejidad ciclomática | ≥ 0 | Complejidad ciclomática no cubierta / cubierta por los tests. |
 | `METHOD_MISSED` / `METHOD_COVERED` | entero | métodos | ≥ 0 | Métodos con al menos una instrucción no cubierta / métodos completamente cubiertos. |
 

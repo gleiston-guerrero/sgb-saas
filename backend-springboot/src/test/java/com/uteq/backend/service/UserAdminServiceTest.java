@@ -314,4 +314,222 @@ class UserAdminServiceTest {
 
         assertThat(objetivo.getStatus().getName()).isEqualTo("INACTIVO");
     }
+
+    // ── listar: sobrecarga y alcance ─────────────────────────
+
+    @Test
+    void list3_sinAuth_delegaWithoutRestriccion() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<User> page = new PageImpl<>(List.of(), pageable, 0);
+        given(userRepo.searchWithFilters("", null, pageable)).willReturn(page);
+        given(statusFineRepo.findByName("PENDIENTE")).willReturn(Optional.empty());
+
+        Page<UserListingResponseDTO> result = service.list("", pageable);
+
+        assertThat(result.getTotalElements()).isZero();
+    }
+
+    @Test
+    void list_managerScope_restringeByCreadorYSinPendientes() {
+        comoManager("gerente@correo.com", 7L);
+        org.mockito.Mockito.lenient().when(userRepo.findByEmailIgnoreCase("gerente@correo.com"))
+                .thenReturn(Optional.of(user(7L, "gerente@correo.com", "GERENTE", "ACTIVO")));
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<User> page = new PageImpl<>(List.of(), pageable, 0);
+        given(userRepo.searchWithFilters("", 7L, pageable)).willReturn(page);
+        given(statusFineRepo.findByName("PENDIENTE")).willReturn(Optional.empty());
+
+        Page<UserListingResponseDTO> result = service.list(null, pageable, authentication, true);
+
+        assertThat(result.getTotalElements()).isZero();
+    }
+
+    @Test
+    void list_withFiltroTexto_trimAplica() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<User> page = new PageImpl<>(List.of(), pageable, 0);
+        given(userRepo.searchWithFilters("ana", null, pageable)).willReturn(page);
+        given(statusFineRepo.findByName("PENDIENTE")).willReturn(Optional.empty());
+
+        service.list("  ana  ", pageable, null, false);
+
+        verify(userRepo).searchWithFilters("ana", null, pageable);
+    }
+
+    // ── cambiarRol: alcance gerente ──────────────────────────
+
+    @Test
+    void manager_changeRoleForbidden_lanzaAccessDenied() {
+        comoManager("gerente@correo.com", 7L);
+        User objetivo = user(5L, "lector@correo.com", "LECTOR", "ACTIVO");
+        objetivo.setCreatedBy(7L);
+        given(userRepo.findByIdWithStatusAndRoles(5L)).willReturn(Optional.of(objetivo));
+        given(roleRepo.findByName("ADMIN")).willReturn(Optional.of(role("ADMIN")));
+
+        assertThatThrownBy(() -> service.changeRole(5L, "ADMIN", authentication))
+                .isInstanceOf(org.springframework.security.access.AccessDeniedException.class);
+    }
+
+    @Test
+    void manager_changeRoleCreatedByNulo_lanzaAccessDenied() {
+        comoManager("gerente@correo.com", 7L);
+        User objetivo = user(5L, "lector@correo.com", "LECTOR", "ACTIVO");
+        objetivo.setCreatedBy(null);
+        given(userRepo.findByIdWithStatusAndRoles(5L)).willReturn(Optional.of(objetivo));
+        given(roleRepo.findByName("BIBLIOTECARIO")).willReturn(Optional.of(role("BIBLIOTECARIO")));
+
+        assertThatThrownBy(() -> service.changeRole(5L, "BIBLIOTECARIO", authentication))
+                .isInstanceOf(org.springframework.security.access.AccessDeniedException.class);
+    }
+
+    @Test
+    void manager_changeRoleSuCreated_permite() {
+        comoManager("gerente@correo.com", 7L);
+        User objetivo = user(5L, "lector@correo.com", "LECTOR", "ACTIVO");
+        objetivo.setCreatedBy(7L);
+        given(userRepo.findByIdWithStatusAndRoles(5L)).willReturn(Optional.of(objetivo));
+        given(roleRepo.findByName("BIBLIOTECARIO")).willReturn(Optional.of(role("BIBLIOTECARIO")));
+
+        service.changeRole(5L, "BIBLIOTECARIO", authentication);
+
+        assertThat(objetivo.getRoles()).extracting(Role::getName).containsExactly("BIBLIOTECARIO");
+    }
+
+    @Test
+    void changeRole_authNula_lanzaEntityNotFound() {
+        User objetivo = user(5L, "lector@correo.com", "LECTOR", "ACTIVO");
+        given(userRepo.findByIdWithStatusAndRoles(5L)).willReturn(Optional.of(objetivo));
+        given(roleRepo.findByName("BIBLIOTECARIO")).willReturn(Optional.of(role("BIBLIOTECARIO")));
+
+        assertThatThrownBy(() -> service.changeRole(5L, "BIBLIOTECARIO", null))
+                .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    // ── cambiarEstado: alcance gerente ───────────────────────
+
+    @Test
+    void manager_changeStatusEstadoNoPermitido_lanzaAccessDenied() {
+        comoManager("gerente@correo.com", 7L);
+        User objetivo = user(5L, "lector@correo.com", "LECTOR", "ACTIVO");
+        objetivo.setCreatedBy(7L);
+        given(userRepo.findByIdWithStatusAndRoles(5L)).willReturn(Optional.of(objetivo));
+        given(statusUserRepo.findByName("BLOQUEADO_POR_MULTA"))
+                .willReturn(Optional.of(status("BLOQUEADO_POR_MULTA")));
+
+        assertThatThrownBy(() -> service.changeStatus(5L, "BLOQUEADO_POR_MULTA", "m", authentication))
+                .isInstanceOf(org.springframework.security.access.AccessDeniedException.class);
+    }
+
+    @Test
+    void manager_changeStatusAjeno_lanzaAccessDenied() {
+        comoManager("gerente@correo.com", 7L);
+        User objetivo = user(5L, "lector@correo.com", "LECTOR", "ACTIVO");
+        objetivo.setCreatedBy(99L);
+        given(userRepo.findByIdWithStatusAndRoles(5L)).willReturn(Optional.of(objetivo));
+        given(statusUserRepo.findByName("INACTIVO")).willReturn(Optional.of(status("INACTIVO")));
+
+        assertThatThrownBy(() -> service.changeStatus(5L, "INACTIVO", "m", authentication))
+                .isInstanceOf(org.springframework.security.access.AccessDeniedException.class);
+    }
+
+    // ── crearUsuario: errores y happy admin ──────────────────
+
+    @Test
+    void createUser_emailDuplicado_lanzaAlreadyRegistered() {
+        given(userRepo.findByEmail("dup@correo.com"))
+                .willReturn(Optional.of(user(1L, "dup@correo.com", "LECTOR", "ACTIVO")));
+
+        assertThatThrownBy(() -> service.createUser(new com.uteq.backend.dto.CreateUserAdminRequestDTO(
+                "Ana", "Paz", "dup@correo.com", "Secreta123", "LECTOR"), authentication))
+                .isInstanceOf(EmailAlreadyRegisteredException.class);
+    }
+
+    @Test
+    void createUser_roleInexistente_lanzaIllegalArgument() {
+        given(userRepo.findByEmail("nuevo@correo.com")).willReturn(Optional.empty());
+        given(roleRepo.findByName("SUPERVISOR")).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.createUser(new com.uteq.backend.dto.CreateUserAdminRequestDTO(
+                "Ana", "Paz", "nuevo@correo.com", "Secreta123", "SUPERVISOR"), authentication))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("SUPERVISOR");
+    }
+
+    @Test
+    void createUser_withoutEstadoActivo_lanzaIllegalState() {
+        given(userRepo.findByEmail("nuevo@correo.com")).willReturn(Optional.empty());
+        given(roleRepo.findByName("LECTOR")).willReturn(Optional.of(role("LECTOR")));
+        given(statusUserRepo.findByName("ACTIVO")).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.createUser(new com.uteq.backend.dto.CreateUserAdminRequestDTO(
+                "Ana", "Paz", "nuevo@correo.com", "Secreta123", "LECTOR"), authentication))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void admin_createReader_retornaResponse() {
+        User admin = user(9L, "admin@correo.com", "ADMIN", "ACTIVO");
+        given(userRepo.findByEmail("nuevo@correo.com")).willReturn(Optional.empty());
+        given(roleRepo.findByName("LECTOR")).willReturn(Optional.of(role("LECTOR")));
+        given(statusUserRepo.findByName("ACTIVO")).willReturn(Optional.of(status("ACTIVO")));
+        given(authentication.getName()).willReturn("admin@correo.com");
+        given(userRepo.findByEmail("admin@correo.com")).willReturn(Optional.of(admin));
+        given(userRepo.save(any())).willAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setId(60L);
+            return u;
+        });
+
+        com.uteq.backend.dto.UserResponseDTO result = service.createUser(
+                new com.uteq.backend.dto.CreateUserAdminRequestDTO(
+                        "Ana", "Paz", "nuevo@correo.com", "Secreta123", "LECTOR"),
+                authentication);
+
+        assertThat(result.id()).isEqualTo(60L);
+        assertThat(result.email()).isEqualTo("nuevo@correo.com");
+    }
+
+    // ── eliminarUsuario: errores ─────────────────────────────
+
+    @Test
+    void deleteUser_userInexistente_lanzaEntityNotFound() {
+        given(userRepo.findByIdWithStatusAndRoles(404L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.deleteUser(404L, "m", authentication))
+                .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    void deleteUser_withoutEstadoInactivo_lanzaIllegalState() {
+        User objetivo = user(6L, "lector2@correo.com", "LECTOR", "ACTIVO");
+        given(userRepo.findByIdWithStatusAndRoles(6L)).willReturn(Optional.of(objetivo));
+        given(statusUserRepo.findByName("INACTIVO")).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.deleteUser(6L, "m", authentication))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    // ── historial de motivos ─────────────────────────────────
+
+    @Test
+    void historyReasons_withRegistros_mapeaOrdenados() {
+        UserReasonChange row = UserReasonChange.builder()
+                .id(1L).userId(5L).typeChange("CAMBIO_ESTADO")
+                .statusAnterior(3).statusFresh(2).reason("Baja")
+                .executedBy(9L).created(java.time.OffsetDateTime.now())
+                .build();
+        given(userReasonChangeRepo.findByUserIdOrderByCreatedDesc(5L)).willReturn(List.of(row));
+
+        List<com.uteq.backend.dto.UserReasonChangeResponseDTO> result = service.historyReasons(5L);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).reason()).isEqualTo("Baja");
+    }
+
+    @Test
+    void historyReasons_withoutRegistros_retornaVacio() {
+        given(userReasonChangeRepo.findByUserIdOrderByCreatedDesc(5L)).willReturn(List.of());
+
+        assertThat(service.historyReasons(5L)).isEmpty();
+    }
 }

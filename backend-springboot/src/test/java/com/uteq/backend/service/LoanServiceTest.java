@@ -42,6 +42,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -521,5 +522,111 @@ class LoanServiceTest {
     private void permitirCreateLoan() {
         lenient().when(configurationSystemService.getIntegerValue("max_prestamos_usuario")).thenReturn(5);
         lenient().when(loanProcRepo.fnListLoansActivesByUser(any())).thenReturn(List.of());
+    }
+
+    // ── Activos por usuario ────────────────────────────────
+    @Test
+    void listActivesByUser_librarianPideCualquiera_retornaMapeados() {
+        Authentication auth = authComoRole("biblio@correo.com", "BIBLIOTECARIO");
+        com.uteq.backend.repository.projection.LoanActiveProjection p =
+                mock(com.uteq.backend.repository.projection.LoanActiveProjection.class);
+        lenient().when(p.getLoanId()).thenReturn(10L);
+        lenient().when(p.getBookTitle()).thenReturn("Clean Code");
+        lenient().when(p.getBookIsbn()).thenReturn("123");
+        lenient().when(p.getDateLoan()).thenReturn(null);
+        lenient().when(p.getDateLoanReturnEstimada()).thenReturn(null);
+        lenient().when(p.getDaysRemaining()).thenReturn(5);
+        lenient().when(p.getStatusName()).thenReturn("ACTIVO");
+        given(loanRepo.findActivesByUserId(1L)).willReturn(List.of(p));
+
+        List<com.uteq.backend.dto.LoanActiveResponseDTO> result =
+                loanService.listActivesByUser(1L, auth);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).loanId()).isEqualTo(10L);
+    }
+
+    @Test
+    void listActivesByUser_readerPideOtroUser_lanzaAccessDenegado() {
+        Authentication auth = authComoRole("lector@correo.com", "LECTOR");
+        given(userRepo.findByEmail("lector@correo.com"))
+                .willReturn(Optional.of(userWithId(1L)));
+
+        assertThatThrownBy(() -> loanService.listActivesByUser(2L, auth))
+                .isInstanceOf(AuthorizationDeniedException.class);
+    }
+
+    // ── Morosidad ──────────────────────────────────────────
+    @Test
+    void reportDelinquency_withLimitExplicito_respetaTope() {
+        ReportDelinquencyProjection p = mock(ReportDelinquencyProjection.class);
+        lenient().when(p.getUserId()).thenReturn(1L);
+        lenient().when(p.getName()).thenReturn("Ana");
+        lenient().when(p.getLastName()).thenReturn("Paz");
+        lenient().when(p.getEmail()).thenReturn("ana@correo.com");
+        lenient().when(p.getAmountTotalAdeudado()).thenReturn(new BigDecimal("5.00"));
+        lenient().when(p.getQuantityFinesPendientes()).thenReturn(2L);
+        lenient().when(p.getDaysAtrasoPromedio()).thenReturn(new BigDecimal("3.5"));
+        given(loanProcRepo.fnReportIndexDelinquency(5)).willReturn(List.of(p));
+
+        List<ReportDelinquencyResponseDTO> result = loanService.reportDelinquency(5);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).userId()).isEqualTo(1L);
+        verify(loanProcRepo).fnReportIndexDelinquency(5);
+    }
+
+    @Test
+    void reportDelinquencyPaginated_paginaRetornaContentYTotal() {
+        ReportDelinquencyProjection p = mock(ReportDelinquencyProjection.class);
+        lenient().when(p.getUserId()).thenReturn(1L);
+        lenient().when(p.getName()).thenReturn("Ana");
+        lenient().when(p.getLastName()).thenReturn("Paz");
+        lenient().when(p.getEmail()).thenReturn("ana@correo.com");
+        lenient().when(p.getAmountTotalAdeudado()).thenReturn(new BigDecimal("5.00"));
+        lenient().when(p.getQuantityFinesPendientes()).thenReturn(2L);
+        lenient().when(p.getDaysAtrasoPromedio()).thenReturn(new BigDecimal("3.5"));
+        org.springframework.data.domain.Pageable pageable =
+                org.springframework.data.domain.PageRequest.of(0, 20);
+        given(loanProcRepo.fnReportIndexDelinquencyPaginated(10, 20, 0)).willReturn(List.of(p));
+        given(loanProcRepo.countReportIndexDelinquency(10)).willReturn(1L);
+
+        org.springframework.data.domain.Page<ReportDelinquencyResponseDTO> result =
+                loanService.reportDelinquencyPaginated(null, pageable);
+
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getContent().get(0).userId()).isEqualTo(1L);
+    }
+
+    // ── Uso por período ────────────────────────────────────
+    @Test
+    void reportUsageByPeriod_granularidadInvalida_lanzaIllegalArgument() {
+        assertThatThrownBy(() -> loanService.reportUsageByPeriod("hora", null, null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("hora");
+    }
+
+    @Test
+    void reportUsageByPeriod_nulaEquivaleADia() {
+        ReportUsageByPeriodProjection p = mock(ReportUsageByPeriodProjection.class);
+        lenient().when(p.getPeriod()).thenReturn(Instant.now());
+        lenient().when(p.getTotalLoans()).thenReturn(4L);
+        lenient().when(p.getTotalLoanReturns()).thenReturn(3L);
+        given(loanProcRepo.fnReportUsageByPeriod(eq("dia"), any(), any())).willReturn(List.of(p));
+
+        List<ReportUsageByPeriodResponseDTO> result =
+                loanService.reportUsageByPeriod(null, null, null);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).totalLoans()).isEqualTo(4L);
+    }
+
+    @Test
+    void reportUsageByPeriodPaginated_granularidadInvalida_lanzaIllegalArgument() {
+        org.springframework.data.domain.Pageable pageable =
+                org.springframework.data.domain.PageRequest.of(0, 20);
+
+        assertThatThrownBy(() -> loanService.reportUsageByPeriodPaginated("hora", null, null, pageable))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }

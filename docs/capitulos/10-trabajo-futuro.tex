@@ -31,20 +31,17 @@ con registro de hora/duración, export crudo versionable sin PII,
 análisis y reporte -- se difiere formalmente a la fase de despliegue en
 producción.
 
-\section{Cerrar cobertura de ramas en servicios -- PENDIENTE}
+\section{Cerrar cobertura de ramas en servicios -- CERRADO}
 \label{sec:tf-service-branch-coverage}
 
-La medición JaCoCo vigente ya deja \texttt{service} por encima del
-umbral de líneas (70,35\,\%), pero no de ramas: el XML versionado en
-\texttt{docs/mediciones/jacoco/2026-08-27-jacoco-cierre-final/jacoco.xml}
-marca 46,10\,\% de cobertura de ramas en
-\texttt{com.uteq.backend.service}. Se mantiene como trabajo futuro
-porque subir esa cifra exige diseñar casos adicionales para múltiples
-combinaciones de reglas de negocio, errores y autorizaciones, no solo
-agregar aserciones mecánicas. El objetivo mínimo operativo de la
-siguiente iteración es superar 40\,\% de ramas de servicio de forma
-estable y luego acercarse gradualmente al 70\,\% exigido por la rúbrica,
-priorizando las ramas con riesgo funcional real.
+La medición JaCoCo vigente deja \texttt{service} por encima del umbral
+tanto en líneas (83,63\,\%, 1180/1411) como en ramas (70,05\,\%,
+311/444), y \texttt{controller} en 95,54\,\%/70,41\,\%, según el XML
+versionado en \texttt{docs/mediciones/jacoco/report.xml} (corrida
+\texttt{mvnw clean verify} con 584 tests, 0 fallos). El objetivo de la
+rúbrica (70\,\% en líneas y ramas de servicios y controladores) queda
+cumplido en esta entrega; como mejora continua se mantiene la vigilancia
+de ramas en los reportes de cierre.
 
 \section{Análisis estático de SQL dinámico -- CERRADO}
 

@@ -103,6 +103,35 @@ class FavoriteServiceTest {
         assertThat(result.get(0).userId()).isEqualTo(7L);
     }
 
+    // ── Test 6: quitar existente delega el borrado ──
+    @Test
+    void remove_cuandoEsFavorite_elimina() {
+        given(authentication.getName()).willReturn("lector@correo.com");
+        given(userRepo.findByEmail("lector@correo.com")).willReturn(Optional.of(userWithId(7L)));
+        given(favoriteRepo.existsByUserIdAndBookId(7L, 1L)).willReturn(true);
+
+        favoriteService.remove(1L, authentication);
+
+        verify(favoriteRepo).deleteByUserIdAndBookId(7L, 1L);
+    }
+
+    // ── Test 7: listado paginado propio ──
+    @Test
+    void listOwnsPaginated_withFavorites_retornaPagina() {
+        given(authentication.getName()).willReturn("lector@correo.com");
+        given(userRepo.findByEmail("lector@correo.com")).willReturn(Optional.of(userWithId(7L)));
+        given(favoriteRepo.findByUserId(org.mockito.ArgumentMatchers.eq(7L),
+                org.mockito.ArgumentMatchers.any()))
+                .willReturn(new org.springframework.data.domain.PageImpl<>(List.of(new Favorite(7L, 1L))));
+        given(bookRepo.findById(1L)).willReturn(Optional.of(bookWithTitle("Clean Code")));
+
+        org.springframework.data.domain.Page<FavoriteResponseDTO> result =
+                favoriteService.listOwnsPaginated(authentication,
+                        org.mockito.Mockito.mock(org.springframework.data.domain.Pageable.class));
+
+        assertThat(result.getTotalElements()).isEqualTo(1);
+    }
+
     // ── Helpers ───────────────────────────────────────────
     private User userWithId(Long id) {
         User user = new User();

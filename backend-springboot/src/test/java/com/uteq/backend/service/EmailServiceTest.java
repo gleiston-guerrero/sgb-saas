@@ -66,4 +66,18 @@ class EmailServiceTest {
 
         assertFalse(result);
     }
+
+    // Con clave Brevo en blanco no hay fallback HTTP: mismo false sin
+    // depender de red externa.
+    @Test
+    void sendEmail_smtpCaidoYBrevoEnBlanco_retornaFalseSinHttp() {
+        ReflectionTestUtils.setField(emailService, "brevoApiKey", "");
+        MimeMessage mimeMessage = new MimeMessage((Session) null);
+        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+        doThrow(new MailSendException("Connection refused")).when(mailSender).send(mimeMessage);
+
+        boolean result = emailService.sendEmail(DESTINATARIO, ASUNTO, CUERPO);
+
+        assertFalse(result);
+    }
 }
