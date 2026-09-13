@@ -29,8 +29,24 @@ class ProcedureMappingContractTest {
                 "Multa.pagarMulta", Long.class);
         assertProcedure(FineProcedureRepository.class, "spVoidFineProcedure",
                 "Multa.anularMulta", Long.class, String.class, String.class);
-        assertProcedure(ReservationProcedureRepository.class, "spExpireReservationsVencidasProcedure",
-                "sp_expirar_reservaciones_vencidas");
+    }
+
+    @Test
+    void scalarPostgresFunctions_useNativeSelectWhenDatabaseObjectIsNotProcedure() throws NoSuchMethodException {
+        Method method = ReservationProcedureRepository.class
+                .getDeclaredMethod("spExpireReservationsVencidasProcedure");
+
+        assertThat(method.isAnnotationPresent(Procedure.class))
+                .as("PostgreSQL rejects CALL for sp_expirar_reservaciones_vencidas because it is a FUNCTION")
+                .isFalse();
+
+        Query query = method.getAnnotation(Query.class);
+        assertThat(query)
+                .as("scalar function must be invoked with SELECT, not CALL")
+                .isNotNull();
+        assertThat(query.nativeQuery()).isTrue();
+        assertThat(query.value())
+                .isEqualTo("SELECT sp_expirar_reservaciones_vencidas()");
     }
 
     @Test
