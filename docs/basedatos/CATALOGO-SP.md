@@ -364,8 +364,35 @@ de V51. Estas 4+ funciones de reporte siguen, correctamente, con `@Query
 **Balance de mecanismos tras V51** (verificado en código, no solo en este
 documento): de las rutinas con efectos secundarios sobre las tablas de
 negocio (préstamos, reservaciones, multas), **5 de 5** ahora tienen un
-`CREATE PROCEDURE` real invocado con `CALL`. Las ~36 ocurrencias restantes
-de `@Query(nativeQuery = true)` en el módulo de préstamos/multas
-corresponden en su totalidad a funciones `RETURNS TABLE`/`SETOF` de solo
-lectura (reportes, listados, paginación) — la excepción técnica documentada
-arriba, no una elección de conveniencia.
+`CREATE PROCEDURE` real invocado con `CALL`.
+
+## Revisión posterior — bajar el conteo de `nativeQuery=true` por la vía legítima
+
+Tras V51 quedaban 36 ocurrencias de `@Query(nativeQuery = true)` en todo el
+backend. Se revisaron **una por una** (no solo las del módulo de
+préstamos/multas) para separar dos grupos: SQL que existe como nativa por
+comodidad (convertible a JPQL sin pérdida de semántica) vs. SQL con una
+razón técnica real para seguir siendo nativa. Resultado: **3 eran
+convertibles**, se migraron a JPQL; **33 quedan nativas**, cada una con una
+razón técnica concreta, no por conveniencia:
+
+| Categoría | Cantidad | Razón técnica |
+|---|---|---|
+| Funciones `RETURNS TABLE`/`SETOF` de reporte/listado (`LoanProcedureRepository`: 20, `FineProcedureRepository`: 2) | 22 | API de stored procedures de JPA 2.1 no expone resultados tabulares (ver sección anterior) |
+| `sp_pago_parcial_multa` (`FineProcedureRepository`) | 1 | Invoca una función almacenada con efectos secundarios y parámetros OUT — no es SQL plano, es la misma categoría que las 5 de V51; sin equivalente JPQL posible. Candidato válido para un futuro `CREATE PROCEDURE` adicional (mismo patrón de V51), fuera del alcance de esta revisión |
+| Búsquedas de `libros` por ISBN (`BookRepository`, 6 métodos) | 6 | Cast `isbn::text` — defensivo contra un incidente real documentado (`LOWER(bytea)` fallaba en una instancia con drift de tipo); una de ellas además usa `similarity()` de la extensión `pg_trgm`. Ambas son sintaxis específica de PostgreSQL sin equivalente JPQL portable |
+| `LoanRepository.findActivesByUserId` | 1 | Cast/aritmética de fechas `(fecha::date - NOW()::date)::INTEGER` para la columna calculada `dias_restantes` — sin equivalente JPQL portable |
+| `ReservationRepository` (dashboard "hoy"/"próximas") | 2 | Literal `CURRENT_DATE + INTERVAL '1 day'` — sintaxis de intervalo específica de PostgreSQL |
+| `AuditLogAuditRepository.searchWithFilters` | 1 | Convertirla a JPQL rompería el `Sort.by("fecha_hora")` que ya construye `AuditService` con el nombre físico de columna — la propiedad JPA real es `dateTime`, no `fecha_hora`; una query nativa pasa el `Sort` tal cual, una JPQL lo valida contra las propiedades de la entidad y fallaría en runtime |
+| **Total nativas con razón técnica documentada** | **33** | — |
+
+**Migradas a JPQL en esta revisión** (3, sin sintaxis específica de motor):
+
+- `AuditLogAuditRepository.summaryByCategory` — `COUNT(*) FILTER (WHERE ...)` de PostgreSQL reemplazado por `SUM(CASE WHEN ... THEN 1L ELSE 0L END)`, agregación condicional estándar con el mismo resultado.
+- `AuditLogAuditRepository.contarLoginFailRecientes` — `COUNT` simple.
+- `UserRepository.deleteNotVerifiedsBefore` — `DELETE` masivo.
+
+Ninguna de las 3 tenía un test que la invocara directamente (son rutas de
+scheduler/soporte); su sintaxis JPQL queda validada de todas formas porque
+Spring Data la parsea al construir el proxy del repositorio en el arranque
+del contexto — cualquier test que levante Spring Boot la cubre.
