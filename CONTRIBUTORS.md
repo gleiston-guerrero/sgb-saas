@@ -16,11 +16,11 @@ recalcula con `git -c log.mailmap=true shortlog -sne --no-merges HEAD`.
 
 | Persona | Alias Git considerados | Commits |
 |---|---|---|
-| Irvin Cajas Ibarra | `Theirvin1 <icajasi@msuteq.edu.ec>`, `TheIrvin <irvincajas72@gmail.com>`, `Irvin <icajasi@msuteq.edu.ec>`, `Irvin Cajas <icajasi@msuteq.edu.ec>` | **711** |
-| Marlon Loor Medranda | `Marlon Loor <mloorm14@uteq.edu.ec>`, `mloorm14 <mloorm14@uteq.edu.ec>`, `Loor Marlon <mloorm14@uteq.edu.ec>`, `Marlon Taylor Loor Medranda <mloorm14@uteq.edu.ec>` | **326** |
+| Irvin Cajas Ibarra | `Theirvin1 <icajasi@msuteq.edu.ec>`, `TheIrvin <irvincajas72@gmail.com>`, `Irvin <icajasi@msuteq.edu.ec>`, `Irvin Cajas <icajasi@msuteq.edu.ec>` | **715** |
+| Marlon Loor Medranda | `Marlon Loor <mloorm14@uteq.edu.ec>`, `mloorm14 <mloorm14@uteq.edu.ec>`, `Loor Marlon <mloorm14@uteq.edu.ec>`, `Marlon Taylor Loor Medranda <mloorm14@uteq.edu.ec>` | **329** |
 | Moises Panama Murillo | `MoisesPanama <mpanamam@uteq.edu.ec>`, `Moisés Panamá <mpanamam@uteq.edu.ec>`, `Moises Panama <mpanamam@uteq.edu.ec>` | **291** |
 
-711+326+291 = 1328, más 1 de `TeilorSuit` y 1 del bot = 1330. Para
+715+329+291 = 1335, más 1 de `TeilorSuit` y 1 del bot = 1337. Para
 re-sincronizar al cierre: `git rev-list --count --no-merges <rev>` y
 `git -c log.mailmap=true shortlog -sne --no-merges <rev>`.
 
@@ -120,14 +120,13 @@ Rol nominal en el equipo: Frontend.
   oscuro integrada en la navegación y banners (commit `366cc40`).
 - **Visualization** — 29 mockups HTML de referencia bajo
   `docs/mockups/` (dashboards, auditoría, configuración, credencial QR,
-  chatbot); generación de los gráficos de SUS (`sus_boxplot.svg/png`,
-  `sus_items_breakdown.svg`, paleta accesible a daltonismo), hash
-  histórico invalidado.
-- **Data curation** — creación del archivo SUS de validación
-  (`docs/mediciones/sus/sus.csv`) y su posterior retiro declarado como
-  evidencia empírica (N=0 en todo el
-  entregable, ver OBS-08 reabierta y `DATA-PROVENANCE.md` filas 16-18:
-  sin commit de datos reales), eliminación de
+  chatbot). Las figuras SUS generadas en una corrida previa se retiraron
+  del entregable por falta de trazabilidad empírica; no se cuentan como
+  evidencia vigente.
+- **Data curation** — creación y retiro declarado del dataset SUS previo
+  como evidencia empírica (N=0 en todo el entregable, ver OBS-08
+  reabierta y `DATA-PROVENANCE.md`: sin commit de datos reales),
+  eliminación de
   15 PDFs con PII del historial de Git por cumplimiento de protección de
   datos, actualización de `ETHICS.md`, `DATA-DICTIONARY.md` (sección SUS,
   22 campos) y `DATA-PROVENANCE.md` (hash histórico invalidado por la

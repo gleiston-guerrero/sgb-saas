@@ -135,7 +135,7 @@ autoría por integrante, siguiendo la taxonomía CRediT.
 \textbf{Rol CRediT} & \textbf{Cajas} & \textbf{Loor} & \textbf{Panamá} \\
 \midrule
 Conceptualization        & \checkmark & \checkmark & \checkmark \\
-Data curation             &            & \checkmark &            \\
+Data curation             & \checkmark & \checkmark & \checkmark \\
 Formal analysis           &            & \checkmark &            \\
 Funding acquisition       & \multicolumn{3}{c}{No aplica -- sin financiamiento externo declarado} \\
 Investigation              & \checkmark & \checkmark & \checkmark \\
@@ -144,8 +144,8 @@ Project administration     &            & \checkmark &            \\
 Resources                  & \checkmark & \checkmark & \checkmark \\
 Software                   & \checkmark & \checkmark & \checkmark \\
 Supervision                & \multicolumn{3}{c}{Ver nota debajo de la tabla} \\
-Validation                  & \checkmark & \checkmark &            \\
-Visualization               &            & \checkmark &            \\
+Validation                  & \checkmark & \checkmark & \checkmark \\
+Visualization               & \checkmark & \checkmark & \checkmark \\
 Writing -- original draft    &            & \checkmark &            \\
 Writing -- review \& editing  & \checkmark & \checkmark & \checkmark \\
 \bottomrule
@@ -159,26 +159,27 @@ este capítulo:
 
 \begin{itemize}[leftmargin=1.2cm]
   \item \textbf{Cajas}: autor del mayor volumen de commits del proyecto
-    (194 de $\sim$390 commits con identidad atribuible, contando las
-    variantes de firma \texttt{Theirvin1}/\texttt{TheIrvin}/\texttt{Irvin}),
+    (715 commits humanos sin merges según
+    \texttt{git -c log.mailmap=true shortlog -sne --no-merges HEAD}),
     concentrados en el backend Spring Boot -- servicios, controladores,
     la validación estricta de \texttt{@Procedure}/
     \texttt{@NamedStoredProcedureQuery} para los procedimientos
     principales (\autoref{cap:discusion}), y la mayoría
-    de los 524 tests automatizados del backend. Autor de los 8 módulos
+    de los tests automatizados del backend. Autor de los 8 módulos
     de dominio mergeados en esta entrega. Asignado también a la
     auditoría ZAP baseline pendiente (\autoref{sec:tf-zap}).
   \item \textbf{Loor}: autor de la mayoría de los commits de
     \texttt{docs/} (este informe, arquitectura C4, ADRs, bibliografía
     verificada contra Crossref), de los scripts de medición
     (\texttt{k6/}, \texttt{scripts/perf-analysis.py}) y del análisis
-    estadístico del \autoref{cap:resultados}. 150 commits (variantes
-    \texttt{Marlon Loor}/\texttt{mloorm14}/\texttt{Loor Marlon}).
+    estadístico del \autoref{cap:resultados}. 329 commits humanos sin
+    merges según la misma consulta con \texttt{.mailmap}.
   \item \textbf{Panamá}: autor de los componentes de frontend de
     Préstamos, Reservaciones y Multas (\texttt{frontend-angular/}) y de
-    varias historias de usuario en \texttt{docs/requisitos/}. 44
-    commits. Asignado a la ejecución de las pruebas SUS pendientes
-    (OBS-08, \autoref{sec:tf-sus}).
+    varias historias de usuario en \texttt{docs/requisitos/}. 291
+    commits humanos sin merges según la misma consulta con
+    \texttt{.mailmap}. Asignado a la ejecución de las pruebas SUS
+    pendientes (OBS-08, \autoref{sec:tf-sus}).
 \end{itemize}
 
 \textbf{Nota sobre "Supervision".} La guía CRediT reserva este rol

@@ -45,7 +45,7 @@ doi: 10.5281/zenodo.22636466
 # ---
 # Digest SHA256 de docs/informe-final.pdf (regenerado 2026-09-12, 104
 # páginas; mismo valor que README.md "Integridad del entregable"):
-# 11a8b1d324d4d8b41baea7f0746815ee78680e8e8167742fab3d9cec07eb4f24
+# 18b7c1de4d7b234457abc1117c874476b995eafec35fa9087e054a06ce637ea2
 # NOTA: si el PDF se recompila al cierre, re-sincronizar este digest,
 # el del README y el de docs/capitulos/00-portada.tex con el nuevo
 # `Get-FileHash docs/informe-final.pdf -Algorithm SHA256`.
