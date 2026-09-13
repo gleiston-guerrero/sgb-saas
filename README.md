@@ -324,5 +324,5 @@ Targets disponibles: `up` `down` `test` `bench` `audit` `docs` `all` `clean`.
 Digest SHA256 de `docs/informe-final.pdf` (regenerado 2026-09-12, 103 páginas):
 
 ```
-a549ca4233e0c462290ea09c23a7b96b807f4ea5cec5d1e2aa65ba3533db142e
+962ea29d4fbabef293ba19a7eefcd0c20225c988f906283cb505bfbebd886946
 ```

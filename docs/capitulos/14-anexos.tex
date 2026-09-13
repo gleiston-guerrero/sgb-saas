@@ -558,15 +558,18 @@ compilado, no se intenta convertirlo en una igualdad autorreferencial
 imposible; se usa como marca documental sincronizada entre los tres
 lugares exigidos por la rúbrica.
 
-\subsection*{Alcance excluido de este cierre}
+\subsection*{Alcance de corrección de este cierre}
 
-No se modificaron procedimientos almacenados ni cobertura de backend en
-este ajuste documental. La decisión fue deliberada: cambiar invocaciones
-de persistencia o agregar pruebas de cobertura a última hora podía
-alterar el comportamiento de producción y comprometer el requisito de que
-\texttt{make all} siga siendo reproducible. Las brechas que requieren
-cambios de aplicación se conservan documentadas para defensa oral y para
-trabajo posterior.
+Sí se ajustó el mecanismo de persistencia donde era estable hacerlo: se
+retiraron dos variantes \texttt{@Query(nativeQuery = true)} obsoletas de
+\texttt{ReservationProcedureRepository}, porque el código de producción y
+sus pruebas ya usaban el método \texttt{@Procedure} equivalente. No se
+reescribieron las funciones tabulares \texttt{RETURNS TABLE} a
+\texttt{REF\_CURSOR}, porque eso cambiaría el contrato SQL público de los
+reportes y empeoraría la inspección directa con \texttt{SELECT * FROM
+fn\_...(...)}. La cobertura de backend tampoco se modificó en este bloque:
+las brechas que requieren nuevos tests de aplicación se conservan como
+trabajo de implementación, no como afirmación documental.
 
 Tampoco se fabricó evidencia externa. El depósito de Zenodo y cualquier
 rotación de credenciales se reportan solo cuando existe una acción real

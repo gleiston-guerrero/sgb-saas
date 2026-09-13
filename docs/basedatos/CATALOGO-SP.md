@@ -30,7 +30,7 @@ El criterio vigente para la rúbrica es explícito:
 - Las funciones `RETURNS TABLE`/`SETOF` de reporte y listado se invocan con `@Query(nativeQuery = true)` porque JPA 2.1 no expone de forma estándar un resultado tabular de PostgreSQL mediante `@Procedure` salvo reescribiendo las funciones a `REF_CURSOR`. Esa reescritura haría peor la operabilidad del sistema, porque ya no podrían inspeccionarse directamente como `SELECT * FROM fn_...(...)`.
 - En ningún caso hay SQL dinámico: los archivos `db/procs/*.sql` no usan `EXECUTE`, `sp_executesql` ni concatenación de entrada de usuario, y el CI ejecuta `scripts/audit-sql-dynamic.sh` antes del build.
 
-**Estado actual (verificado en código):** `LoanProcedureRepository`, `FineProcedureRepository` y `ReservationProcedureRepository` mantienen las anotaciones exigidas para las rutinas principales; `Loan` y `Fine` declaran los `@NamedStoredProcedureQuery` de las rutinas multi-OUT; las funciones tabulares permanecen en `@Query(nativeQuery = true)` por la limitación técnica anterior. Este estado se valida con pruebas para que no vuelva a quedar solo como comentario documental.
+**Estado actual (verificado en código):** `LoanProcedureRepository`, `FineProcedureRepository` y `ReservationProcedureRepository` mantienen las anotaciones exigidas para las rutinas principales; `Loan` y `Fine` declaran los `@NamedStoredProcedureQuery` de las rutinas multi-OUT. El conteo estático actual es 13 apariciones de `@Procedure`/`@NamedStoredProcedureQuery` y 37 apariciones de `nativeQuery = true`. Las nativas restantes quedan acotadas a funciones tabulares `RETURNS TABLE`/`SETOF`, agregaciones/paginación de reportes y proyecciones de solo lectura que JPA no expone con `@Procedure` sin reescribir el contrato SQL a `REF_CURSOR`. Este estado se valida con pruebas para que no vuelva a quedar solo como comentario documental.
 
 ### Addendum — confirmación explícita (Postgres `RETURNS TABLE` vs JPA 2.1, y alcance de la migración)
 
@@ -53,6 +53,13 @@ Hoy las funciones con efectos secundarios conservan el contrato
 prohibición de SQL dinámico / concatenación de entrada de usuario de la
 regla A.2.3: en ningún caso hay `EXECUTE`, `sp_executesql`, ni construcción
 de la sentencia por concatenación de strings.
+
+La limpieza de cierre retiró además las variantes `@Query` nativas obsoletas
+de `ReservationProcedureRepository`: la expiración de reservaciones vencidas
+queda expuesta solo por `spExpireReservationsVencidasProcedure()` con
+`@Procedure(procedureName = "sp_expirar_reservaciones_vencidas")`, que es el
+camino usado por `ReservationScheduler` y cubierto por
+`ProcedureMappingContractTest`.
 
 ## Convención de SQLSTATE para mapeo a HTTP en el backend
 

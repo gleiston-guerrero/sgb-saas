@@ -121,7 +121,13 @@ limitación distinta: JPA~2.1 no expone de forma estándar un
 \texttt{RETURNS TABLE} de PostgreSQL mediante \texttt{@Procedure} salvo
 reescribiendo esas funciones a \texttt{REF\_CURSOR}. Esa excepción queda
 acotada a rutinas tabulares de lectura, no a las operaciones principales
-con efectos secundarios.
+con efectos secundarios. Tras la limpieza de cierre, el conteo estático
+del backend queda en 13 apariciones de \texttt{@Procedure}/
+\texttt{@NamedStoredProcedureQuery} y 37 apariciones de
+\texttt{nativeQuery = true}; las variantes nativas obsoletas de
+\texttt{ReservationProcedureRepository} fueron retiradas y la expiración
+de reservaciones usa solo el método \texttt{@Procedure} que invoca el
+\emph{scheduler}.
 
 \subsection*{¿Esto viola la prohibición de SQL dinámico de la guía (A.2.1)?}
 
