@@ -210,3 +210,170 @@ en `frontend-angular/`.
 4. Agregar el job `frontend` de `ci.yml` a la checklist de validación
    pre-merge del equipo (ver sección 5) para que este tipo de rotura no
    vuelva a llegar a `main` sin detectarse en un merge futuro.
+
+---
+
+## 8. Continuación — 13 de septiembre, segunda sesión
+
+Punto de partida verificado: `origin/main` en `3292ba57` (el HEAD final
+de la sesión anterior), confirmado con `git fetch` antes de tocar nada.
+
+### 8.1 Fase A — la cobertura canónica se había desincronizado (P3 reabierto)
+
+Diagnóstico correcto: `docs/mediciones/jacoco/report.csv` había quedado
+generado el 13-sep 11:01, **antes** de los commits de P4 (`cad89874`,
+`138d06e6`, `6febfa50`) y del fix de frontend (`dd025376`) de la sesión
+anterior. El informe seguía citando 88,06 %/76,90 % (1793/2036, 446/580)
+sobre 615 tests — una cifra que ya no correspondía al código evaluado.
+
+Se decidió **no** regenerar dos veces: primero se hizo la Fase B (los
+cambios de código que iban a volver a mover el número), y al final una
+sola regeneración reflejando el estado verdaderamente final. Cifra nueva,
+estable en dos corridas consecutivas: **87,41 % de líneas (1805/2065) y
+76,19 % de ramas (448/588)**, 620 tests, 0 fallos. Las capas `service`
+(87,38 %/77,70 %) y `controller` (97,03 %/75,51 %) no cambiaron: los
+cambios de esta sesión solo tocaron la capa `repository`.
+
+Propagado en un solo commit (`00b26306`) a: `report.csv`, `report.xml`
+(`html/` ya no se versiona desde el commit `7debd0b1`, hallazgo
+adicional: el README de jacoco todavía lo citaba como artefacto
+canónico — corregido), `docs/mediciones/jacoco/README.md`,
+`01-resumen.tex` (ambos abstracts, ES/EN), `05-materiales-metodos.tex`,
+`08-resultados.tex` (tabla, prosa y fila de resumen), `10-trabajo-futuro.tex`,
+`14-anexos.tex`, `DATA-PROVENANCE.md`, `README.md` raíz y `CITATION.cff`.
+`DATA-DICTIONARY.md` no citaba la cifra (describe el esquema de
+columnas del CSV, no números de una corrida) — sin cambios, verificado.
+Grep final de `88,06|76,90|1793/2036|446/580` en todo el repo: cero
+coincidencias fuera de `INFORME-SESION-13SEP.md` (registro histórico de
+la sesión anterior, no una cifra "vigente" — se deja intacto a propósito).
+
+Informe recompilado (`xelatex` + `bibtex` + `xelatex` + `xelatex`, según
+el Makefile): 102 páginas, cero referencias sin resolver. Digest SHA256
+resincronizado en `README.md`/`CITATION.cff`:
+`d3df8c980652aa59865f3e8f3998afa1d033687a78cc2ef567f8a9c077eccf94`.
+
+### 8.2 Fase B — bajar `nativeQuery=true` por la vía legítima (P4)
+
+Se revisaron **una por una** las 36 ocurrencias restantes tras V51 (no
+solo las que el pedido señalaba como "convertibles" a priori — dos de
+esas resultaron, tras inspección, no convertibles con seguridad):
+
+**Migradas a JPQL (3, sin sintaxis específica de motor):**
+`AuditLogAuditRepository.summaryByCategory` (`COUNT(*) FILTER (WHERE
+...)` de PostgreSQL → `SUM(CASE WHEN ... THEN 1L ELSE 0L END)`, agregación
+condicional estándar con el mismo resultado), `contarLoginFailRecientes`
+(`COUNT` simple) y `UserRepository.deleteNotVerifiedsBefore` (`DELETE`
+masivo). Ninguna tenía un test que la invocara directamente, pero Spring
+Data valida la sintaxis JPQL de todo `@Query` al construir el proxy del
+repositorio en el arranque del contexto — cualquier test que levante
+Spring Boot la cubre; `mvnw clean verify` (620 tests) confirmó que
+compilan y ejecutan correctamente contra PostgreSQL real.
+
+**Revisadas y dejadas nativas a propósito, con razón técnica documentada
+en el código de cada archivo** (33 restantes): las 22 funciones
+`RETURNS TABLE`/`SETOF` de reporte (sin cambio respecto a lo ya
+documentado), `sp_pago_parcial_multa` (invoca una función almacenada con
+efectos secundarios y 4 `OUT` — misma categoría que las 5 de V51, no es
+"SQL plano"; candidato válido para un futuro `CREATE PROCEDURE`
+adicional, fuera de alcance de esta sesión), las 6 búsquedas de
+`BookRepository` (cast `isbn::text` defensivo contra un incidente real ya
+documentado de `LOWER(bytea)`, más `similarity()` de `pg_trgm` en una de
+ellas), `LoanRepository.findActivesByUserId` (cast/aritmética de fechas
+`::date`), las 2 de `ReservationRepository` (literal `INTERVAL` de
+PostgreSQL) y `AuditLogAuditRepository.searchWithFilters` (convertirla
+rompería el `Sort.by("fecha_hora")` — nombre físico de columna — que ya
+usa `AuditService`; la propiedad JPA real es `dateTime`, no `fecha_hora`).
+
+**Balance final:** `nativeQuery=true` 36 → 33; `@Procedure` sin cambio
+(8, ninguna de las 3 migradas usaba esa anotación). Documentado con tabla
+completa en `docs/basedatos/CATALOGO-SP.md` (commit `1028ad02`).
+`mvnw clean verify` tras cada tramo de cambios (no al final de todo):
+620 tests, 0 fallos en ambas corridas.
+
+### 8.3 Fase C — ramas y stash
+
+- **`fix/correciones`**: confirmado 0 commits únicos frente a `main`
+  (100 % fusionada) — borrada del remoto.
+- **`demo/interfaces-completas`**: mismo caso (0 commits únicos) —
+  borrada del remoto. A diferencia de la sesión anterior, el permiso de
+  la sesión **sí** permitió el borrado esta vez.
+- **`fix/procedures`** (3 commits): inspeccionado el diff completo —
+  usa nombres de clase antiguos (`PrestamoProcedureRepository`,
+  `MultaProcedureRepository`, entidad `Multa`, previos al renombrado a
+  inglés) e intenta conectar `@Procedure` directamente contra las
+  funciones `sp_*` sin crear ningún `PROCEDURE` real — exactamente el
+  enfoque que V51 (sesión anterior) superó con `CREATE PROCEDURE`
+  genuinos. Sin valor no cubierto por `main`. **Borrada del remoto.**
+- **`develop`** (35 commits únicos): es el historial original del
+  proyecto, desde `Initial commit` hasta el esqueleto Spring
+  Boot/Angular, JWT+Redis, ADR-001 (Java 21) y diagramas C4 de la
+  Entrega 1A — anterior a una reescritura/squash de historia que hizo
+  que `main` no comparta ya ese linaje. Contenido claramente superado
+  por la arquitectura actual, pero no se borró: es la rama
+  convencionalmente más sensible (integración en git-flow) y la regla
+  pedida es conservadora por defecto. **No se tocó** — queda para
+  revisión humana explícita.
+- **`chore/organizar-raiz`** (18 commits únicos) y **`fix/merge-final-pfc`**
+  (20 commits únicos, 19 de ellos comparte con la anterior + 2 merges):
+  contienen trabajo real de higiene y documentación (P5 jacoco con 489
+  tests -- cifra vieja, muy anterior a la actual --, P6 re-aplicar
+  hashes en `OBSERVACIONES.md`, P9 cero etiquetas huérfanas en los
+  `.tex`, P11 conteos CRediT, P14 remover HTML de jacoco del árbol,
+  Javadoc E2, figuras en inglés E3, y **`OBS-31`**: la evidencia
+  empírica original de que `@Procedure` falla contra las funciones
+  PostgreSQL — el mismo diagnóstico que sirvió de base a V51). Se
+  verificó puntualmente que `OBS-31` **ya está** en
+  `docs/observaciones/OBSERVACIONES.md` de `main` (alguien la portó a
+  mano en algún momento, sin fusionar la rama), y que el hygiene P14 de
+  quitar el HTML de jacoco del árbol también ya ocurrió en `main` por
+  otra vía (`7debd0b1`). No se verificó exhaustivamente commit por
+  commit si el resto (P6, P9, P11, Javadoc E2, figuras E3) también está
+  ya cubierto por el trabajo independiente de `fix/correciones` o por
+  las ediciones directas de SRS en `main` — es plausible que sí, pero
+  confirmarlo a fondo tomaría revisar ~15 archivos de documentación uno
+  por uno. **No se tocaron ninguna de las dos ramas** — hay overlap
+  real con `main` pero no confirmado al 100 %; se deja para que el
+  equipo decida con una revisión de diff dedicada, no a ciegas.
+- **Stash `"scratch SRS.pdf scripts pre-fase0-13sep"`**: inspeccionado
+  con `git ls-tree` sobre el commit de untracked del stash — son ~55
+  scripts Python de un solo uso (`fix_*`, `add_*`, `extract_*`,
+  `validate_*`, con variantes numeradas como `fix_m3_v2`...`fix_m3_v8`,
+  claramente prueba-y-error) más 2 binarios (`block_f22.bin`,
+  `old_f22.bin`) usados para parchear `SRS.pdf` byte a byte durante el
+  trabajo M1-M4 ya reflejado en los commits de `main` anteriores a esta
+  tarea. Es scratch sin valor de código fuente versionable. **No se
+  aplicó ni se borró** — sigue en `git stash list` exactamente como
+  estaba, no es trabajo de esta sesión para decidir su destino.
+
+### 8.4 Verificación final
+
+- `mvnw clean verify` final (tras Fase A+B): 620 tests, 0 fallos,
+  `BUILD SUCCESS`.
+- `origin/main` en `00b26306`, verificado con `git ls-remote` en cada
+  push de la sesión (5 pushes: Fase B código, Fase B docs, Fase A).
+- Tag `v1.0.0` no se tocó, verificado en `3f91a7f7` al cierre.
+- GitHub Actions CI para `00b26306`: **verde** — run
+  `https://github.com/mloorm14/sgb-saas/actions/runs/34784090048`,
+  ambos jobs `build-and-test` y `frontend` en `success`. Confirmado vía
+  API, no solo por el mensaje de push.
+
+### 8.5 Nada se intentó y revirtió en esta sesión
+
+A diferencia de la sesión anterior (donde hubo que corregir un CI roto
+después del hecho), en esta continuación cada cambio se verificó contra
+`mvnw clean verify` real (con Testcontainers/PostgreSQL) antes de
+avanzar al siguiente paso, y no hubo que revertir ningún commit.
+
+### 8.6 Pendiente para el equipo (actualizado)
+
+1. Decidir si se borran `develop`, `chore/organizar-raiz` y
+   `fix/merge-final-pfc` — contienen trabajo con overlap probable pero
+   no 100 % confirmado con el estado actual de `main` (ver 8.3).
+2. El stash de scripts de parcheo de `SRS.pdf` sigue sin resolver
+   (`git stash list` / `git stash show`) — no es scratch de esta
+   sesión, es de la anterior; ninguna de las dos sesiones debía
+   decidir su destino sin que el equipo lo confirme.
+3. `sp_pago_parcial_multa` (`FineProcedureRepository`) queda como
+   candidato documentado para un futuro `CREATE PROCEDURE` adicional
+   (mismo patrón de V51), si se decide perseguir el punto P4 más allá
+   de lo ya cerrado.
