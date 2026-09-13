@@ -1,6 +1,6 @@
 package com.uteq.backend.integration;
 
-import com.uteq.backend.entity.MessageChat;
+import com.uteq.backend.entity.MensajeChat;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,29 +37,29 @@ class ChatbotServiceIntegrationTest {
     private GeminiClient geminiClient;
 
     @Test
-    void generateResponse_withPromptSimple_retornaTextModelo() {
-        String response = geminiClient.generateResponse(
+    void generarRespuesta_conPromptSimple_retornaTextoDelModelo() {
+        String respuesta = geminiClient.generarRespuesta(
                 "Responde con la palabra 'OK'.",
                 List.of(),
                 "Hola");
 
-        assertThat(response)
+        assertThat(respuesta)
                 .isNotBlank()
                 .isNotEqualTo("El asistente está saturado, intenta en unos segundos.")
                 .isNotEqualTo("No se pudo obtener respuesta del asistente, intenta de nuevo.");
     }
 
     @Test
-    void generateResponse_withHistory_retornaResponseConsistente() {
-        MessageChat previo = new MessageChat();
-        previo.setRole("USUARIO");
-        previo.setContent("¿Cuál es el horario de la biblioteca?");
+    void generarRespuesta_conHistorial_retornaRespuestaConsistente() {
+        MensajeChat previo = new MensajeChat();
+        previo.setRol("USUARIO");
+        previo.setContenido("¿Cuál es el horario de la biblioteca?");
 
-        String response = geminiClient.generateResponse(
+        String respuesta = geminiClient.generarRespuesta(
                 "Eres el asistente de una biblioteca. Responde con el contexto real provisto.",
                 List.of(previo),
                 "¿De lunes a viernes?");
 
-        assertThat(response).isNotBlank();
+        assertThat(respuesta).isNotBlank();
     }
 }

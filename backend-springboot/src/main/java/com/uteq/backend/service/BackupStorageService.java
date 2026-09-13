@@ -28,22 +28,8 @@ public class BackupStorageService {
     private static final int GCM_IV_LENGTH = 12;
     private static final int GCM_TAG_LENGTH = 128;
     public BackupStorageService(@org.springframework.beans.factory.annotation.Autowired(required = false) S3Client s3Client) { this.s3Client = s3Client; }
-    /**
-         * isR2Configured.
-     * @return resultado de la operacion
-     */
     public boolean isR2Configured() { return s3Client != null && bucket != null && !bucket.isBlank(); }
-    /**
-         * isEncryptionEnabled.
-     * @return resultado de la operacion
-     */
     public boolean isEncryptionEnabled() { return encryptionKey != null && !encryptionKey.isBlank(); }
-    /**
-     * Ejecuta upload aplicando las validaciones necesarias del proceso.
-     *
-     * @param key clave o valor de configuracion que se valida antes de guardarse
-     * @param data valor de entrada data usado por la operacion para completar su regla de negocio
-     */
     public void upload(String key, byte[] data) {
         byte[] toStore = isEncryptionEnabled() ? encrypt(data) : data;
         if (isR2Configured()) {
@@ -54,23 +40,12 @@ public class BackupStorageService {
             try { Files.createDirectories(base); Files.write(base.resolve(sanitize(key)), toStore); } catch (IOException e) { throw new RuntimeException("No se pudo guardar respaldo local", e); }
         }
     }
-    /**
-     * Genera o entrega download a partir de los datos actuales del sistema.
-     *
-     * @param key clave o valor de configuracion que se valida antes de guardarse
-     * @return contenido binario generado o recuperado por la operacion
-     */
     public byte[] download(String key) {
         byte[] stored;
         if (isR2Configured()) { stored = s3Client.getObjectAsBytes(GetObjectRequest.builder().bucket(bucket).key(key).build()).asByteArray(); }
         else { try { stored = Files.readAllBytes(resolveLocalBase().resolve(sanitize(key))); } catch (IOException e) { throw new RuntimeException("No se pudo leer respaldo local: " + key, e); } }
         return isEncryptionEnabled() ? decrypt(stored) : stored;
     }
-    /**
-     * Elimina o anula delete despues de validar que la operacion sea permitida.
-     *
-     * @param key clave o valor de configuracion que se valida antes de guardarse
-     */
     public void delete(String key) {
         if (isR2Configured()) s3Client.deleteObject(DeleteObjectRequest.builder().bucket(bucket).key(key).build());
         else { try { Files.deleteIfExists(resolveLocalBase().resolve(sanitize(key))); } catch (IOException e) { throw new RuntimeException("No se pudo eliminar respaldo local", e); } }

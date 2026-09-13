@@ -53,7 +53,7 @@ export class DashboardBibliotecarioHomeComponent implements OnInit {
   cargarHoy(): void {
     this.reservacionService.reservacionesDeHoy().subscribe({
       next: (reservas) => {
-        this.reservacionesHoy = reservas ?? [];
+        this.reservacionesHoy = reservas;
         this.cargandoReservacionesHoy = false;
       },
       error: () => {
@@ -66,7 +66,7 @@ export class DashboardBibliotecarioHomeComponent implements OnInit {
   cargarProximas(): void {
     this.reservacionService.reservacionesProximas().subscribe({
       next: (reservas) => {
-        this.reservacionesProximasLista = reservas ?? [];
+        this.reservacionesProximasLista = reservas;
         this.cargandoReservacionesProximas = false;
       },
       error: () => {

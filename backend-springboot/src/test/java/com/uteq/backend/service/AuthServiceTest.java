@@ -1,15 +1,15 @@
 package com.uteq.backend.service;
 
 import com.uteq.backend.dto.LoginRequestDTO;
-import com.uteq.backend.dto.RegistrationRequestDTO;
+import com.uteq.backend.dto.RegistroRequestDTO;
 import com.uteq.backend.dto.TokenResponseDTO;
-import com.uteq.backend.entity.StatusUser;
-import com.uteq.backend.entity.Role;
-import com.uteq.backend.entity.User;
-import com.uteq.backend.repository.AuditLogAuditRepository;
-import com.uteq.backend.repository.StatusUserRepository;
-import com.uteq.backend.repository.RoleRepository;
-import com.uteq.backend.repository.UserRepository;
+import com.uteq.backend.entity.EstadoUsuario;
+import com.uteq.backend.entity.Rol;
+import com.uteq.backend.entity.Usuario;
+import com.uteq.backend.repository.BitacoraAuditoriaRepository;
+import com.uteq.backend.repository.EstadoUsuarioRepository;
+import com.uteq.backend.repository.RolRepository;
+import com.uteq.backend.repository.UsuarioRepository;
 import com.uteq.backend.security.JwtService;
 import com.uteq.backend.security.LoginRateLimiter;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -50,7 +49,7 @@ class AuthServiceTest {
     private static final String IP_DE_PRUEBA = "10.0.0.1";
 
     @Mock
-    private UserRepository userRepository;
+    private UsuarioRepository usuarioRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -68,96 +67,93 @@ class AuthServiceTest {
     private ValueOperations<String, String> valueOperations;
 
     @Mock
-    private RoleRepository roleRepository;
+    private RolRepository rolRepository;
 
     @Mock
-    private StatusUserRepository statusUserRepository;
+    private EstadoUsuarioRepository estadoUsuarioRepository;
 
     @Mock
     private LoginRateLimiter loginRateLimiter;
 
     @Mock
-    private AuditLogAuditRepository auditLogAuditRepository;
+    private BitacoraAuditoriaRepository bitacoraAuditoriaRepository;
 
     @Mock
-    private VerificationEmailService verificationEmailService;
+    private VerificacionCorreoService verificacionCorreoService;
 
     @Mock
-    private ConfigurationSystemService configurationSystemService;
-
-    @Mock
-    private EmailService emailService;
+    private ConfiguracionSistemaService configuracionSistemaService;
 
     @InjectMocks
     private AuthService authService;
 
-    private User userTest() {
+    private Usuario usuarioDePrueba() {
         Instant ahora = Instant.now();
 
-        StatusUser active = new StatusUser();
-        active.setId(1);
-        active.setName("ACTIVO");
+        EstadoUsuario activo = new EstadoUsuario();
+        activo.setId(1);
+        activo.setNombre("ACTIVO");
 
-        Role reader = new Role();
-        reader.setId(1);
-        reader.setName("LECTOR");
+        Rol lector = new Rol();
+        lector.setId(1);
+        lector.setNombre("LECTOR");
 
-        return User.builder()
+        return Usuario.builder()
                 .id(1L)
-                .name("Lector de Prueba")
-                .lastName("Apellido de Prueba")
-                .email("lector@correo.com")
+                .nombre("Lector de Prueba")
+                .apellido("Apellido de Prueba")
+                .correo("lector@correo.com")
                 .passwordHash("hash-encriptado")
-                .status(active)
-                .emailVerified(true)
-                .roles(Set.of(reader))
-                .dateRegistration(ahora)
-                .updated(ahora)
+                .estado(activo)
+                .correoVerificado(true)
+                .roles(Set.of(lector))
+                .fechaRegistro(ahora)
+                .actualizadoEn(ahora)
                 .build();
     }
 
     @Test
-    void loginSuccessful() {
-        User user = userTest();
+    void loginExitoso() {
+        Usuario usuario = usuarioDePrueba();
         LoginRequestDTO dto = new LoginRequestDTO("lector@correo.com", "password123");
 
-        when(userRepository.findByEmail("lector@correo.com")).thenReturn(Optional.of(user));
-        when(jwtService.generateToken(user)).thenReturn("access-token-de-prueba");
-        when(jwtService.generateRefreshToken(user)).thenReturn("refresh-token-de-prueba");
+        when(usuarioRepository.findByCorreo("lector@correo.com")).thenReturn(Optional.of(usuario));
+        when(jwtService.generateToken(usuario)).thenReturn("access-token-de-prueba");
+        when(jwtService.generateRefreshToken(usuario)).thenReturn("refresh-token-de-prueba");
         when(jwtService.getExpirationMs()).thenReturn(3600000L);
 
-        TokenResponseDTO result = authService.login(dto, IP_DE_PRUEBA);
+        TokenResponseDTO resultado = authService.login(dto, IP_DE_PRUEBA);
 
-        assertNotNull(result);
-        assertNotNull(result.accessToken());
-        assertFalse(result.accessToken().isBlank());
-        assertNotNull(result.refreshToken());
-        assertFalse(result.refreshToken().isBlank());
-        assertEquals(3600L, result.expiresIn());
-        assertEquals("Bearer", result.tokenType());
+        assertNotNull(resultado);
+        assertNotNull(resultado.accessToken());
+        assertFalse(resultado.accessToken().isBlank());
+        assertNotNull(resultado.refreshToken());
+        assertFalse(resultado.refreshToken().isBlank());
+        assertEquals(3600L, resultado.expiresIn());
+        assertEquals("Bearer", resultado.tokenType());
     }
 
     // OWASP A07: un login exitoso debe resetear el contador de intentos
     // fallidos de esa combinación correo+IP -- si no, un usuario que se
     // equivocó una vez y luego acertó seguiría acumulando hacia el bloqueo.
     @Test
-    void loginSuccessfulReseteaContadorRateLimit() {
-        User user = userTest();
+    void loginExitosoReseteaContadorDeRateLimit() {
+        Usuario usuario = usuarioDePrueba();
         LoginRequestDTO dto = new LoginRequestDTO("lector@correo.com", "password123");
 
-        when(userRepository.findByEmail("lector@correo.com")).thenReturn(Optional.of(user));
-        when(jwtService.generateToken(user)).thenReturn("access-token-de-prueba");
-        when(jwtService.generateRefreshToken(user)).thenReturn("refresh-token-de-prueba");
+        when(usuarioRepository.findByCorreo("lector@correo.com")).thenReturn(Optional.of(usuario));
+        when(jwtService.generateToken(usuario)).thenReturn("access-token-de-prueba");
+        when(jwtService.generateRefreshToken(usuario)).thenReturn("refresh-token-de-prueba");
         when(jwtService.getExpirationMs()).thenReturn(3600000L);
 
         authService.login(dto, IP_DE_PRUEBA);
 
-        verify(loginRateLimiter).reset("lector@correo.com", IP_DE_PRUEBA);
-        verify(auditLogAuditRepository).save(any());
+        verify(loginRateLimiter).resetear("lector@correo.com", IP_DE_PRUEBA);
+        verify(bitacoraAuditoriaRepository).save(any());
     }
 
     @Test
-    void loginKeyIncorrecta() {
+    void loginClaveIncorrecta() {
         LoginRequestDTO dto = new LoginRequestDTO("lector@correo.com", "claveIncorrecta");
 
         doThrow(new BadCredentialsException("Credenciales inválidas"))
@@ -170,7 +166,7 @@ class AuthServiceTest {
     // combinación correo+IP -- sin esto, LoginRateLimiter.estaBloqueado()
     // nunca llegaría al máximo configurado.
     @Test
-    void loginFailedIncrementaContadorRateLimit() {
+    void loginFallidoIncrementaContadorDeRateLimit() {
         LoginRequestDTO dto = new LoginRequestDTO("lector@correo.com", "claveIncorrecta");
 
         doThrow(new BadCredentialsException("Credenciales inválidas"))
@@ -178,8 +174,8 @@ class AuthServiceTest {
 
         assertThrows(BadCredentialsException.class, () -> authService.login(dto, IP_DE_PRUEBA));
 
-        verify(loginRateLimiter).registerFailure("lector@correo.com", IP_DE_PRUEBA);
-        verify(auditLogAuditRepository).save(any());
+        verify(loginRateLimiter).registrarFallo("lector@correo.com", IP_DE_PRUEBA);
+        verify(bitacoraAuditoriaRepository).save(any());
     }
 
     // OWASP A07: el escenario del 6to intento -- LoginRateLimiter ya
@@ -190,63 +186,63 @@ class AuthServiceTest {
     // authenticationManager.authenticate() -- ni siquiera se intenta
     // autenticar contra credenciales potencialmente correctas.
     @Test
-    void loginBlockedByRateLimitNotIntentaAutenticar() {
+    void loginBloqueadoPorRateLimitNoIntentaAutenticar() {
         LoginRequestDTO dto = new LoginRequestDTO("lector@correo.com", "password123");
 
-        when(loginRateLimiter.isBlocked("lector@correo.com", IP_DE_PRUEBA)).thenReturn(true);
-        when(loginRateLimiter.remainingSeconds("lector@correo.com", IP_DE_PRUEBA)).thenReturn(600L);
+        when(loginRateLimiter.estaBloqueado("lector@correo.com", IP_DE_PRUEBA)).thenReturn(true);
+        when(loginRateLimiter.segundosRestantes("lector@correo.com", IP_DE_PRUEBA)).thenReturn(600L);
 
-        assertThrows(LoginRateLimitExceededException.class, () -> authService.login(dto, IP_DE_PRUEBA));
+        assertThrows(LoginRateLimitExcedidoException.class, () -> authService.login(dto, IP_DE_PRUEBA));
 
         verify(authenticationManager, never()).authenticate(any());
-        verify(loginRateLimiter, never()).registerFailure(any(), any());
+        verify(loginRateLimiter, never()).registrarFallo(any(), any());
     }
 
     @Test
-    void registrationEmailDuplicate() {
-        User userExisting = userTest();
-        RegistrationRequestDTO dto = new RegistrationRequestDTO(
+    void registroCorreoDuplicado() {
+        Usuario usuarioExistente = usuarioDePrueba();
+        RegistroRequestDTO dto = new RegistroRequestDTO(
                 "Nuevo Lector", "Apellido Nuevo", "lector@correo.com", "password123"
         );
 
-        when(userRepository.findByEmail("lector@correo.com")).thenReturn(Optional.of(userExisting));
+        when(usuarioRepository.findByCorreo("lector@correo.com")).thenReturn(Optional.of(usuarioExistente));
 
-        assertThrows(EmailAlreadyRegisteredException.class, () -> authService.register(dto));
+        assertThrows(CorreoYaRegistradoException.class, () -> authService.registrar(dto));
 
-        verify(userRepository, never()).save(any());
+        verify(usuarioRepository, never()).save(any());
     }
 
     // Módulo 9.5: ya no ACTIVO directo -- ver AuthService.ESTADO_INICIAL.
     @Test
-    void registrationSuccessful_dejaUserPendingVerificationYEnviaCode() {
-        RegistrationRequestDTO dto = new RegistrationRequestDTO(
+    void registroExitoso_dejaAlUsuarioPendienteDeVerificacionYEnviaElCodigo() {
+        RegistroRequestDTO dto = new RegistroRequestDTO(
                 "Nuevo", "Lector", "nuevo@correo.com", "password123");
 
-        StatusUser pendingVerification = new StatusUser();
-        pendingVerification.setId(4);
-        pendingVerification.setName("PENDIENTE_VERIFICACION");
+        EstadoUsuario pendienteVerificacion = new EstadoUsuario();
+        pendienteVerificacion.setId(4);
+        pendienteVerificacion.setNombre("PENDIENTE_VERIFICACION");
 
-        Role reader = new Role();
-        reader.setId(1);
-        reader.setName("LECTOR");
+        Rol lector = new Rol();
+        lector.setId(1);
+        lector.setNombre("LECTOR");
 
-        when(userRepository.findByEmail("nuevo@correo.com")).thenReturn(Optional.empty());
-        when(roleRepository.findByName("LECTOR")).thenReturn(Optional.of(reader));
-        when(statusUserRepository.findByName("PENDIENTE_VERIFICACION")).thenReturn(Optional.of(pendingVerification));
+        when(usuarioRepository.findByCorreo("nuevo@correo.com")).thenReturn(Optional.empty());
+        when(rolRepository.findByNombre("LECTOR")).thenReturn(Optional.of(lector));
+        when(estadoUsuarioRepository.findByNombre("PENDIENTE_VERIFICACION")).thenReturn(Optional.of(pendienteVerificacion));
         when(passwordEncoder.encode("password123")).thenReturn("hash-encriptado");
-        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
-            User u = inv.getArgument(0);
+        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(inv -> {
+            Usuario u = inv.getArgument(0);
             u.setId(99L);
             return u;
         });
 
-        authService.register(dto);
+        authService.registrar(dto);
 
-        var capturado = org.mockito.ArgumentCaptor.forClass(User.class);
-        verify(userRepository).save(capturado.capture());
-        assertEquals("PENDIENTE_VERIFICACION", capturado.getValue().getStatus().getName());
-        assertFalse(capturado.getValue().isEmailVerified());
-        verify(verificationEmailService).generateAndSendCode(any(User.class));
+        var capturado = org.mockito.ArgumentCaptor.forClass(Usuario.class);
+        verify(usuarioRepository).save(capturado.capture());
+        assertEquals("PENDIENTE_VERIFICACION", capturado.getValue().getEstado().getNombre());
+        assertFalse(capturado.getValue().isCorreoVerificado());
+        verify(verificacionCorreoService).generarYEnviarCodigo(any(Usuario.class));
     }
 
     // REQ-NF-013 / OWASP A03: replica como test de regresión permanente el
@@ -258,143 +254,74 @@ class AuthServiceTest {
     // concatenación de SQL en vez de un PreparedStatement parametrizado,
     // este flujo lanzaría una excepción en vez de completar el registro.
     @Test
-    void registrationWithPayloadInyeccionSql_seGuardaComoTextLiteralWithoutLanzarException() {
-        RegistrationRequestDTO dto = new RegistrationRequestDTO(
+    void registroConPayloadDeInyeccionSql_seGuardaComoTextoLiteralSinLanzarExcepcion() {
+        RegistroRequestDTO dto = new RegistroRequestDTO(
                 "' OR '1'='1", "'; DROP TABLE usuarios; --", "owasp@correo.com", "password123");
 
-        StatusUser pendingVerification = new StatusUser();
-        pendingVerification.setId(4);
-        pendingVerification.setName("PENDIENTE_VERIFICACION");
+        EstadoUsuario pendienteVerificacion = new EstadoUsuario();
+        pendienteVerificacion.setId(4);
+        pendienteVerificacion.setNombre("PENDIENTE_VERIFICACION");
 
-        Role reader = new Role();
-        reader.setId(1);
-        reader.setName("LECTOR");
+        Rol lector = new Rol();
+        lector.setId(1);
+        lector.setNombre("LECTOR");
 
-        when(userRepository.findByEmail("owasp@correo.com")).thenReturn(Optional.empty());
-        when(roleRepository.findByName("LECTOR")).thenReturn(Optional.of(reader));
-        when(statusUserRepository.findByName("PENDIENTE_VERIFICACION")).thenReturn(Optional.of(pendingVerification));
+        when(usuarioRepository.findByCorreo("owasp@correo.com")).thenReturn(Optional.empty());
+        when(rolRepository.findByNombre("LECTOR")).thenReturn(Optional.of(lector));
+        when(estadoUsuarioRepository.findByNombre("PENDIENTE_VERIFICACION")).thenReturn(Optional.of(pendienteVerificacion));
         when(passwordEncoder.encode("password123")).thenReturn("hash-encriptado");
-        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
-            User u = inv.getArgument(0);
+        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(inv -> {
+            Usuario u = inv.getArgument(0);
             u.setId(100L);
             return u;
         });
 
-        authService.register(dto);
+        authService.registrar(dto);
 
-        var capturado = org.mockito.ArgumentCaptor.forClass(User.class);
-        verify(userRepository).save(capturado.capture());
-        assertEquals("' OR '1'='1", capturado.getValue().getName());
-        assertEquals("'; DROP TABLE usuarios; --", capturado.getValue().getLastName());
+        var capturado = org.mockito.ArgumentCaptor.forClass(Usuario.class);
+        verify(usuarioRepository).save(capturado.capture());
+        assertEquals("' OR '1'='1", capturado.getValue().getNombre());
+        assertEquals("'; DROP TABLE usuarios; --", capturado.getValue().getApellido());
     }
 
     @Test
-    void registrationWithDomainAllowed_continueRegistration() {
-        RegistrationRequestDTO dto = new RegistrationRequestDTO(
-                "Nuevo", "Lector", "nuevo@correo.com", "password123");
-        StatusUser pendingVerification = new StatusUser();
-        pendingVerification.setId(4);
-        pendingVerification.setName("PENDIENTE_VERIFICACION");
-        Role reader = new Role();
-        reader.setId(1);
-        reader.setName("LECTOR");
+    void verificarCorreo_codigoValido_activaAlUsuarioYMarcaCorreoVerificado() {
+        Usuario usuarioPendiente = usuarioDePrueba();
+        usuarioPendiente.setCorreoVerificado(false);
 
-        when(configurationSystemService.getValue("correo_dominios_permitidos"))
-                .thenReturn("uteq.edu.ec, correo.com");
-        when(userRepository.findByEmail("nuevo@correo.com")).thenReturn(Optional.empty());
-        when(roleRepository.findByName("LECTOR")).thenReturn(Optional.of(reader));
-        when(statusUserRepository.findByName("PENDIENTE_VERIFICACION")).thenReturn(Optional.of(pendingVerification));
-        when(passwordEncoder.encode("password123")).thenReturn("hash-encriptado");
-        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
-            User u = inv.getArgument(0);
-            u.setId(101L);
-            return u;
-        });
+        EstadoUsuario activo = new EstadoUsuario();
+        activo.setId(1);
+        activo.setNombre("ACTIVO");
 
-        authService.register(dto);
+        when(usuarioRepository.findByCorreo("lector@correo.com")).thenReturn(Optional.of(usuarioPendiente));
+        when(estadoUsuarioRepository.findByNombre("ACTIVO")).thenReturn(Optional.of(activo));
+        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        verify(userRepository).save(any(User.class));
-    }
+        authService.verificarCorreo("lector@correo.com", "123456", IP_DE_PRUEBA);
 
-    @Test
-    void registrationWithDomainNotAllowed_lanzaDomainException() {
-        RegistrationRequestDTO dto = new RegistrationRequestDTO(
-                "Nuevo", "Lector", "nuevo@example.com", "password123");
-        when(userRepository.findByEmail("nuevo@example.com")).thenReturn(Optional.empty());
-        when(configurationSystemService.getValue("correo_dominios_permitidos"))
-                .thenReturn("uteq.edu.ec, correo.com");
-
-        assertThrows(EmailDomainNotAllowedException.class, () -> authService.register(dto));
-
-        verify(userRepository, never()).save(any());
-    }
-
-    @Test
-    void registrationWithoutConfigDomain_noRestrictsRegistration() {
-        RegistrationRequestDTO dto = new RegistrationRequestDTO(
-                "Nuevo", "Lector", "nuevo@example.com", "password123");
-        StatusUser pendingVerification = new StatusUser();
-        pendingVerification.setId(4);
-        pendingVerification.setName("PENDIENTE_VERIFICACION");
-        Role reader = new Role();
-        reader.setId(1);
-        reader.setName("LECTOR");
-
-        when(userRepository.findByEmail("nuevo@example.com")).thenReturn(Optional.empty());
-        when(configurationSystemService.getValue("correo_dominios_permitidos"))
-                .thenThrow(new jakarta.persistence.EntityNotFoundException("sin clave"));
-        when(roleRepository.findByName("LECTOR")).thenReturn(Optional.of(reader));
-        when(statusUserRepository.findByName("PENDIENTE_VERIFICACION")).thenReturn(Optional.of(pendingVerification));
-        when(passwordEncoder.encode("password123")).thenReturn("hash-encriptado");
-        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
-            User u = inv.getArgument(0);
-            u.setId(102L);
-            return u;
-        });
-
-        authService.register(dto);
-
-        verify(userRepository).save(any(User.class));
-    }
-
-    @Test
-    void verifyEmail_codeValid_activeUserYMarkEmailVerified() {
-        User userPending = userTest();
-        userPending.setEmailVerified(false);
-
-        StatusUser active = new StatusUser();
-        active.setId(1);
-        active.setName("ACTIVO");
-
-        when(userRepository.findByEmail("lector@correo.com")).thenReturn(Optional.of(userPending));
-        when(statusUserRepository.findByName("ACTIVO")).thenReturn(Optional.of(active));
-        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
-
-        authService.verifyEmail("lector@correo.com", "123456", IP_DE_PRUEBA);
-
-        verify(verificationEmailService).validate("lector@correo.com", "123456");
-        var capturado = org.mockito.ArgumentCaptor.forClass(User.class);
-        verify(userRepository).save(capturado.capture());
-        assertTrue(capturado.getValue().isEmailVerified());
-        verify(auditLogAuditRepository).save(any());
+        verify(verificacionCorreoService).validar("lector@correo.com", "123456");
+        var capturado = org.mockito.ArgumentCaptor.forClass(Usuario.class);
+        verify(usuarioRepository).save(capturado.capture());
+        assertTrue(capturado.getValue().isCorreoVerificado());
+        verify(bitacoraAuditoriaRepository).save(any());
     }
 
     // El código inválido/expirado lo detecta VerificacionCorreoService --
     // AuthService no debe intentar activar al usuario si esa validación
     // lanza.
     @Test
-    void verifyEmail_codeInvalid_notActiveUser() {
-        doThrow(new CodeVerificationInvalidException("El código ingresado es incorrecto."))
-                .when(verificationEmailService).validate("lector@correo.com", "000000");
+    void verificarCorreo_codigoInvalido_noActivaAlUsuario() {
+        doThrow(new CodigoVerificacionInvalidoException("El código ingresado es incorrecto."))
+                .when(verificacionCorreoService).validar("lector@correo.com", "000000");
 
-        assertThrows(CodeVerificationInvalidException.class,
-                () -> authService.verifyEmail("lector@correo.com", "000000", IP_DE_PRUEBA));
+        assertThrows(CodigoVerificacionInvalidoException.class,
+                () -> authService.verificarCorreo("lector@correo.com", "000000", IP_DE_PRUEBA));
 
-        verify(userRepository, never()).save(any());
+        verify(usuarioRepository, never()).save(any());
     }
 
     @Test
-    void logoutGuardaTokenBlacklist() {
+    void logoutGuardaTokenEnBlacklist() {
         String token = "token-de-prueba";
         String jti = "550e8400-e29b-41d4-a716-446655440000";
         Date expiracionFutura = new Date(System.currentTimeMillis() + 3600000);
@@ -406,131 +333,23 @@ class AuthServiceTest {
         authService.logout(token, IP_DE_PRUEBA);
 
         verify(valueOperations).set(eq("blacklist:" + jti), eq("revoked"), anyLong(), eq(TimeUnit.SECONDS));
-        verify(auditLogAuditRepository).save(any());
+        verify(bitacoraAuditoriaRepository).save(any());
     }
 
     @Test
-    void logoutTokenExpired_noGuardaBlacklist() {
-        String token = "token-expirado";
-        when(jwtService.extractJti(token)).thenReturn("jti-expirado");
-        when(jwtService.extractExpiration(token)).thenReturn(new Date(System.currentTimeMillis() - 1000));
-        when(jwtService.extractEmail(token)).thenReturn("lector@correo.com");
+    void refreshConTokenValido() {
+        String refreshTokenDePrueba = "refresh-token-de-prueba";
+        Usuario usuario = usuarioDePrueba();
 
-        authService.logout(token, IP_DE_PRUEBA);
+        when(jwtService.validateToken(refreshTokenDePrueba)).thenReturn(true);
+        when(jwtService.extractCorreo(refreshTokenDePrueba)).thenReturn(usuario.getCorreo());
+        when(usuarioRepository.findByCorreo(usuario.getCorreo())).thenReturn(Optional.of(usuario));
+        when(jwtService.generateToken(usuario)).thenReturn("nuevo-access-token");
 
-        verify(redisTemplate, never()).opsForValue();
-        verify(auditLogAuditRepository).save(any());
-    }
+        TokenResponseDTO resultado = authService.refresh(refreshTokenDePrueba);
 
-    @Test
-    void logoutRedisCaido_noRompeLogout() {
-        String token = "token-de-prueba";
-        String jti = "550e8400-e29b-41d4-a716-446655440000";
-        Date expiracionFutura = new Date(System.currentTimeMillis() + 3600000);
-
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-        when(jwtService.extractJti(token)).thenReturn(jti);
-        when(jwtService.extractExpiration(token)).thenReturn(expiracionFutura);
-        when(jwtService.extractEmail(token)).thenReturn("lector@correo.com");
-        doThrow(new DataAccessResourceFailureException("redis caido"))
-                .when(valueOperations).set(eq("blacklist:" + jti), eq("revoked"), anyLong(), eq(TimeUnit.SECONDS));
-
-        authService.logout(token, IP_DE_PRUEBA);
-
-        verify(auditLogAuditRepository).save(any());
-    }
-
-    @Test
-    void resendCode_emailAlreadyVerified_lanzaIllegalArgument() {
-        User user = userTest();
-        when(userRepository.findByEmail("lector@correo.com")).thenReturn(Optional.of(user));
-
-        assertThrows(IllegalArgumentException.class,
-                () -> authService.resendCode("lector@correo.com"));
-
-        verify(verificationEmailService, never()).generateAndSendCode(any());
-    }
-
-    @Test
-    void resendCode_pendingAccount_regeneraCodigo() {
-        User user = userTest();
-        user.setEmailVerified(false);
-        StatusUser pendingVerification = new StatusUser();
-        pendingVerification.setName("PENDIENTE_VERIFICACION");
-        user.setStatus(pendingVerification);
-        when(userRepository.findByEmail("lector@correo.com")).thenReturn(Optional.of(user));
-
-        authService.resendCode("lector@correo.com");
-
-        verify(verificationEmailService).generateAndSendCode(user);
-    }
-
-    @Test
-    void requestReset_redisCaido_lanzaServiceUnavailable() {
-        User user = userTest();
-        when(userRepository.findByEmail("lector@correo.com")).thenReturn(Optional.of(user));
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-        doThrow(new DataAccessResourceFailureException("redis caido"))
-                .when(valueOperations).set(eq("reset-codigo:lector@correo.com"), any(), any(java.time.Duration.class));
-
-        assertThrows(ServiceTemporarilyNotAvailableException.class,
-                () -> authService.requestReset("lector@correo.com"));
-    }
-
-    @Test
-    void requestReset_emailServiceFails_keepsResetCode() {
-        User user = userTest();
-        when(userRepository.findByEmail("lector@correo.com")).thenReturn(Optional.of(user));
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-        when(emailService.sendEmail(eq("lector@correo.com"), any(), any())).thenReturn(false);
-
-        authService.requestReset("lector@correo.com");
-
-        verify(valueOperations).set(eq("reset-codigo:lector@correo.com"), any(), any(java.time.Duration.class));
-        verify(emailService).sendEmail(eq("lector@correo.com"), any(), any());
-    }
-
-    @Test
-    void resetPassword_codeInvalid_lanzaCodeVerificationInvalid() {
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-        when(valueOperations.get("reset-codigo:lector@correo.com")).thenReturn("123456");
-
-        assertThrows(CodeVerificationInvalidException.class,
-                () -> authService.resetPassword("lector@correo.com", "000000", "nuevaClave"));
-
-        verify(userRepository, never()).save(any());
-    }
-
-    @Test
-    void resetPassword_deleteRedisFails_passwordAlreadyUpdated() {
-        User user = userTest();
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-        when(valueOperations.get("reset-codigo:lector@correo.com")).thenReturn("123456");
-        when(userRepository.findByEmail("lector@correo.com")).thenReturn(Optional.of(user));
-        when(passwordEncoder.encode("nuevaClave")).thenReturn("hash-nuevo");
-        doThrow(new DataAccessResourceFailureException("redis caido"))
-                .when(redisTemplate).delete("reset-codigo:lector@correo.com");
-
-        authService.resetPassword("lector@correo.com", "123456", "nuevaClave");
-
-        verify(userRepository).save(user);
-        assertEquals("hash-nuevo", user.getPasswordHash());
-    }
-
-    @Test
-    void refreshWithTokenValid() {
-        String refreshTokenTest = "refresh-token-de-prueba";
-        User user = userTest();
-
-        when(jwtService.validateToken(refreshTokenTest)).thenReturn(true);
-        when(jwtService.extractEmail(refreshTokenTest)).thenReturn(user.getEmail());
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        when(jwtService.generateToken(user)).thenReturn("nuevo-access-token");
-
-        TokenResponseDTO result = authService.refresh(refreshTokenTest);
-
-        assertEquals("nuevo-access-token", result.accessToken());
-        assertSame(refreshTokenTest, result.refreshToken());
+        assertEquals("nuevo-access-token", resultado.accessToken());
+        assertSame(refreshTokenDePrueba, resultado.refreshToken());
     }
 
     // Antes de este fix, un refreshToken invalido/expirado lanzaba una
@@ -538,27 +357,27 @@ class AuthServiceTest {
     // forma especifica -- caia en el handler generico y respondia 500 en
     // vez de 401. Ver GlobalExceptionHandler.handleRefreshTokenInvalido.
     @Test
-    void refreshWithTokenInvalid_lanzaRefreshTokenInvalidException() {
-        String refreshTokenTest = "refresh-token-invalido";
+    void refreshConTokenInvalido_lanzaRefreshTokenInvalidoException() {
+        String refreshTokenDePrueba = "refresh-token-invalido";
 
-        when(jwtService.validateToken(refreshTokenTest)).thenReturn(false);
+        when(jwtService.validateToken(refreshTokenDePrueba)).thenReturn(false);
 
-        assertThrows(RefreshTokenInvalidException.class, () -> authService.refresh(refreshTokenTest));
+        assertThrows(RefreshTokenInvalidoException.class, () -> authService.refresh(refreshTokenDePrueba));
 
-        verify(userRepository, never()).findByEmail(any());
+        verify(usuarioRepository, never()).findByCorreo(any());
     }
 
     // Caso borde: el token es valido (firma/expiracion correctas) pero el
     // correo que codifica ya no resuelve a un usuario existente (ej. cuenta
     // eliminada). Mismo tratamiento que un token invalido -- 401, no 500.
     @Test
-    void refreshWithUserNotFound_lanzaRefreshTokenInvalidException() {
-        String refreshTokenTest = "refresh-token-de-usuario-eliminado";
+    void refreshConUsuarioNoEncontrado_lanzaRefreshTokenInvalidoException() {
+        String refreshTokenDePrueba = "refresh-token-de-usuario-eliminado";
 
-        when(jwtService.validateToken(refreshTokenTest)).thenReturn(true);
-        when(jwtService.extractEmail(refreshTokenTest)).thenReturn("fantasma@correo.com");
-        when(userRepository.findByEmail("fantasma@correo.com")).thenReturn(Optional.empty());
+        when(jwtService.validateToken(refreshTokenDePrueba)).thenReturn(true);
+        when(jwtService.extractCorreo(refreshTokenDePrueba)).thenReturn("fantasma@correo.com");
+        when(usuarioRepository.findByCorreo("fantasma@correo.com")).thenReturn(Optional.empty());
 
-        assertThrows(RefreshTokenInvalidException.class, () -> authService.refresh(refreshTokenTest));
+        assertThrows(RefreshTokenInvalidoException.class, () -> authService.refresh(refreshTokenDePrueba));
     }
 }

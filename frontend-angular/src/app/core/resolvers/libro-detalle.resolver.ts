@@ -1,6 +1,6 @@
 import { ResolveFn } from '@angular/router';
 import { inject } from '@angular/core';
-import { timeout, catchError, of } from 'rxjs';
+import { EMPTY, timeout, catchError, of } from 'rxjs';
 import { LibroService } from '../services/libro.service';
 import { ToastService } from '../../shared/toast/toast.service';
 
@@ -13,8 +13,7 @@ export const libroDetalleResolver: ResolveFn<any> = (route) => {
     timeout(90000),
     catchError(() => {
       toast.warning('Carga demorada', 'Se demoro mucho al cargar los datos, intentalo de nuevo');
-      // Nunca EMPTY: ver catalogo.resolver (navegación cancelada = shell colgado).
-      return of(null);
+      return EMPTY;
     })
   );
 };

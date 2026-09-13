@@ -30,41 +30,34 @@ public class ChatbotRateLimiter {
     @Value("${app.gemini.rate-limit-window-seconds}")
     private long rateLimitWindowSeconds;
 
-    /**
-     * Procesa esta blocked y devuelve el resultado calculado por el backend.
-     *
-     * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return true cuando la comprobacion se cumple; false en caso contrario
-     */
-
-    public boolean isBlocked(Long userId) {
+    public boolean estaBloqueado(Long usuarioId) {
         try {
-            String value = redisTemplate.opsForValue().get(key(userId));
-            return value != null && Long.parseLong(value) >= maxMensajes;
+            String valor = redisTemplate.opsForValue().get(key(usuarioId));
+            return valor != null && Long.parseLong(valor) >= maxMensajes;
         } catch (DataAccessException e) {
-            log.warn("Redis no disponible en estaBloqueado (fail-open, sin bloqueo): usuarioId={}", userId, e);
+            log.warn("Redis no disponible en estaBloqueado (fail-open, sin bloqueo): usuarioId={}", usuarioId, e);
             return false;
         }
     }
 
     /**
-     * Registra register message validando los datos de entrada antes de persistir cambios.
-     *
-     * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
+     * Incrementa el contador. El TTL de la ventana se fija solo en el
+     * primer mensaje (cuando el contador pasa de 0 a 1), misma lógica de
+     * ventana fija que LoginRateLimiter.registrarFallo.
      */
-    public void registerMessage(Long userId) {
+    public void registrarMensaje(Long usuarioId) {
         try {
-            String key = key(userId);
-            Long freshValue = redisTemplate.opsForValue().increment(key);
-            if (freshValue != null && freshValue == 1L) {
-                redisTemplate.expire(key, Duration.ofSeconds(rateLimitWindowSeconds));
+            String llave = key(usuarioId);
+            Long nuevoValor = redisTemplate.opsForValue().increment(llave);
+            if (nuevoValor != null && nuevoValor == 1L) {
+                redisTemplate.expire(llave, Duration.ofSeconds(rateLimitWindowSeconds));
             }
         } catch (DataAccessException e) {
-            log.warn("Redis no disponible en registrarMensaje (contador no incrementado): usuarioId={}", userId, e);
+            log.warn("Redis no disponible en registrarMensaje (contador no incrementado): usuarioId={}", usuarioId, e);
         }
     }
 
-    private String key(Long userId) {
-        return KEY_PREFIX + userId;
+    private String key(Long usuarioId) {
+        return KEY_PREFIX + usuarioId;
     }
 }

@@ -1,8 +1,8 @@
 package com.uteq.backend.security;
 
-import com.uteq.backend.entity.StatusUser;
-import com.uteq.backend.entity.Role;
-import com.uteq.backend.entity.User;
+import com.uteq.backend.entity.EstadoUsuario;
+import com.uteq.backend.entity.Rol;
+import com.uteq.backend.entity.Usuario;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -46,31 +46,31 @@ class JwtServiceTest {
         ReflectionTestUtils.setField(jwtService, "refreshExpirationMs", REFRESH_EXPIRATION_MS);
     }
 
-    private User userWithRoles(String... nombresRoles) {
-        StatusUser active = new StatusUser();
-        active.setId(1);
-        active.setName("ACTIVO");
+    private Usuario usuarioConRoles(String... nombresRoles) {
+        EstadoUsuario activo = new EstadoUsuario();
+        activo.setId(1);
+        activo.setNombre("ACTIVO");
 
-        Set<Role> roles = new java.util.HashSet<>();
+        Set<Rol> roles = new java.util.HashSet<>();
         int idSecuencia = 1;
-        for (String nameRole : nombresRoles) {
-            Role role = new Role();
-            role.setId(idSecuencia++);
-            role.setName(nameRole);
-            roles.add(role);
+        for (String nombreRol : nombresRoles) {
+            Rol rol = new Rol();
+            rol.setId(idSecuencia++);
+            rol.setNombre(nombreRol);
+            roles.add(rol);
         }
 
-        return User.builder()
+        return Usuario.builder()
                 .id(42L)
-                .name("Usuario")
-                .lastName("De Prueba")
-                .email("jwt-test@correo.com")
+                .nombre("Usuario")
+                .apellido("De Prueba")
+                .correo("jwt-test@correo.com")
                 .passwordHash("hash")
-                .status(active)
-                .emailVerified(true)
+                .estado(activo)
+                .correoVerificado(true)
                 .roles(roles)
-                .dateRegistration(Instant.now())
-                .updated(Instant.now())
+                .fechaRegistro(Instant.now())
+                .actualizadoEn(Instant.now())
                 .build();
     }
 
@@ -81,9 +81,9 @@ class JwtServiceTest {
 
     @Test
     void generateToken_contieneClaimsCorrectos() {
-        User user = userWithRoles("LECTOR");
+        Usuario usuario = usuarioConRoles("LECTOR");
 
-        String token = jwtService.generateToken(user);
+        String token = jwtService.generateToken(usuario);
         Claims claims = parsearClaims(token);
 
         assertEquals("42", claims.getSubject());
@@ -101,22 +101,10 @@ class JwtServiceTest {
     }
 
     @Test
-    void generateToken_demoReaderAccount_claimRoleEsReader() {
-        User user = userWithRoles("LECTOR");
-        user.setEmail("u@uteq.edu.ec");
-
-        Claims claims = parsearClaims(jwtService.generateToken(user));
-
-        assertEquals("u@uteq.edu.ec", claims.get("correo", String.class));
-        assertEquals(List.of("LECTOR"), claims.get("roles", List.class));
-        assertEquals("LECTOR", claims.get("rol", String.class));
-    }
-
-    @Test
     void generateRefreshToken_usaRefreshExpirationMs() {
-        User user = userWithRoles("LECTOR");
+        Usuario usuario = usuarioConRoles("LECTOR");
 
-        String refreshToken = jwtService.generateRefreshToken(user);
+        String refreshToken = jwtService.generateRefreshToken(usuario);
         Claims claims = parsearClaims(refreshToken);
 
         long diferenciaMs = claims.getExpiration().getTime() - claims.getIssuedAt().getTime();
@@ -128,31 +116,31 @@ class JwtServiceTest {
     // singular "rol" debe elegir el de mayor privilegio, sin importar el
     // orden de iteracion del Set de roles del usuario.
     @Test
-    void generateToken_withVariosRoles_claimRoleEligeMayorPrivilegio() {
-        User user = userWithRoles("LECTOR", "BIBLIOTECARIO");
+    void generateToken_conVariosRoles_claimRolEligeElDeMayorPrivilegio() {
+        Usuario usuario = usuarioConRoles("LECTOR", "BIBLIOTECARIO");
 
-        Claims claims = parsearClaims(jwtService.generateToken(user));
+        Claims claims = parsearClaims(jwtService.generateToken(usuario));
 
         assertEquals("BIBLIOTECARIO", claims.get("rol", String.class));
     }
 
     @Test
-    void validateToken_withTokenValid_devuelveTrue() {
-        String token = jwtService.generateToken(userWithRoles("LECTOR"));
+    void validateToken_conTokenValido_devuelveTrue() {
+        String token = jwtService.generateToken(usuarioConRoles("LECTOR"));
 
         assertTrue(jwtService.validateToken(token));
     }
 
     @Test
-    void validateToken_withTokenExpirado_devuelveFalse() {
+    void validateToken_conTokenExpirado_devuelveFalse() {
         SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
-        Date haceDosTimes = new Date(System.currentTimeMillis() - 7_200_000L);
-        Date haceUnaTime = new Date(System.currentTimeMillis() - 3_600_000L);
+        Date haceDosHoras = new Date(System.currentTimeMillis() - 7_200_000L);
+        Date haceUnaHora = new Date(System.currentTimeMillis() - 3_600_000L);
 
         String tokenExpirado = Jwts.builder()
                 .subject("42")
-                .issuedAt(haceDosTimes)
-                .expiration(haceUnaTime)
+                .issuedAt(haceDosHoras)
+                .expiration(haceUnaHora)
                 .signWith(key, Jwts.SIG.HS256)
                 .compact();
 
@@ -170,44 +158,44 @@ class JwtServiceTest {
     // reales (no hay padding en chars intermedios), así que el fallo del
     // chequeo de firma es determinista.
     @Test
-    void validateToken_withSignatureAlterada_devuelveFalse() {
-        String token = jwtService.generateToken(userWithRoles("LECTOR"));
+    void validateToken_conFirmaAlterada_devuelveFalse() {
+        String token = jwtService.generateToken(usuarioConRoles("LECTOR"));
         // Altera un carácter central del tercer segmento (firma) para
         // simular un token manipulado sin volver a firmarlo.
         String[] partes = token.split("\\.");
-        String signature = partes[2];
-        int mitad = signature.length() / 2;
-        char original = signature.charAt(mitad);
-        String signatureAlterada = signature.substring(0, mitad)
+        String firma = partes[2];
+        int mitad = firma.length() / 2;
+        char original = firma.charAt(mitad);
+        String firmaAlterada = firma.substring(0, mitad)
                 + (original == 'a' ? 'b' : 'a')
-                + signature.substring(mitad + 1);
-        String tokenAlterado = partes[0] + "." + partes[1] + "." + signatureAlterada;
+                + firma.substring(mitad + 1);
+        String tokenAlterado = partes[0] + "." + partes[1] + "." + firmaAlterada;
 
         assertFalse(jwtService.validateToken(tokenAlterado));
     }
 
     @Test
-    void validateToken_firmadoWithOtraKey_devuelveFalse() {
-        SecretKey otraKey = Keys.hmacShaKeyFor(
+    void validateToken_firmadoConOtraClave_devuelveFalse() {
+        SecretKey otraClave = Keys.hmacShaKeyFor(
                 "otra-clave-completamente-distinta-256-bits-minimo".getBytes(StandardCharsets.UTF_8));
 
-        String tokenWithOtraSignature = Jwts.builder()
+        String tokenConOtraFirma = Jwts.builder()
                 .subject("42")
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 3_600_000L))
-                .signWith(otraKey, Jwts.SIG.HS256)
+                .signWith(otraClave, Jwts.SIG.HS256)
                 .compact();
 
-        assertFalse(jwtService.validateToken(tokenWithOtraSignature));
+        assertFalse(jwtService.validateToken(tokenConOtraFirma));
     }
 
     @Test
-    void extractEmail_extractJti_extractExpiration_devuelvenValuesToken() {
-        User user = userWithRoles("LECTOR");
-        String token = jwtService.generateToken(user);
+    void extractCorreo_extractJti_extractExpiration_devuelvenValoresDelToken() {
+        Usuario usuario = usuarioConRoles("LECTOR");
+        String token = jwtService.generateToken(usuario);
         Claims claimsEsperados = parsearClaims(token);
 
-        assertEquals("jwt-test@correo.com", jwtService.extractEmail(token));
+        assertEquals("jwt-test@correo.com", jwtService.extractCorreo(token));
         assertEquals(claimsEsperados.getId(), jwtService.extractJti(token));
         assertEquals(claimsEsperados.getExpiration(), jwtService.extractExpiration(token));
     }

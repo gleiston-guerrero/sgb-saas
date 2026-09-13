@@ -1,8 +1,8 @@
 package com.uteq.backend.security;
 
-import com.uteq.backend.entity.StatusUser;
-import com.uteq.backend.entity.Role;
-
+import com.uteq.backend.entity.EstadoUsuario;
+import com.uteq.backend.entity.Rol;
+import com.uteq.backend.entity.Usuario;
 import jakarta.servlet.FilterChain;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,7 +57,7 @@ class JwtAuthFilterTest {
     private JwtAuthFilter filter;
 
     @BeforeEach
-    void construirFilter() {
+    void construirFiltro() {
         jwtService = new JwtService();
         ReflectionTestUtils.setField(jwtService, "secret", SECRET);
         ReflectionTestUtils.setField(jwtService, "expirationMs", 3_600_000L);
@@ -72,31 +72,31 @@ class JwtAuthFilterTest {
         SecurityContextHolder.clearContext();
     }
 
-    private com.uteq.backend.entity.User userTest() {
-        StatusUser active = new StatusUser();
-        active.setId(1);
-        active.setName("ACTIVO");
+    private Usuario usuarioDePrueba() {
+        EstadoUsuario activo = new EstadoUsuario();
+        activo.setId(1);
+        activo.setNombre("ACTIVO");
 
-        Role reader = new Role();
-        reader.setId(1);
-        reader.setName("LECTOR");
+        Rol lector = new Rol();
+        lector.setId(1);
+        lector.setNombre("LECTOR");
 
-        return com.uteq.backend.entity.User.builder()
+        return Usuario.builder()
                 .id(7L)
-                .name("Filtro")
-                .lastName("De Prueba")
-                .email("filtro-test@correo.com")
+                .nombre("Filtro")
+                .apellido("De Prueba")
+                .correo("filtro-test@correo.com")
                 .passwordHash("hash")
-                .status(active)
-                .emailVerified(true)
-                .roles(Set.of(reader))
-                .dateRegistration(Instant.now())
-                .updated(Instant.now())
+                .estado(activo)
+                .correoVerificado(true)
+                .roles(Set.of(lector))
+                .fechaRegistro(Instant.now())
+                .actualizadoEn(Instant.now())
                 .build();
     }
 
     @Test
-    void withoutHeaderAuthorization_continuaWithoutAutenticar() throws Exception {
+    void sinHeaderAuthorization_continuaSinAutenticar() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
         FilterChain filterChain = mock(FilterChain.class);
@@ -108,9 +108,9 @@ class JwtAuthFilterTest {
     }
 
     @Test
-    void headerWithTokenValidYNotBlacklist_pueblaContextoSeguridad() throws Exception {
-        com.uteq.backend.entity.User user = userTest();
-        String token = jwtService.generateToken(user);
+    void headerConTokenValidoYNoEnBlacklist_pueblaContextoDeSeguridad() throws Exception {
+        Usuario usuario = usuarioDePrueba();
+        String token = jwtService.generateToken(usuario);
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("Authorization", "Bearer " + token);
@@ -119,11 +119,11 @@ class JwtAuthFilterTest {
 
         when(redisTemplate.hasKey(anyString())).thenReturn(false);
         UserDetails userDetails = User.builder()
-                .username(user.getEmail())
-                .password(user.getPasswordHash())
+                .username(usuario.getCorreo())
+                .password(usuario.getPasswordHash())
                 .roles("LECTOR")
                 .build();
-        when(userDetailsServiceImpl.loadUserByUsername(user.getEmail())).thenReturn(userDetails);
+        when(userDetailsServiceImpl.loadUserByUsername(usuario.getCorreo())).thenReturn(userDetails);
 
         filter.doFilterInternal(request, response, filterChain);
 
@@ -138,7 +138,7 @@ class JwtAuthFilterTest {
     }
 
     @Test
-    void headerWithTokenInvalid_continuaWithoutAutenticarYNotConsultaRedisNiBd() throws Exception {
+    void headerConTokenInvalido_continuaSinAutenticarYNoConsultaRedisNiBd() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("Authorization", "Bearer esto-no-es-un-jwt-valido");
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -153,9 +153,9 @@ class JwtAuthFilterTest {
     }
 
     @Test
-    void headerWithTokenBlacklist_notAutenticaYNotConsultaUserDetails() throws Exception {
-        com.uteq.backend.entity.User user = userTest();
-        String token = jwtService.generateToken(user);
+    void headerConTokenEnBlacklist_noAutenticaYNoConsultaUserDetails() throws Exception {
+        Usuario usuario = usuarioDePrueba();
+        String token = jwtService.generateToken(usuario);
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("Authorization", "Bearer " + token);
@@ -175,9 +175,9 @@ class JwtAuthFilterTest {
     // estructuralmente valido pero el correo ya no resuelve a un usuario
     // (cuenta eliminada entre la emision del token y esta request).
     @Test
-    void headerWithTokenValidPeroUserNotFound_limpiaContextoYContinua() throws Exception {
-        com.uteq.backend.entity.User user = userTest();
-        String token = jwtService.generateToken(user);
+    void headerConTokenValidoPeroUsuarioNoEncontrado_limpiaContextoYContinua() throws Exception {
+        Usuario usuario = usuarioDePrueba();
+        String token = jwtService.generateToken(usuario);
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("Authorization", "Bearer " + token);
@@ -185,7 +185,7 @@ class JwtAuthFilterTest {
         FilterChain filterChain = mock(FilterChain.class);
 
         when(redisTemplate.hasKey(anyString())).thenReturn(false);
-        when(userDetailsServiceImpl.loadUserByUsername(user.getEmail()))
+        when(userDetailsServiceImpl.loadUserByUsername(usuario.getCorreo()))
                 .thenThrow(new UsernameNotFoundException("Usuario no encontrado"));
 
         filter.doFilterInternal(request, response, filterChain);
@@ -201,9 +201,9 @@ class JwtAuthFilterTest {
     // comportamiento anterior (fail-open) este mismo escenario dejaba
     // pasar tokens revocados durante el corte.
     @Test
-    void headerWithTokenValidYRedisCaido_rechazaCon401WithoutContinuarCadena() throws Exception {
-        com.uteq.backend.entity.User user = userTest();
-        String token = jwtService.generateToken(user);
+    void headerConTokenValidoYRedisCaido_rechazaCon401SinContinuarCadena() throws Exception {
+        Usuario usuario = usuarioDePrueba();
+        String token = jwtService.generateToken(usuario);
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("Authorization", "Bearer " + token);

@@ -33,33 +33,16 @@ public class SecurityConfig {
     private final UserDetailsServiceImpl userDetailsServiceImpl;
 
     @Bean
-    /**
-     * Handles password encoder.
-     *
-     * @return password encoder with the resulting state after the operation
-     */
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
     }
 
     @Bean
-    /**
-     * Procesa authentication manager y devuelve el resultado calculado por el backend.
-     *
-     * @param config objeto del framework usado para integrar esta operacion con Spring o Jackson
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
-     * @throws Exception si la operacion no puede completarse por validacion, permisos o fallo del recurso asociado
-     */
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
     @Bean
-    /**
-     * Handles authentication provider.
-     *
-     * @return authentication provider with the resulting state after the operation
-     */
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsServiceImpl);
         provider.setPasswordEncoder(passwordEncoder());
@@ -67,13 +50,6 @@ public class SecurityConfig {
     }
 
     @Bean
-    /**
-     * Procesa filter chain y devuelve el resultado calculado por el backend.
-     *
-     * @param http objeto del framework usado para integrar esta operacion con Spring o Jackson
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
-     * @throws Exception si la operacion no puede completarse por validacion, permisos o fallo del recurso asociado
-     */
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())

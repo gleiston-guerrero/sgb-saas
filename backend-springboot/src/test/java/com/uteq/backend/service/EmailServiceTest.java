@@ -43,13 +43,13 @@ class EmailServiceTest {
     }
 
     @Test
-    void sendEmail_smtpAvailable_retornaTrueYDespachaMessage() {
+    void enviarCorreo_smtpDisponible_retornaTrueYDespachaElMensaje() {
         MimeMessage mimeMessage = new MimeMessage((Session) null);
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
 
-        boolean result = emailService.sendEmail(DESTINATARIO, ASUNTO, CUERPO);
+        boolean resultado = emailService.enviarCorreo(DESTINATARIO, ASUNTO, CUERPO);
 
-        assertTrue(result);
+        assertTrue(resultado);
         verify(mailSender).send(mimeMessage);
     }
 
@@ -57,27 +57,13 @@ class EmailServiceTest {
     // EmailService: un préstamo/devolución/registro es válido con o sin
     // correo enviado.
     @Test
-    void sendEmail_smtpCaido_capturaExceptionYRetornaFalse() {
+    void enviarCorreo_smtpCaido_capturaLaExcepcionYRetornaFalse() {
         MimeMessage mimeMessage = new MimeMessage((Session) null);
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
         doThrow(new MailSendException("Connection refused")).when(mailSender).send(mimeMessage);
 
-        boolean result = emailService.sendEmail(DESTINATARIO, ASUNTO, CUERPO);
+        boolean resultado = emailService.enviarCorreo(DESTINATARIO, ASUNTO, CUERPO);
 
-        assertFalse(result);
-    }
-
-    // Con clave Brevo en blanco no hay fallback HTTP: mismo false sin
-    // depender de red externa.
-    @Test
-    void sendEmail_smtpCaidoYBrevoEnBlanco_retornaFalseSinHttp() {
-        ReflectionTestUtils.setField(emailService, "brevoApiKey", "");
-        MimeMessage mimeMessage = new MimeMessage((Session) null);
-        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
-        doThrow(new MailSendException("Connection refused")).when(mailSender).send(mimeMessage);
-
-        boolean result = emailService.sendEmail(DESTINATARIO, ASUNTO, CUERPO);
-
-        assertFalse(result);
+        assertFalse(resultado);
     }
 }

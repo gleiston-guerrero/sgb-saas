@@ -410,7 +410,7 @@ export class ReportesComponent implements OnInit {
     const rango = this.rangoIso(this.librosDesde, this.librosHasta, this.librosDia, this.librosTipoDias);
     this.reporteService.librosMasPrestadosDetallado(rango.desde, rango.hasta, this.limiteTop, this.filtroLibrosCategoriaId ?? undefined, this.librosPage, this.librosPageSize).subscribe({
       next: (page) => {
-        this.libros = (page?.content ?? []);
+        this.libros = page.content;
         this.librosTotalPagesServer = page.totalPages;
         this.cargando = false;
       },
@@ -423,8 +423,8 @@ export class ReportesComponent implements OnInit {
     this.errorMsg = '';
     this.reporteService.morosidad(undefined, this.morosidadPage, this.morosidadPageSize).subscribe({
       next: (page) => {
-        this.morososTodos = (page?.content ?? []);
-        this.morosos = this.filtrarMorosidad((page?.content ?? []));
+        this.morososTodos = page.content;
+        this.morosos = this.filtrarMorosidad(page.content);
         this.morosidadTotalPagesServer = page.totalPages;
         this.cargando = false;
       },
@@ -457,7 +457,7 @@ export class ReportesComponent implements OnInit {
       this.filtroUbicacion?.trim() || undefined
     ).subscribe({
       next: (page) => {
-        this.inventario = (page?.content ?? []);
+        this.inventario = page.content;
         this.inventarioTotalPages = page.totalPages;
         this.cargando = false;
       },
@@ -580,7 +580,7 @@ export class ReportesComponent implements OnInit {
     this.errorMsg = '';
     this.sugerenciaService.listarMasPedidos({ page: this.sugerenciasPage, size: this.sugerenciasPageSize }).subscribe({
       next: (page) => {
-        this.sugerenciasMasPedidas = (page?.content ?? []);
+        this.sugerenciasMasPedidas = page.content;
         this.sugerenciasTotalPagesServer = page.totalPages;
         this.cargando = false;
       },
@@ -614,9 +614,9 @@ export class ReportesComponent implements OnInit {
     const busqueda = [this.vencidosCorreo.trim(), this.vencidosLibro.trim(), this.vencidosIsbn.trim()].filter(Boolean).join(' ') || undefined;
     this.reporteService.vencidos(undefined, busqueda, this.vencidosPage, this.vencidosPageSize).subscribe({
       next: (page) => {
-        this.vencidos = (page?.content ?? []);
+        this.vencidos = page.content;
         this.vencidosTotalPagesServer = page.totalPages;
-        this.vencidosTodos = (page?.content ?? []);
+        this.vencidosTodos = page.content;
         this.cargando = false;
       },
       error: (err) => this.fallar(err)
@@ -640,8 +640,8 @@ export class ReportesComponent implements OnInit {
     this.errorMsg = '';
     this.reporteService.categoriasDemandadas(undefined, undefined, this.limiteCategorias, this.categoriasPage, this.categoriasPageSize).subscribe({
       next: (page) => {
-        this.categoriasTodas = (page?.content ?? []);
-        this.categorias = this.filtrarCategorias((page?.content ?? []));
+        this.categoriasTodas = page.content;
+        this.categorias = this.filtrarCategorias(page.content);
         this.categoriasTotalPagesServer = page.totalPages;
         this.cargando = false;
       },
@@ -660,7 +660,7 @@ export class ReportesComponent implements OnInit {
     this.errorMsg = '';
     this.reporteService.usoPorPeriodo(this.usoGranularidad, this.usoDesde || undefined, this.usoHasta || undefined, this.usoPage, this.usoPageSize).subscribe({
       next: (page) => {
-        this.usoPeriodo = (page?.content ?? []);
+        this.usoPeriodo = page.content;
         this.usoTotalPagesServer = page.totalPages;
         this.cargando = false;
       },

@@ -370,7 +370,7 @@ export class CatalogoComponent implements OnInit, OnDestroy {
     this.libroService.listar({
       page: this.currentPage,
       size: this.pageSize,
-      sort: 'title,asc',
+      sort: 'titulo,asc',
       q: this.textoBusqueda.trim() || undefined,
       categoriaId: this.categoriaId ?? undefined,
       disponible

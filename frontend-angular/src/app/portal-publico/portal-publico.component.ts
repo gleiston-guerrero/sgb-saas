@@ -118,7 +118,7 @@ export class PortalPublicoComponent implements OnInit, OnDestroy {
     this.libroPublicoService.listar({
       page: this.currentPage,
       size: this.pageSize,
-      sort: 'title,asc',
+      sort: 'titulo,asc',
       q: this.textoBusqueda.trim() || undefined,
       categoriaId: this.categoriaSeleccionada ?? undefined
     }).subscribe({

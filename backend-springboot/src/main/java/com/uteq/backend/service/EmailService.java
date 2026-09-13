@@ -42,29 +42,25 @@ public class EmailService {
     }
 
     /**
-     * Envia send email usando los datos y destinatarios recibidos.
-     *
-     * @param destinatario valor de entrada destinatario usado por la operacion para completar su regla de negocio
-     * @param asunto valor de entrada asunto usado por la operacion para completar su regla de negocio
-     * @param bodyHtml valor de entrada bodyHtml usado por la operacion para completar su regla de negocio
-     * @return true cuando la comprobacion se cumple; false en caso contrario
+     * @param cuerpoHtml se envía como HTML para énfasis simple, sin plantilla externa.
+     * @return {@code true} si se despachó sin error; {@code false} si falló (ya quedó en el log).
      */
-    public boolean sendEmail(String destinatario, String asunto, String bodyHtml) {
+    public boolean enviarCorreo(String destinatario, String asunto, String cuerpoHtml) {
         // 1) Intento SMTP clásico
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
+            MimeMessage mensaje = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mensaje, "UTF-8");
             helper.setFrom(remitente);
             helper.setTo(destinatario);
             helper.setSubject(asunto);
-            helper.setText(bodyHtml, true);
-            mailSender.send(message);
+            helper.setText(cuerpoHtml, true);
+            mailSender.send(mensaje);
             return true;
         } catch (MessagingException | MailException ex) {
             log.warn("SMTP falló para {} (asunto: \"{}\"): {} — probando fallback Brevo API", destinatario, asunto, ex.getMessage());
             // 2) Fallback HTTP Brevo API
             if (brevoApiKey != null && !brevoApiKey.isBlank()) {
-                boolean ok = sendViaBrevoApi(destinatario, asunto, bodyHtml);
+                boolean ok = enviarViaBrevoApi(destinatario, asunto, cuerpoHtml);
                 if (ok) return true;
             }
             log.error("Fallo al enviar correo a {} (asunto: \"{}\") por SMTP y Brevo API", destinatario, asunto);
@@ -72,14 +68,14 @@ public class EmailService {
         }
     }
 
-    private boolean sendViaBrevoApi(String destinatario, String asunto, String bodyHtml) {
+    private boolean enviarViaBrevoApi(String destinatario, String asunto, String cuerpoHtml) {
         try {
             RestClient client = RestClient.builder().baseUrl("https://api.brevo.com").build();
             Map<String, Object> body = Map.of(
                     "sender", Map.of("email", remitente, "name", "SGB-SaaS"),
                     "to", List.of(Map.of("email", destinatario)),
                     "subject", asunto,
-                    "htmlContent", bodyHtml
+                    "htmlContent", cuerpoHtml
             );
             var resp = client.post()
                     .uri("/v3/smtp/email")

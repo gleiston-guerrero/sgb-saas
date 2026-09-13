@@ -11,11 +11,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class SchedulerConfig {
 
     @Bean
-    /**
-     * Handles task scheduler.
-     *
-     * @return task scheduler with the resulting state after the operation
-     */
     public TaskScheduler taskScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(4);

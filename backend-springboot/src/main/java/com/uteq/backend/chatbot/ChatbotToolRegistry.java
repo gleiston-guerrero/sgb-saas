@@ -16,7 +16,7 @@ import java.util.Map;
  * Registry que recolecta todas las {@link ChatbotTool} beans y las expone
  * en dos formatos:
  * <ul>
- *   <li>{@link #buildToolsPayload} — formato Gemini (para el campo {@code tools} del payload)</li>
+ *   <li>{@link #buildToolsPayload()} — formato Gemini (para el campo {@code tools} del payload)</li>
  *   <li>{@link #execute(String, JsonNode)} — ejecuta una tool por nombre y devuelve el resultado</li>
  * </ul>
  */
@@ -38,9 +38,10 @@ public class ChatbotToolRegistry {
     }
 
     /**
-     * Procesa build tools payload y devuelve el resultado calculado por el backend.
-     *
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * Construye el array {@code tools} en el formato que espera Gemini:
+     * <pre>
+     * [{ "functionDeclarations": [ { name, description, parameters }, ... ] }]
+     * </pre>
      */
     public List<Map<String, Object>> buildToolsPayload() {
         ArrayNode functionDeclarations = MAPPER.createArrayNode();
@@ -60,11 +61,7 @@ public class ChatbotToolRegistry {
     }
 
     /**
-     * Procesa execute y devuelve el resultado calculado por el backend.
-     *
-     * @param toolName argumento recibido por la herramienta del chatbot para decidir y ejecutar la accion
-     * @param args argumento recibido por la herramienta del chatbot para decidir y ejecutar la accion
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * Ejecuta una tool por nombre. Si la tool no existe, retorna un error JSON.
      */
     public JsonNode execute(String toolName, JsonNode args) {
         ChatbotTool tool = tools.get(toolName);
@@ -80,22 +77,13 @@ public class ChatbotToolRegistry {
         }
     }
 
-    /**
-     * Verifica contains y devuelve el resultado de la comprobacion.
-     *
-     * @param toolName argumento recibido por la herramienta del chatbot para decidir y ejecutar la accion
-     * @return true cuando la comprobacion se cumple; false en caso contrario
-     */
-
     public boolean contains(String toolName) {
         return tools.containsKey(toolName);
     }
 
     /**
-     * Consulta get tool schema usando los filtros recibidos y devuelve el resultado solicitado.
-     *
-     * @param toolName argumento recibido por la herramienta del chatbot para decidir y ejecutar la accion
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * Retorna el JSON Schema de entrada de una tool por nombre.
+     * Útil para inspección dinámica (ej: verificar si requiere usuario_id).
      */
     public JsonNode getToolSchema(String toolName) {
         ChatbotTool tool = tools.get(toolName);
@@ -106,10 +94,8 @@ public class ChatbotToolRegistry {
     }
 
     /**
-     * Procesa requires user id y devuelve el resultado calculado por el backend.
-     *
-     * @param toolName argumento recibido por la herramienta del chatbot para decidir y ejecutar la accion
-     * @return true cuando la comprobacion se cumple; false en caso contrario
+     * Verifica si una tool requiere el parámetro {@code usuario_id} en su schema.
+     * Busca en el array {@code required} del JSON Schema.
      */
     public boolean requiresUserId(String toolName) {
         JsonNode schema = getToolSchema(toolName);

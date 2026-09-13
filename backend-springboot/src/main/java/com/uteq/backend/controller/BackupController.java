@@ -1,9 +1,8 @@
 package com.uteq.backend.controller;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.uteq.backend.entity.Backup;
-import com.uteq.backend.entity.BackupSchedule;
-import com.uteq.backend.service.BackupScheduleService;
+import com.uteq.backend.entity.BackupProgramacion;
+import com.uteq.backend.service.BackupProgramacionService;
 import com.uteq.backend.service.BackupService;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -36,167 +35,113 @@ import java.util.Set;
 public class BackupController {
 
     private final BackupService backupService;
-    private final BackupScheduleService progService;
+    private final BackupProgramacionService progService;
 
-    public BackupController(BackupService backupService, BackupScheduleService progService) {
+    public BackupController(BackupService backupService, BackupProgramacionService progService) {
         this.backupService = backupService;
         this.progService = progService;
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    /**
-     * Genera o entrega generate a partir de los datos actuales del sistema.
-     *
-     * @param req datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
-     */
-    public ResponseEntity<BackupResponseDTO> generate(@Valid @RequestBody BackupRequestDTO req) {
-        String type = req.type != null ? req.type : "manual";
-        Backup b = backupService.generateBackup(req.from, req.until, req.tables, req.format, type);
+    public ResponseEntity<BackupResponseDTO> generar(@Valid @RequestBody BackupRequestDTO req) {
+        String tipo = req.tipo != null ? req.tipo : "manual";
+        Backup b = backupService.generarBackup(req.desde, req.hasta, req.tablas, req.formato, tipo);
         String url = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}/download").buildAndExpand(b.getId()).toUriString();
-        return ResponseEntity.status(HttpStatus.CREATED).body(new BackupResponseDTO(b.getId(), b.getCreated(), b.getFrom(), b.getUntil(), b.getTables(), b.getFormat(), b.getPath(), b.getSizeBytes(), b.getStatus(), b.getType(), url));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new BackupResponseDTO(b.getId(), b.getCreadoEn(), b.getDesde(), b.getHasta(), b.getTablas(), b.getFormato(), b.getRuta(), b.getTamanoBytes(), b.getEstado(), b.getTipo(), url));
     }
-    /**
-     * Consulta list usando los filtros recibidos y devuelve el resultado solicitado.
-     *
-     * @param from fecha limite usada para acotar el rango temporal de la consulta
-     * @param until fecha limite usada para acotar el rango temporal de la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
-     */
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<BackupSummaryDTO>> list(@RequestParam(name = "desde", required = false) String from, @RequestParam(name = "hasta", required = false) String until) {
-        OffsetDateTime d = from != null ? parseFlexible(from) : null;
-        OffsetDateTime h = until != null ? parseFlexible(until) : null;
+    public ResponseEntity<List<BackupResumenDTO>> listar(@RequestParam(required = false) String desde, @RequestParam(required = false) String hasta) {
+        OffsetDateTime d = desde != null ? parseFlexible(desde) : null;
+        OffsetDateTime h = hasta != null ? parseFlexible(hasta) : null;
         OffsetDateTime ahora = OffsetDateTime.now();
         List<Backup> lista;
         if (d != null || h != null) {
-            OffsetDateTime fromEffective = d != null ? d : ahora.minusDays(30);
-            OffsetDateTime untilEffective = h != null ? h : ahora;
-            lista = backupService.listByRange(fromEffective, untilEffective);
+            OffsetDateTime desdeEfectivo = d != null ? d : ahora.minusDays(30);
+            OffsetDateTime hastaEfectivo = h != null ? h : ahora;
+            lista = backupService.listarPorRango(desdeEfectivo, hastaEfectivo);
         } else {
-            lista = backupService.listAll();
+            lista = backupService.listarTodos();
         }
-        return ResponseEntity.ok(lista.stream().map(b -> new BackupSummaryDTO(b.getId(), b.getCreated(), b.getFrom(), b.getUntil(), b.getTables(), b.getFormat(), b.getSizeBytes(), b.getStatus(), b.getType())).toList());
+        return ResponseEntity.ok(lista.stream().map(b -> new BackupResumenDTO(b.getId(), b.getCreadoEn(), b.getDesde(), b.getHasta(), b.getTablas(), b.getFormato(), b.getTamanoBytes(), b.getEstado(), b.getTipo())).toList());
     }
 
     @GetMapping("/programacion")
     @PreAuthorize("hasRole('ADMIN')")
-    /**
-     * Lists programaciones.
-     *
-     * @return response entity<list<backup programacion>> with the resulting state after the operation
-     */
-    public ResponseEntity<List<BackupSchedule>> listSchedules() {
-        return ResponseEntity.ok(progService.listActives());
+    public ResponseEntity<List<BackupProgramacion>> listarProgramaciones() {
+        return ResponseEntity.ok(progService.listarActivas());
     }
 
     @PostMapping("/programacion")
     @PreAuthorize("hasRole('ADMIN')")
-    /**
-     * Registra create schedule validando los datos de entrada antes de persistir cambios.
-     *
-     * @param req datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
-     */
-    public ResponseEntity<BackupSchedule> createSchedule(@RequestBody BackupSchedule req) {
-        BackupSchedule created = progService.create(req);
+    public ResponseEntity<BackupProgramacion> crearProgramacion(@RequestBody BackupProgramacion req) {
+        BackupProgramacion creada = progService.crear(req);
         // Opcional: auto-programar al crear
-        if (Boolean.TRUE.equals(created.getActive())) {
-            progService.scheduleExecution(created.getId());
+        if (Boolean.TRUE.equals(creada.getActivo())) {
+            progService.programarEjecucion(creada.getId());
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(creada);
     }
 
     @PostMapping("/{id}/programar")
     @PreAuthorize("hasRole('ADMIN')")
-    /**
-     * Procesa schedule y devuelve el resultado calculado por el backend.
-     *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
-     */
-    public ResponseEntity<Map<String, Object>> schedule(@PathVariable Long id) {
-        progService.scheduleExecution(id);
-        BackupSchedule schedule = progService.get(id);
+    public ResponseEntity<Map<String, Object>> programar(@PathVariable Long id) {
+        progService.programarEjecucion(id);
+        BackupProgramacion programacion = progService.obtener(id);
         return ResponseEntity.ok(Map.of(
-                "id", schedule.getId(),
-                "activo", Boolean.TRUE.equals(schedule.getActive()),
+                "id", programacion.getId(),
+                "activo", Boolean.TRUE.equals(programacion.getActivo()),
                 "mensaje", "Programación de respaldo activada exitosamente"));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    /**
-     * Procesa deleteBackup y devuelve el resultado calculado por el backend.
-     *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
-     */
-    public ResponseEntity<Void> deleteBackup(@PathVariable Long id) {
+    public ResponseEntity<Void> borrar(@PathVariable Long id) {
         // Solo elimina el registro de backup. La programación usa su propio endpoint
         // para evitar colisión de IDs entre ambas tablas.
-        backupService.delete(id);
+        backupService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/programacion/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    /**
-     * Procesa deleteBackup schedule y devuelve el resultado calculado por el backend.
-     *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
-     */
-    public ResponseEntity<Void> deleteSchedule(@PathVariable Long id) {
-        progService.delete(id);
+    public ResponseEntity<Void> borrarProgramacion(@PathVariable Long id) {
+        progService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/download")
     @PreAuthorize("hasRole('ADMIN')")
-    /**
-     * Genera o entrega download a partir de los datos actuales del sistema.
-     *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
-     */
-    public ResponseEntity<byte[]> download(@PathVariable Long id) {
-        byte[] content = backupService.download(id);
+    public ResponseEntity<byte[]> descargar(@PathVariable Long id) {
+        byte[] contenido = backupService.descargar(id);
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/zip"))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=backup-" + id + ".zip")
-                .contentLength(content.length)
-                .body(content);
+                .contentLength(contenido.length)
+                .body(contenido);
     }
 
     @PostMapping("/{id}/ejecutar-ahora")
     @PreAuthorize("hasRole('ADMIN')")
-    /**
-     * Procesa execute ahora y devuelve el resultado calculado por el backend.
-     *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
-     */
-    public ResponseEntity<Map<String, Object>> executeNow(@PathVariable Long id) {
-        BackupSchedule p = progService.get(id);
+    public ResponseEntity<Map<String, Object>> ejecutarAhora(@PathVariable Long id) {
+        BackupProgramacion p = progService.obtener(id);
         // Ejecutar backup inmediato con el rango correspondiente
           OffsetDateTime ahora = OffsetDateTime.now();
-          OffsetDateTime from;
-          OffsetDateTime until;
-        if (p.getEveryTimes() != null) {
-            from = ahora.minusHours(p.getEveryTimes());
-            until = ahora;
+          OffsetDateTime desde;
+          OffsetDateTime hasta;
+        if (p.getCadaHoras() != null) {
+            desde = ahora.minusHours(p.getCadaHoras());
+            hasta = ahora;
         } else {
-            from = ahora.minusDays(p.getEveryDays()).withHour(0).withMinute(0).withSecond(0).withNano(0);
-            until = ahora.withHour(23).withMinute(59).withSecond(59);
+            desde = ahora.minusDays(p.getCadaDias()).withHour(0).withMinute(0).withSecond(0).withNano(0);
+            hasta = ahora.withHour(23).withMinute(59).withSecond(59);
         }
-        Set<String> tables = (p.getTables() != null && !p.getTables().isEmpty()) ? p.getTables() : Set.of();
-        Backup backup = backupService.generateBackup(from, until, tables, p.getFormat(), "automatico");
+        Set<String> tablas = (p.getTablas() != null && !p.getTablas().isEmpty()) ? p.getTablas() : Set.of();
+        Backup backup = backupService.generarBackup(desde, hasta, tablas, p.getFormato(), "automatico");
         // Actualizar última ejecución en la programación (usa método interno del service)
-        progService.updateLastExecution(id, backup.getCreated());
+        progService.actualizarUltimaEjecucion(id, backup.getCreadoEn());
         return ResponseEntity.ok(Map.of(
                 "id", backup.getId(),
                 "programacionId", p.getId(),
@@ -205,54 +150,37 @@ public class BackupController {
 
     @Data @NoArgsConstructor @AllArgsConstructor
     public static class BackupRequestDTO {
-        @NotNull @JsonProperty("desde") @JsonDeserialize(using = FlexibleOffsetDateTimeDeserializer.class) OffsetDateTime from;
-        @NotNull @JsonProperty("hasta") @JsonDeserialize(using = FlexibleOffsetDateTimeDeserializer.class) OffsetDateTime until;
-        @NotEmpty @JsonProperty("tablas") Set<String> tables;
-        @NotNull @JsonProperty("formato") String format;
-        @JsonProperty("tipo") String type; // "manual" o "automatico", default "manual"
+        @NotNull @JsonDeserialize(using = FlexibleOffsetDateTimeDeserializer.class) OffsetDateTime desde;
+        @NotNull @JsonDeserialize(using = FlexibleOffsetDateTimeDeserializer.class) OffsetDateTime hasta;
+        @NotEmpty Set<String> tablas;
+        @NotNull String formato;
+        String tipo; // "manual" o "automatico", default "manual"
     }
     @Data @NoArgsConstructor @AllArgsConstructor
       public static class BackupResponseDTO {
           Long id;
-          @JsonProperty("creadoEn")
-          OffsetDateTime created;
-          @JsonProperty("desde")
-          OffsetDateTime from;
-          @JsonProperty("hasta")
-          OffsetDateTime until;
-          @JsonProperty("tablas")
-          Set<String> tables;
-          @JsonProperty("formato")
-          String format;
-          @JsonProperty("ruta")
-          String path;
-          @JsonProperty("tamanoBytes")
-          Long sizeBytes;
-          @JsonProperty("estado")
-          String status;
-          @JsonProperty("tipo")
-          String type;
+          OffsetDateTime creadoEn;
+          OffsetDateTime desde;
+          OffsetDateTime hasta;
+          Set<String> tablas;
+          String formato;
+          String ruta;
+          Long tamanoBytes;
+          String estado;
+          String tipo;
           String urlDescarga;
       }
       @Data @NoArgsConstructor @AllArgsConstructor
-      public static class BackupSummaryDTO {
+      public static class BackupResumenDTO {
           Long id;
-          @JsonProperty("creadoEn")
-          OffsetDateTime created;
-          @JsonProperty("desde")
-          OffsetDateTime from;
-          @JsonProperty("hasta")
-          OffsetDateTime until;
-          @JsonProperty("tablas")
-          Set<String> tables;
-          @JsonProperty("formato")
-          String format;
-          @JsonProperty("tamanoBytes")
-          Long sizeBytes;
-          @JsonProperty("estado")
-          String status;
-          @JsonProperty("tipo")
-          String type;
+          OffsetDateTime creadoEn;
+          OffsetDateTime desde;
+          OffsetDateTime hasta;
+          Set<String> tablas;
+          String formato;
+          Long tamanoBytes;
+          String estado;
+          String tipo;
       }
 
     private static OffsetDateTime parseFlexible(String text) {

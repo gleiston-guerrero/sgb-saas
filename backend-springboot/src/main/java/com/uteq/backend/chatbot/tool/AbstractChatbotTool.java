@@ -15,9 +15,9 @@ public abstract class AbstractChatbotTool implements ChatbotTool {
 
     protected final ObjectMapper mapper = new ObjectMapper();
 
-    protected ObjectNode errorNode(String message) {
+    protected ObjectNode errorNode(String mensaje) {
         ObjectNode error = mapper.createObjectNode();
-        error.put("error", message);
+        error.put("error", mensaje);
         return error;
     }
 }

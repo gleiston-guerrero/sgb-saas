@@ -17,11 +17,6 @@ public class OpenApiConfig {
     private static final String ESQUEMA_BEARER_JWT = "bearer-jwt";
 
     @Bean
-    /**
-     * Handles sgb open api.
-     *
-     * @return open api with the resulting state after the operation
-     */
     public OpenAPI sgbOpenAPI() {
         return new OpenAPI()
                 .info(new Info()

@@ -35,58 +35,58 @@ class ChatbotRateLimiterTest {
     @InjectMocks
     private ChatbotRateLimiter chatbotRateLimiter;
 
-    private void configurarLimites(int maxMensajes, long ventanaSeconds) {
+    private void configurarLimites(int maxMensajes, long ventanaSegundos) {
         ReflectionTestUtils.setField(chatbotRateLimiter, "maxMensajes", maxMensajes);
-        ReflectionTestUtils.setField(chatbotRateLimiter, "rateLimitWindowSeconds", ventanaSeconds);
+        ReflectionTestUtils.setField(chatbotRateLimiter, "rateLimitWindowSeconds", ventanaSegundos);
     }
 
     @Test
-    void estaBlocked_cuandoContadorIgualaMaximo_retornaTrue() {
+    void estaBloqueado_cuandoContadorIgualaElMaximo_retornaTrue() {
         configurarLimites(10, 60);
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get(KEY)).thenReturn("10");
 
-        assertTrue(chatbotRateLimiter.isBlocked(USUARIO_ID));
+        assertTrue(chatbotRateLimiter.estaBloqueado(USUARIO_ID));
     }
 
     @Test
-    void estaBlocked_cuandoContadorByDebajoMaximo_retornaFalse() {
+    void estaBloqueado_cuandoContadorPorDebajoDelMaximo_retornaFalse() {
         configurarLimites(10, 60);
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get(KEY)).thenReturn("5");
 
-        assertFalse(chatbotRateLimiter.isBlocked(USUARIO_ID));
+        assertFalse(chatbotRateLimiter.estaBloqueado(USUARIO_ID));
     }
 
     @Test
-    void estaBlocked_withoutMensajesPrevios_retornaFalse() {
+    void estaBloqueado_sinMensajesPrevios_retornaFalse() {
         configurarLimites(10, 60);
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get(KEY)).thenReturn(null);
 
-        assertFalse(chatbotRateLimiter.isBlocked(USUARIO_ID));
+        assertFalse(chatbotRateLimiter.estaBloqueado(USUARIO_ID));
     }
 
     // El TTL de la ventana se fija SOLO cuando el contador pasa de 0 a 1
     // (primer mensaje), misma lógica de ventana fija que LoginRateLimiter.
     @Test
-    void registerMessage_primerMessage_fijaTtlVentana() {
+    void registrarMensaje_primerMensaje_fijaTtlDeLaVentana() {
         configurarLimites(10, 60);
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.increment(KEY)).thenReturn(1L);
 
-        chatbotRateLimiter.registerMessage(USUARIO_ID);
+        chatbotRateLimiter.registrarMensaje(USUARIO_ID);
 
         verify(redisTemplate).expire(KEY, Duration.ofSeconds(60));
     }
 
     @Test
-    void registerMessage_messageSubsiguiente_notRefijaTtl() {
+    void registrarMensaje_mensajeSubsiguiente_noRefijaElTtl() {
         configurarLimites(10, 60);
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.increment(KEY)).thenReturn(3L);
 
-        chatbotRateLimiter.registerMessage(USUARIO_ID);
+        chatbotRateLimiter.registrarMensaje(USUARIO_ID);
 
         verify(redisTemplate, never()).expire(anyString(), org.mockito.ArgumentMatchers.any(Duration.class));
     }
