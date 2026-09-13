@@ -102,6 +102,17 @@ ventana real es la del reinicio del contenedor (~10–60 s en free).
 Además, `SPRING_FLYWAY_LOCATIONS` y los datos en Neon no se ven afectados:
 **ninguna rotación de secretos toca datos**.
 
+### 2.5 Estado de ejecución en esta entrega
+
+Esta sección es un procedimiento operativo, no una evidencia de ejecución.
+Para esta entrega no se declara una rotación completada de la contraseña de
+Neon ni de otros secretos de producción, porque esa acción ocurre fuera del
+repositorio y requeriría evidencia externa del dashboard del proveedor y del
+redeploy correspondiente. Si se ejecuta una rotación real, debe registrarse
+en un archivo de evidencia separado con fecha, secreto afectado, responsable,
+hora de redeploy y resultado del health check, sin publicar nunca el valor
+del secreto.
+
 ## 3. Rotación de contenedores (redeploy manual)
 
 Se usa cuando hay que **aplicar una imagen nueva** sin esperar un push al
