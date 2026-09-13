@@ -118,12 +118,15 @@ originales):
 
 ## `docs/mediciones/jacoco/report.csv` (y `report.xml` equivalente)
 
-Reporte de cobertura generado por el plugin Maven `jacoco-maven-plugin`
-(`./mvnw clean verify`), no escrito a mano. Columnas verificadas
-abriendo el CSV real (`docs/mediciones/jacoco/report.csv`, 51 líneas: 1
-cabecera + 50 clases analizadas) para esta tarea -- coincide exactamente
-con la lista de columnas que trajo el prompt de esta tarea, sin
-discrepancias:
+Reporte canónico de cobertura generado por el plugin Maven
+`jacoco-maven-plugin` (`./mvnw clean verify`), no escrito a mano. La
+fuente vigente es siempre `docs/mediciones/jacoco/report.csv` junto con
+`report.xml`; las carpetas fechadas de `docs/mediciones/jacoco/` quedan
+solo como historial, según `docs/mediciones/jacoco/README.md`. Columnas
+verificadas abriendo el CSV real (`docs/mediciones/jacoco/report.csv`,
+49 líneas: 1 cabecera + 48 clases analizadas) para esta tarea -- coincide
+exactamente con la lista de columnas que trajo el prompt de esta tarea,
+sin discrepancias:
 
 | Campo / variable | Tipo de dato | Unidad | Rango esperado | Significado |
 |---|---|---|---|---|
@@ -132,7 +135,7 @@ discrepancias:
 | `CLASS` | string | — | nombre simple de la clase, ej. `LoginRateLimiter`, `JwtService` | Clase Java analizada. |
 | `INSTRUCTION_MISSED` / `INSTRUCTION_COVERED` | entero | instrucciones de bytecode | ≥ 0 | Instrucciones de bytecode no cubiertas / cubiertas por al menos un test; la unidad de cobertura más granular que reporta JaCoCo. |
 | `BRANCH_MISSED` / `BRANCH_COVERED` | entero | ramas condicionales | ≥ 0 | Ramas de decisión (`if`/`switch`/operadores condicionales) no cubiertas / cubiertas. |
-| `LINE_MISSED` / `LINE_COVERED` | entero | líneas de código fuente | ≥ 0 | Líneas fuente no cubiertas / cubiertas -- la base del porcentaje de "cobertura de líneas" citado en el \autoref{cap:resultados} ($81{,}64\,\%$ = `LINE_COVERED` / (`LINE_COVERED` + `LINE_MISSED`), agregado sobre las 50 filas). |
+| `LINE_MISSED` / `LINE_COVERED` | entero | líneas de código fuente | ≥ 0 | Líneas fuente no cubiertas / cubiertas -- la base del porcentaje de "cobertura de líneas" citado en el \autoref{cap:resultados} ($78{,}34\,\%$ = `1595 / (1595 + 441)`, agregado sobre las 48 filas de clases). |
 | `COMPLEXITY_MISSED` / `COMPLEXITY_COVERED` | entero | unidades de complejidad ciclomática | ≥ 0 | Complejidad ciclomática no cubierta / cubierta por los tests. |
 | `METHOD_MISSED` / `METHOD_COVERED` | entero | métodos | ≥ 0 | Métodos con al menos una instrucción no cubierta / métodos completamente cubiertos. |
 

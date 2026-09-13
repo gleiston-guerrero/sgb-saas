@@ -259,14 +259,14 @@ parte de evaluar el efecto de la estrategia híbrida de acceso a datos
 sobre la cobertura de pruebas.
 
 \textbf{Métrica.} Porcentaje de líneas cubiertas, medido con
-\texttt{jacoco-maven-plugin}. La cifra de cierre
-vigente se re-verificó con una corrida real de \texttt{./mvnw clean verify}
-sobre la rama \texttt{fix/errores-encontrados}: 524
-tests, 0 fallos, 0 errores, 0 \emph{skipped}, \textbf{78,34\,\%} de líneas
-(1595/2036) y \textbf{59,48\,\%} de ramas (345/580). Esta es la única cifra vigente de cobertura citada en el
-entregable final. Las mediciones anteriores quedan archivadas como
-evidencia histórica en \texttt{docs/mediciones/jacoco/}, pero no se
-defienden como resultado de cierre.
+\texttt{jacoco-maven-plugin}. La cifra de cierre vigente se calcula
+desde los artefactos raíz versionados en \texttt{docs/mediciones/jacoco/}:
+\texttt{report.csv}, \texttt{report.xml} y el HTML asociado. Esos
+artefactos declaran \textbf{78,34\,\%} de líneas (1595/2036) y
+\textbf{59,48\,\%} de ramas (345/580). Esta es la única cifra vigente de
+cobertura citada en el entregable final. Las mediciones anteriores quedan
+archivadas como evidencia histórica en \texttt{docs/mediciones/jacoco/},
+pero no se defienden como resultado de cierre.
 
 \textbf{Control de cifras históricas.} Las discrepancias previas se
 conservan trazadas en \texttt{docs/observaciones/OBSERVACIONES.md} y en
@@ -275,10 +275,10 @@ no repite esos valores porque el criterio de cierre exige una sola cifra
 vigente en el entregable defendido.
 
 \textbf{Datos crudos.} \texttt{docs/mediciones/jacoco/report.xml} y
-\texttt{report.csv} corresponden a la corrida vigente sobre HEAD
-\texttt{fix/errores-encontrados} descrita arriba. Los cortes anteriores permanecen en
-subdirectorios fechados como trazabilidad histórica, pero esta sección
-usa una sola cifra de cierre.
+\texttt{report.csv} son la fuente canónica vigente descrita arriba. Los
+cortes anteriores permanecen en subdirectorios fechados como trazabilidad
+histórica, pero esta sección solo usa los artefactos raíz; la regla de
+canonicidad queda declarada en \texttt{docs/mediciones/jacoco/README.md}.
 
 \textbf{Estadística descriptiva.} Esta métrica es una medición agregada
 sobre la totalidad del código analizado (48 clases en la corrida
@@ -298,7 +298,7 @@ Lines & 1595/2036 & \textbf{78,34\,\%} & $\geq$70\,\% \textbf{Sí} \\
 Branches & 345/580 & \textbf{59,48\,\%} & Sin umbral formal \\
 \bottomrule
 \end{tabular}
-\caption{Cobertura JaCoCo vigente al cierre de la Entrega Final (rama \texttt{fix/errores-encontrados}).}
+\caption{Cobertura JaCoCo vigente al cierre de la Entrega Final.}
 \label{tab:res-jacoco}
 \end{table}
 
@@ -331,7 +331,7 @@ Service & Sobre umbral & JaCoCo XML & \textbf{Sí} \\
 Domain/Entity & --- & Excluido & N/A \\
 \bottomrule
 \end{tabular}
-\caption{Cobertura JaCoCo por capa arquitectónica, medición vigente al cierre (rama \texttt{fix/errores-encontrados})}
+\caption{Cobertura JaCoCo por capa arquitectónica, medición vigente al cierre}
 \label{tab:res-jacoco-capas-vigente}
 \end{table}
 
