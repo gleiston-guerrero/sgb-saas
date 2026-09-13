@@ -523,15 +523,13 @@ Usability Scale (SUS)?
 ítems \citep{brooke1996sus} (\autoref{cap:materiales-metodos}).
 
 \textbf{Datos crudos.} Ninguno todavía: $N=0$ de los $N\geq15$
-participantes que exige la guía. El archivo
-\texttt{docs/mediciones/sus/sus.csv} se conserva únicamente como
-\textbf{datos de prueba (mock/sintéticos) para validación del pipeline
-de análisis automatizado}, sin valor evidencial: una corrida previa se
-retiró por falta de trazabilidad a un export crudo del instrumento y por
-patrones incompatibles con respuestas independientes (ver \texttt{OBS-08} en
-\texttt{docs/observaciones/OBSERVACIONES.md}). El pipeline
-(\texttt{scripts/sus-analysis.ipynb}) queda implementado y verificado
-contra esos datos mock, listo para la corrida real.
+participantes que exige la guía. La corrida SUS previa queda retirada
+como evidencia empírica por falta de trazabilidad a un export crudo del
+instrumento y por ausencia de consentimientos versionables/verificables
+sin exponer datos personales. Por esa razón, este informe no publica
+ningún archivo de respuestas, cifra agregada, tabla descriptiva ni figura
+derivada de SUS; solo conserva el protocolo y el instrumento para una
+corrida futura.
 
 \textbf{Estadística descriptiva.} Sin datos no hay estadística que
 reportar: la tabla, el intervalo de confianza y la clasificación
@@ -549,32 +547,13 @@ anonimización por código de participante
 (\texttt{docs/etica/consentimientos/plantilla.md},
 \autoref{cap:materiales-metodos}).
 
-\textbf{Estado real.} \textbf{Pendiente.} La toma de datos con usuarios
-y el protocolo SUS se difieren formalmente como trabajo futuro para la
-fase de despliegue en producción (\autoref{sec:tf-sus}). Documentado
-como reabierto en \texttt{OBS-08} de
-\texttt{docs/observaciones/OBSERVACIONES.md}. Las
-\autoref{fig:res-sus-boxplot} y \autoref{fig:res-sus-items} muestran la
-salida del pipeline sobre esos datos mock (sin valor evidencial).
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.85\textwidth]{mediciones/sus/sus_boxplot.png}
-\caption{Distribución de puntuaciones SUS con datos mock/sintéticos de
-  prueba del pipeline (sin valor evidencial, $N=0$): la muestra real de
-  usabilidad queda reservada para fases futuras con despliegue en
-  producción.}
-\label{fig:res-sus-boxplot}
-\end{figure}
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.85\textwidth]{mediciones/sus/sus_items_breakdown.pdf}
-\caption{Desglose por ítem Q1--Q10 del instrumento SUS con datos
-  mock/sintéticos de prueba del pipeline (sin valor evidencial,
-  $N=0$): muestra real reservada para fases futuras.}
-\label{fig:res-sus-items}
-\end{figure}
+\textbf{Estado real.} \textbf{Pendiente / retirado como resultado.} La
+toma de datos con usuarios y el protocolo SUS se difieren formalmente
+como trabajo futuro para la fase de despliegue en producción
+(\autoref{sec:tf-sus}). Documentado como reabierto en \texttt{OBS-08} de
+\texttt{docs/observaciones/OBSERVACIONES.md}. Este bloque queda cerrado
+sin evidencia SUS evaluable: no hay consentimientos firmados versionados,
+no hay export crudo del instrumento y no hay conclusión de usabilidad.
 
 \section{Resumen de bloques}
 

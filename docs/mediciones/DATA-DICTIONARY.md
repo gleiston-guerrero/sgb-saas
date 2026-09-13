@@ -9,9 +9,9 @@ Entrega.
 > las 5 corridas de k6 (`docs/mediciones/perf/`), las 16 evidencias
 > OWASP (`docs/mediciones/sec/`), los 3 reportes JaCoCo
 > (`docs/mediciones/jacoco/`), las 2 corridas de Lighthouse
-> (`docs/mediciones/lighthouse/`) y la estructura del archivo SUS
-> (`docs/mediciones/sus/sus.csv`, datos mock — el bloque de usabilidad
-> sigue en $N=0$, ver `OBS-08`).
+> (`docs/mediciones/lighthouse/`) y la especificación del futuro archivo
+> SUS; el bloque de usabilidad sigue en $N=0$ y no conserva datos
+> versionados (ver `OBS-08`).
 
 ## `docs/mediciones/sec/2026-07-21-cookie-refresh-token.md`
 
@@ -170,24 +170,20 @@ formato de dato nuevo que no esté ya cubierto por las tablas de esta
 sección. Documentarlos aparte sería repetir la misma tabla sin aportar
 un campo nuevo -- decisión de esta tarea, no una omisión.
 
-## `docs/mediciones/sus/sus.csv`
+## Dataset SUS retirado
 
-**Datos de prueba (mock/sintéticos) para validación del pipeline de
-análisis automatizado — sin valor evidencial.** El bloque de usabilidad
-sigue en $N=0$ (ver `OBS-08` en
-`docs/observaciones/OBSERVACIONES.md`, reabierta): una corrida declarada
-como N=15 se retiró por falta de trazabilidad. La tabla de abajo
-documenta el **formato** que tendrá el dataset real (mismos campos que
-producirá el export del instrumento), no una recolección ejecutada. Los
-participantes de la futura corrida firmarán consentimiento informado
-(ver `docs/etica/consentimientos/plantilla.md`); los formularios
-firmados nunca se versionarán en este repositorio (ver
-`docs/etica/ETHICS.md` §(iii)).
+El repositorio ya no versiona `docs/mediciones/sus/sus.csv` ni las
+figuras derivadas de esa corrida. El bloque de usabilidad queda en
+$N=0$: la corrida previa se retiró por falta de trazabilidad a un export
+crudo del instrumento y por ausencia de consentimientos verificables sin
+exponer datos personales. Se conserva únicamente este diccionario como
+especificación del formato que deberá tener una corrida futura, una vez
+ejecutada con consentimiento informado.
 
 | Campo / variable | Tipo de dato | Unidad | Rango esperado | Significado |
 |---|---|---|---|---|
 | `codigo` | string | — | `P01` a `P15` | Identificador anónimo del participante. Nunca se incluye nombre, correo ni cédula. |
-| `fecha` | string (fecha ISO 8601) | — | `2026-08-28`, `2026-08-29`, `2026-08-30` | Fecha de la sesión de prueba (3 días de recolección). |
+| `fecha` | string (fecha ISO 8601) | — | fecha real de la sesión | Fecha de la sesión de prueba. |
 | `edad` | entero | años | 18–34 | Rango de edad del participante al momento de la prueba. |
 | `sexo` | string | — | `Femenino`, `Masculino` | Sexo autopercibido del participante (opcional en el instrumento; aquí se reporta para descripción demográfica). |
 | `experiencia_web` | string | — | `Basica`, `Intermedia`, `Avanzada` | Nivel de experiencia previa con sistemas web similares, autopercibido por el participante. |
@@ -213,18 +209,9 @@ score = ((Q1-1) + (5-Q2) + (Q3-1) + (5-Q4) + (Q5-1) +
          (5-Q6) + (Q7-1) + (5-Q8) + (Q9-1) + (5-Q10)) * 2.5
 ```
 
-## `docs/mediciones/sus/sus_boxplot.svg` y `sus_boxplot.png`
-
-Boxplot generado por `scripts/sus-analysis.ipynb` **sobre los datos mock
-de `sus.csv`** (solo validación del pipeline, sin valor evidencial).
-Incluye línea de umbral de aceptabilidad (68) y línea de media.
-
-## `docs/mediciones/sus/sus_items_breakdown.svg`
-
-Gráfico de barras horizontal con el promedio de cada ítem SUS (Q1–Q10) en
-escala Likert 1–5, generado por `scripts/sus-analysis.ipynb` **sobre los
-datos mock**. Ítems impares (positivos) en color verde; ítems pares
-(negativos) en naranja.
+Cuando exista una corrida real, las figuras SUS deberán generarse de
+nuevo desde el export crudo trazable. Hasta entonces no hay boxplot,
+desglose por ítem ni estadística descriptiva versionada para SUS.
 
 ## Referencias
 
