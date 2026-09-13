@@ -22,7 +22,7 @@ class ProcedureMappingContractTest {
     @Test
     void sideEffectRoutines_useProcedureAnnotationsRequiredByRubric() throws NoSuchMethodException {
         assertProcedure(LoanProcedureRepository.class, "spCreateLoanProcedure",
-                "sp_crear_prestamo", Long.class, Long.class, Long.class, Integer.class);
+                "proc_crear_prestamo", Long.class, Long.class, Long.class, Integer.class);
         assertProcedure(LoanProcedureRepository.class, "spRegisterLoanReturn",
                 "Prestamo.registrarDevolucion", Long.class);
         assertProcedure(FineProcedureRepository.class, "spPayFineProcedure",
@@ -31,22 +31,27 @@ class ProcedureMappingContractTest {
                 "Multa.anularMulta", Long.class, String.class, String.class);
     }
 
+    /**
+     * Desde V51 existe proc_expirar_reservaciones_vencidas (CREATE
+     * PROCEDURE nativo que envuelve la función sp_expirar_reservaciones_vencidas),
+     * así que esta rutina dejó de ser la excepción "es una FUNCTION, no se
+     * puede invocar con CALL" -- ahora declara @Procedure como las demás
+     * rutinas con efectos secundarios.
+     */
     @Test
-    void scalarPostgresFunctions_useNativeSelectWhenDatabaseObjectIsNotProcedure() throws NoSuchMethodException {
+    void reservationExpiry_usesProcedureAnnotationSinceV51WrapperExists() throws NoSuchMethodException {
         Method method = ReservationProcedureRepository.class
                 .getDeclaredMethod("spExpireReservationsVencidasProcedure");
 
-        assertThat(method.isAnnotationPresent(Procedure.class))
-                .as("PostgreSQL rejects CALL for sp_expirar_reservaciones_vencidas because it is a FUNCTION")
+        assertThat(method.isAnnotationPresent(Query.class))
+                .as("spExpireReservationsVencidasProcedure must not be implemented as @Query")
                 .isFalse();
 
-        Query query = method.getAnnotation(Query.class);
-        assertThat(query)
-                .as("scalar function must be invoked with SELECT, not CALL")
+        Procedure procedure = method.getAnnotation(Procedure.class);
+        assertThat(procedure)
+                .as("spExpireReservationsVencidasProcedure must declare @Procedure")
                 .isNotNull();
-        assertThat(query.nativeQuery()).isTrue();
-        assertThat(query.value())
-                .isEqualTo("SELECT sp_expirar_reservaciones_vencidas()");
+        assertThat(procedure.procedureName()).isEqualTo("proc_expirar_reservaciones_vencidas");
     }
 
     @Test
@@ -55,10 +60,10 @@ class ProcedureMappingContractTest {
         Map<String, String> fineProcedures = namedProcedures(Fine.class);
 
         assertThat(loanProcedures)
-                .containsEntry("Prestamo.registrarDevolucion", "sp_registrar_devolucion");
+                .containsEntry("Prestamo.registrarDevolucion", "proc_registrar_devolucion");
         assertThat(fineProcedures)
-                .containsEntry("Multa.pagarMulta", "sp_pagar_multa")
-                .containsEntry("Multa.anularMulta", "sp_anular_multa");
+                .containsEntry("Multa.pagarMulta", "proc_pagar_multa")
+                .containsEntry("Multa.anularMulta", "proc_anular_multa");
     }
 
     @Test
