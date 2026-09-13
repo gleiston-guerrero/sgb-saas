@@ -9,13 +9,23 @@ directamente en este directorio:
 
 - `docs/mediciones/jacoco/report.csv`
 - `docs/mediciones/jacoco/report.xml`
-- `docs/mediciones/jacoco/html/`
+
+`docs/mediciones/jacoco/html/` ya no se versiona (commit `7debd0b1`,
+higiene del arbol: el reporte HTML de JaCoCo es voluminoso y se regenera
+localmente con `mvnw clean verify` en `backend-springboot/target/site/jacoco/`
+cuando se necesita inspeccionarlo visualmente -- `report.csv`/`report.xml`
+bastan como fuente de cierre versionada. Esta nota reemplaza la mencion
+anterior a `html/` como tercer artefacto canonico, que habia quedado
+desactualizada tras esa limpieza.
 
 Estos artefactos corresponden a la corrida de cierre citada en
-`docs/capitulos/08-resultados.tex`: 88,06 % de lineas
-(`1793 / 2036`) y 76,90 % de ramas (`446 / 580`), calculado desde
-`report.csv` (corrida `mvnw clean verify` del 2026-09-13: 615 tests,
-0 fallos; servicios 87,38 %/77,70 %, controladores 97,03 %/75,51 %).
+`docs/capitulos/08-resultados.tex`: 87,41 % de lineas
+(`1805 / 2065`) y 76,19 % de ramas (`448 / 588`), calculado desde
+`report.csv` (corrida `mvnw clean verify` del 2026-09-13 sobre el HEAD que
+incluye V51 -- procedures nativos para P4 -- y la migracion de 3
+`nativeQuery` a JPQL: 620 tests, 0 fallos; servicios y controladores por
+capa quedan en el XML versionado, no se repiten aqui para evitar otra
+cifra que se desincronice por separado).
 
 ## Corridas historicas
 

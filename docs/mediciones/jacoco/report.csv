@@ -7,7 +7,7 @@ GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_
 ,com.uteq.backend.service,UserAdminService,16,595,9,37,0,112,9,41,1,26
 ,com.uteq.backend.service,ReservationService,23,458,9,31,1,106,11,30,2,19
 ,com.uteq.backend.service,SubscriptionAvailabilityService,0,151,0,12,0,29,0,14,0,8
-,com.uteq.backend.service,ConfigurationSystemService,20,140,0,2,5,36,1,10,1,9
+,com.uteq.backend.service,ConfigurationSystemService,26,134,0,2,5,36,2,9,2,8
 ,com.uteq.backend.service,ChatbotService,45,326,2,14,7,75,4,16,2,10
 ,com.uteq.backend.service,SuggestionAcquisitionService,36,185,6,4,5,46,7,11,3,10
 ,com.uteq.backend.service,VerificationEmailService,29,96,0,6,8,22,0,8,0,5
@@ -21,11 +21,12 @@ GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_
 ,com.uteq.backend.service,BackupStorageService,22,329,3,25,2,47,3,22,0,11
 ,com.uteq.backend.service,EmailService,100,73,5,3,20,17,4,4,1,3
 ,com.uteq.backend.service,BackupScheduleService,136,419,9,27,10,94,14,29,5,20
-,com.uteq.backend.scheduling,ReservationScheduler,0,80,0,2,0,24,0,7,0,6
-,com.uteq.backend.scheduling,UserScheduler,5,23,1,1,1,8,1,3,0,3
-,com.uteq.backend.scheduling,NotificationDueScheduler,6,91,0,2,0,25,1,5,1,4
-,com.uteq.backend.repository,LoanProcedureRepositoryCustomImpl,86,3,2,0,14,1,3,1,2,1
+,com.uteq.backend.scheduling,ReservationScheduler,0,97,0,4,0,34,0,8,0,6
+,com.uteq.backend.scheduling,UserScheduler,28,0,2,0,9,0,4,0,3,0
+,com.uteq.backend.scheduling,NotificationDueScheduler,5,109,1,3,2,34,1,6,0,5
+,com.uteq.backend.repository,LoanProcedureRepositoryCustomImpl,100,3,4,0,16,1,4,1,2,1
 ,com.uteq.backend.repository,FineProcedureRepositoryCustomImpl,86,3,0,0,16,1,2,1,2,1
+,com.uteq.backend.repository,ReservationProcedureRepositoryCustomImpl,30,3,2,0,5,1,2,1,1,1
 ,com.uteq.backend.repository,LoanProcedureRepository,20,0,0,0,3,0,3,0,3,0
 ,com.uteq.backend.controller,CategoryDamageController,0,130,0,10,0,20,0,11,0,6
 ,com.uteq.backend.controller,BookController,0,104,0,0,0,23,0,12,0,12
