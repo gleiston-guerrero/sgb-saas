@@ -44,7 +44,7 @@ public class FavoriteService {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
-    public FavoriteResponseDTO agregar(Long bookId, Authentication authentication) {
+    public FavoriteResponseDTO add(Long bookId, Authentication authentication) {
         Long userId = resolveIdByEmail(authentication.getName());
         Book book = bookRepo.findById(bookId)
                 .orElseThrow(() -> new EntityNotFoundException(LIBRO_NO_ENCONTRADO + bookId));
@@ -69,7 +69,7 @@ public class FavoriteService {
      * @param bookId identificador del registro que se usa para ubicar el recurso en la base de datos
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      */
-    public void quitar(Long bookId, Authentication authentication) {
+    public void remove(Long bookId, Authentication authentication) {
         Long userId = resolveIdByEmail(authentication.getName());
         if (!favoriteRepo.existsByUserIdAndBookId(userId, bookId)) {
             throw new EntityNotFoundException(String.format(FAVORITO_NO_ENCONTRADO, bookId));

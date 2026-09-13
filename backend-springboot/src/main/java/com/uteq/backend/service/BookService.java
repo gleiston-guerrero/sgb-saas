@@ -325,18 +325,18 @@ public class BookService {
             throw new IllegalArgumentException("El precio base no puede ser negativo");
         }
         Book book = fromDTO(dto);
-        if (esManagerOAdmin() && dto.priceBase() != null) {
+        if (isManagerOrAdmin() && dto.priceBase() != null) {
             // precio ya seteado en fromDTO; mantenerlo
-        } else if (esManagerOAdmin()) {
+        } else if (isManagerOrAdmin()) {
             // gerente/admin creando sin precio también va a pendiente según regla
         }
-        if (esManagerOAdmin()) {
+        if (isManagerOrAdmin()) {
             StatusBook pending = statusRepo.findByName(ESTADO_PENDIENTE).orElse(null);
             if (pending != null) {
                 book.setStatus(pending);
             }
         }
-        if (esLibrarianSolo() && book.getPriceBase() != null) {
+        if (isLibrarianOnly() && book.getPriceBase() != null) {
             book.setPriceBase(null);
         }
         BookResponseDTO result = toDTO(bookRepo.save(book));
@@ -393,13 +393,13 @@ public class BookService {
         book.setCategories(resolveCategories(dto.categoryIds()));
         book.setAuthors(resolveAuthors(dto.authorIds()));
         // Proveedor opcional: solo GERENTE/ADMIN pueden vincular (BIBLIOTECARIO -> S/P).
-        if (dto.supplierId() != null && esManagerOAdmin()) {
+        if (dto.supplierId() != null && isManagerOrAdmin()) {
             book.setSupplier(supplierRepo.getReferenceById(dto.supplierId()));
         } else {
             book.setSupplier(null);
         }
         // precioBase solo GERENTE/ADMIN puede modificar
-        if (esManagerOAdmin()) {
+        if (isManagerOrAdmin()) {
             if (dto.priceBase() != null && dto.priceBase().signum() < 0) {
                 throw new IllegalArgumentException("El precio base no puede ser negativo");
             }
@@ -532,13 +532,13 @@ public class BookService {
         }
     }
 
-    private boolean esManagerOAdmin() {
+    private boolean isManagerOrAdmin() {
         var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) return false;
         return auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_GERENTE") || a.getAuthority().equals("ROLE_ADMIN"));
     }
 
-    private boolean esLibrarianSolo() {
+    private boolean isLibrarianOnly() {
         var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) return false;
         boolean isBiblio = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_BIBLIOTECARIO"));
@@ -622,7 +622,7 @@ public class BookService {
         l.setCategories(resolveCategories(dto.categoryIds()));
         l.setAuthors(resolveAuthors(dto.authorIds()));
         // Proveedor opcional: solo GERENTE/ADMIN pueden vincular (BIBLIOTECARIO -> S/P).
-        if (dto.supplierId() != null && esManagerOAdmin()) {
+        if (dto.supplierId() != null && isManagerOrAdmin()) {
             l.setSupplier(supplierRepo.getReferenceById(dto.supplierId()));
         } else {
             l.setSupplier(null);

@@ -117,7 +117,7 @@ public class LoanService {
         validateLimitLoans(userId);
 
         // Ventanilla: si nace de una reserva, se valida ANTES de tocar stock y se vincula DESPUÉS del SP.
-        Reservation reservationSource = validateReservationSiAplica(dto, userId);
+        Reservation reservationSource = validateReservationIfApplicable(dto, userId);
         Long loanId = loanProcRepo.spCreateLoanProcedure(
                 userId, dto.bookId(), librarianId, dto.daysLoan());
         Loan loan = loanRepo.findById(loanId)
@@ -132,7 +132,7 @@ public class LoanService {
     }
 
     // Valida que la reservacionId sea una reserva VIGENTE del mismo usuario y libro; o null si es directo.
-    private Reservation validateReservationSiAplica(LoanRequestDTO dto, Long userId) {
+    private Reservation validateReservationIfApplicable(LoanRequestDTO dto, Long userId) {
         if (dto.reservationId() == null) {
             return null;
         }
@@ -246,7 +246,7 @@ public class LoanService {
                             + maxRenewals + " renovaciones permitidas.");
         }
 
-        if (existeReservationVigenteOtroUser(loan.getBookId(), loan.getUserId())) {
+        if (existsActiveReservationForOtherUser(loan.getBookId(), loan.getUserId())) {
             throw new MaterialReservadoException(
                     "El libro del préstamo " + loanId
                             + " tiene una reserva vigente de otro usuario.");
@@ -265,7 +265,7 @@ public class LoanService {
                 (short) (maxRenewals - loan.getRenewalsRealizadas()));
     }
 
-    private boolean existeReservationVigenteOtroUser(Long bookId, Long userIdDuenoLoan) {
+    private boolean existsActiveReservationForOtherUser(Long bookId, Long userIdDuenoLoan) {
         List<Integer> idsStatusesVigentes = ESTADOS_RESERVA_VIGENTE.stream()
                 .map(name -> statusReservationRepo.findByName(name)
                         .orElseThrow(() -> new IllegalStateException(
@@ -447,10 +447,10 @@ public class LoanService {
     // ── Propio vs cualquiera ──
     // LECTOR solo su propio usuarioId; BIBLIOTECARIO/GERENTE sin restricción.
     private void validateAccessUser(Long userIdSolicitado, Authentication authentication) {
-        boolean esReader = authentication.getAuthorities().stream()
+        boolean isReader = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(role -> role.equals("ROLE_" + ROL_LECTOR));
-        if (!esReader) {
+        if (!isReader) {
             return;
         }
         Long idOwn = resolveIdByEmail(authentication.getName());

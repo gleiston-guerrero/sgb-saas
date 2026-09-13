@@ -67,9 +67,9 @@ class NotificationDueSchedulerTest {
 
         scheduler.notifyNextsAExpire();
 
-        verify(notificationService).generateAlertaDue(p1);
-        verify(notificationService).generateAlertaDue(p2);
-        verify(notificationService, times(2)).generateAlertaDue(any());
+        verify(notificationService).generateDueAlert(p1);
+        verify(notificationService).generateDueAlert(p2);
+        verify(notificationService, times(2)).generateDueAlert(any());
     }
 
     @Test
@@ -79,7 +79,7 @@ class NotificationDueSchedulerTest {
 
         scheduler.notifyNextsAExpire();
 
-        verify(notificationService, never()).generateAlertaDue(any());
+        verify(notificationService, never()).generateDueAlert(any());
     }
 
     private StatusLoan status(Integer id, String name) {

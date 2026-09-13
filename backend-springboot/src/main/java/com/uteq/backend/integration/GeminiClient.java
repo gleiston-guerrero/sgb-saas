@@ -104,7 +104,7 @@ public class GeminiClient {
         }
         for (int attempt = 0; attempt < 2; attempt++) {
             try {
-                return llamarGemini(promptSystem, history, messageFresh, tools);
+                return callGemini(promptSystem, history, messageFresh, tools);
             } catch (HttpClientErrorException.TooManyRequests ex) {
                 log.warn("Gemini respondió 429 (intento {}/2)", attempt + 1);
                 if (attempt == 0) continue;
@@ -128,7 +128,7 @@ public class GeminiClient {
 
     // ── Lógica interna ────────────────────────────────────────────────────
 
-    private GeminiResponse llamarGemini(
+    private GeminiResponse callGemini(
             String promptSystem,
             List<MessageChat> history,
             String messageFresh,

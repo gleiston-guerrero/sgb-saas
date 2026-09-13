@@ -45,13 +45,13 @@ public class ReservationScheduler {
      * Handles expirar reservations Vencidas.
      */
     public void expireReservationsVencidas() {
-        notifyQueVanAExpire();
+        notifyExpiringSoon();
 
         Integer rowsUpdated = reservationProcedureRepository.spExpireReservationsVencidasProcedure();
         log.info("Job de expiración de reservaciones: {} filas actualizadas", rowsUpdated);
     }
 
-    private void notifyQueVanAExpire() {
+    private void notifyExpiringSoon() {
         List<Integer> statusIds = ESTADOS_RESERVA_POR_EXPIRAR.stream()
                 .map(this::idStatus)
                 .toList();

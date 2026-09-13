@@ -65,7 +65,7 @@ public class ReservationService {
      */
     @Transactional
     public ReservationResponseDTO create(ReservationRequestDTO dto, Authentication authentication) {
-        if (esReader(authentication)) {
+        if (isReader(authentication)) {
             Long idOwn = resolveIdByEmail(authentication.getName());
             if (!idOwn.equals(dto.userId())) {
                 throw new AuthorizationDeniedException(
@@ -158,7 +158,7 @@ public class ReservationService {
                 .orElseThrow(() -> new EntityNotFoundException(RESERVACION_NO_ENCONTRADA + reservationId));
 
         // LECTOR solo puede cancelar su propia reserva pendiente
-        if (esReader(authentication)) {
+        if (isReader(authentication)) {
             Long idOwn = resolveIdByEmail(authentication.getName());
             if (!idOwn.equals(reservation.getUserId())) {
                 throw new AuthorizationDeniedException("Un LECTOR solo puede cancelar sus propias reservaciones.");
@@ -250,7 +250,7 @@ public class ReservationService {
 
     // ── "Propio vs cualquiera", mismo patrón que PrestamoService. ──
     private void validateAccessUser(Long userIdSolicitado, Authentication authentication) {
-        if (!esReader(authentication)) {
+        if (!isReader(authentication)) {
             return;
         }
         Long idOwn = resolveIdByEmail(authentication.getName());
@@ -260,7 +260,7 @@ public class ReservationService {
         }
     }
 
-    private boolean esReader(Authentication authentication) {
+    private boolean isReader(Authentication authentication) {
         return authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(role -> role.equals("ROLE_" + ROL_LECTOR));

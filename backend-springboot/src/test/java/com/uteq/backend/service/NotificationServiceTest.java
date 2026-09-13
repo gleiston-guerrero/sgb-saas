@@ -54,14 +54,14 @@ class NotificationServiceTest {
     // failed" en SMTP -- solo el correo manual de verificacion de cuenta
     // sigue activo). ──
     @Test
-    void generateAlertaDue_loanWithoutAlertaPrevia_creaNotificationWithoutSendEmail() {
+    void generateDueAlert_loanWithoutAlertaPrevia_creaNotificationWithoutSendEmail() {
         given(typeNotificationRepo.findByName("VENCIMIENTO"))
                 .willReturn(Optional.of(typeWithId(1, "VENCIMIENTO")));
         given(notificationRepo.existsByLoanIdAndTypeNotificationId(50L, 1)).willReturn(false);
         given(userRepo.findById(1L)).willReturn(Optional.of(userWithEmail(1L, "lector@correo.com")));
         given(bookRepo.findById(2L)).willReturn(Optional.of(bookWithTitle("Clean Code")));
 
-        notificationService.generateAlertaDue(loanWithId(50L));
+        notificationService.generateDueAlert(loanWithId(50L));
 
         verify(notificationRepo).save(any());
         verify(emailService, never()).sendEmail(any(), any(), any());
@@ -69,12 +69,12 @@ class NotificationServiceTest {
 
     // ── Test 2: dedup -- ya existe una alerta VENCIMIENTO para este préstamo ──
     @Test
-    void generateAlertaDue_yaNotificadoAntes_notReenviaNiDuplica() {
+    void generateDueAlert_yaNotificadoAntes_notReenviaNiDuplica() {
         given(typeNotificationRepo.findByName("VENCIMIENTO"))
                 .willReturn(Optional.of(typeWithId(1, "VENCIMIENTO")));
         given(notificationRepo.existsByLoanIdAndTypeNotificationId(50L, 1)).willReturn(true);
 
-        notificationService.generateAlertaDue(loanWithId(50L));
+        notificationService.generateDueAlert(loanWithId(50L));
 
         verify(notificationRepo, never()).save(any());
         verify(emailService, never()).sendEmail(any(), any(), any());

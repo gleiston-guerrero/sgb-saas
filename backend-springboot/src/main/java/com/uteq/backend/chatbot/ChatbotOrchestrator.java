@@ -176,7 +176,7 @@ public class ChatbotOrchestrator {
                     i + 1, response.functionName(), response.functionArgs());
 
             // Inyectar usuario_id si la tool lo requiere
-            JsonNode argsFinal = inyectarUserIdSiRequired(response.functionName(), response.functionArgs(), userId);
+            JsonNode argsFinal = injectUserIdIfRequired(response.functionName(), response.functionArgs(), userId);
 
             // Ejecutar la tool real
             JsonNode result = toolRegistry.execute(response.functionName(), argsFinal);
@@ -275,7 +275,7 @@ public class ChatbotOrchestrator {
      * y permite que tools como {@code consultar_multas}, {@code consultar_prestamos}
      * y {@code consultar_reservaciones} funcionen transparentes.
      */
-    private JsonNode inyectarUserIdSiRequired(String toolName, JsonNode args, Long userId) {
+    private JsonNode injectUserIdIfRequired(String toolName, JsonNode args, Long userId) {
         if (toolRegistry.requiresUserId(toolName)) {
             if (args == null || args.isNull() || !args.has(AbstractUserAwareTool.USUARIO_ID) || args.path(AbstractUserAwareTool.USUARIO_ID).asLong(0) == 0) {
                 ObjectNode argsWithUser = mapper.createObjectNode();

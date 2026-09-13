@@ -40,26 +40,26 @@ public class ReportPdfService {
     private static final String HEADER_PRESTAMOS = "Préstamos";
     private static final String HEADER_CATEGORIA = "Categoría";
 
-    private static PdfFont createFuenteNegrita() {
+    private static PdfFont createBoldFont() {
         try {
             return PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
         } catch (IOException ex) {
-            throw new IllegalStateException("No se pudo cargar la fuente negrita del PDF", ex);
+            throw new IllegalStateException("No se pudo cargar la fuente en negrita del PDF", ex);
         }
     }
 
-    private void agregarEncabezado(Document document, String title, PdfFont negrita) {
+    private void addHeader(Document document, String title, PdfFont bold) {
         document.add(new Paragraph("Leibri — Sistema de Gestión de Biblioteca")
-                .setFont(negrita).setFontSize(14));
+                .setFont(bold).setFontSize(14));
         document.add(new Paragraph(title).setFontSize(12));
         document.add(new Paragraph("Generado: " + OffsetDateTime.now().format(FORMATO_FECHA_GENERACION))
                 .setFontSize(9));
         document.add(new Paragraph("\n"));
     }
 
-    private Cell celdaEncabezado(String text, PdfFont negrita) {
+    private Cell headerCell(String text, PdfFont bold) {
         return new Cell()
-                .add(new Paragraph(text).setFont(negrita).setFontSize(8))
+                .add(new Paragraph(text).setFont(bold).setFontSize(8))
                 .setTextAlignment(TextAlignment.CENTER)
                 .setBackgroundColor(com.itextpdf.kernel.colors.ColorConstants.LIGHT_GRAY);
     }
@@ -69,7 +69,7 @@ public class ReportPdfService {
     }
 
     /** Primer valor no nulo, o el texto de vacío si todos son nulos. */
-    private static String primeroNotNulo(String... values) {
+    private static String firstNonNull(String... values) {
         for (String v : values) {
             if (v != null) return v;
         }
@@ -81,14 +81,14 @@ public class ReportPdfService {
      * Permite reutilizar el trazado en reportes con cuerpo previo
      * (ej. resumen financiero con párrafos de totales).
      */
-    private <T> void agregarTable(Document document, PdfFont negrita, float[] anchosColumns,
-                                  List<String> headers, List<T> rows, BiConsumer<Table, T> agregarRow) {
-        Table table = new Table(UnitValue.createPercentArray(anchosColumns)).useAllAvailableWidth();
+    private <T> void addTable(Document document, PdfFont bold, float[] columnWidths,
+                                  List<String> headers, List<T> rows, BiConsumer<Table, T> addRow) {
+        Table table = new Table(UnitValue.createPercentArray(columnWidths)).useAllAvailableWidth();
         for (String header : headers) {
-            table.addHeaderCell(celdaEncabezado(header, negrita));
+            table.addHeaderCell(headerCell(header, bold));
         }
         for (T row : rows) {
-            agregarRow.accept(table, row);
+            addRow.accept(table, row);
         }
         document.add(table);
     }
@@ -97,17 +97,17 @@ public class ReportPdfService {
      * Genera un PDF estándar: encabezado + (mensaje de vacío | tabla).
      */
     private <T> byte[] generatePdf(String title, String messageVacio, List<T> rows,
-                                  float[] anchosColumns, List<String> headers,
-                                  BiConsumer<Table, T> agregarRow) {
+                                  float[] columnWidths, List<String> headers,
+                                  BiConsumer<Table, T> addRow) {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         try (PdfDocument pdfDoc = new PdfDocument(new PdfWriter(output));
              Document document = new Document(pdfDoc)) {
-            PdfFont negrita = createFuenteNegrita();
-            agregarEncabezado(document, title, negrita);
+            PdfFont bold = createBoldFont();
+            addHeader(document, title, bold);
             if (rows.isEmpty()) {
                 document.add(new Paragraph(messageVacio));
             } else {
-                agregarTable(document, negrita, anchosColumns, headers, rows, agregarRow);
+                addTable(document, bold, columnWidths, headers, rows, addRow);
             }
         }
         return output.toByteArray();
@@ -246,18 +246,18 @@ public class ReportPdfService {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         try (PdfDocument pdfDoc = new PdfDocument(new PdfWriter(output));
              Document document = new Document(pdfDoc)) {
-            PdfFont negrita = createFuenteNegrita();
-            agregarEncabezado(document, "Resumen financiero de multas", negrita);
-            document.add(new Paragraph("Recaudado: $" + dto.totalRecaudado()).setFont(negrita));
+            PdfFont bold = createBoldFont();
+            addHeader(document, "Resumen financiero de multas", bold);
+            document.add(new Paragraph("Recaudado: $" + dto.totalRecaudado()).setFont(bold));
             document.add(new Paragraph("Pendiente: $" + dto.totalPending()));
             document.add(new Paragraph("Generado hoy: $" + dto.totalGeneratedToday()));
             document.add(new Paragraph("\n"));
             if (dto.paymentsRecientes() == null || dto.paymentsRecientes().isEmpty()) {
                 document.add(new Paragraph("Sin pagos recientes."));
             } else {
-                agregarTable(
+                addTable(
                         document,
-                        negrita,
+                        bold,
                         new float[]{1, 2, 2, 3, 3},
                         List.of("Multa", "Monto", "Fecha", HEADER_USUARIO, "Libro"),
                         dto.paymentsRecientes(),
@@ -267,7 +267,7 @@ public class ReportPdfService {
                             table.addCell(new Cell().add(new Paragraph(p.datePaid() != null
                                     ? p.datePaid().format(FORMATO_FECHA_CORTA) : TEXTO_VACIO)));
                             table.addCell(new Cell().add(new Paragraph(
-                                    primeroNotNulo(p.userName(), p.userEmail()))));
+                                    firstNonNull(p.userName(), p.userEmail()))));
                             table.addCell(new Cell().add(new Paragraph(p.bookTitle() != null ? p.bookTitle() : TEXTO_VACIO)));
                         });
             }

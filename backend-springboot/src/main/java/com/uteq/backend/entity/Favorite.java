@@ -41,7 +41,7 @@ public class Favorite {
     // lo que violaría el NOT NULL -- mismo motivo por el que Libro fija
     // fechaRegistro en @PrePersist en vez de confiar en el default SQL.
     @PrePersist
-    private void antesGuardar() {
+    private void beforePersist() {
         this.agregado = OffsetDateTime.now();
     }
 }

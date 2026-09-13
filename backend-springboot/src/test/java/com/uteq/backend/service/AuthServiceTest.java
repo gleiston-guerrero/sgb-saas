@@ -207,7 +207,7 @@ class AuthServiceTest {
 
         when(userRepository.findByEmail("lector@correo.com")).thenReturn(Optional.of(userExisting));
 
-        assertThrows(EmailYaRegistradoException.class, () -> authService.register(dto));
+        assertThrows(EmailAlreadyRegisteredException.class, () -> authService.register(dto));
 
         verify(userRepository, never()).save(any());
     }

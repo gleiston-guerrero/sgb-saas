@@ -67,13 +67,13 @@ public class AuthService {
      *
      * @param dto solicitud con nombre, apellido, correo de acceso y contraseña en claro sin cifrar
      * @return vista resumida del usuario persistido con identificador, nombre, correo y roles asignados
-     * @throws EmailYaRegistradoException si ya existe un usuario con el correo solicitado
+     * @throws EmailAlreadyRegisteredException si ya existe un usuario con el correo solicitado
      * @throws EmailDomainNotAllowedException si el dominio del correo no figura entre los permitidos
      * @throws IllegalStateException si faltan las filas de catálogo del rol LECTOR o del estado inicial
      */
     public UserResponseDTO register(RegistrationRequestDTO dto) {
         userRepository.findByEmail(dto.email()).ifPresent(user -> {
-            throw new EmailYaRegistradoException("El correo ya está registrado: " + dto.email());
+            throw new EmailAlreadyRegisteredException("El correo ya está registrado: " + dto.email());
         });
 
         validateDomainEmail(dto.email());

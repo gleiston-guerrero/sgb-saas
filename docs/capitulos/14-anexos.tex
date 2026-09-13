@@ -545,10 +545,23 @@ La documentación Javadoc del backend queda respaldada por una auditoría
 reproducible versionada en
 \texttt{docs/mediciones/backend/javadoc-audit.md}. El comando
 \texttt{python scripts\textbackslash audit-javadocs.py} cuenta
-\textbf{352 de 386} métodos públicos documentados
-(\textbf{91,19\,\%}), junto con 564 etiquetas \texttt{@param}, 339
-\texttt{@return} y 80 \texttt{@throws}; las brechas restantes se listan
-por archivo para no depender de una cifra manual.
+\textbf{403 de 403} métodos públicos documentados
+(\textbf{100,00\,\%}), junto con 679 etiquetas \texttt{@param}, 369
+\texttt{@return} y 80 \texttt{@throws}; además,
+\texttt{mvn javadoc:javadoc} termina sin errores sobre el backend, como
+exige la rúbrica para el nivel Completo.
+
+Los nombres del código del backend quedan respaldados por una auditoría
+reproducible versionada en
+\texttt{docs/mediciones/backend/english-names-audit.md}. El comando
+\texttt{python scripts\textbackslash audit-english-names.py} reporta
+\textbf{0 de 283} tipos y \textbf{0 de 642} métodos con raíz española
+(\textbf{0,00\,\%}), y una verificación ampliada con un diccionario de
+más de 700 voces deja solo 7 métodos con cognados válidos en inglés
+(\texttt{error}, \texttt{local}, \texttt{via}, \texttt{principal}),
+documentados como excepciones en la propia evidencia. Los identificadores
+con raíz española real se renombraron sin tocar contratos externos
+(rutas, nombres de parámetros \texttt{@RequestParam} ni firmas SQL).
 
 \subsection*{Reproducibilidad documental}
 

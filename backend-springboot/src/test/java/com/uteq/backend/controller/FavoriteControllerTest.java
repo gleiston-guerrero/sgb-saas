@@ -45,7 +45,7 @@ class FavoriteControllerTest extends WebMvcControllerTestSupport {
 
     @Test
     void agregar_bookExisting_devuelve201() throws Exception {
-        when(favoriteService.agregar(eq(3L), any())).thenReturn(favorite());
+        when(favoriteService.add(eq(3L), any())).thenReturn(favorite());
 
         mockMvc.perform(post("/api/v1/favoritos/3"))
                 .andExpect(status().isCreated())
@@ -55,7 +55,7 @@ class FavoriteControllerTest extends WebMvcControllerTestSupport {
 
     @Test
     void agregar_bookInexistente_devuelve404() throws Exception {
-        when(favoriteService.agregar(eq(99L), any()))
+        when(favoriteService.add(eq(99L), any()))
                 .thenThrow(new EntityNotFoundException("Libro no encontrado: 99"));
 
         mockMvc.perform(post("/api/v1/favoritos/99"))
@@ -70,7 +70,7 @@ class FavoriteControllerTest extends WebMvcControllerTestSupport {
 
     @Test
     void quitar_inexistente_devuelve404() throws Exception {
-        doThrow(new EntityNotFoundException("Favorito no encontrado")).when(favoriteService).quitar(eq(99L), any());
+        doThrow(new EntityNotFoundException("Favorito no encontrado")).when(favoriteService).remove(eq(99L), any());
 
         mockMvc.perform(delete("/api/v1/favoritos/99"))
                 .andExpect(status().isNotFound());

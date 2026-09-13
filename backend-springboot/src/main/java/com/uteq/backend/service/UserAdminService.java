@@ -90,7 +90,7 @@ public class UserAdminService {
                                                   Authentication authentication, boolean soloMios) {
         String text = filter == null ? "" : filter.trim();
         Long createdBy = null;
-        if (authentication != null && (soloMios || esManager(authentication))) {
+        if (authentication != null && (soloMios || isManager(authentication))) {
             createdBy = resolveIdByEmail(authentication.getName());
         }
         Page<User> page = userRepo.searchWithFilters(text, createdBy, pageable);
@@ -127,7 +127,7 @@ public class UserAdminService {
                 .orElseThrow(() -> new IllegalArgumentException(ROL_NO_ENCONTRADO + freshRole));
         Long executorId = resolveIdByEmail(authentication == null ? null : authentication.getName());
         // GERENTE solo cambia rol a sus creados y solo LECTOR/BIBLIOTECARIO.
-        if (esManager(authentication)) {
+        if (isManager(authentication)) {
             if (!ROLES_GERENTE_PERMITIDOS.contains(freshRole)) {
                 throw new org.springframework.security.access.AccessDeniedException(
                         "GERENTE solo puede asignar roles LECTOR o BIBLIOTECARIO");
@@ -167,7 +167,7 @@ public class UserAdminService {
                 .orElseThrow(() -> new IllegalArgumentException(ESTADO_NO_ENCONTRADO + freshStatus));
         Long executorId = resolveIdByEmail(authentication == null ? null : authentication.getName());
         // GERENTE solo bloquea/reactiva (ACTIVO/INACTIVO) a sus creados.
-        if (esManager(authentication)) {
+        if (isManager(authentication)) {
             if (!ESTADOS_GERENTE_PERMITIDOS.contains(freshStatus)) {
                 throw new org.springframework.security.access.AccessDeniedException(
                         "GERENTE solo puede bloquear o reactivar usuarios");
@@ -200,16 +200,16 @@ public class UserAdminService {
      * @param dto solicitud con nombre, apellido, correo, contraseña en claro sin cifrar y nombre del rol a asignar
      * @param authentication identidad autenticada desde el JWT de la que se deriva el ejecutor y su alcance
      * @return vista resumida del usuario persistido con identificador, nombre, correo y roles asignados
-     * @throws EmailYaRegistradoException si ya existe un usuario con el correo solicitado
+     * @throws EmailAlreadyRegisteredException si ya existe un usuario con el correo solicitado
      * @throws org.springframework.security.access.AccessDeniedException si un GERENTE intenta crear un rol fuera de su alcance
      * @throws IllegalArgumentException si el nombre de rol no existe en el catálogo
      * @throws IllegalStateException si falta la fila de catálogo del estado ACTIVO
      */
     @Transactional
     public com.uteq.backend.dto.UserResponseDTO createUser(com.uteq.backend.dto.CreateUserAdminRequestDTO dto, Authentication authentication) {
-        userRepo.findByEmail(dto.email()).ifPresent(u -> { throw new com.uteq.backend.service.EmailYaRegistradoException("El correo ya está registrado: " + dto.email()); });
+        userRepo.findByEmail(dto.email()).ifPresent(u -> { throw new com.uteq.backend.service.EmailAlreadyRegisteredException("El correo ya está registrado: " + dto.email()); });
         // GERENTE solo crea LECTOR o BIBLIOTECARIO.
-        if (esManager(authentication) && !ROLES_GERENTE_PERMITIDOS.contains(dto.role())) {
+        if (isManager(authentication) && !ROLES_GERENTE_PERMITIDOS.contains(dto.role())) {
             throw new org.springframework.security.access.AccessDeniedException(
                     "GERENTE solo puede crear usuarios LECTOR o BIBLIOTECARIO");
         }
@@ -295,7 +295,7 @@ public class UserAdminService {
     }
 
     // GERENTE opera solo sobre sus creados; ADMIN sin restricción.
-    private boolean esManager(Authentication authentication) {
+    private boolean isManager(Authentication authentication) {
         if (authentication == null || authentication.getAuthorities() == null) return false;
         return authentication.getAuthorities().stream()
                 .anyMatch(a -> "ROLE_GERENTE".equals(a.getAuthority()));

@@ -211,10 +211,10 @@ public class FineService {
     }
 
     private void validateAccessUser(Long userIdSolicitado, Authentication authentication) {
-        boolean esReader = authentication.getAuthorities().stream()
+        boolean isReader = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(role -> role.equals(PREFIJO_ROL + ROL_LECTOR));
-        if (!esReader) {
+        if (!isReader) {
             return;
         }
         Long idOwn = resolveIdByEmail(authentication.getName());

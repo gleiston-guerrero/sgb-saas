@@ -36,10 +36,10 @@ public class FavoriteController {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
-    public ResponseEntity<FavoriteResponseDTO> agregar(
+    public ResponseEntity<FavoriteResponseDTO> add(
             @PathVariable("libroId") Long bookId, Authentication authentication) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(favoriteService.agregar(bookId, authentication));
+                .body(favoriteService.add(bookId, authentication));
     }
 
     // ── DELETE /api/v1/favoritos/{libroId} ────────────────
@@ -52,9 +52,9 @@ public class FavoriteController {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
-    public ResponseEntity<Void> quitar(
+    public ResponseEntity<Void> remove(
             @PathVariable("libroId") Long bookId, Authentication authentication) {
-        favoriteService.quitar(bookId, authentication);
+        favoriteService.remove(bookId, authentication);
         return ResponseEntity.noContent().build();
     }
 

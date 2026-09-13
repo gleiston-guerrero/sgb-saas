@@ -3,7 +3,7 @@ package com.uteq.backend.exception;
 import com.uteq.backend.service.ChatbotRateLimitExceededException;
 import com.uteq.backend.service.CodeVerificationInvalidException;
 import com.uteq.backend.service.EmailDomainNotAllowedException;
-import com.uteq.backend.service.EmailYaRegistradoException;
+import com.uteq.backend.service.EmailAlreadyRegisteredException;
 import com.uteq.backend.service.StatusReservationInitialNotConfiguredException;
 import com.uteq.backend.service.LimitLoansExceededException;
 import com.uteq.backend.service.LimitRenewalsExceededException;
@@ -52,13 +52,13 @@ public class GlobalExceptionHandler {
 
     // ── Registro y préstamos ──────────────────────────────────
 
-    @ExceptionHandler(EmailYaRegistradoException.class)
+    @ExceptionHandler(EmailAlreadyRegisteredException.class)
     /**
          * Maneja el caso en que el correo ya est registrado en el sistema.
      * @param ex excepcin que indica que el correo ya est registrado
      * @return ProblemDetail con estado 409 y el mensaje del conflicto
      */
-    public ProblemDetail handleEmailYaRegistrado(EmailYaRegistradoException ex) {
+    public ProblemDetail handleEmailAlreadyRegistered(EmailAlreadyRegisteredException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
     }
 

@@ -10,7 +10,7 @@ import com.uteq.backend.security.JwtAuthFilter;
 import com.uteq.backend.security.JwtService;
 import com.uteq.backend.security.UserDetailsServiceImpl;
 import com.uteq.backend.service.AuthService;
-import com.uteq.backend.service.EmailYaRegistradoException;
+import com.uteq.backend.service.EmailAlreadyRegisteredException;
 import com.uteq.backend.service.LoginRateLimitExceededException;
 import com.uteq.backend.service.RefreshTokenInvalidException;
 import jakarta.servlet.http.Cookie;
@@ -96,7 +96,7 @@ class AuthControllerTest {
     void registration_emailDuplicate_devuelve409ProblemDetail() throws Exception {
         RegistrationRequestDTO dto = new RegistrationRequestDTO("Nueva", "Persona", "duplicado@correo.com", "password123");
         when(authService.register(any()))
-                .thenThrow(new EmailYaRegistradoException("El correo ya está registrado: duplicado@correo.com"));
+                .thenThrow(new EmailAlreadyRegisteredException("El correo ya está registrado: duplicado@correo.com"));
 
         mockMvc.perform(post("/api/auth/registro")
                         .contentType("application/json")

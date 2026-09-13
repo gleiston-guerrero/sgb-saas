@@ -42,7 +42,7 @@ class FavoriteServiceTest {
         given(favoriteRepo.existsByUserIdAndBookId(7L, 1L)).willReturn(false);
         given(favoriteRepo.save(org.mockito.ArgumentMatchers.any())).willReturn(new Favorite(7L, 1L));
 
-        FavoriteResponseDTO result = favoriteService.agregar(1L, authentication);
+        FavoriteResponseDTO result = favoriteService.add(1L, authentication);
 
         assertThat(result.userId()).isEqualTo(7L);
         assertThat(result.bookId()).isEqualTo(1L);
@@ -56,7 +56,7 @@ class FavoriteServiceTest {
         given(userRepo.findByEmail("lector@correo.com")).willReturn(Optional.of(userWithId(7L)));
         given(bookRepo.findById(99L)).willReturn(Optional.empty());
 
-        assertThatThrownBy(() -> favoriteService.agregar(99L, authentication))
+        assertThatThrownBy(() -> favoriteService.add(99L, authentication))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessageContaining("99");
     }
@@ -71,7 +71,7 @@ class FavoriteServiceTest {
         given(favoriteRepo.existsByUserIdAndBookId(7L, 1L)).willReturn(true);
         given(favoriteRepo.findByUserId(7L)).willReturn(List.of(new Favorite(7L, 1L)));
 
-        FavoriteResponseDTO result = favoriteService.agregar(1L, authentication);
+        FavoriteResponseDTO result = favoriteService.add(1L, authentication);
 
         assertThat(result.bookId()).isEqualTo(1L);
         verify(favoriteRepo, org.mockito.Mockito.never()).save(org.mockito.ArgumentMatchers.any());
@@ -84,7 +84,7 @@ class FavoriteServiceTest {
         given(userRepo.findByEmail("lector@correo.com")).willReturn(Optional.of(userWithId(7L)));
         given(favoriteRepo.existsByUserIdAndBookId(7L, 1L)).willReturn(false);
 
-        assertThatThrownBy(() -> favoriteService.quitar(1L, authentication))
+        assertThatThrownBy(() -> favoriteService.remove(1L, authentication))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 

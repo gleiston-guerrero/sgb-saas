@@ -57,7 +57,7 @@ public class SuggestionAcquisition {
     @Column(name = "creado_en", updatable = false)  private OffsetDateTime created;
 
     @PrePersist
-    private void antesGuardar() {
+    private void beforePersist() {
         this.created = OffsetDateTime.now();
         if (this.status == null) {
             this.status = PENDIENTE;

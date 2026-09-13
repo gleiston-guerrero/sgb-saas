@@ -127,7 +127,7 @@ public class Book {
     private Set<Author> authors = new HashSet<>();
 
     @PrePersist
-    private void antesGuardar() {
+    private void beforePersist() {
         this.dateRegistration = OffsetDateTime.now();
         this.updated = OffsetDateTime.now();
     }

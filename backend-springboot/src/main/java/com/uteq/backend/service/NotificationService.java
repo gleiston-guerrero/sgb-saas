@@ -71,7 +71,7 @@ public class NotificationService {
      * @param loan préstamo próximo a vencer, con usuario, libro y fecha estimada
      */
     @Transactional
-    public void generateAlertaDue(Loan loan) {
+    public void generateDueAlert(Loan loan) {
         Integer typeId = idType(TIPO_VENCIMIENTO);
         if (notificationRepo.existsByLoanIdAndTypeNotificationId(loan.getId(), typeId)) {
             return;
@@ -269,10 +269,10 @@ public class NotificationService {
     }
 
     private void validateAccessUser(Long userIdSolicitado, Authentication authentication) {
-        boolean esReader = authentication.getAuthorities().stream()
+        boolean isReader = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(role -> role.equals("ROLE_" + ROL_LECTOR));
-        if (!esReader) {
+        if (!isReader) {
             return;
         }
         Long idOwn = userRepo.findByEmail(authentication.getName())

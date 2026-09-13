@@ -58,7 +58,7 @@ public class NotificationDueScheduler {
                 .findByStatusLoanIdInAndDateLoanReturnEstimadaBetween(statusIds, ahora, limit);
 
         for (Loan loan : nextsAExpire) {
-            notificationService.generateAlertaDue(loan);
+            notificationService.generateDueAlert(loan);
         }
 
         log.info("Job de notificación de vencimiento: {} préstamos evaluados (ventana: {} días)", nextsAExpire.size(), daysAnticipacion);
