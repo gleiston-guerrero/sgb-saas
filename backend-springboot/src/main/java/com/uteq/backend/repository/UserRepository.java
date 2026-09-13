@@ -56,10 +56,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // Auto-eliminación de cuentas no verificados: borra usuarios cuyo
     // correo no fue verificado dentro de las últimas 24 horas. Invocado
-    // periódicamente por UsuarioScheduler.
+    // periódicamente por UsuarioScheduler. Migrada de nativeQuery a JPQL
+    // (P4): DELETE masivo sin sintaxis especifica de motor.
     @org.springframework.data.jpa.repository.Query(
-            value = "DELETE FROM usuarios WHERE correo_verificado = false AND fecha_registro < :cutoff",
-            nativeQuery = true)
+            "DELETE FROM User u WHERE u.emailVerified = false AND u.dateRegistration < :cutoff")
     @org.springframework.data.jpa.repository.Modifying
     @org.springframework.transaction.annotation.Transactional
     int deleteNotVerifiedsBefore(@org.springframework.data.repository.query.Param("cutoff") java.time.Instant cutoff);

@@ -38,6 +38,10 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
     // Préstamos activos del LECTOR: misma lógica que
     // fn_listar_prestamos_activos_por_usuario pero como query nativa JPA
     // para evitar dependencia del stored procedure en producción.
+    // Revisada para P4 (nativeQuery -> JPQL): se mantiene nativa porque usa
+    // (fecha::date - NOW()::date)::INTEGER, cast/aritmetica de fechas
+    // especifica de PostgreSQL sin equivalente portable en JPQL para
+    // calcular dias_restantes como columna proyectada.
     @Query(value = "SELECT p.id AS prestamo_id, l.titulo AS libro_titulo, l.isbn AS libro_isbn, "
             + "p.fecha_prestamo, p.fecha_devolucion_estimada, "
             + "(p.fecha_devolucion_estimada::date - NOW()::date)::INTEGER AS dias_restantes, "

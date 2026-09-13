@@ -50,9 +50,20 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     Page<Book> findByCategories_IdAndAuthors_IdAndStatusId(Integer categoryId, Long authorId, Integer statusId, Pageable pageable);
 
     // --- Queries nativas: isbn puede ser bytea o varchar en BD real ---
-    // Todas usan isbn::text para兼容 ambos tipos (bytea y varchar).
+    // Todas usan isbn::text para compatibilidad con ambos tipos (bytea y varchar).
     // Las queries anteriores eran JPQL con LOWER(l.isbn) que fallaba si
     // isbn es bytea ("function lower(bytea) does not exist").
+    //
+    // Revisadas de nuevo para P4 (nativeQuery -> JPQL): se mantienen
+    // nativas a proposito. schema.sql declara isbn character varying(13)
+    // hoy, pero el fallo LOWER(bytea) documentado arriba fue real contra
+    // una instancia con drift de tipo -- no hay migracion que garantice
+    // que toda base desplegada (incluida Neon en produccion) esta en el
+    // tipo actual. El cast ::text y similarity() (pg_trgm, en
+    // suggestByTitle) son ademas sintaxis especifica de PostgreSQL sin
+    // equivalente portable en JPQL. Revertir a JPQL aqui arriesgaria
+    // reproducir el incidente ya documentado a cambio de una anotacion;
+    // no es un cambio de bajo riesgo.
 
     // Búsqueda por título O ISBN con estado específico + filtro opcional disponible
     @Query(value = "SELECT l.* FROM libros l "

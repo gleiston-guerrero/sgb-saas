@@ -44,6 +44,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     // retiro cae HOY, con libro/usuario ya resueltos (evita el N+1 que
     // tendría el frontend pidiendo cada libro/usuario por separado para
     // un widget que se carga en cada visita al dashboard).
+    // Revisadas para P4 (nativeQuery -> JPQL): searchReservationsToday y
+    // searchReservationsNexts se mantienen nativas por CURRENT_DATE +
+    // INTERVAL '1 day' (literal de intervalo especifico de PostgreSQL, sin
+    // equivalente portable en JPQL).
     @Query(value = """
         SELECT r.id AS reservacionId,
                u.nombre || ' ' || u.apellido AS usuarioNombre,
