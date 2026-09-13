@@ -64,15 +64,47 @@ public class RedisConfig {
     public CacheErrorHandler cacheErrorHandler() {
         return new CacheErrorHandler() {
             private final Logger log = LoggerFactory.getLogger(CacheErrorHandler.class);
+            /**
+             * Logs a cache read failure and lets the request continue without
+             * cache (Redis works as a degraded optional layer, never fatal).
+             *
+             * @param e runtime failure raised by the cache read
+             * @param cache cache region where the read failed
+             * @param key key that could not be read from the cache
+             */
             @Override public void handleCacheGetError(RuntimeException e, org.springframework.cache.Cache cache, Object key) {
                 log.warn("Cache get error (Redis degradado) cache={} key={}: {}", cache.getName(), key, e.toString());
             }
+            /**
+             * Logs a cache write failure and lets the request continue; the
+             * response is still served even though it was not cached.
+             *
+             * @param e runtime failure raised by the cache write
+             * @param cache cache region where the write failed
+             * @param key key that could not be written to the cache
+             * @param value value that could not be stored in the cache
+             */
             @Override public void handleCachePutError(RuntimeException e, org.springframework.cache.Cache cache, Object key, Object value) {
                 log.warn("Cache put error (Redis degradado) cache={} key={}: {}", cache.getName(), key, e.toString());
             }
+            /**
+             * Logs a cache eviction failure; a stale entry may survive until
+             * its TTL expires, which the short TTLs keep harmless.
+             *
+             * @param e runtime failure raised by the cache eviction
+             * @param cache cache region where the eviction failed
+             * @param key key that could not be evicted from the cache
+             */
             @Override public void handleCacheEvictError(RuntimeException e, org.springframework.cache.Cache cache, Object key) {
                 log.warn("Cache evict error (Redis degradado) cache={} key={}: {}", cache.getName(), key, e.toString());
             }
+            /**
+             * Logs a cache clear failure; entries remain until TTL expiry
+             * instead of being wiped at once.
+             *
+             * @param e runtime failure raised by the cache clear
+             * @param cache cache region that could not be cleared
+             */
             @Override public void handleCacheClearError(RuntimeException e, org.springframework.cache.Cache cache) {
                 log.warn("Cache clear error (Redis degradado) cache={}: {}", cache.getName(), e.toString());
             }

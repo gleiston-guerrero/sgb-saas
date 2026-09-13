@@ -17,15 +17,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "backend-springboot" / "src" / "main" / "java"
 
+NON_PAREN = r"(?:[^()]|\([^()]*\))*"
 METHOD_RE = re.compile(
     r"(?P<javadoc>/\*\*.*?\*/\s*)?"
-    r"(?P<annotations>(?:@\w+(?:\([^)]*\))?\s*)*)"
+    r"(?P<annotations>(?:@\w+(?:\(" + NON_PAREN + r"\))?\s*)*)"
     r"public\s+"
     r"(?!class\b|interface\b|enum\b|record\b|@interface\b)"
     r"(?:static\s+|final\s+|default\s+|synchronized\s+)*"
     r"(?P<return>[\w<>\[\], ? extends super.&]+)\s+"
     r"(?P<name>[A-Za-z_][A-Za-z0-9_]*)\s*"
-    r"\((?P<params>[^;{}()]*(?:\([^)]*\)[^;{}()]*)*)\)\s*"
+    r"\((?P<params>[^;{}()]*(?:\([^;{}()]*\)[^;{}()]*)*)\)\s*"
     r"(?:throws\s+[\w.,\s]+)?\s*(?:\{|;)",
     re.DOTALL,
 )

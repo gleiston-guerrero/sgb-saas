@@ -15,6 +15,16 @@ class LoanProcedureRepositoryCustomImpl implements LoanProcedureRepositoryCustom
     @PersistenceContext
     private EntityManager em;
 
+    /**
+     * Creates a loan through the stored procedure sp_crear_prestamo, which
+     * validates stock availability, lector limits and active reservations.
+     *
+     * @param userId identifier of the lector requesting the loan
+     * @param bookId identifier of the book to loan
+     * @param librarianId identifier of the librarian registering the loan
+     * @param daysLoan loan term in days used to compute the estimated return date
+     * @return identifier of the loan created by the procedure
+     */
     @Override
     public Long spCreateLoanProcedure(Long userId, Long bookId, Long librarianId, Integer daysLoan) {
         Query q = em.createNativeQuery("SELECT sp_crear_prestamo(?1, ?2, ?3, ?4)");
@@ -25,6 +35,15 @@ class LoanProcedureRepositoryCustomImpl implements LoanProcedureRepositoryCustom
         return ((Number) q.getSingleResult()).longValue();
     }
 
+    /**
+     * Registers a loan return through the stored procedure
+     * sp_registrar_devolucion, which restores stock and generates an overdue
+     * fine when the return is late.
+     *
+     * @param loanId identifier of the loan being returned
+     * @return map with o_prestamo_id (returned loan id), o_hubo_multa (whether
+     *         an overdue fine was generated) and o_monto_multa (fine amount, if any)
+     */
     @Override
     public Map<String, Object> spRegisterLoanReturn(Long loanId) {
         Query q = em.createNativeQuery("SELECT * FROM sp_registrar_devolucion(?1)");
