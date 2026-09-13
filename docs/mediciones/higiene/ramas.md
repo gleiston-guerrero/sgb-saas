@@ -1,12 +1,17 @@
 # Higiene de ramas (punto 14d de la rubrica)
 
-Fecha: 2026-09-13. Remotas reales en `origin`: **31**
-(`git branch -r`, sin contar `origin/HEAD`).
+Fecha: 2026-09-13. Remotas reales en `origin`: **6**
+(`git ls-remote --heads origin`). Ramas locales en este clon: **7**
+(`git branch --format='%(refname:short)'`).
 
-> Regla del proyecto (`sgb-workflow`): ninguna rama ajena se borra sin
-> aprobacion del equipo. Este archivo es el listado con recomendacion;
-> el borrado (`git push origin --delete <rama>`) queda pendiente de esa
-> aprobacion. Nada se borro en este commit.
+La observacion anterior de unas 66 ramas no provenia de `origin`, sino
+del clutter local acumulado en este clon. Se ejecutaron dos limpiezas:
+
+1. `git push origin --delete ...` para retirar ramas remotas cerradas,
+   demo, temporales u obsoletas.
+2. `git fetch --prune origin` y `git branch -D ...` para retirar ramas
+   locales sin contraparte remota, conservando `main` y la rama de
+   correccion `fix/correciones`.
 
 ## Conservar (trabajo activo o referencia)
 
@@ -16,50 +21,57 @@ Fecha: 2026-09-13. Remotas reales en `origin`: **31**
 | `demo/interfaces-completas` | 2026-09-03 | rama base del equipo (integracion) |
 | `develop` | 2026-06-20 | desarrollo (solo `origin`) |
 | `fix/procedures` | 2026-09-12 | trabajo activo de procedimientos |
-| `fix/nombres-codigo` | 2026-09-12 | trabajo activo de nombres (fusionada a `main`, conservar hasta cierre) |
 | `fix/merge-final-pfc` | 2026-09-11 merge de `main` | integracion en curso |
+| `chore/organizar-raiz` | 2026-09-11 | referencia de organizacion previa |
+| `fix/correciones` | 2026-09-13 | rama local de esta correccion; aun no subida a `origin` |
 
-## Candidatas a borrar: fusionadas a `main` (`--merged`)
+## Ramas eliminadas de `origin`
 
-Ya integradas, sin contenido unico pendiente:
+Se retiraron 24 ramas remotas que ya eran cierres historicos, demos,
+temporales o trabajo absorbido por las ramas de entrega:
 
-| Rama | Ultimo commit |
-|---|---|
-| `DEMO-FINAL` | 2026-09-05 |
-| `DEMO-PRESENTAR` | 2026-09-01 |
-| `Presentacion_Final` | 2026-09-09 |
-| `final-biblioteca` | 2026-08-28 |
+`backup/main-pre-sync-2026-09-01`, `conf-produccion`,
+`configurar-biblioteca`, `Demo_PFC`, `DEMO-FINAL`, `DEMO-PRESENTAR`,
+`docs/fix-srs`, `docs/flujo-mvc-ta`, `feature/autocompletar-isbn`,
+`feature/diagrama-flujo-mvc-cajas`, `feature/diagrama-flujo-mvc-panama`,
+`feature/portal-publico-catalogo`, `feature/prestamos-backend`,
+`final-biblioteca`, `Fix-Demo`, `fix/fuentes-autohospedadas-fundacion`,
+`fix/nombres-codigo`, `frontend/fundacion`, `Presentacion_Final`,
+`refactor/mis-prestamos-reservaciones-tailwind`,
+`refactor/sonarqube-dedup`, `Test-Backup`,
+`tmp/audit-dashboard-gerente` y `tmp/audit-tangled-commit`.
 
-Comando por rama (tras aprobacion):
-`git push origin --delete DEMO-FINAL` (y asi con cada una).
+## Verificacion posterior a la limpieza
 
-## Candidatas a borrar: obsoletas no fusionadas
+```text
+git ls-remote --heads origin -> 6
+git branch --format='%(refname:short)' -> 7
+git branch -a --format='%(refname:short)' -> 14
+git remote prune origin --dry-run -> sin salida
+```
 
-Features/docs/tmp de agosto ya integrados por otra via o abandonados;
-requieren confirmacion del autor antes de borrar:
+Ramas remotas vigentes:
 
-| Rama | Ultimo commit |
-|---|---|
-| `Demo_PFC` | 2026-09-01 |
-| `Fix-Demo` | 2026-09-03 |
-| `Test-Backup` | 2026-09-06 |
-| `backup/main-pre-sync-2026-09-01` | 2026-08-17 |
-| `chore/organizar-raiz` | 2026-09-11 |
-| `conf-produccion` | 2026-08-26 |
-| `configurar-biblioteca` | 2026-08-27 |
-| `docs/fix-srs` | 2026-09-10 |
-| `docs/flujo-mvc-ta` | 2026-08-07 |
-| `feature/autocompletar-isbn` | 2026-08-16 |
-| `feature/diagrama-flujo-mvc-cajas` | 2026-08-09 |
-| `feature/diagrama-flujo-mvc-panama` | 2026-08-09 |
-| `feature/portal-publico-catalogo` | 2026-08-16 |
-| `feature/prestamos-backend` | 2026-07-30 |
-| `fix/fuentes-autohospedadas-fundacion` | 2026-08-16 |
-| `frontend/fundacion` | 2026-08-16 |
-| `refactor/mis-prestamos-reservaciones-tailwind` | 2026-08-16 |
-| `refactor/sonarqube-dedup` | 2026-09-07 |
-| `tmp/audit-dashboard-gerente` | 2026-08-17 |
-| `tmp/audit-tangled-commit` | 2026-08-16 |
+```text
+chore/organizar-raiz
+demo/interfaces-completas
+develop
+fix/merge-final-pfc
+fix/procedures
+main
+```
+
+Ramas locales vigentes:
+
+```text
+chore/organizar-raiz
+demo/interfaces-completas
+develop
+fix/correciones
+fix/merge-final-pfc
+fix/procedures
+main
+```
 
 ## Verificacion de las otras partes del punto 14
 
