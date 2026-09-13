@@ -35,3 +35,10 @@ management:
 
 server:
   port: 0
+
+sgb:
+  scheduling:
+    # Apaga los jobs @Scheduled en tests: sin seed de catálogos/config,
+    # el primer disparo competía con el arranque del contexto y dejaba
+    # ERROR de fondo (ver ReservationScheduler/NotificationDueScheduler).
+    enabled: false

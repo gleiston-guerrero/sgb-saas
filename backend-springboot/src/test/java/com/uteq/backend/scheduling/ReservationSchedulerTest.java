@@ -21,7 +21,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -41,9 +43,12 @@ class ReservationSchedulerTest {
         scheduler = new ReservationScheduler(
                 reservationProcedureRepository, reservationRepository, statusReservationRepository, notificationService);
 
-        given(statusReservationRepository.findByName("PENDIENTE")).willReturn(Optional.of(status(1, "PENDIENTE")));
-        given(statusReservationRepository.findByName("LISTA_PARA_RETIRO"))
-                .willReturn(Optional.of(status(2, "LISTA_PARA_RETIRO")));
+        // Lenient: los tests de seed parcial (catalogo ausente) redefinen
+        // estos stubs y dejarían los de aquí sin usar.
+        lenient().when(statusReservationRepository.findByName("PENDIENTE"))
+                .thenReturn(Optional.of(status(1, "PENDIENTE")));
+        lenient().when(statusReservationRepository.findByName("LISTA_PARA_RETIRO"))
+                .thenReturn(Optional.of(status(2, "LISTA_PARA_RETIRO")));
     }
 
     // Los ids de PENDIENTE/LISTA_PARA_RETIRO deben resolverse por nombre
@@ -116,6 +121,34 @@ class ReservationSchedulerTest {
         given(reservationProcedureRepository.spExpireReservationsVencidasProcedure()).willReturn(0);
 
         scheduler.expireOverdueReservations();
+
+        verify(reservationProcedureRepository).spExpireReservationsVencidasProcedure();
+    }
+
+    // Seed parcial: sin filas de catálogo el ciclo se omite sin lanzar
+    // (antes IllegalStateException → ERROR cada 15 min en log).
+    @Test
+    void expireReservationsVencidas_withoutCatalogo_omiteCicloWithoutLanzar() {
+        given(statusReservationRepository.findByName("PENDIENTE")).willReturn(Optional.empty());
+        given(statusReservationRepository.findByName("LISTA_PARA_RETIRO")).willReturn(Optional.empty());
+
+        assertDoesNotThrow(() -> scheduler.expireOverdueReservations());
+
+        verify(reservationRepository, never()).findByStatusReservationIdInAndDateLimitPickupBefore(anyList(), any());
+        verify(reservationProcedureRepository, never()).spExpireReservationsVencidasProcedure();
+        verify(notificationService, never()).notifyReservationExpired(any());
+    }
+
+    // BD sin la función (H2) o fallo del SP: se omite sin lanzar
+    // (antes DataAccessException → ERROR en log del scheduler).
+    @Test
+    void expireReservationsVencidas_whenProcedimientoFalla_omiteWithoutLanzar() {
+        given(reservationRepository.findByStatusReservationIdInAndDateLimitPickupBefore(anyList(), any()))
+                .willReturn(List.of());
+        given(reservationProcedureRepository.spExpireReservationsVencidasProcedure())
+                .willThrow(new org.springframework.dao.DataRetrievalFailureException("sp_expirar_reservaciones_vencidas()"));
+
+        assertDoesNotThrow(() -> scheduler.expireOverdueReservations());
 
         verify(reservationProcedureRepository).spExpireReservationsVencidasProcedure();
     }
