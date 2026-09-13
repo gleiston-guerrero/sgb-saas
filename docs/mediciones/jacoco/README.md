@@ -12,10 +12,10 @@ directamente en este directorio:
 - `docs/mediciones/jacoco/html/`
 
 Estos artefactos corresponden a la corrida de cierre citada en
-`docs/capitulos/08-resultados.tex`: 85,17 % de lineas
-(`1734 / 2036`) y 70,17 % de ramas (`407 / 580`), calculado desde
-`report.csv` (corrida `mvnw clean verify` del 2026-09-13: 584 tests,
-0 fallos; servicios 83,63 %/70,05 %, controladores 95,54 %/70,41 %).
+`docs/capitulos/08-resultados.tex`: 87,77 % de lineas
+(`1787 / 2036`) y 76,03 % de ramas (`441 / 580`), calculado desde
+`report.csv` (corrida `mvnw clean verify` del 2026-09-13: 608 tests,
+0 fallos; servicios 87,38 %/77,70 %, controladores 95,54 %/70,41 %).
 
 ## Corridas historicas
 

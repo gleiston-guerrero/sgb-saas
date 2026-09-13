@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -83,6 +84,9 @@ class AuthServiceTest {
 
     @Mock
     private ConfigurationSystemService configurationSystemService;
+
+    @Mock
+    private EmailService emailService;
 
     @InjectMocks
     private AuthService authService;
@@ -285,6 +289,75 @@ class AuthServiceTest {
     }
 
     @Test
+    void registrationWithDomainAllowed_continueRegistration() {
+        RegistrationRequestDTO dto = new RegistrationRequestDTO(
+                "Nuevo", "Lector", "nuevo@correo.com", "password123");
+        StatusUser pendingVerification = new StatusUser();
+        pendingVerification.setId(4);
+        pendingVerification.setName("PENDIENTE_VERIFICACION");
+        Role reader = new Role();
+        reader.setId(1);
+        reader.setName("LECTOR");
+
+        when(configurationSystemService.getValue("correo_dominios_permitidos"))
+                .thenReturn("uteq.edu.ec, correo.com");
+        when(userRepository.findByEmail("nuevo@correo.com")).thenReturn(Optional.empty());
+        when(roleRepository.findByName("LECTOR")).thenReturn(Optional.of(reader));
+        when(statusUserRepository.findByName("PENDIENTE_VERIFICACION")).thenReturn(Optional.of(pendingVerification));
+        when(passwordEncoder.encode("password123")).thenReturn("hash-encriptado");
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setId(101L);
+            return u;
+        });
+
+        authService.register(dto);
+
+        verify(userRepository).save(any(User.class));
+    }
+
+    @Test
+    void registrationWithDomainNotAllowed_lanzaDomainException() {
+        RegistrationRequestDTO dto = new RegistrationRequestDTO(
+                "Nuevo", "Lector", "nuevo@example.com", "password123");
+        when(userRepository.findByEmail("nuevo@example.com")).thenReturn(Optional.empty());
+        when(configurationSystemService.getValue("correo_dominios_permitidos"))
+                .thenReturn("uteq.edu.ec, correo.com");
+
+        assertThrows(EmailDomainNotAllowedException.class, () -> authService.register(dto));
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void registrationWithoutConfigDomain_noRestrictsRegistration() {
+        RegistrationRequestDTO dto = new RegistrationRequestDTO(
+                "Nuevo", "Lector", "nuevo@example.com", "password123");
+        StatusUser pendingVerification = new StatusUser();
+        pendingVerification.setId(4);
+        pendingVerification.setName("PENDIENTE_VERIFICACION");
+        Role reader = new Role();
+        reader.setId(1);
+        reader.setName("LECTOR");
+
+        when(userRepository.findByEmail("nuevo@example.com")).thenReturn(Optional.empty());
+        when(configurationSystemService.getValue("correo_dominios_permitidos"))
+                .thenThrow(new jakarta.persistence.EntityNotFoundException("sin clave"));
+        when(roleRepository.findByName("LECTOR")).thenReturn(Optional.of(reader));
+        when(statusUserRepository.findByName("PENDIENTE_VERIFICACION")).thenReturn(Optional.of(pendingVerification));
+        when(passwordEncoder.encode("password123")).thenReturn("hash-encriptado");
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setId(102L);
+            return u;
+        });
+
+        authService.register(dto);
+
+        verify(userRepository).save(any(User.class));
+    }
+
+    @Test
     void verifyEmail_codeValid_activeUserYMarkEmailVerified() {
         User userPending = userTest();
         userPending.setEmailVerified(false);
@@ -334,6 +407,114 @@ class AuthServiceTest {
 
         verify(valueOperations).set(eq("blacklist:" + jti), eq("revoked"), anyLong(), eq(TimeUnit.SECONDS));
         verify(auditLogAuditRepository).save(any());
+    }
+
+    @Test
+    void logoutTokenExpired_noGuardaBlacklist() {
+        String token = "token-expirado";
+        when(jwtService.extractJti(token)).thenReturn("jti-expirado");
+        when(jwtService.extractExpiration(token)).thenReturn(new Date(System.currentTimeMillis() - 1000));
+        when(jwtService.extractEmail(token)).thenReturn("lector@correo.com");
+
+        authService.logout(token, IP_DE_PRUEBA);
+
+        verify(redisTemplate, never()).opsForValue();
+        verify(auditLogAuditRepository).save(any());
+    }
+
+    @Test
+    void logoutRedisCaido_noRompeLogout() {
+        String token = "token-de-prueba";
+        String jti = "550e8400-e29b-41d4-a716-446655440000";
+        Date expiracionFutura = new Date(System.currentTimeMillis() + 3600000);
+
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(jwtService.extractJti(token)).thenReturn(jti);
+        when(jwtService.extractExpiration(token)).thenReturn(expiracionFutura);
+        when(jwtService.extractEmail(token)).thenReturn("lector@correo.com");
+        doThrow(new DataAccessResourceFailureException("redis caido"))
+                .when(valueOperations).set(eq("blacklist:" + jti), eq("revoked"), anyLong(), eq(TimeUnit.SECONDS));
+
+        authService.logout(token, IP_DE_PRUEBA);
+
+        verify(auditLogAuditRepository).save(any());
+    }
+
+    @Test
+    void resendCode_emailAlreadyVerified_lanzaIllegalArgument() {
+        User user = userTest();
+        when(userRepository.findByEmail("lector@correo.com")).thenReturn(Optional.of(user));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> authService.resendCode("lector@correo.com"));
+
+        verify(verificationEmailService, never()).generateAndSendCode(any());
+    }
+
+    @Test
+    void resendCode_pendingAccount_regeneraCodigo() {
+        User user = userTest();
+        user.setEmailVerified(false);
+        StatusUser pendingVerification = new StatusUser();
+        pendingVerification.setName("PENDIENTE_VERIFICACION");
+        user.setStatus(pendingVerification);
+        when(userRepository.findByEmail("lector@correo.com")).thenReturn(Optional.of(user));
+
+        authService.resendCode("lector@correo.com");
+
+        verify(verificationEmailService).generateAndSendCode(user);
+    }
+
+    @Test
+    void requestReset_redisCaido_lanzaServiceUnavailable() {
+        User user = userTest();
+        when(userRepository.findByEmail("lector@correo.com")).thenReturn(Optional.of(user));
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        doThrow(new DataAccessResourceFailureException("redis caido"))
+                .when(valueOperations).set(eq("reset-codigo:lector@correo.com"), any(), any(java.time.Duration.class));
+
+        assertThrows(ServiceTemporarilyNotAvailableException.class,
+                () -> authService.requestReset("lector@correo.com"));
+    }
+
+    @Test
+    void requestReset_emailServiceFails_keepsResetCode() {
+        User user = userTest();
+        when(userRepository.findByEmail("lector@correo.com")).thenReturn(Optional.of(user));
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(emailService.sendEmail(eq("lector@correo.com"), any(), any())).thenReturn(false);
+
+        authService.requestReset("lector@correo.com");
+
+        verify(valueOperations).set(eq("reset-codigo:lector@correo.com"), any(), any(java.time.Duration.class));
+        verify(emailService).sendEmail(eq("lector@correo.com"), any(), any());
+    }
+
+    @Test
+    void resetPassword_codeInvalid_lanzaCodeVerificationInvalid() {
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get("reset-codigo:lector@correo.com")).thenReturn("123456");
+
+        assertThrows(CodeVerificationInvalidException.class,
+                () -> authService.resetPassword("lector@correo.com", "000000", "nuevaClave"));
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void resetPassword_deleteRedisFails_passwordAlreadyUpdated() {
+        User user = userTest();
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get("reset-codigo:lector@correo.com")).thenReturn("123456");
+        when(userRepository.findByEmail("lector@correo.com")).thenReturn(Optional.of(user));
+        when(passwordEncoder.encode("nuevaClave")).thenReturn("hash-nuevo");
+        doThrow(new DataAccessResourceFailureException("redis caido"))
+                .when(redisTemplate).delete("reset-codigo:lector@correo.com");
+
+        authService.resetPassword("lector@correo.com", "123456", "nuevaClave");
+
+        verify(userRepository).save(user);
+        assertEquals("hash-nuevo", user.getPasswordHash());
     }
 
     @Test

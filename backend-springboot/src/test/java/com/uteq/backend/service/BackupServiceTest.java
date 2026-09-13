@@ -11,6 +11,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.ByteArrayInputStream;
@@ -28,6 +30,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,6 +40,11 @@ class BackupServiceTest {
     @Mock UserRepository userRepository;
     @Mock JdbcTemplate jdbcTemplate;
     @Mock BackupStorageService storageService;
+
+    @org.junit.jupiter.api.AfterEach
+    void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
+    }
 
     @Test
     void generateBackup_csvFiltraTableWithDateYGuardaMetadata() throws Exception {
@@ -91,6 +99,85 @@ class BackupServiceTest {
     }
 
     @Test
+    void generateBackup_sqlEscapaNullBooleanYTextoLargo() throws Exception {
+        BackupService service = service();
+        given(storageService.isEncryptionEnabled()).willReturn(false);
+        String longText = "x".repeat(510);
+        java.util.Map<String, Object> row = new java.util.LinkedHashMap<>();
+        row.put("id", 3L);
+        row.put("activo", true);
+        row.put("nota", null);
+        row.put("detalle", longText);
+        given(jdbcTemplate.queryForList("SELECT * FROM autores")).willReturn(List.of(row));
+        given(backupRepository.save(any(Backup.class))).willAnswer(inv -> inv.getArgument(0));
+
+        Backup result = service.generateBackup(
+                OffsetDateTime.now().minusDays(1),
+                OffsetDateTime.now(),
+                Set.of("autores"),
+                "SQL",
+                "manual");
+
+        ArgumentCaptor<byte[]> zipCaptor = ArgumentCaptor.forClass(byte[].class);
+        verify(storageService).upload(org.mockito.ArgumentMatchers.endsWith(".zip"), zipCaptor.capture());
+        String sql = contentZip(zipCaptor.getValue(), "autores.sql");
+        assertThat(result.getFormat()).isEqualTo("sql");
+        assertThat(sql)
+                .contains("3, TRUE, NULL")
+                .contains("...(truncado)");
+    }
+
+    @Test
+    void generateBackup_csvEscapaNullSaltosComillasYTextoLargo() throws Exception {
+        BackupService service = service();
+        given(storageService.isEncryptionEnabled()).willReturn(false);
+        String longText = "y".repeat(510);
+        java.util.Map<String, Object> row = new java.util.LinkedHashMap<>();
+        row.put("id", 4L);
+        row.put("detalle", "linea 1\n\"linea 2\"");
+        row.put("observacion", null);
+        row.put("texto_largo", longText);
+        given(jdbcTemplate.queryForList("SELECT * FROM configuracion_sistema")).willReturn(List.of(row));
+        given(backupRepository.save(any(Backup.class))).willAnswer(inv -> inv.getArgument(0));
+
+        service.generateBackup(
+                OffsetDateTime.now().minusDays(1),
+                OffsetDateTime.now(),
+                Set.of("configuracion_sistema"),
+                "csv",
+                "manual");
+
+        ArgumentCaptor<byte[]> zipCaptor = ArgumentCaptor.forClass(byte[].class);
+        verify(storageService).upload(org.mockito.ArgumentMatchers.endsWith(".zip"), zipCaptor.capture());
+        assertThat(contentZip(zipCaptor.getValue(), "configuracion_sistema.csv"))
+                .contains("\"linea 1\n\"\"linea 2\"\"\"")
+                .contains(",,")
+                .contains("...(truncado)");
+    }
+
+    @Test
+    void generateBackup_aliasReservasYAuditoriaUsanTablasFisicas() throws Exception {
+        BackupService service = service();
+        OffsetDateTime from = OffsetDateTime.now().minusDays(1);
+        OffsetDateTime until = OffsetDateTime.now();
+        given(storageService.isEncryptionEnabled()).willReturn(false);
+        given(jdbcTemplate.queryForList("SELECT * FROM reservaciones WHERE fecha_reserva >= ? AND fecha_reserva <= ?", from, until))
+                .willReturn(List.of());
+        given(jdbcTemplate.queryForList("SELECT * FROM bitacora_auditoria WHERE fecha_hora >= ? AND fecha_hora <= ?", from, until))
+                .willReturn(List.of());
+        given(backupRepository.save(any(Backup.class))).willAnswer(inv -> inv.getArgument(0));
+
+        service.generateBackup(from, until, Set.of("reservas", "auditoria"), "sql", "manual");
+
+        ArgumentCaptor<byte[]> zipCaptor = ArgumentCaptor.forClass(byte[].class);
+        verify(storageService).upload(org.mockito.ArgumentMatchers.endsWith(".zip"), zipCaptor.capture());
+        assertThat(contentZip(zipCaptor.getValue(), "reservas.sql"))
+                .contains("-- sin filas reservaciones");
+        assertThat(contentZip(zipCaptor.getValue(), "auditoria.sql"))
+                .contains("-- sin filas bitacora_auditoria");
+    }
+
+    @Test
     void generateBackup_rechazaRangeTableYFormatInvalids() {
         BackupService service = service();
         OffsetDateTime ahora = OffsetDateTime.now();
@@ -142,6 +229,58 @@ class BackupServiceTest {
     }
 
     @Test
+    void delete_siStorageFallaIgualEliminaMetadata() {
+        BackupService service = service();
+        Backup backup = Backup.builder().id(8L).path("backups/falta.zip").build();
+        given(backupRepository.findById(8L)).willReturn(Optional.of(backup));
+        doThrow(new IllegalStateException("storage caido")).when(storageService).delete("backups/falta.zip");
+
+        service.delete(8L);
+
+        verify(backupRepository).delete(backup);
+    }
+
+    @Test
+    void generateBackup_usuarioActualDesdePrincipalConId() {
+        BackupService service = service();
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(new PrincipalWithId(42L), null));
+        given(storageService.isEncryptionEnabled()).willReturn(false);
+        given(jdbcTemplate.queryForList("SELECT * FROM categorias")).willReturn(List.of());
+        given(backupRepository.save(any(Backup.class))).willAnswer(inv -> inv.getArgument(0));
+
+        Backup result = service.generateBackup(
+                OffsetDateTime.now().minusDays(1),
+                OffsetDateTime.now(),
+                Set.of("categorias"),
+                "sql",
+                "manual");
+
+        assertThat(result.getCreatedBy()).isEqualTo(42L);
+    }
+
+    @Test
+    void generateBackup_usuarioActualDesdeEmailAutenticado() {
+        BackupService service = service();
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("lector@correo.com", null));
+        given(userRepository.findByEmail("lector@correo.com"))
+                .willReturn(Optional.of(com.uteq.backend.entity.User.builder().id(77L).build()));
+        given(storageService.isEncryptionEnabled()).willReturn(false);
+        given(jdbcTemplate.queryForList("SELECT * FROM autores")).willReturn(List.of());
+        given(backupRepository.save(any(Backup.class))).willAnswer(inv -> inv.getArgument(0));
+
+        Backup result = service.generateBackup(
+                OffsetDateTime.now().minusDays(1),
+                OffsetDateTime.now(),
+                Set.of("autores"),
+                "sql",
+                "manual");
+
+        assertThat(result.getCreatedBy()).isEqualTo(77L);
+    }
+
+    @Test
     void get_cuandoNotExiste_lanza404() {
         BackupService service = service();
         given(backupRepository.findById(99L)).willReturn(Optional.empty());
@@ -153,6 +292,15 @@ class BackupServiceTest {
 
     private BackupService service() {
         return new BackupService(backupRepository, userRepository, jdbcTemplate, storageService);
+    }
+
+    private static final class PrincipalWithId {
+        @SuppressWarnings("unused")
+        private final Long id;
+
+        private PrincipalWithId(Long id) {
+            this.id = id;
+        }
     }
 
     private String contentZip(byte[] zipBytes, String nameInput) throws Exception {
