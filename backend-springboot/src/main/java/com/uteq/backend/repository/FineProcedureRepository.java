@@ -15,9 +15,22 @@ import org.springframework.data.jpa.repository.query.Procedure;
 @org.springframework.stereotype.Repository
 public interface FineProcedureRepository extends Repository<Fine, Long>, FineProcedureRepositoryCustom {
 
+    /**
+     * Desde V51 existe el PROCEDURE nativo proc_pagar_multa (CREATE
+     * PROCEDURE, invocable con CALL). La anotación documenta el mapeo
+     * exigido por la rúbrica (ver {@code ProcedureMappingContractTest});
+     * la ejecución real está en
+     * {@link FineProcedureRepositoryCustom#spPayFineProcedure(Long)} por el
+     * mismo motivo que {@link com.uteq.backend.repository.LoanProcedureRepository#spCreateLoanProcedure}.
+     */
     @Procedure(name = "Multa.pagarMulta")
     Map<String, Object> spPayFineProcedure(Long fineId);
 
+    /**
+     * Desde V51 existe el PROCEDURE nativo proc_anular_multa (SECURITY
+     * DEFINER, invocable con CALL). Misma situación que
+     * {@link #spPayFineProcedure}.
+     */
     @Procedure(name = "Multa.anularMulta")
     Map<String, Object> spVoidFineProcedure(Long fineId, String reason, String roleExecutor);
 

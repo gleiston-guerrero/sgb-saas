@@ -15,8 +15,12 @@ class FineProcedureRepositoryCustomImpl implements FineProcedureRepositoryCustom
     private EntityManager em;
 
     /**
-     * Pays a fine through the stored procedure sp_pagar_multa, which settles
-     * the balance and decides whether the lector is unblocked.
+     * Pays a fine through the stored procedure proc_pagar_multa (CREATE
+     * PROCEDURE nativo de V51, invocado con CALL), que envuelve la función
+     * sp_pagar_multa -- settles the balance and decides whether the lector
+     * is unblocked. Binding exclusivamente posicional: ver nota extensa en
+     * {@link LoanProcedureRepositoryCustomImpl#spCreateLoanProcedure} sobre
+     * el conflicto Hibernate 6 / pgjdbc con parámetros nombrados.
      *
      * @param fineId identifier of the fine to pay in full
      * @return map with o_multa_id (paid fine id) and o_usuario_desbloqueado
@@ -24,7 +28,7 @@ class FineProcedureRepositoryCustomImpl implements FineProcedureRepositoryCustom
      */
     @Override
     public Map<String, Object> spPayFineProcedure(Long fineId) {
-        Query q = em.createNativeQuery("SELECT * FROM sp_pagar_multa(?1)");
+        Query q = em.createNativeQuery("CALL proc_pagar_multa(?1, NULL, NULL)");
         q.setParameter(1, fineId);
         Object[] row = (Object[]) q.getSingleResult();
         Map<String, Object> result = new HashMap<>();
@@ -34,8 +38,10 @@ class FineProcedureRepositoryCustomImpl implements FineProcedureRepositoryCustom
     }
 
     /**
-     * Voids a fine through the stored procedure sp_anular_multa, recording the
-     * reason and the role that authorized the void for audit purposes.
+     * Voids a fine through the stored procedure proc_anular_multa (CREATE
+     * PROCEDURE nativo de V51, SECURITY DEFINER, invocado con CALL), que
+     * envuelve sp_anular_multa -- recording the reason and the role that
+     * authorized the void for audit purposes.
      *
      * @param fineId identifier of the fine to void
      * @param reason business reason for the void, persisted in the audit trail
@@ -45,7 +51,7 @@ class FineProcedureRepositoryCustomImpl implements FineProcedureRepositoryCustom
      */
     @Override
     public Map<String, Object> spVoidFineProcedure(Long fineId, String reason, String roleExecutor) {
-        Query q = em.createNativeQuery("SELECT * FROM sp_anular_multa(?1, ?2, ?3)");
+        Query q = em.createNativeQuery("CALL proc_anular_multa(?1, ?2, ?3, NULL, NULL)");
         q.setParameter(1, fineId);
         q.setParameter(2, reason);
         q.setParameter(3, roleExecutor);

@@ -28,7 +28,7 @@ import java.time.OffsetDateTime;
  */
 @NamedStoredProcedureQuery(
         name = "Prestamo.registrarDevolucion",
-        procedureName = "sp_registrar_devolucion",
+        procedureName = "proc_registrar_devolucion",
         parameters = {
                 @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_prestamo_id", type = Long.class),
                 @StoredProcedureParameter(mode = ParameterMode.OUT, name = "o_prestamo_id", type = Long.class),

@@ -16,8 +16,20 @@ class LoanProcedureRepositoryCustomImpl implements LoanProcedureRepositoryCustom
     private EntityManager em;
 
     /**
-     * Creates a loan through the stored procedure sp_crear_prestamo, which
-     * validates stock availability, lector limits and active reservations.
+     * Creates a loan through the stored procedure proc_crear_prestamo
+     * (CREATE PROCEDURE nativo de V51, invocado con CALL), que a su vez
+     * envuelve la función sp_crear_prestamo -- valida stock disponible y
+     * bloqueo por multas del lector.
+     *
+     * <p>Se invoca con {@code CALL} y binding exclusivamente posicional
+     * (sin nombres de parámetro) porque el proxy estándar de
+     * {@code @Procedure}/{@code @NamedStoredProcedureQuery} de Hibernate 6
+     * genera sintaxis de parámetros nombrados de PostgreSQL dentro del
+     * escape JDBC {@code {call ...}}, que pgjdbc rechaza
+     * (spring-projects/spring-data-jpa#3393). PostgreSQL exige un
+     * placeholder posicional también para cada parámetro OUT en un CALL
+     * emitido desde SQL plano (no PL/pgSQL); su valor no importa, se
+     * convención escribir NULL.
      *
      * @param userId identifier of the lector requesting the loan
      * @param bookId identifier of the book to loan
@@ -27,18 +39,22 @@ class LoanProcedureRepositoryCustomImpl implements LoanProcedureRepositoryCustom
      */
     @Override
     public Long spCreateLoanProcedure(Long userId, Long bookId, Long librarianId, Integer daysLoan) {
-        Query q = em.createNativeQuery("SELECT sp_crear_prestamo(?1, ?2, ?3, ?4)");
+        Query q = em.createNativeQuery("CALL proc_crear_prestamo(?1, ?2, ?3, ?4, NULL)");
         q.setParameter(1, userId);
         q.setParameter(2, bookId);
         q.setParameter(3, librarianId);
         q.setParameter(4, daysLoan);
-        return ((Number) q.getSingleResult()).longValue();
+        Object result = q.getSingleResult();
+        Object value = (result instanceof Object[] row) ? row[0] : result;
+        return ((Number) value).longValue();
     }
 
     /**
      * Registers a loan return through the stored procedure
-     * sp_registrar_devolucion, which restores stock and generates an overdue
-     * fine when the return is late.
+     * proc_registrar_devolucion (CREATE PROCEDURE nativo de V51, invocado
+     * con CALL), que envuelve sp_registrar_devolucion -- restaura stock y
+     * genera multa automática si la devolución es tardía. Mismo criterio de
+     * binding posicional que {@link #spCreateLoanProcedure} arriba.
      *
      * @param loanId identifier of the loan being returned
      * @return map with o_prestamo_id (returned loan id), o_hubo_multa (whether
@@ -46,7 +62,7 @@ class LoanProcedureRepositoryCustomImpl implements LoanProcedureRepositoryCustom
      */
     @Override
     public Map<String, Object> spRegisterLoanReturn(Long loanId) {
-        Query q = em.createNativeQuery("SELECT * FROM sp_registrar_devolucion(?1)");
+        Query q = em.createNativeQuery("CALL proc_registrar_devolucion(?1, NULL, NULL, NULL)");
         q.setParameter(1, loanId);
         Object[] row = (Object[]) q.getSingleResult();
         Map<String, Object> result = new HashMap<>();

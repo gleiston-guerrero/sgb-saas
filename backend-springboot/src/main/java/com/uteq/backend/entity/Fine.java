@@ -25,7 +25,7 @@ import java.time.OffsetDateTime;
 @NamedStoredProcedureQueries({
         @NamedStoredProcedureQuery(
                 name = "Multa.pagarMulta",
-                procedureName = "sp_pagar_multa",
+                procedureName = "proc_pagar_multa",
                 parameters = {
                         @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_multa_id", type = Long.class),
                         @StoredProcedureParameter(mode = ParameterMode.OUT, name = "o_multa_id", type = Long.class),
@@ -34,7 +34,7 @@ import java.time.OffsetDateTime;
         ),
         @NamedStoredProcedureQuery(
                 name = "Multa.anularMulta",
-                procedureName = "sp_anular_multa",
+                procedureName = "proc_anular_multa",
                 parameters = {
                         @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_multa_id", type = Long.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_motivo", type = String.class),

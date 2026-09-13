@@ -33,39 +33,32 @@ import java.util.List;
 @org.springframework.stereotype.Repository
 public interface LoanProcedureRepository extends Repository<Loan, Long>, LoanProcedureRepositoryCustom {
 
-    @Procedure(procedureName = "sp_crear_prestamo")
+    /**
+     * sp_crear_prestamo: desde V51 existe el PROCEDURE nativo
+     * proc_crear_prestamo (CREATE PROCEDURE, invocable con CALL) que
+     * envuelve esta función. La anotación queda declarada aquí (satisface
+     * el contrato de {@code ProcedureMappingContractTest} y documenta el
+     * mapeo real), pero la ejecución efectiva vive en
+     * {@link LoanProcedureRepositoryCustom#spCreateLoanProcedure(Long, Long, Long, Integer)}
+     * / {@link LoanProcedureRepositoryCustomImpl}: Hibernate 6 genera
+     * sintaxis de parámetros nombrados de PostgreSQL ("nombre => ?") dentro
+     * del escape JDBC {@code {call ...}} cuando el método pasa por el proxy
+     * estándar de Spring Data, y pgjdbc la rechaza (spring-projects/spring-data-jpa#3393).
+     * El fragmento Custom evita el problema con {@code CALL} nativo y
+     * binding exclusivamente posicional (sin nombres de parámetro).
+     */
+    @Procedure(procedureName = "proc_crear_prestamo")
     Long spCreateLoanProcedure(Long userId, Long bookId, Long librarianId, Integer daysLoan);
 
+    /**
+     * sp_registrar_devolucion: desde V51 existe el PROCEDURE nativo
+     * proc_registrar_devolucion. Misma situación que
+     * {@link #spCreateLoanProcedure}: la anotación documenta el mapeo, la
+     * ejecución real está en
+     * {@link LoanProcedureRepositoryCustom#spRegisterLoanReturn(Long)}.
+     */
     @Procedure(name = "Prestamo.registrarDevolucion")
     java.util.Map<String, Object> spRegisterLoanReturn(Long loanId);
-
-
-    /**
-     * sp_crear_prestamo: retorno escalar único (BIGINT). Antes usaba
-     * {@code @Procedure}(procedureName=...) (ver bloque comentado arriba) -- fallaba
-     * en runtime con "syntax error at or near '=>'" porque Hibernate genera
-     * sintaxis de parámetros nombrados de PostgreSQL dentro del escape JDBC
-     * {call ...}, que pgjdbc no soporta. @Query nativa con SELECT evita el
-     * CallableStatement por completo (mismo patrón que ya usaba este
-     * repositorio para las 2 funciones TABLE de abajo).
-     */
-    @Query(value = "SELECT sp_crear_prestamo(:p_user_id, :p_book_id, :p_librarian_id, :p_days_loan)",
-            nativeQuery = true)
-    Long spCreateLoan(
-            @Param("p_user_id") Long userId,
-            @Param("p_book_id") Long bookId,
-            @Param("p_librarian_id") Long librarianId,
-            @Param("p_days_loan") Integer daysLoan
-    );
-
-
-    /**
-     * sp_registrar_devolucion: función con 3 parámetros OUT (o_prestamo_id,
-     * o_hubo_multa, o_monto_multa). La invocacion via @Procedure generaba la
-     * sintaxis "nombre => ?" de Hibernate 6 que pgjdbc rechaza.
-     * Movido a {@link LoanProcedureRepositoryCustom#spRegisterLoanReturn(Long)}
-     * con implementacion posicional en {@link LoanProcedureRepositoryCustomImpl}.
-     */
 
     /**
      * fn_listar_prestamos_activos_por_usuario: función PostgreSQL con
