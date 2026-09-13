@@ -226,7 +226,7 @@
             </thead>
             <tbody class="divide-y divide-outline-variant font-body-sm text-body-sm text-on-surface">
               @for (m of morosidadPaginado; track m.usuarioId) {
-                <tr><td class="px-md py-sm font-medium">{{ m.nombre }} {{ m.apellido }}</td><td class="px-md py-sm hidden md:table-cell text-on-surface-variant">{{ m.correo }}</td><td class="px-md py-sm text-right font-medium text-error">$ {{ m.montoTotalAdeudado.toFixed(2) }}</td><td class="px-md py-sm text-right hidden sm:table-cell">{{ m.cantidadMultasPendientes }}</td><td class="px-md py-sm text-right hidden lg:table-cell">{{ m.diasAtrasoPromedio }} días</td></tr>
+                <tr><td class="px-md py-sm font-medium">{{ m.nombre }} {{ m.apellido }}</td><td class="px-md py-sm hidden md:table-cell text-on-surface-variant">{{ m.correo }}</td><td class="px-md py-sm text-right font-medium text-error">$ {{ (m.montoTotalAdeudado ?? 0).toFixed(2) }}</td><td class="px-md py-sm text-right hidden sm:table-cell">{{ m.cantidadMultasPendientes }}</td><td class="px-md py-sm text-right hidden lg:table-cell">{{ m.diasAtrasoPromedio }} días</td></tr>
               } @empty {
                 @if (!cargando) { <tr><td colspan="5" class="px-md py-lg text-center text-on-surface-variant">Sin morosidad registrada</td></tr> }
               }
@@ -439,7 +439,7 @@
             </th></tr></thead>
             <tbody class="divide-y divide-outline-variant font-body-sm text-body-sm text-on-surface">
               @for (v of vencidosPaginado; track v.prestamoId) {
-                <tr><td class="px-md py-sm font-medium">{{ v.usuarioNombre }}</td><td class="px-md py-sm hidden md:table-cell text-on-surface-variant">{{ v.usuarioCorreo }}</td><td class="px-md py-sm">{{ v.libroTitulo }}</td><td class="px-md py-sm hidden md:table-cell text-on-surface-variant">{{ v.libroIsbn || '—' }}</td><td class="px-md py-sm text-on-surface-variant">{{ formatearFechaHora(v.fechaDevolucionEstimada) }}</td><td class="px-md py-sm text-right font-medium text-error">{{ v.diasAtraso }}</td><td class="px-md py-sm text-right font-medium text-error">$ {{ v.montoMultaEstimada.toFixed(2) }}</td></tr>
+                <tr><td class="px-md py-sm font-medium">{{ v.usuarioNombre }}</td><td class="px-md py-sm hidden md:table-cell text-on-surface-variant">{{ v.usuarioCorreo }}</td><td class="px-md py-sm">{{ v.libroTitulo }}</td><td class="px-md py-sm hidden md:table-cell text-on-surface-variant">{{ v.libroIsbn || '—' }}</td><td class="px-md py-sm text-on-surface-variant">{{ formatearFechaHora(v.fechaDevolucionEstimada) }}</td><td class="px-md py-sm text-right font-medium text-error">{{ v.diasAtraso }}</td><td class="px-md py-sm text-right font-medium text-error">$ {{ (v.montoMultaEstimada ?? 0).toFixed(2) }}</td></tr>
               } @empty { @if (!cargando) { <tr><td colspan="7" class="px-md py-lg text-center text-on-surface-variant">Sin préstamos vencidos</td></tr> } }
             </tbody>
           </table>
@@ -637,15 +637,15 @@
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-md mb-md">
             <div class="rounded-xl border border-outline-variant bg-surface-container-lowest shadow-sm p-lg text-center">
               <p class="font-label-sm text-label-sm text-on-surface-variant mb-xs">Recaudado</p>
-              <p class="font-headline-md text-headline-md text-success">$ {{ resumenFinanciero.totalRecaudado.toFixed(2) }}</p>
+              <p class="font-headline-md text-headline-md text-success">$ {{ (resumenFinanciero.totalRecaudado ?? 0).toFixed(2) }}</p>
             </div>
             <div class="rounded-xl border border-outline-variant bg-surface-container-lowest shadow-sm p-lg text-center">
               <p class="font-label-sm text-label-sm text-on-surface-variant mb-xs">Pendiente</p>
-              <p class="font-headline-md text-headline-md text-error">$ {{ resumenFinanciero.totalPendiente.toFixed(2) }}</p>
+              <p class="font-headline-md text-headline-md text-error">$ {{ (resumenFinanciero.totalPendiente ?? 0).toFixed(2) }}</p>
             </div>
             <div class="rounded-xl border border-outline-variant bg-surface-container-lowest shadow-sm p-lg text-center">
               <p class="font-label-sm text-label-sm text-on-surface-variant mb-xs">Generado hoy</p>
-              <p class="font-headline-md text-headline-md text-primary">$ {{ resumenFinanciero.totalGeneradoHoy.toFixed(2) }}</p>
+              <p class="font-headline-md text-headline-md text-primary">$ {{ (resumenFinanciero.totalGeneradoHoy ?? 0).toFixed(2) }}</p>
             </div>
           </div>
           <div class="flex items-center justify-end gap-xs mb-sm">
@@ -658,7 +658,7 @@
               <thead class="bg-surface-container-low"><tr class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wide"><th class="px-md py-sm">Multa</th><th class="px-md py-sm">Monto</th><th class="px-md py-sm hidden md:table-cell">Fecha</th><th class="px-md py-sm">Usuario</th><th class="px-md py-sm hidden lg:table-cell">Libro</th></tr></thead>
               <tbody class="divide-y divide-outline-variant font-body-sm text-body-sm text-on-surface">
                 @for (p of financieroPaginado; track p.multaId) {
-                  <tr><td class="px-md py-sm font-medium">#{{ p.multaId }}</td><td class="px-md py-sm font-medium text-success">$ {{ p.montoPagado.toFixed(2) }}</td><td class="px-md py-sm hidden md:table-cell text-on-surface-variant">{{ formatearFechaHora(p.fechaPagada) }}</td><td class="px-md py-sm">{{ p.usuarioNombre }}</td><td class="px-md py-sm hidden lg:table-cell text-on-surface-variant">{{ p.libroTitulo }}</td></tr>
+                  <tr><td class="px-md py-sm font-medium">#{{ p.multaId }}</td><td class="px-md py-sm font-medium text-success">$ {{ (p.montoPagado ?? 0).toFixed(2) }}</td><td class="px-md py-sm hidden md:table-cell text-on-surface-variant">{{ formatearFechaHora(p.fechaPagada) }}</td><td class="px-md py-sm">{{ p.usuarioNombre }}</td><td class="px-md py-sm hidden lg:table-cell text-on-surface-variant">{{ p.libroTitulo }}</td></tr>
                 } @empty { @if (!cargando) { <tr><td colspan="5" class="px-md py-lg text-center text-on-surface-variant">Sin pagos recientes</td></tr> } }
               </tbody>
             </table>

@@ -88,7 +88,7 @@ export class DashboardGerenteAdminHomeComponent implements OnInit {
   }
 
   get maxDeudaUsuario(): number {
-    return Math.max(...this.usuariosEnMora.map(u => u.montoTotalAdeudado), 1);
+    return Math.max(...this.usuariosEnMora.map(u => u.montoTotalAdeudado ?? 0), 1);
   }
 
   private maxPrestamos = 1;
@@ -110,8 +110,8 @@ export class DashboardGerenteAdminHomeComponent implements OnInit {
 
     this.reporteService.morosidad().subscribe({
       next: (res: any) => {
-        const usuarios = Array.isArray(res) ? res : res.content ?? [];
-        this.usuariosEnMora = usuarios;
+        const usuarios = Array.isArray(res) ? res : (res?.content ?? []);
+        this.usuariosEnMora = usuarios ?? [];
         this.cargandoMorosidad = false;
       },
       error: () => {
@@ -137,8 +137,11 @@ export class DashboardGerenteAdminHomeComponent implements OnInit {
     this.cargandoLibros = true;
     this.reporteService.librosMasPrestados(undefined, undefined, limite).subscribe({
       next: (libros) => {
-        this.librosMasPrestados = libros;
-        this.maxPrestamos = Math.max(...libros.map(l => l.totalPrestamos), 1);
+        // Filtra filas fantasma (libroId null) que la función de reporte
+        // puede devolver con seed parcial: sin esto el @for/track y
+        // titulo.length revientan el render y el loader queda eterno.
+        this.librosMasPrestados = (libros ?? []).filter(l => l?.libroId != null);
+        this.maxPrestamos = Math.max(...this.librosMasPrestados.map(l => l.totalPrestamos ?? 0), 1);
         this.cargandoLibros = false;
       },
       error: () => {
@@ -169,15 +172,21 @@ export class DashboardGerenteAdminHomeComponent implements OnInit {
   }
 
   get totalPrestamosTopN(): number {
-    return this.librosMasPrestados.reduce((sum, l) => sum + l.totalPrestamos, 0);
+    return this.librosMasPrestados.reduce((sum, l) => sum + (l.totalPrestamos ?? 0), 0);
   }
 
   get montoTotalAdeudado(): number {
-    return this.usuariosEnMora.reduce((sum, u) => sum + u.montoTotalAdeudado, 0);
+    return this.usuariosEnMora.reduce((sum, u) => sum + (u.montoTotalAdeudado ?? 0), 0);
   }
 
-  maxBarWidth(totalPrestamos: number): number {
-    return Math.round((totalPrestamos / this.maxPrestamos) * 460);
+  maxBarWidth(totalPrestamos: number | null | undefined): number {
+    return Math.round(((totalPrestamos ?? 0) / this.maxPrestamos) * 460);
+  }
+
+  // Título corto tolerante a null (filas fantasma del reporte).
+  tituloCorto(titulo: string | null | undefined): string {
+    const t = titulo ?? 'Sin título';
+    return t.length > 30 ? t.substring(0, 30) + '...' : t;
   }
 
   getIniciales(nombre: string, apellido: string): string {

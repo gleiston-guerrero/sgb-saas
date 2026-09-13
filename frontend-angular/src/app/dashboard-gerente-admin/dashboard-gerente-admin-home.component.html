@@ -106,11 +106,11 @@
         <p class="font-body-sm text-body-sm text-on-surface-variant text-center py-lg">No hay datos disponibles.</p>
       } @else {
         <svg [attr.viewBox]="'0 0 500 ' + (librosMasPrestados.length * 32 + 10)" class="w-full h-auto" role="img" aria-label="Grafico de barras de libros mas prestados">
-          @for (libro of librosMasPrestados; track libro.libroId; let i = $index) {
-            <g (click)="irAInventario()" class="cursor-pointer" [attr.aria-label]="'Ver ' + libro.titulo + ' en inventario'">
-              <text x="0" [attr.y]="i * 32 + 14" class="fill-on-surface" font-size="12" font-family="Inter">{{ libro.titulo.length > 30 ? libro.titulo.substring(0, 30) + '...' : libro.titulo }}</text>
+          @for (libro of librosMasPrestados; track libro.libroId ?? libro.isbn ?? $index; let i = $index) {
+            <g (click)="irAInventario()" class="cursor-pointer" [attr.aria-label]="'Ver ' + (libro.titulo ?? 'Sin título') + ' en inventario'">
+              <text x="0" [attr.y]="i * 32 + 14" class="fill-on-surface" font-size="12" font-family="Inter">{{ tituloCorto(libro.titulo) }}</text>
               <rect x="0" [attr.y]="i * 32 + 18" [attr.width]="maxBarWidth(libro.totalPrestamos)" height="14" rx="4" [attr.fill]="barColors[i % barColors.length]"/>
-              <text [attr.x]="maxBarWidth(libro.totalPrestamos) + 6" [attr.y]="i * 32 + 30" font-size="12" font-family="Inter" font-weight="600" [attr.fill]="barTextColors[i % barTextColors.length]">{{ libro.totalPrestamos }}</text>
+              <text [attr.x]="maxBarWidth(libro.totalPrestamos) + 6" [attr.y]="i * 32 + 30" font-size="12" font-family="Inter" font-weight="600" [attr.fill]="barTextColors[i % barTextColors.length]">{{ libro.totalPrestamos ?? 0 }}</text>
             </g>
           }
         </svg>
@@ -138,14 +138,14 @@
         </div>
       } @else {
         <div class="space-y-sm">
-          @for (u of top10PorDeuda; track u.usuarioId; let i = $index) {
+          @for (u of top10PorDeuda; track u.usuarioId ?? u.correo ?? $index; let i = $index) {
             <div>
               <div class="flex items-center justify-between mb-1">
                 <span class="font-body-sm text-[13px] text-on-surface truncate">{{ i + 1 }}. {{ u.nombre }} {{ u.apellido }}</span>
-                <span class="font-label-sm text-[12px] font-semibold text-error shrink-0">${{ u.montoTotalAdeudado.toFixed(2) }}</span>
+                <span class="font-label-sm text-[12px] font-semibold text-error shrink-0">${{ (u.montoTotalAdeudado ?? 0).toFixed(2) }}</span>
               </div>
               <div class="w-full h-2 rounded-full bg-surface-container-low overflow-hidden">
-                <div class="h-full rounded-full bg-error" [style.width.%]="(u.montoTotalAdeudado / maxDeudaUsuario) * 100"></div>
+                <div class="h-full rounded-full bg-error" [style.width.%]="((u.montoTotalAdeudado ?? 0) / maxDeudaUsuario) * 100"></div>
               </div>
             </div>
           }
@@ -181,7 +181,7 @@
             </tr>
           </thead>
           <tbody class="font-body-sm text-body-sm text-on-surface">
-            @for (u of deudasPaginadas; track u.usuarioId) {
+            @for (u of deudasPaginadas; track u.usuarioId ?? u.correo ?? $index) {
               <tr class="border-b border-outline-variant/50">
                 <td class="py-sm pr-md">
                   <div class="flex items-center gap-sm">
@@ -201,7 +201,7 @@
                     {{ u.diasAtrasoPromedio | number:'1.0-0' }} dias
                   </span>
                 </td>
-                <td class="py-sm font-semibold text-error">${{ u.montoTotalAdeudado.toFixed(2) }}</td>
+                <td class="py-sm font-semibold text-error">${{ (u.montoTotalAdeudado ?? 0).toFixed(2) }}</td>
               </tr>
             }
           </tbody>

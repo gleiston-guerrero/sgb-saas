@@ -151,6 +151,32 @@ describe('DashboardGerenteComponent', () => {
     expect(component.eventosAuditoria.length).toBe(0);
   });
 
+  // Misma regresión que el home admin: filas fantasma con 200.
+  it('filtra filas fantasma con ids nulos sin romper el render', () => {
+    reporteService.librosMasPrestados.and.returnValue(of([
+      { libroId: null, titulo: null, isbn: '9788401352836', totalPrestamos: null } as any
+    ]));
+
+    expect(() => { fixture.detectChanges(); }).not.toThrow();
+
+    expect(component.librosMasPrestados).toEqual([]);
+    expect(component.cargando).toBeFalse();
+  });
+
+  it('tolera pagina y pagosRecientes nulos sin romper el render', () => {
+    auditoriaService.listar.and.returnValue(of(null as any));
+    multaService.resumenFinanciero.and.returnValue(of({
+      totalRecaudado: 1, totalPendiente: 2, totalGeneradoHoy: 0, pagosRecientes: null
+    } as any));
+
+    expect(() => { fixture.detectChanges(); }).not.toThrow();
+
+    expect(component.eventosAuditoria).toEqual([]);
+    expect(component.resumenFinanciero?.pagosRecientes).toEqual([]);
+    expect(component.cargandoAuditoria).toBeFalse();
+    expect(component.cargandoFinanciero).toBeFalse();
+  });
+
   it('ADMIN no dispara reportes de libros/morosidad (endpoints excluyen su rol)', () => {
     // Re-mock de AuthService: solo ADMIN es true, GERENTE es false.
     // ADMIN aun asi ve resumen financiero y auditoría.

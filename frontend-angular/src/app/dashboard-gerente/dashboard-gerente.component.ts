@@ -52,7 +52,7 @@ export class DashboardGerenteComponent implements OnInit {
     if (this.authService.hasRole('GERENTE')) {
       this.reporteService.librosMasPrestados().subscribe({
         next: (libros) => {
-          this.librosMasPrestados = libros.slice(0, 5); // Top 5.
+          this.librosMasPrestados = (libros ?? []).filter(l => l?.libroId != null).slice(0, 5); // Top 5.
           this.cargando = false;
         },
         error: () => {
@@ -63,7 +63,7 @@ export class DashboardGerenteComponent implements OnInit {
 
       this.reporteService.morosidad().subscribe({
         next: (res: any) => {
-          const usuarios = Array.isArray(res) ? res : res.content ?? [];
+          const usuarios = Array.isArray(res) ? res : (res?.content ?? []);
           this.usuariosEnMora = usuarios;
           this.cargandoMorosidad = false;
         },
@@ -80,7 +80,9 @@ export class DashboardGerenteComponent implements OnInit {
 
     this.multaService.resumenFinanciero().subscribe({
       next: (resumen) => {
-        this.resumenFinanciero = resumen;
+        this.resumenFinanciero = resumen
+          ? { ...resumen, pagosRecientes: resumen.pagosRecientes ?? [] }
+          : resumen;
         this.cargandoFinanciero = false;
       },
       error: () => {
@@ -91,7 +93,7 @@ export class DashboardGerenteComponent implements OnInit {
 
     this.auditoriaService.listar({ page: 0, size: 5 }).subscribe({
       next: (pagina) => {
-        this.eventosAuditoria = pagina.content;
+        this.eventosAuditoria = pagina?.content ?? [];
         this.cargandoAuditoria = false;
       },
       error: () => {
@@ -102,7 +104,7 @@ export class DashboardGerenteComponent implements OnInit {
   }
 
   get montoTotalAdeudado(): number {
-    return this.usuariosEnMora.reduce((suma, u) => suma + u.montoTotalAdeudado, 0);
+    return this.usuariosEnMora.reduce((suma, u) => suma + (u.montoTotalAdeudado ?? 0), 0);
   }
 
   // El titulo no asume rol: GERENTE ve "Bienvenida, Gerencia" y ADMIN

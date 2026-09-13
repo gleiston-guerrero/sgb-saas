@@ -104,4 +104,32 @@ describe('DashboardGerenteAdminHomeComponent', () => {
     expect(component.errorLibros).toContain('No se pudo cargar');
     expect(component.cargandoLibros).toBeFalse();
   });
+
+  // Regresión prod: la función de reporte devolvió filas fantasma
+  // {libroId: null, titulo: null, totalPrestamos: null} con 200 y el
+  // template reventaba (titulo.length + track duplicado), dejando el
+  // loader eterno.
+  it('filtra filas fantasma con ids nulos sin romper el render', () => {
+    reporteServiceSpy.librosMasPrestados.and.returnValue(of([
+      { libroId: null, titulo: null, isbn: '9788401352836', totalPrestamos: null } as any
+    ]));
+
+    expect(() => { component.cambiarLimiteLibros(5); fixture.detectChanges(); }).not.toThrow();
+
+    expect(component.librosMasPrestados).toEqual([]);
+    expect(component.cargandoLibros).toBeFalse();
+    expect(component.tituloCorto(null)).toBe('Sin título');
+  });
+
+  it('tolera montos nulos en morosidad sin romper el render', () => {
+    reporteServiceSpy.morosidad.and.returnValue(of({
+      content: [{ ...mockMorosidad[0], montoTotalAdeudado: null } as any],
+      totalPages: 1, totalElements: 1
+    }));
+
+    expect(() => { component.ngOnInit(); fixture.detectChanges(); }).not.toThrow();
+
+    expect(component.cargandoMorosidad).toBeFalse();
+    expect(component.montoTotalAdeudado).toBe(0);
+  });
 });

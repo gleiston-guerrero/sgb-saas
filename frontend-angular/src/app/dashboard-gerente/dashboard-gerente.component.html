@@ -29,10 +29,10 @@
     <div class="rounded-xl border border-outline-variant bg-surface-container-lowest shadow-sm p-lg">
       <h2 class="font-headline-md text-headline-md text-on-background mb-md">Libros más prestados</h2>
       <div class="space-y-sm">
-        @for (libro of librosMasPrestados; track libro.libroId; let i = $index) {
+        @for (libro of librosMasPrestados; track libro.libroId ?? libro.isbn ?? $index; let i = $index) {
           <div class="flex items-center justify-between gap-sm">
-            <p class="font-body-sm text-body-sm text-on-surface truncate">{{ i + 1 }}. {{ libro.titulo }}</p>
-            <span class="font-label-sm text-[12px] text-on-surface-variant shrink-0">{{ libro.totalPrestamos }} préstamos</span>
+            <p class="font-body-sm text-body-sm text-on-surface truncate">{{ i + 1 }}. {{ libro.titulo ?? 'Sin título' }}</p>
+            <span class="font-label-sm text-[12px] text-on-surface-variant shrink-0">{{ libro.totalPrestamos ?? 0 }} préstamos</span>
           </div>
         } @empty {
           @if (!cargando) {
@@ -93,11 +93,11 @@
           </div>
         </div>
 
-        @if (resumenFinanciero.pagosRecientes.length > 0) {
+        @if ((resumenFinanciero.pagosRecientes ?? []).length > 0) {
           <div class="border-t border-outline-variant pt-md">
             <h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-sm">Pagos recientes</h3>
             <div class="space-y-sm">
-              @for (pago of resumenFinanciero.pagosRecientes; track pago.multaId) {
+              @for (pago of (resumenFinanciero.pagosRecientes ?? []); track pago.multaId ?? $index) {
                 <div class="flex items-center justify-between gap-sm">
                   <div class="min-w-0">
                     <p class="font-body-sm text-body-sm text-on-surface truncate">{{ pago.usuarioNombre }}</p>
@@ -151,7 +151,7 @@
         <p class="font-body-sm text-body-sm text-error">{{ errorAuditoria }}</p>
       } @else {
         <div class="space-y-sm">
-          @for (evento of eventosAuditoria; track evento.id) {
+          @for (evento of eventosAuditoria; track evento.id ?? $index) {
             <div class="flex items-center justify-between gap-sm">
               <p class="font-body-sm text-body-sm text-on-surface truncate">{{ evento.accion }} · {{ evento.usuario ?? '—' }}</p>
               <span class="font-label-sm text-[11px] text-on-surface-variant shrink-0">{{ evento.fechaHora | date:'short' }}</span>
