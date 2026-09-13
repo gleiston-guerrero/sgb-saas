@@ -19,8 +19,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -39,6 +41,9 @@ class SupplierControllerTest extends WebMvcControllerTestSupport {
 
     @MockitoBean
     private SupplierRepository supplierRepository;
+
+    @Autowired
+    private SupplierController supplierController;
 
     private Supplier supplier() {
         Supplier p = new Supplier();
@@ -164,6 +169,45 @@ class SupplierControllerTest extends WebMvcControllerTestSupport {
     }
 
     @Test
+    void create_withoutRucAndActiveNull_defaultsActiveTrue() throws Exception {
+        Supplier saved = supplier();
+        saved.setRuc(null);
+        saved.setActive(true);
+        SupplierRequestDTO dto = new SupplierRequestDTO(
+                "Proveedor sin RUC", null, "Calle 2",
+                "099333444", "sin-ruc@correo.com", "Luis", null);
+        when(supplierRepository.existsByNameIgnoreCase("Proveedor sin RUC")).thenReturn(false);
+        when(supplierRepository.save(any(Supplier.class))).thenReturn(saved);
+
+        var response = supplierController.create(dto);
+
+        assertThat(response.getStatusCode().value()).isEqualTo(201);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().active()).isTrue();
+        verify(supplierRepository).save(org.mockito.ArgumentMatchers.argThat(Supplier::getActive));
+    }
+
+    @Test
+    void create_withBlankRuc_noConsultaDuplicadoRuc() throws Exception {
+        SupplierRequestDTO dto = new SupplierRequestDTO(
+                "Proveedor RUC blanco", "   ", "Calle 3",
+                "099333555", "blank-ruc@correo.com", "Luis", false);
+        Supplier saved = supplier();
+        saved.setName("Proveedor RUC blanco");
+        saved.setRuc("   ");
+        saved.setActive(false);
+        when(supplierRepository.existsByNameIgnoreCase("Proveedor RUC blanco")).thenReturn(false);
+        when(supplierRepository.save(any(Supplier.class))).thenReturn(saved);
+
+        var response = supplierController.create(dto);
+
+        assertThat(response.getStatusCode().value()).isEqualTo(201);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().active()).isFalse();
+        verify(supplierRepository, org.mockito.Mockito.never()).existsByRucIgnoreCase("   ");
+    }
+
+    @Test
     void update_existing_devuelve200() throws Exception {
         when(supplierRepository.findById(1)).thenReturn(Optional.of(supplier()));
         when(supplierRepository.save(any(Supplier.class))).thenReturn(supplier());
@@ -173,6 +217,23 @@ class SupplierControllerTest extends WebMvcControllerTestSupport {
                         .content(objectMapper.writeValueAsString(requestValid())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nombre").value("Editorial UTEQ"));
+    }
+
+    @Test
+    void update_withActiveNull_preservaEstadoExistente() throws Exception {
+        Supplier existing = supplier();
+        existing.setActive(false);
+        SupplierRequestDTO dto = new SupplierRequestDTO(
+                "Editorial UTEQ", "1790012345001", "Calle 1",
+                "099111222", "prov@correo.com", "Ana", null);
+        when(supplierRepository.findById(1)).thenReturn(Optional.of(existing));
+        when(supplierRepository.save(any(Supplier.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        mockMvc.perform(put("/api/v1/proveedores/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.activo").value(false));
     }
 
     @Test

@@ -32,7 +32,7 @@ GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_
 ,com.uteq.backend.controller,BackupController,8,362,6,20,0,61,6,19,0,12
 ,com.uteq.backend.controller,SubscriptionAvailabilityController,0,67,0,0,0,18,0,6,0,6
 ,com.uteq.backend.controller,AuditController,0,49,0,0,0,8,0,4,0,4
-,com.uteq.backend.controller,FullBackupController,112,136,17,7,17,32,12,9,1,8
+,com.uteq.backend.controller,FullBackupController,86,162,16,8,11,38,10,11,0,9
 ,com.uteq.backend.controller,AuthController,0,167,0,4,0,36,0,12,0,10
 ,com.uteq.backend.controller,ChatbotController,0,20,0,0,0,5,0,3,0,3
 ,com.uteq.backend.controller,UserAdminController,6,57,0,0,1,12,1,6,1,6
@@ -46,4 +46,4 @@ GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_
 ,com.uteq.backend.controller,CategoryDamageController.CategoryRequest,0,6,0,0,0,1,0,1,0,1
 ,com.uteq.backend.controller,PublicBookController,0,34,0,0,0,7,0,4,0,4
 ,com.uteq.backend.controller,AuthorController,0,71,0,0,0,16,0,6,0,6
-,com.uteq.backend.controller,SupplierController,1,221,4,16,0,46,4,14,0,8
+,com.uteq.backend.controller,SupplierController,0,222,0,20,0,46,0,18,0,8
