@@ -31,9 +31,9 @@ public class SubscriptionAvailabilityController {
      * @param auth identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
-    public ResponseEntity<Void> suscribir(@PathVariable("libroId") Long bookId, Authentication auth) {
+    public ResponseEntity<Void> subscribe(@PathVariable("libroId") Long bookId, Authentication auth) {
         Long userId = resolveUserId(auth);
-        service.suscribir(userId, bookId);
+        service.subscribe(userId, bookId);
         return ResponseEntity.ok().build();
     }
 
@@ -46,9 +46,9 @@ public class SubscriptionAvailabilityController {
      * @param auth identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
-    public ResponseEntity<Void> desuscribir(@PathVariable("libroId") Long bookId, Authentication auth) {
+    public ResponseEntity<Void> unsubscribe(@PathVariable("libroId") Long bookId, Authentication auth) {
         Long userId = resolveUserId(auth);
-        service.desuscribir(userId, bookId);
+        service.unsubscribe(userId, bookId);
         return ResponseEntity.noContent().build();
     }
 
@@ -60,7 +60,7 @@ public class SubscriptionAvailabilityController {
      * @param auth identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
-    public ResponseEntity<List<Long>> misSubscriptions(Authentication auth) {
+    public ResponseEntity<List<Long>> mySubscriptions(Authentication auth) {
         Long userId = resolveUserId(auth);
         return ResponseEntity.ok(service.listBooksIds(userId));
     }

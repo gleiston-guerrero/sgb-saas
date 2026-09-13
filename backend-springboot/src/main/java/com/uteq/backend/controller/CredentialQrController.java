@@ -32,7 +32,7 @@ public class CredentialQrController {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
-    public ResponseEntity<byte[]> miCredential(Authentication authentication) {
+    public ResponseEntity<byte[]> myCredential(Authentication authentication) {
         byte[] image = service.generateImageQrOwn(authentication);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"credencial-qr.png\"")

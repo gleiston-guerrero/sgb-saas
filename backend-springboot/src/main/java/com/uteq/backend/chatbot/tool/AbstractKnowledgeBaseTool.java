@@ -42,7 +42,7 @@ public abstract class AbstractKnowledgeBaseTool extends AbstractChatbotTool {
     protected abstract String getResponseKey();
 
     /** Mapea una entrada de la base a su nodo JSON. */
-    protected abstract ObjectNode mapearInput(KnowledgeBase bc);
+    protected abstract ObjectNode mapInput(KnowledgeBase bc);
 
     @Override
     /**
@@ -61,7 +61,7 @@ public abstract class AbstractKnowledgeBaseTool extends AbstractChatbotTool {
 
         ArrayNode array = mapper.createArrayNode();
         for (KnowledgeBase bc : inputs) {
-            array.add(mapearInput(bc));
+            array.add(mapInput(bc));
         }
 
         ObjectNode response = mapper.createObjectNode();

@@ -151,7 +151,7 @@ class SuggestionAcquisitionControllerSecurityTest {
     @Test
     @WithMockUser(roles = "GERENTE")
     void mostPedidos_withRoleManager_sePermite() throws Exception {
-        when(suggestionService.getMostPedidos(any())).thenReturn(Page.empty());
+        when(suggestionService.getMostRequested(any())).thenReturn(Page.empty());
 
         mockMvc.perform(get("/api/v1/sugerencias-adquisicion/mas-pedidos"))
                 .andExpect(status().isOk());
@@ -187,7 +187,7 @@ class SuggestionAcquisitionControllerSecurityTest {
     @Test
     @WithMockUser(roles = "GERENTE")
     void reportPdf_withRoleManager_descargaPdf() throws Exception {
-        when(suggestionService.getMostPedidosList()).thenReturn(java.util.List.of());
+        when(suggestionService.getMostRequestedList()).thenReturn(java.util.List.of());
 
         mockMvc.perform(get("/api/v1/sugerencias-adquisicion/reporte-pdf"))
                 .andExpect(status().isOk())

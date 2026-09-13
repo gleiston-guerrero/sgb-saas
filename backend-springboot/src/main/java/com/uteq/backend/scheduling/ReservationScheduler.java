@@ -44,7 +44,7 @@ public class ReservationScheduler {
     /**
      * Handles expirar reservations Vencidas.
      */
-    public void expireReservationsVencidas() {
+    public void expireOverdueReservations() {
         notifyExpiringSoon();
 
         Integer rowsUpdated = reservationProcedureRepository.spExpireReservationsVencidasProcedure();

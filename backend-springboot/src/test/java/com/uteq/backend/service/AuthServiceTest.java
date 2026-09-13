@@ -148,7 +148,7 @@ class AuthServiceTest {
 
         authService.login(dto, IP_DE_PRUEBA);
 
-        verify(loginRateLimiter).resetear("lector@correo.com", IP_DE_PRUEBA);
+        verify(loginRateLimiter).reset("lector@correo.com", IP_DE_PRUEBA);
         verify(auditLogAuditRepository).save(any());
     }
 
@@ -189,8 +189,8 @@ class AuthServiceTest {
     void loginBlockedByRateLimitNotIntentaAutenticar() {
         LoginRequestDTO dto = new LoginRequestDTO("lector@correo.com", "password123");
 
-        when(loginRateLimiter.estaBlocked("lector@correo.com", IP_DE_PRUEBA)).thenReturn(true);
-        when(loginRateLimiter.secondsRestantes("lector@correo.com", IP_DE_PRUEBA)).thenReturn(600L);
+        when(loginRateLimiter.isBlocked("lector@correo.com", IP_DE_PRUEBA)).thenReturn(true);
+        when(loginRateLimiter.remainingSeconds("lector@correo.com", IP_DE_PRUEBA)).thenReturn(600L);
 
         assertThrows(LoginRateLimitExceededException.class, () -> authService.login(dto, IP_DE_PRUEBA));
 
@@ -242,7 +242,7 @@ class AuthServiceTest {
         verify(userRepository).save(capturado.capture());
         assertEquals("PENDIENTE_VERIFICACION", capturado.getValue().getStatus().getName());
         assertFalse(capturado.getValue().isEmailVerified());
-        verify(verificationEmailService).generateYSendCode(any(User.class));
+        verify(verificationEmailService).generateAndSendCode(any(User.class));
     }
 
     // REQ-NF-013 / OWASP A03: replica como test de regresión permanente el

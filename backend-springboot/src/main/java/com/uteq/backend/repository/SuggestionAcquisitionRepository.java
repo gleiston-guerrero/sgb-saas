@@ -33,5 +33,5 @@ public interface SuggestionAcquisitionRepository extends JpaRepository<Suggestio
             + "GROUP BY s.isbn ORDER BY COUNT(s) DESC, s.isbn ASC",
             countQuery = "SELECT COUNT(DISTINCT s.isbn) FROM SuggestionAcquisition s "
                     + "WHERE s.status = 'PENDIENTE' AND s.isbn IS NOT NULL")
-    Page<SuggestionGroupedDTO> findMostPedidosAgrupados(Pageable pageable);
+    Page<SuggestionGroupedDTO> findMostRequestedGrouped(Pageable pageable);
 }

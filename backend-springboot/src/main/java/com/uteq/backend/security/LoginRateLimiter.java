@@ -39,7 +39,7 @@ public class LoginRateLimiter {
      * @return true cuando la comprobacion se cumple; false en caso contrario
      */
 
-    public boolean estaBlocked(String email, String ip) {
+    public boolean isBlocked(String email, String ip) {
         try {
             String value = redisTemplate.opsForValue().get(key(email, ip));
             return value != null && Long.parseLong(value) >= maxAttempts;
@@ -74,7 +74,7 @@ public class LoginRateLimiter {
      * @param ip valor de entrada ip usado por la operacion para completar su regla de negocio
      */
 
-    public void resetear(String email, String ip) {
+    public void reset(String email, String ip) {
         try {
             redisTemplate.delete(key(email, ip));
         } catch (DataAccessException e) {
@@ -89,7 +89,7 @@ public class LoginRateLimiter {
      * @param ip valor de entrada ip usado por la operacion para completar su regla de negocio
      * @return valor numerico calculado o recuperado por la operacion
      */
-    public long secondsRestantes(String email, String ip) {
+    public long remainingSeconds(String email, String ip) {
         try {
             Long ttl = redisTemplate.getExpire(key(email, ip));
             return (ttl == null || ttl < 0) ? rateLimitWindowSeconds : ttl;

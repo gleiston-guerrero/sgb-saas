@@ -66,7 +66,7 @@ public class ChatbotService {
     public MessageChatResponseDTO sendMessage(MessageChatRequestDTO dto, Authentication authentication) {
         Long userId = resolveIdByEmail(authentication.getName());
 
-        if (chatbotRateLimiter.estaBlocked(userId)) {
+        if (chatbotRateLimiter.isBlocked(userId)) {
             throw new ChatbotRateLimitExceededException(
                     "Has alcanzado el límite de mensajes al asistente. Intenta de nuevo en un momento.");
         }
@@ -112,7 +112,7 @@ public class ChatbotService {
      */
     public List<MessageChatHistoryDTO> getHistory(UUID sessionId, Authentication authentication) {
         Long userId = resolveIdByEmail(authentication.getName());
-        SessionChat session = validatePropiedadSession(sessionId, userId);
+        SessionChat session = validateSessionOwnership(sessionId, userId);
         return messageChatRepo.findBySessionIdOrderByCreatedAsc(session.getId()).stream()
                 .map(m -> new MessageChatHistoryDTO(m.getRole(), m.getContent(), m.getCreated()))
                 .toList();
@@ -137,8 +137,8 @@ public class ChatbotService {
                     .append("\n");
         }
 
-        if (tieneIntencionAvailability(textUser)) {
-            List<BookSuggestionDTO> suggestions = bookService.sugerir(textUser);
+        if (hasAvailabilityIntention(textUser)) {
+            List<BookSuggestionDTO> suggestions = bookService.suggest(textUser);
             sb.append("\n### Disponibilidad real de libros (única fuente veraz):\n");
             if (suggestions.isEmpty()) {
                 sb.append("(sin coincidencias en el catálogo para esta búsqueda)\n");
@@ -150,7 +150,7 @@ public class ChatbotService {
             }
         }
 
-        if (tieneIntencionReservation(textUser)) {
+        if (hasReservationIntention(textUser)) {
             sb.append("\n### Si el usuario pide reservar o apartar un libro: NO ejecutes la reserva. ")
                     .append("Indícale que confirme el título exacto y que puede reservar desde el ")
                     .append("catálogo o en ventanilla. Pide confirmación antes de dar por hecho nada.\n");
@@ -158,12 +158,12 @@ public class ChatbotService {
         return sb.toString();
     }
 
-    private boolean tieneIntencionAvailability(String text) {
+    private boolean hasAvailabilityIntention(String text) {
         String t = text.toLowerCase(Locale.ROOT);
         return PALABRAS_DISPONIBILIDAD.stream().anyMatch(t::contains);
     }
 
-    private boolean tieneIntencionReservation(String text) {
+    private boolean hasReservationIntention(String text) {
         String t = text.toLowerCase(Locale.ROOT);
         return PALABRAS_RESERVA.stream().anyMatch(t::contains);
     }
@@ -177,10 +177,10 @@ public class ChatbotService {
             fresh.setLastActividad(ahora);
             return sessionChatRepo.save(fresh);
         }
-        return validatePropiedadSession(sessionId, userId);
+        return validateSessionOwnership(sessionId, userId);
     }
 
-    private SessionChat validatePropiedadSession(UUID sessionId, Long userId) {
+    private SessionChat validateSessionOwnership(UUID sessionId, Long userId) {
         SessionChat session = sessionChatRepo.findById(sessionId)
                 .orElseThrow(() -> new SessionChatNotFoundException(
                         "Sesión de chat no encontrada: " + sessionId));

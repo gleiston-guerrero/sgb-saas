@@ -151,7 +151,7 @@ class BackupScheduleServiceTest {
         doReturn(future).when(taskScheduler)
                 .scheduleAtFixedRate(any(Runnable.class), any(Instant.class), any(Duration.class));
 
-        service.initializeTasksProgramadas();
+        service.initializeScheduledTasks();
 
         verify(taskScheduler).scheduleAtFixedRate(any(Runnable.class), any(Instant.class), eq(Duration.ofSeconds(7200)));
     }

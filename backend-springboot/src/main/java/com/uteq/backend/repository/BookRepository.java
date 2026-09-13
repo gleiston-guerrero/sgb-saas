@@ -100,14 +100,14 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             + "AND (LOWER(l.titulo) LIKE LOWER(CONCAT('%', :q, '%')) "
             + "OR LOWER(l.isbn::text) LIKE LOWER(CONCAT('%', :q, '%')))",
             nativeQuery = true)
-    Page<Book> searchByTextOIsbnYAuthor(@Param("q") String q, @Param("authorId") Long authorId, @Param("statusId") Integer statusId, Pageable pageable);
+    Page<Book> searchByTextOrIsbnAndAuthor(@Param("q") String q, @Param("authorId") Long authorId, @Param("statusId") Integer statusId, Pageable pageable);
 
     // Búsqueda por similitud con pg_trgm (top 10 por similarity de título, para autocompletado).
     @Query(value = "SELECT * FROM libros "
             + "WHERE estado_id = :p_estado_id AND similarity(titulo, :p_texto) > 0.1 "
             + "ORDER BY similarity(titulo, :p_texto) DESC "
             + "LIMIT 10", nativeQuery = true)
-    List<Book> sugerirByTitle(@Param("p_texto") String text, @Param("p_estado_id") Integer statusId);
+    List<Book> suggestByTitle(@Param("p_texto") String text, @Param("p_estado_id") Integer statusId);
 
     // buscarPendientes y buscarPorEstados: nativas con isbn::text.
     // Antes usaban @EntityGraph pero eso no funciona con nativeQuery.

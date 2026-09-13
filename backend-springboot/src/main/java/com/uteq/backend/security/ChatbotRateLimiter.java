@@ -37,7 +37,7 @@ public class ChatbotRateLimiter {
      * @return true cuando la comprobacion se cumple; false en caso contrario
      */
 
-    public boolean estaBlocked(Long userId) {
+    public boolean isBlocked(Long userId) {
         try {
             String value = redisTemplate.opsForValue().get(key(userId));
             return value != null && Long.parseLong(value) >= maxMensajes;

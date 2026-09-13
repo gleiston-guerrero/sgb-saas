@@ -60,7 +60,7 @@ class BookControllerTest extends WebMvcControllerTestSupport {
     @Test
     @WithMockUser(roles = "LECTOR")
     void suggestions_devuelve200() throws Exception {
-        when(bookService.sugerir("java")).thenReturn(List.of());
+        when(bookService.suggest("java")).thenReturn(List.of());
 
         mockMvc.perform(get("/api/v1/libros/sugerencias").param("texto", "java"))
                 .andExpect(status().isOk());

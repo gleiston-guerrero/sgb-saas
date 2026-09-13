@@ -106,7 +106,7 @@ class ConfigurationSystemServiceTest {
     void getValueEntero_withValueNotNumerico_lanzaException() {
         given(repo.findById("clave_texto")).willReturn(Optional.of(config("clave_texto", "no-es-numero")));
 
-        assertThatThrownBy(() -> service.getValueEntero("clave_texto"))
+        assertThatThrownBy(() -> service.getIntegerValue("clave_texto"))
                 .isInstanceOf(IllegalStateException.class);
     }
 }

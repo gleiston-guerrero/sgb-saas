@@ -89,7 +89,7 @@ public class AuditController {
                                          @RequestParam(name = "modulo", required = false) String module,
                                          @RequestParam(name = "desde", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
                                          @RequestParam(name = "hasta", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime until) {
-        byte[] data = auditService.exportarCsv(userId, module, from, until);
+        byte[] data = auditService.exportCsv(userId, module, from, until);
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=auditoria.csv").contentType(MediaType.parseMediaType("text/csv")).contentLength(data.length).body(data);
     }
 }

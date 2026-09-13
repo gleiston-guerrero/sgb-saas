@@ -72,7 +72,7 @@ public class BookIsbnLookupService {
 
     public BookIsbnLookupDTO searchByIsbn(String isbn) {
         try {
-            JsonNode volume = searchPrimerVolume(isbn);
+            JsonNode volume = searchFirstVolume(isbn);
             JsonNode volumeInfo = volume.path("volumeInfo");
 
             String author = null;
@@ -176,7 +176,7 @@ public class BookIsbnLookupService {
 
     public CoverImageDTO getCover(String isbn) {
         try {
-            JsonNode volume = searchPrimerVolume(isbn);
+            JsonNode volume = searchFirstVolume(isbn);
             String thumbnail = volume.path("volumeInfo").path("imageLinks").path("thumbnail").asText(null);
             if (thumbnail != null) {
                 byte[] bytes = restClient.get()
@@ -216,7 +216,7 @@ public class BookIsbnLookupService {
     }
 
     // El ISBN admite guiones; Google Books espera solo dígitos, se limpian acá.
-    private JsonNode searchPrimerVolume(String isbn) {
+    private JsonNode searchFirstVolume(String isbn) {
         String url = urlBase + "/volumes?q=isbn:" + isbn.replace("-", "");
         String json = null;
         try {

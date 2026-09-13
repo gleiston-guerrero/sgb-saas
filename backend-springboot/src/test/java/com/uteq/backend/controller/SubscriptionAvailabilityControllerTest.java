@@ -55,7 +55,7 @@ class SubscriptionAvailabilityControllerTest extends WebMvcControllerTestSupport
                 .principal(new TestingAuthenticationToken("lector@correo.com", null, "ROLE_LECTOR")))
                 .andExpect(status().isOk());
 
-        verify(service).suscribir(7L, 3L);
+        verify(service).subscribe(7L, 3L);
     }
 
     @Test
@@ -76,12 +76,12 @@ class SubscriptionAvailabilityControllerTest extends WebMvcControllerTestSupport
                 .principal(new TestingAuthenticationToken("5", null, "ROLE_LECTOR")))
                 .andExpect(status().isNoContent());
 
-        verify(service).desuscribir(5L, 3L);
+        verify(service).unsubscribe(5L, 3L);
     }
 
     @Test
     @WithMockUser(username = "lector@correo.com", roles = "LECTOR")
-    void misSubscriptions_devuelve200() throws Exception {
+    void mySubscriptions_devuelve200() throws Exception {
         when(userRepo.findByEmail("lector@correo.com")).thenReturn(Optional.of(reader()));
         when(service.listBooksIds(7L)).thenReturn(List.of(3L, 9L));
 
@@ -94,7 +94,7 @@ class SubscriptionAvailabilityControllerTest extends WebMvcControllerTestSupport
 
     @Test
     @WithMockUser(username = "7", roles = "LECTOR")
-    void misSubscriptions_userNumerico_devuelve200() throws Exception {
+    void mySubscriptions_userNumerico_devuelve200() throws Exception {
         when(service.listBooksIds(7L)).thenReturn(List.of(3L));
 
         mockMvc.perform(get("/api/v1/libros/suscripciones/mias")

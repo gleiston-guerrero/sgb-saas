@@ -49,7 +49,7 @@ public class BackupScheduleService {
      * TaskScheduler en memoria y los automáticos dejan de correr.
      */
     @PostConstruct
-    public void initializeTasksProgramadas() {
+    public void initializeScheduledTasks() {
         progRepo.findByActiveTrueOrderByLastExecutionDesc().forEach(p -> {
             try {
                 scheduleExecution(p.getId());
@@ -190,7 +190,7 @@ public class BackupScheduleService {
         // Programar con fixedDelay
         long delayMs = initialDelay * 1000L;
         ScheduledFuture<?> sf = taskScheduler.scheduleAtFixedRate(
-                () -> executeBackupProgramado(id),
+                () -> executeScheduledBackup(id),
                 Instant.now().plusMillis(delayMs),
                 java.time.Duration.ofSeconds(intervalSeconds)
         );
@@ -232,7 +232,7 @@ public class BackupScheduleService {
      * Ejecuta el backup inmediato según la programación configurada.
      * Genera el zip y lo sube a R2, guarda registro en tabla 'backups'.
      */
-    private void executeBackupProgramado(Long id) {
+    private void executeScheduledBackup(Long id) {
         BackupSchedule p = progRepo.findById(id)
                 .filter(prog -> Boolean.TRUE.equals(prog.getActive()))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Programación no encontrada " + id));

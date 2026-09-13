@@ -220,7 +220,7 @@ public class LoanService {
      * @throws IllegalArgumentException si ya fue devuelto
      * @throws LoanOverdueException si está vencido
      * @throws LimitRenewalsExceededException si agotó sus renovaciones
-     * @throws MaterialReservadoException si otro usuario tiene reserva vigente del libro
+     * @throws ReservedMaterialException si otro usuario tiene reserva vigente del libro
      */
     @Transactional
     public RenewalResponseDTO renew(Long loanId, Authentication authentication) {
@@ -239,7 +239,7 @@ public class LoanService {
                     PRESTAMO_MSG + loanId + " está vencido, no se puede renovar.");
         }
 
-        int maxRenewals = configurationSystemService.getValueEntero(CLAVE_MAX_RENOVACIONES_DEFAULT);
+        int maxRenewals = configurationSystemService.getIntegerValue(CLAVE_MAX_RENOVACIONES_DEFAULT);
         if (loan.getRenewalsRealizadas() >= maxRenewals) {
             throw new LimitRenewalsExceededException(
                     "El préstamo " + loanId + " ya alcanzó el máximo de "
@@ -247,12 +247,12 @@ public class LoanService {
         }
 
         if (existsActiveReservationForOtherUser(loan.getBookId(), loan.getUserId())) {
-            throw new MaterialReservadoException(
+            throw new ReservedMaterialException(
                     "El libro del préstamo " + loanId
                             + " tiene una reserva vigente de otro usuario.");
         }
 
-        int daysLoan = configurationSystemService.getValueEntero(CLAVE_DIAS_PRESTAMO_DEFAULT);
+        int daysLoan = configurationSystemService.getIntegerValue(CLAVE_DIAS_PRESTAMO_DEFAULT);
         loan.setDateLoanReturnEstimada(OffsetDateTime.now().plusDays(daysLoan));
         loan.setRenewalsRealizadas((short) (loan.getRenewalsRealizadas() + 1));
         loan.setStatusLoanId(idStatusLoan(ESTADO_RENOVADO));
@@ -487,7 +487,7 @@ public class LoanService {
                 p.getBookIsbn(),
                 p.getDateLoan() != null ? p.getDateLoan().atOffset(ZoneOffset.UTC) : null,
                 p.getDateLoanReturnEstimada() != null ? p.getDateLoanReturnEstimada().atOffset(ZoneOffset.UTC) : null,
-                p.getDaysRestantes(),
+                p.getDaysRemaining(),
                 p.getStatusName());
     }
 
@@ -778,7 +778,7 @@ public class LoanService {
     }
 
     private void validateLimitLoans(Long userId) {
-        int maxLoans = configurationSystemService.getValueEntero("max_prestamos_usuario");
+        int maxLoans = configurationSystemService.getIntegerValue("max_prestamos_usuario");
         List<LoanActiveProjection> actives = loanProcRepo.fnListLoansActivesByUser(userId);
         if (actives.size() >= maxLoans) {
             throw new LimitLoansExceededException(

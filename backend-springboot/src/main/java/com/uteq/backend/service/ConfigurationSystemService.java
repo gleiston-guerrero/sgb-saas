@@ -101,7 +101,7 @@ public class ConfigurationSystemService {
      * @return valor numerico calculado o recuperado por la operacion
      */
 
-    public Integer getValueEntero(String key) {
+    public Integer getIntegerValue(String key) {
         String value = getValue(key);
         try {
             return Integer.valueOf(value);

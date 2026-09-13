@@ -294,7 +294,7 @@ public class LoansManagementService {
     // Días de préstamo prellenados según la configuración del sistema
     // ('dias_prestamo_default', editable por el Admin en /admin/configuracion).
     private Integer daysLoanSuggested() {
-        return configurationSystemService.getValueEntero(CLAVE_DIAS_PRESTAMO_DEFAULT);
+        return configurationSystemService.getIntegerValue(CLAVE_DIAS_PRESTAMO_DEFAULT);
     }
 
     // Se usa IllegalStateException para "fila de catálogo faltante": problema

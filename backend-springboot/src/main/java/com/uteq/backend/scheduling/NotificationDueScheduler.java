@@ -43,8 +43,8 @@ public class NotificationDueScheduler {
     /**
      * Notifies notification Vencimiento Scheduler.
      */
-    public void notifyNextsAExpire() {
-        int daysAnticipacion = configurationSystemService.getValueEntero("dias_anticipacion_vencimiento");
+    public void notifyNextToExpire() {
+        int daysAnticipacion = configurationSystemService.getIntegerValue("dias_anticipacion_vencimiento");
         int minutesAnticipacion = daysAnticipacion * 24 * 60;
 
         List<Integer> statusIds = ESTADOS_PRESTAMO_VIGENTE.stream()

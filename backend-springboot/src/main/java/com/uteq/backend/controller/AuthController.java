@@ -71,7 +71,7 @@ public class AuthController {
      * @param dto email de la cuenta
      * @return ResponseEntity vacia
      * @throws EntityNotFoundException si email no existe
-     * @throws ServiceTemporalmenteNotAvailableException si Redis no disponible
+     * @throws ServiceTemporarilyNotAvailableException si Redis no disponible
      */
     public ResponseEntity<Void> requestReset(@Valid @RequestBody RequestResetRequestDTO dto) {
         authService.requestReset(dto.email());

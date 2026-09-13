@@ -56,7 +56,7 @@ class VerificationEmailServiceTest {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(emailService.sendEmail(anyString(), anyString(), anyString())).thenReturn(true);
 
-        verificationEmailService.generateYSendCode(userTest());
+        verificationEmailService.generateAndSendCode(userTest());
 
         ArgumentCaptor<String> codeCapturado = ArgumentCaptor.forClass(String.class);
         verify(valueOperations).set(eq(KEY), codeCapturado.capture(), eq(Duration.ofMinutes(10)));
@@ -73,7 +73,7 @@ class VerificationEmailServiceTest {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(emailService.sendEmail(anyString(), anyString(), anyString())).thenReturn(false);
 
-        assertDoesNotThrow(() -> verificationEmailService.generateYSendCode(userTest()));
+        assertDoesNotThrow(() -> verificationEmailService.generateAndSendCode(userTest()));
     }
 
     @Test

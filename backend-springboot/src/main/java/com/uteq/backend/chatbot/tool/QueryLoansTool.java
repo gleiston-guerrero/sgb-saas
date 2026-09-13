@@ -67,7 +67,7 @@ public class QueryLoansTool extends AbstractUserAwareTool {
             node.put("isbn", p.getBookIsbn());
             node.put("fecha_prestamo", p.getDateLoan() != null ? p.getDateLoan().toString() : null);
             node.put("fecha_devolucion_estimada", p.getDateLoanReturnEstimada() != null ? p.getDateLoanReturnEstimada().toString() : null);
-            node.put("dias_restantes", p.getDaysRestantes());
+            node.put("dias_restantes", p.getDaysRemaining());
             node.put("estado", p.getStatusName());
             loansArray.add(node);
         }

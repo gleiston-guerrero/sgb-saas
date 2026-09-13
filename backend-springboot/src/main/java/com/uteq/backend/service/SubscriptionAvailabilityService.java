@@ -37,7 +37,7 @@ public class SubscriptionAvailabilityService {
      * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
      * @param bookId identificador del registro que se usa para ubicar el recurso en la base de datos
      */
-    public void suscribir(Long userId, Long bookId) {
+    public void subscribe(Long userId, Long bookId) {
         userRepo.findById(userId).orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado: " + userId));
         Book book = bookRepo.findById(bookId).orElseThrow(() -> new EntityNotFoundException("Libro no encontrado: " + bookId));
         if (subscriptionRepo.existsByUserIdAndBookId(userId, bookId)) {
@@ -61,7 +61,7 @@ public class SubscriptionAvailabilityService {
      * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
      * @param bookId identificador del registro que se usa para ubicar el recurso en la base de datos
      */
-    public void desuscribir(Long userId, Long bookId) {
+    public void unsubscribe(Long userId, Long bookId) {
         subscriptionRepo.deleteByUserIdAndBookId(userId, bookId);
     }
 
@@ -82,7 +82,7 @@ public class SubscriptionAvailabilityService {
      *
      * @param bookId identificador del registro que se usa para ubicar el recurso en la base de datos
      */
-    public void notifyDisponibles(Long bookId) {
+    public void notifyAvailable(Long bookId) {
         Book book = bookRepo.findById(bookId).orElseThrow(() -> new EntityNotFoundException("Libro no encontrado: " + bookId));
         if (book.getStockAvailable() == null || book.getStockAvailable() <= 0) return;
         List<SubscriptionAvailability> subs = subscriptionRepo.findByBookId(bookId);

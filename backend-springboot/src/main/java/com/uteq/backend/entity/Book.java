@@ -133,7 +133,7 @@ public class Book {
     }
 
     @PreUpdate
-    private void antesCualquierUpdate() {
+    private void beforeAnyUpdate() {
         this.updated = OffsetDateTime.now();
     }
 }

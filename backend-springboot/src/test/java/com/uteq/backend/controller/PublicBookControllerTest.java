@@ -115,7 +115,7 @@ class PublicBookControllerTest {
 
     @Test
     void suggestions_withoutToken_responde200() throws Exception {
-        when(bookService.sugerir("clean"))
+        when(bookService.suggest("clean"))
                 .thenReturn(List.of(new BookSuggestionDTO(1L, "Clean Code", true)));
 
         mockMvc.perform(get("/api/publico/libros/sugerencias").param("texto", "clean"))

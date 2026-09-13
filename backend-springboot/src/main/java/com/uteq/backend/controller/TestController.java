@@ -15,7 +15,7 @@ public class TestController {
      *
      * @return response entity<string> with the resulting state after the operation
      */
-    public ResponseEntity<String> protegido() {
+    public ResponseEntity<String> protectedEndpoint() {
         return ResponseEntity.ok("Acceso autorizado. Estás autenticado correctamente.");
     }
 }

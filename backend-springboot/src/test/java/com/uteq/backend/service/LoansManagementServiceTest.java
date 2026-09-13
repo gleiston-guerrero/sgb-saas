@@ -62,7 +62,7 @@ class LoansManagementServiceTest {
         given(statusFineRepo.findByName("PENDIENTE")).willReturn(Optional.of(statusFine(2)));
         given(fineRepo.sumAmountByUserIdAndStatusFineId(5L, 2)).willReturn(BigDecimal.valueOf(12));
         given(fineRepo.countByUserIdAndStatusFineId(5L, 2)).willReturn(3L);
-        given(configurationSystemService.getValueEntero("dias_prestamo_default")).willReturn(7);
+        given(configurationSystemService.getIntegerValue("dias_prestamo_default")).willReturn(7);
 
         UserLoansManagementDTO result = service.searchByEmail("ana@uteq.edu.ec");
 
@@ -114,7 +114,7 @@ class LoansManagementServiceTest {
         given(reservationRepo.findFirstByUserIdAndStatusReservationIdInOrderByDateReservationDesc(5L, List.of(1, 2)))
                 .willReturn(Optional.of(reservation));
         given(bookRepo.findById(30L)).willReturn(Optional.of(book(30L, true)));
-        given(configurationSystemService.getValueEntero("dias_prestamo_default")).willReturn(10);
+        given(configurationSystemService.getIntegerValue("dias_prestamo_default")).willReturn(10);
 
         ReservationActiveDTO result = service.reservationActive(5L);
 

@@ -64,7 +64,7 @@ public class ReportPdfService {
                 .setBackgroundColor(com.itextpdf.kernel.colors.ColorConstants.LIGHT_GRAY);
     }
 
-    private static String textOAlternativo(String value) {
+    private static String textOrAlternative(String value) {
         return value != null ? value : TEXTO_VACIO;
     }
 
@@ -154,9 +154,9 @@ public class ReportPdfService {
                 (table, f) -> {
                     table.addCell(new Cell().add(new Paragraph(String.valueOf(contador[0]++))));
                     table.addCell(new Cell().add(new Paragraph(f.title())));
-                    table.addCell(new Cell().add(new Paragraph(textOAlternativo(f.isbn()))));
-                    table.addCell(new Cell().add(new Paragraph(textOAlternativo(f.authorName()))));
-                    table.addCell(new Cell().add(new Paragraph(textOAlternativo(f.categoryName()))));
+                    table.addCell(new Cell().add(new Paragraph(textOrAlternative(f.isbn()))));
+                    table.addCell(new Cell().add(new Paragraph(textOrAlternative(f.authorName()))));
+                    table.addCell(new Cell().add(new Paragraph(textOrAlternative(f.categoryName()))));
                     table.addCell(new Cell().add(new Paragraph(String.valueOf(f.totalLoans()))));
                     table.addCell(new Cell().add(new Paragraph(f.percentage() + "%")));
                 });
@@ -178,12 +178,12 @@ public class ReportPdfService {
                 List.of("Título", "ISBN", "Autor", HEADER_CATEGORIA, "Stock", "Disponible", "Estado"),
                 (table, f) -> {
                     table.addCell(new Cell().add(new Paragraph(f.title())));
-                    table.addCell(new Cell().add(new Paragraph(textOAlternativo(f.isbn()))));
-                    table.addCell(new Cell().add(new Paragraph(textOAlternativo(f.authorName()))));
-                    table.addCell(new Cell().add(new Paragraph(textOAlternativo(f.categoryName()))));
+                    table.addCell(new Cell().add(new Paragraph(textOrAlternative(f.isbn()))));
+                    table.addCell(new Cell().add(new Paragraph(textOrAlternative(f.authorName()))));
+                    table.addCell(new Cell().add(new Paragraph(textOrAlternative(f.categoryName()))));
                     table.addCell(new Cell().add(new Paragraph(String.valueOf(f.stockTotal()))));
                     table.addCell(new Cell().add(new Paragraph(String.valueOf(f.stockAvailable()))));
-                    table.addCell(new Cell().add(new Paragraph(textOAlternativo(f.statusAvailability()))));
+                    table.addCell(new Cell().add(new Paragraph(textOrAlternative(f.statusAvailability()))));
                 });
     }
 
@@ -205,7 +205,7 @@ public class ReportPdfService {
                     table.addCell(new Cell().add(new Paragraph(f.userName())));
                     table.addCell(new Cell().add(new Paragraph(f.userEmail())));
                     table.addCell(new Cell().add(new Paragraph(f.bookTitle())));
-                    table.addCell(new Cell().add(new Paragraph(textOAlternativo(f.bookIsbn()))));
+                    table.addCell(new Cell().add(new Paragraph(textOrAlternative(f.bookIsbn()))));
                     table.addCell(new Cell().add(new Paragraph(f.dateLoanReturnEstimada() != null
                             ? f.dateLoanReturnEstimada().format(FORMATO_FECHA_CORTA) : TEXTO_VACIO)));
                     table.addCell(new Cell().add(new Paragraph(String.valueOf(f.daysAtraso()))));
@@ -305,7 +305,7 @@ public class ReportPdfService {
      * @param rows lista de SuggestionGroupedDTO con los datos de solicitudes.
      * @return bytes con el PDF generado
      */
-    public byte[] generateReportSuggestionsMostPedidas(List<SuggestionGroupedDTO> rows) {
+    public byte[] generateReportSuggestionsMostRequested(List<SuggestionGroupedDTO> rows) {
         int[] contador = {1};
         return generatePdf(
                 "Reporte de sugerencias más pedidas",
@@ -315,9 +315,9 @@ public class ReportPdfService {
                 List.of("#", "Título", "Autor", "ISBN", "Solicitudes"),
                 (table, f) -> {
                     table.addCell(new Cell().add(new Paragraph(String.valueOf(contador[0]++))));
-                    table.addCell(new Cell().add(new Paragraph(textOAlternativo(f.title()))));
-                    table.addCell(new Cell().add(new Paragraph(textOAlternativo(f.author()))));
-                    table.addCell(new Cell().add(new Paragraph(textOAlternativo(f.isbn()))));
+                    table.addCell(new Cell().add(new Paragraph(textOrAlternative(f.title()))));
+                    table.addCell(new Cell().add(new Paragraph(textOrAlternative(f.author()))));
+                    table.addCell(new Cell().add(new Paragraph(textOrAlternative(f.isbn()))));
                     table.addCell(new Cell().add(new Paragraph(String.valueOf(f.quantity()))));
                 });
     }

@@ -76,7 +76,7 @@ public class BookController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<BookSuggestionDTO>> suggestions(
             @RequestParam("texto") @Size(min = 2, max = 60, message = "El texto de búsqueda debe tener entre 2 y 60 caracteres") String text) {
-        return ResponseEntity.ok(bookService.sugerir(text));
+        return ResponseEntity.ok(bookService.suggest(text));
     }
 
     // ── GET /api/v1/libros/pendientes ────────────────

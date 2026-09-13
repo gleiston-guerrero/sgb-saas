@@ -67,7 +67,7 @@ public class EvidenceDamageController {
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
     public ResponseEntity<byte[]> getFile(@PathVariable Long id) {
-        var evidence = loanReturnService.getFileBinario(id);
+        var evidence = loanReturnService.getFileBinary(id);
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(evidence.fileType()))
                 .body(evidence.fileBytes());

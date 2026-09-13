@@ -81,7 +81,7 @@ public class NotificationService {
         String message = "Tu préstamo de \"" + title + "\" vence el " + loan.getDateLoanReturnEstimada()
                 + ". Recuerda devolverlo o renovarlo a tiempo.";
 
-        createYSend(loan.getUserId(), loan.getId(), typeId, message,
+        createAndSend(loan.getUserId(), loan.getId(), typeId, message,
                 "Tu préstamo está por vencer");
     }
 
@@ -98,7 +98,7 @@ public class NotificationService {
     public void notifyFine(Long userId, Long loanId, BigDecimal amount) {
         String message = "Se generó una multa de $" + amount + " asociada a tu préstamo #" + loanId
                 + " por atraso en la devolución.";
-        createYSend(userId, loanId, idType(TIPO_MULTA), message, "Se generó una multa en tu cuenta");
+        createAndSend(userId, loanId, idType(TIPO_MULTA), message, "Se generó una multa en tu cuenta");
     }
 
     /**
@@ -112,7 +112,7 @@ public class NotificationService {
     public void notifyReservationExpired(Reservation reservation) {
         String title = titleBook(reservation.getBookId());
         String message = "Tu reserva de \"" + title + "\" caducó porque no se retiró dentro del plazo.";
-        createYSend(reservation.getUserId(), null, idType(TIPO_RESERVA_CADUCADA), message,
+        createAndSend(reservation.getUserId(), null, idType(TIPO_RESERVA_CADUCADA), message,
                 "Tu reserva caducó");
     }
 
@@ -177,7 +177,7 @@ public class NotificationService {
                 + CIERRE_DIV
                 + CIERRE_DIV;
 
-        createYSend(userId, null, idType(TIPO_COMPROBANTE_PAGO), html, asunto);
+        createAndSend(userId, null, idType(TIPO_COMPROBANTE_PAGO), html, asunto);
     }
 
     /**
@@ -195,10 +195,10 @@ public class NotificationService {
         String message = "El libro \"" + title + "\" esta disponible ahora — reservalo antes que otros.";
         Integer typeId = idType(TIPO_DISPONIBLE);
         // Notificación manual: si permite envío, se intenta correo.
-        createYSendAvailable(userId, null, typeId, message, "Libro disponible");
+        createAndSendAvailable(userId, null, typeId, message, "Libro disponible");
     }
 
-    private void createYSendAvailable(Long userId, Long loanId, Integer typeNotificationId, String message, String asunto) {
+    private void createAndSendAvailable(Long userId, Long loanId, Integer typeNotificationId, String message, String asunto) {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(USUARIO_NO_ENCONTRADO + userId));
         String bodyHtml = message.startsWith("<") ? message : "<p>" + message + "</p>";
@@ -229,7 +229,7 @@ public class NotificationService {
 
     // Correos automáticos desactivados: solo se crea la notificación in-app.
     // Para DISPONIBLE (manual) se usa crearYEnviarDisponible con email activo.
-    private void createYSend(Long userId, Long loanId, Integer typeNotificationId, String message, String asunto) {
+    private void createAndSend(Long userId, Long loanId, Integer typeNotificationId, String message, String asunto) {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(USUARIO_NO_ENCONTRADO + userId));
 

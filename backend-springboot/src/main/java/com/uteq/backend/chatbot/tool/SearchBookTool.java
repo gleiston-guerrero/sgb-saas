@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * Tool que busca libros en el catálogo real por título, autor o tema.
- * Usa {@link BookService#sugerir(String)} que internamente consulta con
+ * Usa {@link BookService#suggest(String)} que internamente consulta con
  * pg_trgm (similitud de texto) y retorna los 3 resultados más relevantes.
  */
 @Component
@@ -80,7 +80,7 @@ public class SearchBookTool extends AbstractChatbotTool {
      */
     public JsonNode execute(JsonNode args) {
         String query = args.path(PARAM_QUERY).asText("");
-        List<BookSuggestionDTO> results = bookService.sugerir(query);
+        List<BookSuggestionDTO> results = bookService.suggest(query);
 
         ArrayNode resultsArray = mapper.createArrayNode();
         for (BookSuggestionDTO book : results) {

@@ -97,7 +97,7 @@ class FineControllerTest extends WebMvcControllerTestSupport {
 
     @Test
     void pay_parcial_devuelve200() throws Exception {
-        when(fineService.paymentParcial(eq(1L), eq(new BigDecimal("1.50"))))
+        when(fineService.payPartial(eq(1L), eq(new BigDecimal("1.50"))))
                 .thenReturn(Map.of("o_multa_id", 1L, "o_saldo_restante", new BigDecimal("2.00")));
         when(fineService.resolveUserIdFine(1L)).thenReturn(2L);
 

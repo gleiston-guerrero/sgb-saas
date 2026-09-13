@@ -53,7 +53,7 @@ class AbstractBaseKnowledgeToolTest {
         }
 
         @Override
-        protected com.fasterxml.jackson.databind.node.ObjectNode mapearInput(KnowledgeBase bc) {
+        protected com.fasterxml.jackson.databind.node.ObjectNode mapInput(KnowledgeBase bc) {
             return MAPPER.createObjectNode().put("respuesta", bc.getResponse());
         }
     }

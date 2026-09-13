@@ -171,7 +171,7 @@ public class BackupService {
         for (Map<String, Object> r : rows) {
             sb.append(r.values().stream().map(v -> {
                 if (v == null) return "";
-                String s = truncarText(v.toString());
+                String s = truncateText(v.toString());
                 s = s.replace("\"", "\"\"");
                 if (s.contains(",") || s.contains("\n") || s.contains("\"")) return "\"" + s + "\"";
                 return s;
@@ -189,7 +189,7 @@ public class BackupService {
                 if (v == null) return "NULL";
                 if (v instanceof Number) return v.toString();
                 if (v instanceof Boolean) return (Boolean) v ? "TRUE" : "FALSE";
-                return "'" + truncarText(v.toString()).replace("'", "''") + "'";
+                return "'" + truncateText(v.toString()).replace("'", "''") + "'";
             }).collect(Collectors.joining(", "));
             sb.append("INSERT INTO ").append(table).append(" (").append(cols).append(") VALUES (").append(vals).append(");\n");
         }
@@ -223,7 +223,7 @@ public class BackupService {
      * El campo detalles puede traer dumps previos de 10k caracteres que luego se encriptan
      * y rompen la visualización del frontend.
      */
-    private String truncarText(String text) {
+    private String truncateText(String text) {
         if (text != null && text.length() > MAX_DETALLE_CHARS) {
             return text.substring(0, MAX_DETALLE_CHARS) + "...(truncado)";
         }

@@ -55,7 +55,7 @@ class ReservationSchedulerTest {
                 .willReturn(List.of());
         given(reservationProcedureRepository.spExpireReservationsVencidasProcedure()).willReturn(0);
 
-        scheduler.expireReservationsVencidas();
+        scheduler.expireOverdueReservations();
 
         verify(reservationRepository).findByStatusReservationIdInAndDateLimitPickupBefore(
                 eq(List.of(1, 2)), any(OffsetDateTime.class));
@@ -71,7 +71,7 @@ class ReservationSchedulerTest {
                 .willReturn(List.of(r1, r2));
         given(reservationProcedureRepository.spExpireReservationsVencidasProcedure()).willReturn(2);
 
-        scheduler.expireReservationsVencidas();
+        scheduler.expireOverdueReservations();
 
         verify(notificationService).notifyReservationExpired(r1);
         verify(notificationService).notifyReservationExpired(r2);
@@ -84,7 +84,7 @@ class ReservationSchedulerTest {
                 .willReturn(List.of());
         given(reservationProcedureRepository.spExpireReservationsVencidasProcedure()).willReturn(0);
 
-        scheduler.expireReservationsVencidas();
+        scheduler.expireOverdueReservations();
 
         verify(notificationService, never()).notifyReservationExpired(any());
     }
@@ -99,7 +99,7 @@ class ReservationSchedulerTest {
                 .willReturn(List.of(r1));
         given(reservationProcedureRepository.spExpireReservationsVencidasProcedure()).willReturn(1);
 
-        scheduler.expireReservationsVencidas();
+        scheduler.expireOverdueReservations();
 
         InOrder order = inOrder(notificationService, reservationProcedureRepository);
         order.verify(notificationService).notifyReservationExpired(r1);
@@ -115,7 +115,7 @@ class ReservationSchedulerTest {
                 .willReturn(List.of());
         given(reservationProcedureRepository.spExpireReservationsVencidasProcedure()).willReturn(0);
 
-        scheduler.expireReservationsVencidas();
+        scheduler.expireOverdueReservations();
 
         verify(reservationProcedureRepository).spExpireReservationsVencidasProcedure();
     }

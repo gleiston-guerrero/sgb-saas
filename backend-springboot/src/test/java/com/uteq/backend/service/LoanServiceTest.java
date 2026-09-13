@@ -166,20 +166,20 @@ class LoanServiceTest {
         loan.setStatusLoanId(1);
         given(loanRepo.findById(50L)).willReturn(Optional.of(loan));
         given(statusLoanRepo.findById(1)).willReturn(Optional.of(statusLoan(1, "ACTIVO")));
-        given(configurationSystemService.getValueEntero("max_renovaciones_default")).willReturn(2);
+        given(configurationSystemService.getIntegerValue("max_renovaciones_default")).willReturn(2);
         given(statusReservationRepo.findByName("PENDIENTE"))
                 .willReturn(Optional.of(statusReservation(1, "PENDIENTE")));
         given(statusReservationRepo.findByName("LISTA_PARA_RETIRO"))
                 .willReturn(Optional.of(statusReservation(2, "LISTA_PARA_RETIRO")));
         given(reservationRepo.existsByBookIdAndStatusReservationIdInAndUserIdNot(2L, List.of(1, 2), 1L))
                 .willReturn(false);
-        given(configurationSystemService.getValueEntero("dias_prestamo_default")).willReturn(15);
+        given(configurationSystemService.getIntegerValue("dias_prestamo_default")).willReturn(15);
         given(statusLoanRepo.findByName("RENOVADO")).willReturn(Optional.of(statusLoan(2, "RENOVADO")));
 
         RenewalResponseDTO result = loanService.renew(50L, auth);
 
         assertThat(result.renewalsRealizadas()).isEqualTo((short) 1);
-        assertThat(result.renewalsRestantes()).isEqualTo((short) 1);
+        assertThat(result.renewalsRemaining()).isEqualTo((short) 1);
         assertThat(loan.getStatusLoanId()).isEqualTo(2);
         verify(loanRepo).save(loan);
     }
@@ -207,7 +207,7 @@ class LoanServiceTest {
         loan.setRenewalsRealizadas((short) 2);
         given(loanRepo.findById(52L)).willReturn(Optional.of(loan));
         given(statusLoanRepo.findById(1)).willReturn(Optional.of(statusLoan(1, "ACTIVO")));
-        given(configurationSystemService.getValueEntero("max_renovaciones_default")).willReturn(2);
+        given(configurationSystemService.getIntegerValue("max_renovaciones_default")).willReturn(2);
 
         assertThatThrownBy(() -> loanService.renew(52L, auth))
                 .isInstanceOf(LimitRenewalsExceededException.class);
@@ -221,7 +221,7 @@ class LoanServiceTest {
         loan.setStatusLoanId(1);
         given(loanRepo.findById(53L)).willReturn(Optional.of(loan));
         given(statusLoanRepo.findById(1)).willReturn(Optional.of(statusLoan(1, "ACTIVO")));
-        given(configurationSystemService.getValueEntero("max_renovaciones_default")).willReturn(2);
+        given(configurationSystemService.getIntegerValue("max_renovaciones_default")).willReturn(2);
         given(statusReservationRepo.findByName("PENDIENTE"))
                 .willReturn(Optional.of(statusReservation(1, "PENDIENTE")));
         given(statusReservationRepo.findByName("LISTA_PARA_RETIRO"))
@@ -230,7 +230,7 @@ class LoanServiceTest {
                 .willReturn(true);
 
         assertThatThrownBy(() -> loanService.renew(53L, auth))
-                .isInstanceOf(MaterialReservadoException.class);
+                .isInstanceOf(ReservedMaterialException.class);
     }
 
     // ── Test 10: LECTOR intenta renovar un préstamo ajeno ──
@@ -519,7 +519,7 @@ class LoanServiceTest {
     }
 
     private void permitirCreateLoan() {
-        lenient().when(configurationSystemService.getValueEntero("max_prestamos_usuario")).thenReturn(5);
+        lenient().when(configurationSystemService.getIntegerValue("max_prestamos_usuario")).thenReturn(5);
         lenient().when(loanProcRepo.fnListLoansActivesByUser(any())).thenReturn(List.of());
     }
 }

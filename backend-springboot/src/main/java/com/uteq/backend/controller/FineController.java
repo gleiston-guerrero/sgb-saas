@@ -91,7 +91,7 @@ public class FineController {
 
         Map<String, Object> result;
         if (amountPaid != null) {
-            result = fineService.paymentParcial(id, amountPaid);
+            result = fineService.payPartial(id, amountPaid);
         } else {
             var action = fineService.pay(id);
             result = Map.of(

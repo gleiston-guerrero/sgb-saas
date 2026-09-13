@@ -138,14 +138,14 @@ class SuggestionAcquisitionServiceTest {
     void getMostPedidos_pasaPageableWithoutSort() {
         org.springframework.data.domain.Page<com.uteq.backend.dto.SuggestionGroupedDTO> page =
                 new org.springframework.data.domain.PageImpl<>(java.util.List.of());
-        given(suggestionRepo.findMostPedidosAgrupados(org.mockito.ArgumentMatchers.any()))
+        given(suggestionRepo.findMostRequestedGrouped(org.mockito.ArgumentMatchers.any()))
                 .willReturn(page);
 
-        suggestionService.getMostPedidos(org.springframework.data.domain.PageRequest.of(1, 20));
+        suggestionService.getMostRequested(org.springframework.data.domain.PageRequest.of(1, 20));
 
         org.mockito.ArgumentCaptor<org.springframework.data.domain.Pageable> captor =
                 org.mockito.ArgumentCaptor.forClass(org.springframework.data.domain.Pageable.class);
-        org.mockito.Mockito.verify(suggestionRepo).findMostPedidosAgrupados(captor.capture());
+        org.mockito.Mockito.verify(suggestionRepo).findMostRequestedGrouped(captor.capture());
         assertThat(captor.getValue().getPageNumber()).isEqualTo(1);
         assertThat(captor.getValue().getPageSize()).isEqualTo(20);
         assertThat(captor.getValue().getSort().isSorted()).isFalse();

@@ -343,7 +343,7 @@ public class LoanReturnService {
                             + ". Solo se admiten JPG, JPEG, PNG, WebP y AVIF.");
         }
 
-        int maxSizeMb = configurationSystemService.getValueEntero(CLAVE_MAX_TAMANO_EVIDENCIA_MB);
+        int maxSizeMb = configurationSystemService.getIntegerValue(CLAVE_MAX_TAMANO_EVIDENCIA_MB);
         long maxSizeBytes = maxSizeMb * 1024L * 1024L;
         if (file.getSize() > maxSizeBytes) {
             throw new IllegalArgumentException(
@@ -407,7 +407,7 @@ public class LoanReturnService {
      * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
-    public EvidenceDamageFileDTO getFileBinario(Long id) {
+    public EvidenceDamageFileDTO getFileBinary(Long id) {
         EvidenceDamage evidence = evidenceDamageRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Evidencia no encontrada: " + id));
         return new EvidenceDamageFileDTO(evidence.getFileType(), evidence.getFileBytes());

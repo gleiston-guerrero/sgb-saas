@@ -8,10 +8,10 @@ import com.uteq.backend.service.StatusReservationInitialNotConfiguredException;
 import com.uteq.backend.service.LimitLoansExceededException;
 import com.uteq.backend.service.LimitRenewalsExceededException;
 import com.uteq.backend.service.LoginRateLimitExceededException;
-import com.uteq.backend.service.MaterialReservadoException;
+import com.uteq.backend.service.ReservedMaterialException;
 import com.uteq.backend.service.LoanOverdueException;
 import com.uteq.backend.service.RefreshTokenInvalidException;
-import com.uteq.backend.service.ServiceTemporalmenteNotAvailableException;
+import com.uteq.backend.service.ServiceTemporarilyNotAvailableException;
 import com.uteq.backend.service.SessionChatNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
@@ -289,13 +289,13 @@ public class GlobalExceptionHandler {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
     }
 
-    @ExceptionHandler(MaterialReservadoException.class)
+    @ExceptionHandler(ReservedMaterialException.class)
     /**
          * Maneja el caso en que el material de un prstamo ya est reservado por otro usuario.
      * @param ex excepcin que indica que el material ya est reservado
      * @return ProblemDetail con estado 409 y el mensaje de material reservado
      */
-    public ProblemDetail handleMaterialReservado(MaterialReservadoException ex) {
+    public ProblemDetail handleReservedMaterial(ReservedMaterialException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
     }
 
@@ -311,13 +311,13 @@ public class GlobalExceptionHandler {
     }
 
     // Dependencia externa caída (Redis/SMTP) → 503.
-    @ExceptionHandler(ServiceTemporalmenteNotAvailableException.class)
+    @ExceptionHandler(ServiceTemporarilyNotAvailableException.class)
     /**
          * Maneja la indisponibilidad temporal de una dependencia externa (Redis/SMTP).
      * @param ex excepcin que indica que el servicio est temporalmente no disponible
      * @return ProblemDetail con estado 503 y el mensaje del servicio no disponible
      */
-    public ProblemDetail handleServiceTemporalmenteNotAvailable(ServiceTemporalmenteNotAvailableException ex) {
+    public ProblemDetail handleServiceTemporarilyNotAvailable(ServiceTemporarilyNotAvailableException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
     }
 
@@ -451,7 +451,7 @@ public class GlobalExceptionHandler {
      * @param ex excepcion capturada que se transforma en una respuesta HTTP controlada
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
-    public ProblemDetail handleGenerica(Exception ex) {
+    public ProblemDetail handleGeneric(Exception ex) {
         log.error("Error no controlado: {}", ex.getMessage(), ex);
         String msg = ex.getMessage();
         String detail = "Error interno del servidor: " + (msg != null ? msg.substring(0, Math.min(300, msg.length())) : ex.getClass().getSimpleName());

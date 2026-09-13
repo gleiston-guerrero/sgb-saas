@@ -38,7 +38,7 @@ class NotificationDueSchedulerTest {
     void setUp() {
         scheduler = new NotificationDueScheduler(loanRepo, statusLoanRepo, notificationService, configurationSystemService);
 
-        given(configurationSystemService.getValueEntero("dias_anticipacion_vencimiento")).willReturn(1);
+        given(configurationSystemService.getIntegerValue("dias_anticipacion_vencimiento")).willReturn(1);
         given(statusLoanRepo.findByName("ACTIVO")).willReturn(Optional.of(status(1, "ACTIVO")));
         given(statusLoanRepo.findByName("RENOVADO")).willReturn(Optional.of(status(2, "RENOVADO")));
     }
@@ -50,7 +50,7 @@ class NotificationDueSchedulerTest {
         given(loanRepo.findByStatusLoanIdInAndDateLoanReturnEstimadaBetween(
                 anyList(), any(), any())).willReturn(List.of());
 
-        scheduler.notifyNextsAExpire();
+        scheduler.notifyNextToExpire();
 
         verify(loanRepo).findByStatusLoanIdInAndDateLoanReturnEstimadaBetween(
                 eq(List.of(1, 2)), any(OffsetDateTime.class), any(OffsetDateTime.class));
@@ -65,7 +65,7 @@ class NotificationDueSchedulerTest {
         given(loanRepo.findByStatusLoanIdInAndDateLoanReturnEstimadaBetween(
                 anyList(), any(), any())).willReturn(List.of(p1, p2));
 
-        scheduler.notifyNextsAExpire();
+        scheduler.notifyNextToExpire();
 
         verify(notificationService).generateDueAlert(p1);
         verify(notificationService).generateDueAlert(p2);
@@ -77,7 +77,7 @@ class NotificationDueSchedulerTest {
         given(loanRepo.findByStatusLoanIdInAndDateLoanReturnEstimadaBetween(
                 anyList(), any(), any())).willReturn(List.of());
 
-        scheduler.notifyNextsAExpire();
+        scheduler.notifyNextToExpire();
 
         verify(notificationService, never()).generateDueAlert(any());
     }

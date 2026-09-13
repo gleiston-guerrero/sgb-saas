@@ -101,7 +101,7 @@ class EvidenceDamageControllerTest extends WebMvcControllerTestSupport {
 
     @Test
     void getFile_existing_devuelve200() throws Exception {
-        when(loanReturnService.getFileBinario(11L))
+        when(loanReturnService.getFileBinary(11L))
                 .thenReturn(new EvidenceDamageFileDTO("image/jpeg", new byte[]{9, 8, 7}));
 
         mockMvc.perform(get("/api/v1/devoluciones/evidencia/11/archivo")
@@ -113,7 +113,7 @@ class EvidenceDamageControllerTest extends WebMvcControllerTestSupport {
 
     @Test
     void getFile_inexistente_devuelve404() throws Exception {
-        when(loanReturnService.getFileBinario(99L))
+        when(loanReturnService.getFileBinary(99L))
                 .thenThrow(new EntityNotFoundException("Evidencia no encontrada: 99"));
 
         mockMvc.perform(get("/api/v1/devoluciones/evidencia/99/archivo")

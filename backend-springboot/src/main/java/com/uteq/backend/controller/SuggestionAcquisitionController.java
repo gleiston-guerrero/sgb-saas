@@ -111,9 +111,9 @@ public class SuggestionAcquisitionController {
      */
     @GetMapping("/mas-pedidos")
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
-    public ResponseEntity<Page<SuggestionGroupedDTO>> mostPedidos(
+    public ResponseEntity<Page<SuggestionGroupedDTO>> mostRequested(
             @PageableDefault(size = 10) Pageable pageable) {
-        return ResponseEntity.ok(suggestionService.getMostPedidos(pageable));
+        return ResponseEntity.ok(suggestionService.getMostRequested(pageable));
     }
 
     // ── POST /api/v1/sugerencias-adquisicion/confirmar-adquisicion?isbn= ──
@@ -145,8 +145,8 @@ public class SuggestionAcquisitionController {
      * @return response entity<byte[]> with the resulting state after the operation
      */
     public ResponseEntity<byte[]> reportPdf() {
-        byte[] pdf = reportPdfService.generateReportSuggestionsMostPedidas(
-                suggestionService.getMostPedidosList());
+        byte[] pdf = reportPdfService.generateReportSuggestionsMostRequested(
+                suggestionService.getMostRequestedList());
         return ResponseEntity.ok()
                 .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
                 .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION,

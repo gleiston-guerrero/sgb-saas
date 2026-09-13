@@ -212,10 +212,10 @@ public class GeminiClient {
                 .body(String.class);
 
         log.debug("Respuesta cruda completa de Gemini: {}", responseJson);
-        return parsearResponse(responseJson);
+        return parseResponse(responseJson);
     }
 
-    private GeminiResponse parsearResponse(String responseJson) {
+    private GeminiResponse parseResponse(String responseJson) {
         try {
             JsonNode root = objectMapper.readTree(responseJson);
             JsonNode candidates = root.path("candidates");

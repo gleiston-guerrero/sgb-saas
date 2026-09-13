@@ -20,7 +20,7 @@ public interface LoanActiveProjection {
 
     Instant getDateLoanReturnEstimada();
 
-    Integer getDaysRestantes();
+    Integer getDaysRemaining();
 
     String getStatusName();
 }

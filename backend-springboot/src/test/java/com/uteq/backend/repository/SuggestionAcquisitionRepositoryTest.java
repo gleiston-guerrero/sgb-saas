@@ -51,7 +51,7 @@ class SuggestionAcquisitionRepositoryTest {
         repo.save(withoutIsbn);
 
         Page<SuggestionGroupedDTO> page =
-                repo.findMostPedidosAgrupados(PageRequest.of(0, 10));
+                repo.findMostRequestedGrouped(PageRequest.of(0, 10));
 
         assertThat(page.getTotalElements()).isEqualTo(2);
         assertThat(page.getContent().get(0).isbn()).isEqualTo("9781449373320");
@@ -66,7 +66,7 @@ class SuggestionAcquisitionRepositoryTest {
         pending("9780134757599", "Refactoring");
 
         Page<SuggestionGroupedDTO> page =
-                repo.findMostPedidosAgrupados(PageRequest.of(1, 1));
+                repo.findMostRequestedGrouped(PageRequest.of(1, 1));
 
         assertThat(page.getTotalElements()).isEqualTo(2);
         assertThat(page.getTotalPages()).isEqualTo(2);

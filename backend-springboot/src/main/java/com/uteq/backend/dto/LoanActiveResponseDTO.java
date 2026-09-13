@@ -8,6 +8,6 @@ import java.time.OffsetDateTime;
 // para no acoplar el contrato de la API a la forma exacta de la
 // proyección JPA (mismo criterio de "nunca expongas la entidad/proyección
 // directamente" aplicado también a proyecciones, no solo a entidades).
-public record LoanActiveResponseDTO( @JsonProperty("prestamoId") Long loanId, @JsonProperty("libroTitulo") String bookTitle, @JsonProperty("libroIsbn") String bookIsbn, @JsonProperty("fechaPrestamo") OffsetDateTime dateLoan, @JsonProperty("fechaDevolucionEstimada") OffsetDateTime dateLoanReturnEstimada, @JsonProperty("diasRestantes") Integer daysRestantes,
+public record LoanActiveResponseDTO( @JsonProperty("prestamoId") Long loanId, @JsonProperty("libroTitulo") String bookTitle, @JsonProperty("libroIsbn") String bookIsbn, @JsonProperty("fechaPrestamo") OffsetDateTime dateLoan, @JsonProperty("fechaDevolucionEstimada") OffsetDateTime dateLoanReturnEstimada, @JsonProperty("diasRestantes") Integer daysRemaining,
         @JsonProperty("estadoNombre") String statusName
 ) {}

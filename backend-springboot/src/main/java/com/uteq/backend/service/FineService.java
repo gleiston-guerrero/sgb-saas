@@ -105,7 +105,7 @@ public class FineService {
      * @return mapa con las salidas del procedimiento (identificadores y estado resultante)
      */
     @Transactional
-    public Map<String, Object> paymentParcial(Long fineId, BigDecimal amountPaid) {
+    public Map<String, Object> payPartial(Long fineId, BigDecimal amountPaid) {
         return fineProcRepo.spPaymentParcialFine(fineId, amountPaid);
     }
 

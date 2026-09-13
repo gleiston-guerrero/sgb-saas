@@ -88,7 +88,7 @@ public class ChatbotOrchestrator {
     public MessageChatResponseDTO sendMessage(MessageChatRequestDTO dto, Authentication authentication) {
         Long userId = resolveIdByEmail(authentication.getName());
 
-        if (chatbotRateLimiter.estaBlocked(userId)) {
+        if (chatbotRateLimiter.isBlocked(userId)) {
             throw new ChatbotRateLimitExceededException(
                     "Has alcanzado el límite de mensajes al asistente. Intenta de nuevo en un momento.");
         }
@@ -104,7 +104,7 @@ public class ChatbotOrchestrator {
         messageChatRepo.save(msgUser);
 
         // Construir system prompt + tools
-        String promptSystem = construirPromptSystem();
+        String promptSystem = buildSystemPrompt();
         List<Map<String, Object>> tools = toolRegistry.buildToolsPayload();
         List<MessageChat> history =
                 messageChatRepo.findBySessionIdOrderByCreatedAsc(session.getId());
@@ -138,7 +138,7 @@ public class ChatbotOrchestrator {
      */
     public List<MessageChatHistoryDTO> getHistory(UUID sessionId, Authentication authentication) {
         Long userId = resolveIdByEmail(authentication.getName());
-        SessionChat session = validatePropiedadSession(sessionId, userId);
+        SessionChat session = validateSessionOwnership(sessionId, userId);
         return messageChatRepo.findBySessionIdOrderByCreatedAsc(session.getId()).stream()
                 .map(m -> new MessageChatHistoryDTO(m.getRole(), m.getContent(), m.getCreated()))
                 .toList();
@@ -207,7 +207,7 @@ public class ChatbotOrchestrator {
 
     // ── System prompt ─────────────────────────────────────────────────────
 
-    private String construirPromptSystem() {
+    private String buildSystemPrompt() {
         StringBuilder sb = new StringBuilder();
         sb.append("Eres el asistente virtual de la biblioteca Leibri. ")
                 .append("Tienes acceso a herramientas que consultan la base de datos real de la biblioteca. ")
@@ -247,10 +247,10 @@ public class ChatbotOrchestrator {
             fresh.setLastActividad(ahora);
             return sessionChatRepo.save(fresh);
         }
-        return validatePropiedadSession(sessionId, userId);
+        return validateSessionOwnership(sessionId, userId);
     }
 
-    private SessionChat validatePropiedadSession(UUID sessionId, Long userId) {
+    private SessionChat validateSessionOwnership(UUID sessionId, Long userId) {
         SessionChat session = sessionChatRepo.findById(sessionId)
                 .orElseThrow(() -> new SessionChatNotFoundException(
                         "Sesión de chat no encontrada: " + sessionId));

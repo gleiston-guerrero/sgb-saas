@@ -49,7 +49,7 @@ class LoginRateLimiterTest {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get(KEY)).thenReturn("5");
 
-        assertTrue(loginRateLimiter.estaBlocked(CORREO, IP));
+        assertTrue(loginRateLimiter.isBlocked(CORREO, IP));
     }
 
     @Test
@@ -58,7 +58,7 @@ class LoginRateLimiterTest {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get(KEY)).thenReturn("4");
 
-        assertFalse(loginRateLimiter.estaBlocked(CORREO, IP));
+        assertFalse(loginRateLimiter.isBlocked(CORREO, IP));
     }
 
     @Test
@@ -67,7 +67,7 @@ class LoginRateLimiterTest {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get(KEY)).thenReturn(null);
 
-        assertFalse(loginRateLimiter.estaBlocked(CORREO, IP));
+        assertFalse(loginRateLimiter.isBlocked(CORREO, IP));
     }
 
     // El TTL de la ventana se fija SOLO quando el contador pasa de 0 a 1
@@ -96,7 +96,7 @@ class LoginRateLimiterTest {
 
     @Test
     void resetear_borraKey() {
-        loginRateLimiter.resetear(CORREO, IP);
+        loginRateLimiter.reset(CORREO, IP);
 
         verify(redisTemplate).delete(KEY);
     }

@@ -55,7 +55,7 @@ class AuditControllerTest extends WebMvcControllerTestSupport {
     @Test
     void export_devuelve200() throws Exception {
         byte[] csv = "id,accion".getBytes();
-        when(auditService.exportarCsv(any(), any(), any(), any())).thenReturn(csv);
+        when(auditService.exportCsv(any(), any(), any(), any())).thenReturn(csv);
 
         mockMvc.perform(get("/api/v1/auditoria/export"))
                 .andExpect(status().isOk());

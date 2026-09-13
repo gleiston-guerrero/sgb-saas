@@ -286,11 +286,11 @@ public class BookService {
      */
     @Cacheable("sugerencias-libros")
     @Transactional(readOnly = true)
-    public List<BookSuggestionDTO> sugerir(String text) {
+    public List<BookSuggestionDTO> suggest(String text) {
         StatusBook statusActive = statusRepo.findByName(ESTADO_ACTIVO)
                 .orElseThrow(() -> new IllegalStateException(
                         "Catálogo estados_libro sin fila '" + ESTADO_ACTIVO + "'"));
-        return bookRepo.sugerirByTitle(text, statusActive.getId()).stream()
+        return bookRepo.suggestByTitle(text, statusActive.getId()).stream()
                 .map(l -> new BookSuggestionDTO(
                         l.getId(),
                         l.getTitle(),
@@ -409,7 +409,7 @@ public class BookService {
 
         BookResponseDTO result = toDTO(bookRepo.save(book));
         if (stockAntes == 0 && dto.stockAvailable() != null && dto.stockAvailable() > 0 && subscriptionAvailabilityService != null) {
-              try { subscriptionAvailabilityService.notifyDisponibles(id); } catch (Exception ignored) {
+              try { subscriptionAvailabilityService.notifyAvailable(id); } catch (Exception ignored) {
                   // best-effort: la actualización del libro ya se guardó
               }
         }
@@ -501,7 +501,7 @@ public class BookService {
                             + ". Solo se admiten PNG, JPEG, WEBP y AVIF.");
         }
         int maxSizeMb = configurationSystemService
-                .getValueEntero(CLAVE_MAX_TAMANO_PORTADA_MB);
+                .getIntegerValue(CLAVE_MAX_TAMANO_PORTADA_MB);
         long maxSizeBytes = maxSizeMb * 1024L * 1024L;
         if (file.getSize() > maxSizeBytes) {
             throw new IllegalArgumentException(

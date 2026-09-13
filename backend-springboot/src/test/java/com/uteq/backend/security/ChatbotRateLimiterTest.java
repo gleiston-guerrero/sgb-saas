@@ -46,7 +46,7 @@ class ChatbotRateLimiterTest {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get(KEY)).thenReturn("10");
 
-        assertTrue(chatbotRateLimiter.estaBlocked(USUARIO_ID));
+        assertTrue(chatbotRateLimiter.isBlocked(USUARIO_ID));
     }
 
     @Test
@@ -55,7 +55,7 @@ class ChatbotRateLimiterTest {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get(KEY)).thenReturn("5");
 
-        assertFalse(chatbotRateLimiter.estaBlocked(USUARIO_ID));
+        assertFalse(chatbotRateLimiter.isBlocked(USUARIO_ID));
     }
 
     @Test
@@ -64,7 +64,7 @@ class ChatbotRateLimiterTest {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get(KEY)).thenReturn(null);
 
-        assertFalse(chatbotRateLimiter.estaBlocked(USUARIO_ID));
+        assertFalse(chatbotRateLimiter.isBlocked(USUARIO_ID));
     }
 
     // El TTL de la ventana se fija SOLO cuando el contador pasa de 0 a 1

@@ -78,7 +78,7 @@ public class PublicBookController {
     @GetMapping("/sugerencias")
     public List<BookSuggestionDTO> suggestions(
             @RequestParam("texto") @Size(min = 2, max = 60, message = "El texto de búsqueda debe tener entre 2 y 60 caracteres") String text) {
-        return bookService.sugerir(text);
+        return bookService.suggest(text);
     }
 
     // ── GET /api/publico/libros/{id} ─────────────────────────────────

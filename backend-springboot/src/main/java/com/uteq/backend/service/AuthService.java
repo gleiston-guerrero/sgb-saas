@@ -102,7 +102,7 @@ public class AuthService {
         User guardado = userRepository.save(user);
 
         // Queda PENDIENTE_VERIFICACION hasta confirmar el código vía verificarCorreo().
-        verificationEmailService.generateYSendCode(guardado);
+        verificationEmailService.generateAndSendCode(guardado);
 
         return mapToUserResponseDTO(guardado);
     }
@@ -139,7 +139,7 @@ public class AuthService {
         if (user.isEmailVerified() || !ESTADO_INICIAL.equals(user.getStatus().getName())) {
             throw new IllegalArgumentException("El correo ya está verificado o la cuenta no requiere verificación.");
         }
-        verificationEmailService.generateYSendCode(user);
+        verificationEmailService.generateAndSendCode(user);
     }
 
     // ── POST /api/auth/solicitar-reset ──
@@ -151,7 +151,7 @@ public class AuthService {
      *
      * @param email dirección de la cuenta que solicita la recuperación
      * @throws jakarta.persistence.EntityNotFoundException si no existe ningún usuario con ese correo
-     * @throws ServiceTemporalmenteNotAvailableException si Redis no acepta el guardado del código
+     * @throws ServiceTemporarilyNotAvailableException si Redis no acepta el guardado del código
      */
     public void requestReset(String email) {
         User user = userRepository.findByEmail(email)
@@ -161,7 +161,7 @@ public class AuthService {
         try {
             redisTemplate.opsForValue().set(key, code, java.time.Duration.ofMinutes(10));
         } catch (org.springframework.dao.DataAccessException e) {
-            throw new ServiceTemporalmenteNotAvailableException("Servicio de reset no disponible");
+            throw new ServiceTemporarilyNotAvailableException("Servicio de reset no disponible");
         }
         String body = "<p>Hola " + user.getName() + ",</p>"
                 + "<p>Tu código para recuperar la cuenta es: <b>" + code + "</b></p>"
@@ -256,12 +256,12 @@ public class AuthService {
      */
     public TokenResponseDTO login(LoginRequestDTO dto, String ipSource) {
         // Verifica el rate limit ANTES de autenticar → 429 si se agotó.
-        if (loginRateLimiter.estaBlocked(dto.email(), ipSource)) {
-            long secondsRestantes = loginRateLimiter.secondsRestantes(dto.email(), ipSource);
+        if (loginRateLimiter.isBlocked(dto.email(), ipSource)) {
+            long secondsRemaining = loginRateLimiter.remainingSeconds(dto.email(), ipSource);
             log.warn("Login bloqueado por rate limit: correo={} ip={} segundosRestantes={}",
-                    dto.email(), ipSource, secondsRestantes);
+                    dto.email(), ipSource, secondsRemaining);
             throw new LoginRateLimitExceededException(
-                    "Demasiados intentos fallidos. Intente nuevamente en " + secondsRestantes + " segundos.");
+                    "Demasiados intentos fallidos. Intente nuevamente en " + secondsRemaining + " segundos.");
         }
 
         try {
@@ -279,7 +279,7 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException(USUARIO_NO_ENCONTRADO + dto.email()));
 
         // Login exitoso: resetea el contador de fallos de esta combinación correo+IP.
-        loginRateLimiter.resetear(dto.email(), ipSource);
+        loginRateLimiter.reset(dto.email(), ipSource);
         log.info("Login exitoso: sub={} correo={} ip={}", user.getId(), dto.email(), ipSource);
         registerAudit(user.getId(), "LOGIN_OK", user.getId(),
                 "Login exitoso para correo: " + dto.email(), ipSource);

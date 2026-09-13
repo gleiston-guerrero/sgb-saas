@@ -72,7 +72,7 @@ class ReportPdfServiceTest {
         String categories = extractText(service.generateReportCategoriesDemanded(List.of(
                 new ReportCategoriesDemandedResponseDTO(2, "Software", 7L, new BigDecimal("70.0"))
         )));
-        String suggestions = extractText(service.generateReportSuggestionsMostPedidas(List.of(
+        String suggestions = extractText(service.generateReportSuggestionsMostRequested(List.of(
                 new SuggestionGroupedDTO("9780132350884", "Refactoring", null, 3L)
         )));
 

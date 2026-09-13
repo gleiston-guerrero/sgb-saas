@@ -36,13 +36,13 @@ public class VerificationEmailService {
      *
      * @param user valor de entrada user usado por la operacion para completar su regla de negocio
      */
-    public void generateYSendCode(User user) {
+    public void generateAndSendCode(User user) {
         String code = generateCode();
         try {
             redisTemplate.opsForValue().set(key(user.getEmail()), code, Duration.ofMinutes(ttlMinutes));
         } catch (DataAccessException e) {
             log.error("Redis no disponible al generar código de verificación para {}", user.getEmail(), e);
-            throw new ServiceTemporalmenteNotAvailableException(
+            throw new ServiceTemporarilyNotAvailableException(
                     "El servicio de verificación de correo no está disponible temporalmente. Intente más tarde.");
         }
 

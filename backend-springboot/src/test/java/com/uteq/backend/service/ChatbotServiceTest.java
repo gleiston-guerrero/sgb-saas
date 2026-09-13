@@ -60,7 +60,7 @@ class ChatbotServiceTest {
     void sendMessage_sessionFresh_creaSessionYPersisteAmbosMensajes() {
         Authentication auth = authComoReader();
         prepararUserReader();
-        given(chatbotRateLimiter.estaBlocked(1L)).willReturn(false);
+        given(chatbotRateLimiter.isBlocked(1L)).willReturn(false);
         given(sessionChatRepo.save(any(SessionChat.class))).willAnswer(inv -> {
             SessionChat s = inv.getArgument(0);
             s.setId(UUID.randomUUID());
@@ -89,7 +89,7 @@ class ChatbotServiceTest {
     void sendMessage_sessionExistingOwn_reutilizaSessionYActualizaLastActividad() {
         Authentication auth = authComoReader();
         prepararUserReader();
-        given(chatbotRateLimiter.estaBlocked(1L)).willReturn(false);
+        given(chatbotRateLimiter.isBlocked(1L)).willReturn(false);
         UUID sessionId = UUID.randomUUID();
         given(sessionChatRepo.findById(sessionId)).willReturn(Optional.of(sessionUser(sessionId, 1L)));
         given(messageChatRepo.save(any(MessageChat.class))).willAnswer(inv -> inv.getArgument(0));
@@ -118,7 +118,7 @@ class ChatbotServiceTest {
     void sendMessage_sessionOtroUser_lanzaSessionChatNotFound() {
         Authentication auth = authComoReader();
         prepararUserReader();
-        given(chatbotRateLimiter.estaBlocked(1L)).willReturn(false);
+        given(chatbotRateLimiter.isBlocked(1L)).willReturn(false);
         UUID sessionId = UUID.randomUUID();
         given(sessionChatRepo.findById(sessionId)).willReturn(Optional.of(sessionUser(sessionId, 2L)));
 
@@ -133,7 +133,7 @@ class ChatbotServiceTest {
     void sendMessage_rateLimitExceeded_lanzaChatbotRateLimitExceeded() {
         Authentication auth = authComoReader();
         prepararUserReader();
-        given(chatbotRateLimiter.estaBlocked(1L)).willReturn(true);
+        given(chatbotRateLimiter.isBlocked(1L)).willReturn(true);
 
         assertThatThrownBy(() -> chatbotService.sendMessage(
                 new MessageChatRequestDTO(null, "hola"), auth))
@@ -147,7 +147,7 @@ class ChatbotServiceTest {
     void sendMessage_textConsultaAvailability_incluyeResultsBookServiceContexto() {
         Authentication auth = authComoReader();
         prepararUserReader();
-        given(chatbotRateLimiter.estaBlocked(1L)).willReturn(false);
+        given(chatbotRateLimiter.isBlocked(1L)).willReturn(false);
         given(sessionChatRepo.save(any(SessionChat.class))).willAnswer(inv -> {
             SessionChat s = inv.getArgument(0);
             s.setId(UUID.randomUUID());
@@ -156,7 +156,7 @@ class ChatbotServiceTest {
         given(messageChatRepo.save(any(MessageChat.class))).willAnswer(inv -> inv.getArgument(0));
         given(baseKnowledgeRepo.findByActiveTrue()).willReturn(List.of());
         given(messageChatRepo.findBySessionIdOrderByCreatedAsc(any(UUID.class))).willReturn(List.of());
-        given(bookService.sugerir(anyString())).willReturn(
+        given(bookService.suggest(anyString())).willReturn(
                 List.of(new BookSuggestionDTO(10L, "Clean Code", true)));
         given(geminiClient.generateResponse(anyString(), any(), anyString())).willReturn("Sí está disponible.");
 
@@ -168,7 +168,7 @@ class ChatbotServiceTest {
         assertThat(captorPrompt.getValue())
                 .contains("Clean Code")
                 .contains("disponible=true");
-        verify(bookService).sugerir(anyString());
+        verify(bookService).suggest(anyString());
     }
 
     // ── Test 6: fallback de Gemini no rompe el flujo ────────
@@ -176,7 +176,7 @@ class ChatbotServiceTest {
     void sendMessage_geminiClientDevuelveMessageFallback_seGuardaComoResponseAsistente() {
         Authentication auth = authComoReader();
         prepararUserReader();
-        given(chatbotRateLimiter.estaBlocked(1L)).willReturn(false);
+        given(chatbotRateLimiter.isBlocked(1L)).willReturn(false);
         given(sessionChatRepo.save(any(SessionChat.class))).willAnswer(inv -> {
             SessionChat s = inv.getArgument(0);
             s.setId(UUID.randomUUID());

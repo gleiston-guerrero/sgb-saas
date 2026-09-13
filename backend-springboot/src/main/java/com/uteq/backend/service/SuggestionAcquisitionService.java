@@ -116,9 +116,9 @@ public class SuggestionAcquisitionService {
      * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
      * @return pagina de resultados que coincide con los filtros y la paginacion solicitada
      */
-    public Page<SuggestionGroupedDTO> getMostPedidos(Pageable pageable) {
+    public Page<SuggestionGroupedDTO> getMostRequested(Pageable pageable) {
         Pageable effective = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
-        return suggestionRepo.findMostPedidosAgrupados(effective);
+        return suggestionRepo.findMostRequestedGrouped(effective);
     }
 
     @Transactional(readOnly = true)
@@ -126,9 +126,9 @@ public class SuggestionAcquisitionService {
          * Busca/lista recursos.
      * @return lista o pagina de resultados
      */
-    public List<SuggestionGroupedDTO> getMostPedidosList() {
+    public List<SuggestionGroupedDTO> getMostRequestedList() {
         return suggestionRepo
-                .findMostPedidosAgrupados(PageRequest.of(0, Integer.MAX_VALUE))
+                .findMostRequestedGrouped(PageRequest.of(0, Integer.MAX_VALUE))
                 .getContent();
     }
 

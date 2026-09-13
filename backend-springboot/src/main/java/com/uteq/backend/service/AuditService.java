@@ -109,7 +109,7 @@ public class AuditService {
      * @return contenido binario generado o recuperado por la operacion
      */
 
-    public byte[] exportarCsv(Long userId, String module, OffsetDateTime from, OffsetDateTime until) {
+    public byte[] exportCsv(Long userId, String module, OffsetDateTime from, OffsetDateTime until) {
         var pageable = org.springframework.data.domain.PageRequest.of(0, 10000, org.springframework.data.domain.Sort.by("fecha_hora").descending());
         var page = auditLogAuditRepo.searchWithFilters(userId, module, from, until, pageable);
         StringBuilder sb = new StringBuilder();

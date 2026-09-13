@@ -79,7 +79,7 @@ public class ReservationService {
 
     private void validateLimitReservations(Long userId) {
         int max = 3;
-          try { max = configurationSystemService.getValueEntero("max_reservas_por_usuario"); } catch (Exception ignored) {
+          try { max = configurationSystemService.getIntegerValue("max_reservas_por_usuario"); } catch (Exception ignored) {
               // best-effort: se usa el valor por defecto si falla la config
           }
         long actives = reservationRepo.countByUserIdAndStatusReservationIdIn(userId, List.of(1, 2));

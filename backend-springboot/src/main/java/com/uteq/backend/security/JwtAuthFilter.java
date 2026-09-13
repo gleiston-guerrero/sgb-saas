@@ -55,7 +55,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             String jti = jwtService.extractJti(token);
             try {
-                if (estaRevocado(jti)) {
+                if (isRevoked(jti)) {
                     filterChain.doFilter(request, response);
                     return;
                 }
@@ -94,7 +94,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      * La revocación por logout vive en la blacklist de Redis. Sin respuesta
      * de Redis se propaga y el filtro rechaza con 401.
      */
-    private boolean estaRevocado(String jti) {
+    private boolean isRevoked(String jti) {
         return Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:" + jti));
     }
 }

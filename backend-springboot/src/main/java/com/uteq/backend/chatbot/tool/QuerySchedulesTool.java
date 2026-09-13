@@ -50,7 +50,7 @@ public class QuerySchedulesTool extends AbstractKnowledgeBaseTool {
     }
 
     @Override
-    protected ObjectNode mapearInput(KnowledgeBase bc) {
+    protected ObjectNode mapInput(KnowledgeBase bc) {
         ObjectNode node = mapper.createObjectNode();
         node.put("pregunta", bc.getQuestionExample());
         node.put("respuesta", bc.getResponse());

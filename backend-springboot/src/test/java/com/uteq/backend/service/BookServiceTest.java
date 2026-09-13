@@ -128,10 +128,10 @@ class BookServiceTest {
         Book coincidencia = bookWithId();
         coincidencia.setStockAvailable((short) 2);
         given(statusRepo.findByName("ACTIVO")).willReturn(Optional.of(active));
-        given(bookRepo.sugerirByTitle("clean", active.getId()))
+        given(bookRepo.suggestByTitle("clean", active.getId()))
                 .willReturn(List.of(coincidencia));
 
-        List<BookSuggestionDTO> result = bookService.sugerir("clean");
+        List<BookSuggestionDTO> result = bookService.suggest("clean");
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).title()).isEqualTo("Clean Code");
@@ -143,9 +143,9 @@ class BookServiceTest {
     void sugerir_withoutCoincidencias_retornaListaVacia() {
         StatusBook active = statusWithName("ACTIVO");
         given(statusRepo.findByName("ACTIVO")).willReturn(Optional.of(active));
-        given(bookRepo.sugerirByTitle(anyString(), anyInt())).willReturn(List.of());
+        given(bookRepo.suggestByTitle(anyString(), anyInt())).willReturn(List.of());
 
-        List<BookSuggestionDTO> result = bookService.sugerir("xyz-inexistente");
+        List<BookSuggestionDTO> result = bookService.suggest("xyz-inexistente");
 
         assertThat(result).isEmpty();
     }
@@ -157,7 +157,7 @@ class BookServiceTest {
         Book book = bookWithId();
         book.setCoverUrl("https://host-externo/portada.png");
         given(bookRepo.findById(1L)).willReturn(Optional.of(book));
-        given(configurationSystemService.getValueEntero("max_tamano_portada_mb")).willReturn(2);
+        given(configurationSystemService.getIntegerValue("max_tamano_portada_mb")).willReturn(2);
         given(bookRepo.save(any())).willReturn(book);
         byte[] binario = new byte[1024];
         MockMultipartFile file = new MockMultipartFile(
@@ -196,7 +196,7 @@ class BookServiceTest {
     @Test
     void updateCover_withSizeExceeded_lanzaException() {
         given(bookRepo.findById(1L)).willReturn(Optional.of(bookWithId()));
-        given(configurationSystemService.getValueEntero("max_tamano_portada_mb")).willReturn(2);
+        given(configurationSystemService.getIntegerValue("max_tamano_portada_mb")).willReturn(2);
         MockMultipartFile file = new MockMultipartFile(
                 "archivo", "grande.png", "image/png", new byte[2 * 1024 * 1024 + 1]);
 

@@ -51,7 +51,7 @@ public class InfoPoliciesTool extends AbstractKnowledgeBaseTool {
     }
 
     @Override
-    protected ObjectNode mapearInput(KnowledgeBase bc) {
+    protected ObjectNode mapInput(KnowledgeBase bc) {
         ObjectNode node = mapper.createObjectNode();
         node.put("categoria", bc.getCategory());
         node.put("pregunta", bc.getQuestionExample());
