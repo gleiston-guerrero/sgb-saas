@@ -1,5 +1,5 @@
 import { Component, HostListener } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterOutlet, Router, NavigationEnd, NavigationCancel, NavigationError } from '@angular/router';
 import { AuthService } from './core/services/auth.service';
 import { filter } from 'rxjs/operators';
 import { ChatbotWidgetComponent } from './shared/chatbot-widget/chatbot-widget.component';
@@ -43,17 +43,22 @@ export class AppComponent {
     private navigationBlocking: NavigationBlockingService
   ) {
     this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
+      filter(event => event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError)
     ).subscribe((event) => {
-      const url = (event as NavigationEnd).urlAfterRedirects || (event as NavigationEnd).url;
-      this.enRutaBibliotecario = url.startsWith('/dashboard-bibliotecario');
-      this.enRutaAdmin = url.startsWith('/dashboard-admin');
-      this.enRutaLector = url.startsWith('/dashboard-lector');
-      this.enRutaPublica = url.startsWith('/no-autorizado');
-      // Portal público ('/' y '/portal/*') trae su propio nav: el header global no se muestra ahí.
-      this.enRutaCatalogoPublico = url.startsWith('/catalogo');
+      // NavigationCancel/Error también apagan el loader: una navegación
+      // que no termina (resolver que cancela, guard que redirige en loop)
+      // nunca emite NavigationEnd y el shell quedaba cargando para siempre.
+      if (event instanceof NavigationEnd) {
+        const url = (event as NavigationEnd).urlAfterRedirects || (event as NavigationEnd).url;
+        this.enRutaBibliotecario = url.startsWith('/dashboard-bibliotecario');
+        this.enRutaAdmin = url.startsWith('/dashboard-admin');
+        this.enRutaLector = url.startsWith('/dashboard-lector');
+        this.enRutaPublica = url.startsWith('/no-autorizado');
+        // Portal público ('/' y '/portal/*') trae su propio nav: el header global no se muestra ahí.
+        this.enRutaCatalogoPublico = url.startsWith('/catalogo');
+        this.rutaAnnouncement = this.obtenerNombreRuta(url);
+      }
       this.cargandoRuta = false;
-      this.rutaAnnouncement = this.obtenerNombreRuta(url);
     });
   }
 

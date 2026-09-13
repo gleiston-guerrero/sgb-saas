@@ -45,12 +45,15 @@ export class LoginComponent implements OnInit {
   }
 
   // Redirección post-login hacia los paneles con sidebar:
-  // - ADMIN/GERENTE → /dashboard-admin (panel con sidebar).
+  // - ADMIN → /dashboard-admin, GERENTE → /dashboard-gerente (cada rol su
+  //   URL, espejo de redirectIfAuthenticatedGuard).
   // - LECTOR → /dashboard-lector (panel consumidor con sidebar).
   // - BIBLIOTECARIO → /dashboard-bibliotecario (panel Cajas con sidebar).
   private redirigirSegunRol(): void {
-    if (this.authService.hasRole('ADMIN') || this.authService.hasRole('GERENTE')) {
+    if (this.authService.hasRole('ADMIN')) {
       this.router.navigate(['/dashboard-admin']);
+    } else if (this.authService.hasRole('GERENTE')) {
+      this.router.navigate(['/dashboard-gerente']);
     } else if (this.authService.hasRole('LECTOR')) {
       this.router.navigate(['/dashboard-lector']);
     } else if (this.authService.hasRole('BIBLIOTECARIO')) {
