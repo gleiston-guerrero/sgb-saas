@@ -260,3 +260,112 @@ pago de multa, anulación autorizada y anulación rechazada por rol inválido.
 `ProcedureMappingContractTest` cubre además el contrato estático de la
 rúbrica: si alguien elimina las anotaciones `@Procedure` o
 `@NamedStoredProcedureQuery` de las rutinas principales, el build falla.
+
+## V51 — PROCEDURE nativos reales para las 5 rutinas con efectos secundarios
+
+**Motivación:** la rúbrica del examen final (punto P4) exige que el acceso a
+datos con lógica de negocio se haga mediante el mecanismo nativo de stored
+procedure (`CREATE PROCEDURE` + `CALL`), no solo mediante anotaciones que
+apuntan a una `FUNCTION`. La nota de diseño original de este documento
+("FUNCTION en todos los casos, no PROCEDURE nativo") seguía siendo
+técnicamente correcta para justificar por qué las funciones tabulares de
+reporte no pueden convertirse, pero ya no describe el estado real de las 5
+rutinas con efectos secundarios: **estas 5 sí tienen ahora un objeto
+`CREATE PROCEDURE` real**, agregado en
+`database/migrations/V51__procedimientos_envolventes.sql`:
+
+| Función original | PROCEDURE nuevo (V51) | Repositorio / Custom impl |
+|---|---|---|
+| `sp_crear_prestamo` | `proc_crear_prestamo` | `LoanProcedureRepositoryCustomImpl` |
+| `sp_expirar_reservaciones_vencidas` | `proc_expirar_reservaciones_vencidas` | `ReservationProcedureRepositoryCustomImpl` |
+| `sp_registrar_devolucion` | `proc_registrar_devolucion` | `LoanProcedureRepositoryCustomImpl` |
+| `sp_pagar_multa` | `proc_pagar_multa` | `FineProcedureRepositoryCustomImpl` |
+| `sp_anular_multa` | `proc_anular_multa` (SECURITY DEFINER) | `FineProcedureRepositoryCustomImpl` |
+
+**Naturaleza aditiva:** V51 no elimina ninguna función. Cada `PROCEDURE`
+nuevo simplemente delega en la función existente y expone el resultado como
+parámetro(s) `OUT`. Las 10 funciones originales de este catálogo siguen
+existiendo e invocables directamente desde `psql`/Postman igual que antes —
+nada de lo documentado en las secciones anteriores de este archivo deja de
+ser cierto sobre las funciones en sí, solo se agrega una capa de acceso
+adicional sobre 5 de ellas.
+
+**Cómo se invocan desde el backend — CALL con binding posicional, no
+`@NamedStoredProcedureQuery` estándar:** las 5 rutinas siguen declarando
+`@Procedure`/`@NamedStoredProcedureQuery` en el repositorio/entidad
+correspondiente (satisface el contrato estático verificado por
+`ProcedureMappingContractTest`, ahora apuntando a `proc_*` en vez de a la
+función), pero la ejecución real sigue viviendo en un fragmento *Custom*
+(`LoanProcedureRepositoryCustomImpl`, `FineProcedureRepositoryCustomImpl`,
+`ReservationProcedureRepositoryCustomImpl` — este último nuevo en V51) que
+emite `CALL proc_xxx(?1, ?2, ...)` vía `EntityManager.createNativeQuery`
+con **binding exclusivamente posicional, sin nombres de parámetro**. Motivo:
+Hibernate 6, cuando genera el `CALL` a partir de
+`@NamedStoredProcedureQuery`/`@StoredProcedureParameter` con `name` fijado,
+produce sintaxis de parámetros nombrados de PostgreSQL (`nombre => ?`)
+dentro del escape JDBC `{call ...}`, que pgjdbc rechaza con "syntax error at
+or near '=>'" (spring-projects/spring-data-jpa#3393 — bug real, no
+hipotético; se intentó primero la vía estándar y falló exactamente así antes
+de este cambio). El `CALL` nativo con placeholders posicionales evita ese
+camino de código por completo y sí funciona: verificado contra PostgreSQL
+real (no mocks) por `LoanFineProcedureIntegrationTest`, que pasa sin cambios
+tras el cambio de mecanismo (mismos escenarios: creación de préstamo,
+devolución con/sin multa, doble devolución, pago y anulación de multa).
+
+Nota sobre PostgreSQL y `CALL` con parámetros `OUT` desde SQL plano (no
+PL/pgSQL): a diferencia de una llamada a función (`SELECT fn(args)`, donde
+solo se pasan los argumentos `IN`), un `CALL proc(args)` emitido desde SQL
+plano exige un placeholder posicional también para cada parámetro `OUT`
+—su valor no importa, por convención se escribe `NULL`— porque el
+emparejamiento de argumentos en un `CALL` es puramente posicional contra la
+lista completa de parámetros del procedimiento. Así quedan las 5 llamadas:
+
+- `CALL proc_crear_prestamo(?1, ?2, ?3, ?4, NULL)`
+- `CALL proc_expirar_reservaciones_vencidas(?1, NULL)` — `?1` es
+  `OffsetDateTime.now()`, pasado siempre explícito desde Java: el `PROCEDURE`
+  no tiene `DEFAULT` en `p_ahora` porque un `CALL` con placeholders
+  posicionales no puede depender del `DEFAULT` de la función envuelta.
+- `CALL proc_registrar_devolucion(?1, NULL, NULL, NULL)`
+- `CALL proc_pagar_multa(?1, NULL, NULL)`
+- `CALL proc_anular_multa(?1, ?2, ?3, NULL, NULL)`
+
+**`proc_anular_multa` es `SECURITY DEFINER` con `search_path` fijo:**
+`sp_anular_multa` inserta en `bitacora_auditoria`, tabla sobre la que los
+roles de aplicación del modelo de `db/roles-privilegios.sql` no tienen
+`INSERT` directo (ese archivo es teórico/de entrega de Administración de
+BD, no aplicado hoy contra el PostgreSQL real de Aplicaciones Web — pero la
+migración se escribe correcta para ambos escenarios). `SECURITY DEFINER`
+hace que el procedimiento, y todo lo que invoca dentro de su cuerpo
+(incluida la función anidada `sp_anular_multa` y su `INSERT`), corra con los
+privilegios del propietario del procedimiento durante toda la llamada.
+`SET search_path = public` evita que un `search_path` de sesión manipulado
+redirija esa resolución a un esquema distinto — práctica estándar para
+cualquier rutina `SECURITY DEFINER`.
+
+**Por qué las 4 funciones `RETURNS TABLE`/`SETOF` de reporte y listado NO
+se envolvieron también (y no es una omisión):** `fn_listar_prestamos_activos_por_usuario`,
+`fn_reporte_libros_mas_prestados`, `fn_reporte_indice_morosidad`,
+`fn_reporte_uso_por_periodo` y las demás funciones tabulares de este
+catálogo devuelven múltiples filas (`RETURNS TABLE`/`SETOF`). La API de
+stored procedures de JPA 2.1 (`@Procedure`/`@NamedStoredProcedureQuery`)
+está construida sobre `CallableStatement`, que en PostgreSQL solo expone
+resultados vía un valor escalar/`OUT` o un parámetro `REF_CURSOR` — nunca vía
+`RETURNS TABLE` invocado como rutina. Envolverlas en un `PROCEDURE` no
+cambia esa limitación: un `PROCEDURE` con un parámetro `OUT SETOF` no existe
+en PostgreSQL (los parámetros `OUT` son de un tipo fijo, no un conjunto de
+filas); la única forma real de exponer un resultado tabular a través del
+mecanismo de stored procedure de JPA es reescribir la función para que abra
+y retorne un `REF_CURSOR`, lo que le impediría seguir invocándose
+directamente como `SELECT * FROM fn_...(...)` desde `psql`/Postman — la
+misma razón técnica documentada en el addendum de este archivo desde antes
+de V51. Estas 4+ funciones de reporte siguen, correctamente, con `@Query
+(nativeQuery = true)`.
+
+**Balance de mecanismos tras V51** (verificado en código, no solo en este
+documento): de las rutinas con efectos secundarios sobre las tablas de
+negocio (préstamos, reservaciones, multas), **5 de 5** ahora tienen un
+`CREATE PROCEDURE` real invocado con `CALL`. Las ~36 ocurrencias restantes
+de `@Query(nativeQuery = true)` en el módulo de préstamos/multas
+corresponden en su totalidad a funciones `RETURNS TABLE`/`SETOF` de solo
+lectura (reportes, listados, paginación) — la excepción técnica documentada
+arriba, no una elección de conveniencia.
