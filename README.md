@@ -40,6 +40,33 @@ Email:    admin@sgb-saas.local
 Password: Admin123!
 ```
 
+### Cuenta demo LECTOR (punto 7 de la rúbrica)
+
+Cuenta pública de lector para verificar el rol del token
+(`database/migrations/V11__seed_usuario_demo.sql`,
+`V12__fix_usuario_demo.sql` y `V42__fix_usuario_demo_roles_unicos.sql`:
+la V42 deja la cuenta con únicamente `LECTOR`, `ACTIVO` y verificado;
+la V12 había dejado por error el doble rol `LECTOR+GERENTE`).
+
+| Campo | Valor esperado |
+|-------|----------------|
+| **Rol del token** | `LECTOR` (claims `rol` y `roles` del JWT) |
+| **Usuario / Email** | `u@uteq.edu.ec` |
+| **Contraseña** | `usuario1` |
+| **Acceso** | Solo préstamos/notificaciones propios; lo ajeno responde 403 |
+
+Verificación reproducible (requiere Docker, perfil `integration-tests`):
+
+```powershell
+cd backend-springboot
+./mvnw -B verify -Pintegration-tests "-Dtest=DemoAccountMigrationIntegrationTest"
+```
+
+El test levanta PostgreSQL 16 en Testcontainers, aplica las migraciones
+Flyway, comprueba `roles = [LECTOR]` + cuenta activa/verificada, hace
+login y decodifica el JWT: `rol = LECTOR`. Detalle en
+`docs/mediciones/demo-account.md`.
+
 > ⚠️ Credenciales **solo** para evaluación académica / entorno demo. No usarlas con datos personales reales.
 
 **Health check del backend:** https://sgb-backend-b058.onrender.com/actuator/health
