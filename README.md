@@ -321,8 +321,8 @@ Targets disponibles: `up` `down` `test` `bench` `audit` `docs` `all` `clean`.
 
 ## Integridad del entregable
 
-Digest SHA256 de `docs/informe-final.pdf` (regenerado 2026-09-12, 103 páginas):
+Digest SHA256 de `docs/informe-final.pdf` (regenerado 2026-09-13, 104 páginas):
 
 ```
-845085283ca2e890b7869b60b2b9a5d4b8f5de7f49c237cfc427abc9bd05341d
+dccc332383033586d75270dd06081e296a4ec79eb00b3b32d8f320cc2ff72679
 ```
