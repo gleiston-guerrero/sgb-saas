@@ -10,7 +10,7 @@ export const catalogoResolver: ResolveFn<any> = () => {
   const categoriaService = inject(CategoriaService);
   const toast = inject(ToastService);
   return forkJoin({
-    libros: libroService.listar({ page: 0, size: 10, sort: 'titulo,asc' }),
+    libros: libroService.listar({ page: 0, size: 10, sort: 'title,asc' }),
     categorias: categoriaService.listar()
   }).pipe(
     timeout(90000),

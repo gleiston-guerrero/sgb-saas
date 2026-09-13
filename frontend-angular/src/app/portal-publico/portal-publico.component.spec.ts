@@ -37,11 +37,11 @@ describe('PortalPublicoComponent', () => {
     fixture.detectChanges();
   });
 
-  it('carga el grid público con el sort por título sin pedir sesión', () => {
+  it('carga el grid público con el sort por propiedad title sin pedir sesión', () => {
     expect(libroPublicoService.listar).toHaveBeenCalledWith({
       page: 0,
       size: 10,
-      sort: 'titulo,asc',
+      sort: 'title,asc',
       q: undefined,
       categoriaId: undefined
     });

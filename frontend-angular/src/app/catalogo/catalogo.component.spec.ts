@@ -73,13 +73,13 @@ describe('CatalogoComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('carga el grid del catálogo con el sort por título', () => {
+  it('carga el grid del catálogo con el sort por propiedad title de la entidad', () => {
     fixture.detectChanges();
 
     expect(libroService.listar).toHaveBeenCalledWith(jasmine.objectContaining({
       page: 0,
       size: 10,
-      sort: 'titulo,asc',
+      sort: 'title,asc',
       categoriaId: undefined
     }));
     expect(component.libros.length).toBe(1);
