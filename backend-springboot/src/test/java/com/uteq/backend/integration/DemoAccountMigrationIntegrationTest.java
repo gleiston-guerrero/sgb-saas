@@ -1,7 +1,13 @@
 package com.uteq.backend.integration;
 
+import com.uteq.backend.dto.LoginRequestDTO;
+import com.uteq.backend.dto.TokenResponseDTO;
+import com.uteq.backend.service.AuthService;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -11,6 +17,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,6 +59,12 @@ class DemoAccountMigrationIntegrationTest {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    AuthService authService;
+
+    @Value("${security.jwt.secret}")
+    String jwtSecret;
+
     @Test
     void demoAccount_afterMigrations_hasOnlyReaderRoleAndCanLogin() {
         List<String> roles = jdbcTemplate.queryForList("""
@@ -72,5 +85,19 @@ class DemoAccountMigrationIntegrationTest {
 
         assertThat(roles).containsExactly("LECTOR");
         assertThat(activeAndVerified).isTrue();
+
+        TokenResponseDTO tokens = authService.login(
+                new LoginRequestDTO("u@uteq.edu.ec", "usuario1"),
+                "127.0.0.1");
+
+        var claims = Jwts.parser()
+                .verifyWith(Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8)))
+                .build()
+                .parseSignedClaims(tokens.accessToken())
+                .getPayload();
+
+        assertThat(claims.get("correo", String.class)).isEqualTo("u@uteq.edu.ec");
+        assertThat(claims.get("rol", String.class)).isEqualTo("LECTOR");
+        assertThat(claims.get("roles", List.class)).containsExactly("LECTOR");
     }
 }
