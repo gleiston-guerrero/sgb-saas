@@ -25,18 +25,18 @@ automática de \texttt{workspace.dsl} con Structurizr
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.85\textwidth]{arquitectura/c4-nivel1-contexto.png}
-\caption{Modelo C4, Nivel~1 (Contexto): los cinco actores del sistema
-y sus interacciones con SGB-SaaS como caja negra. Exportado
-automáticamente desde \texttt{workspace.dsl}.}
+\caption{C4 model, Level~1 (System Context): the five system actors and
+their interactions with SGB-SaaS as a black box. Exported automatically
+from \texttt{workspace.dsl}.}
 \label{fig:c4-nivel1-contexto}
 \end{figure}
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.95\textwidth]{arquitectura/c4-nivel2-contenedores.png}
-\caption{Modelo C4, Nivel~2 (Contenedores): Frontend Angular, Backend
-Spring Boot, PostgreSQL y Redis, alineados 1:1 con
-\texttt{docker-compose.yml}. Exportado automáticamente desde
+\caption{C4 model, Level~2 (Containers): Angular frontend, Spring Boot
+backend, PostgreSQL, and Redis, aligned 1:1 with
+\texttt{docker-compose.yml}. Exported automatically from
 \texttt{workspace.dsl}.}
 \label{fig:c4-nivel2-contenedores}
 \end{figure}
@@ -183,12 +183,11 @@ exportaron en esta sesión de la misma forma, resultando en
 \begin{figure}[h]
 \centering
 \includegraphics[width=\textwidth]{arquitectura/c4-nivel3-componentes.pdf}
-\caption{Modelo C4, Nivel~3 (Componentes) del backend Spring Boot -- 21
-componentes agrupados por dominio (capa API, capa de servicio,
-seguridad e integración externa), con sus relaciones verificadas contra
-el código real. Conversión a PDF del SVG fuente versionado en
-\texttt{docs/arquitectura/c4-nivel3-componentes.svg} (pdflatex no
-soporta SVG directamente).}
+\caption{C4 model, Level~3 (Components) for the Spring Boot backend --
+21 components grouped by domain (API layer, service layer, security, and
+external integration), with relationships verified against the real
+codebase. PDF conversion from the versioned source SVG at
+\texttt{docs/arquitectura/c4-nivel3-componentes.svg}.}
 \label{fig:c4-componentes}
 \end{figure}
 
