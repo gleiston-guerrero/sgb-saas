@@ -6,6 +6,9 @@ import { libroDetalleResolver } from './libro-detalle.resolver';
 import { LibroService } from '../services/libro.service';
 import { CategoriaService } from '../services/categoria.service';
 import { ToastService } from '../../shared/toast/toast.service';
+import { Page } from '../models/pagina.model';
+import { Libro } from '../models/libro.model';
+import { Categoria } from '../models/categoria.model';
 
 // Regresión loading-infinito: los resolvers nunca deben retornar EMPTY
 // (la navegación se cancela en silencio, sin NavigationEnd, y el shell
@@ -45,9 +48,17 @@ describe('resolvers anti loading-infinito', () => {
   });
 
   it('catalogoResolver deja pasar los datos cuando el backend responde', (done) => {
-    const pagina = { content: [{ id: 1 }], totalPages: 1, totalElements: 1 };
+    const pagina = {
+      content: [{ id: 1 }],
+      totalPages: 1,
+      totalElements: 1,
+      size: 1,
+      number: 0,
+      numberOfElements: 1,
+      empty: false
+    } as unknown as Page<Libro>;
     libroService.listar.and.returnValue(of(pagina));
-    categoriaService.listar.and.returnValue(of([{ id: 2 }]));
+    categoriaService.listar.and.returnValue(of([{ id: 2 }] as unknown as Categoria[]));
 
     TestBed.runInInjectionContext(() => {
       catalogoResolver({} as any, {} as any).subscribe((data: any) => {
@@ -64,7 +75,7 @@ describe('resolvers anti loading-infinito', () => {
 
     TestBed.runInInjectionContext(() => {
       libroDetalleResolver(route, {} as any).subscribe({
-        next: (data) => {
+        next: (data: any) => {
           expect(data).toBeNull();
           done();
         },
@@ -77,7 +88,7 @@ describe('resolvers anti loading-infinito', () => {
     const route = { paramMap: convertToParamMap({}) } as any;
 
     TestBed.runInInjectionContext(() => {
-      libroDetalleResolver(route, {} as any).subscribe((data) => {
+      libroDetalleResolver(route, {} as any).subscribe((data: any) => {
         expect(data).toBeNull();
       });
     });
