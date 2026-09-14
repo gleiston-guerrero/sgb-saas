@@ -13,6 +13,12 @@ mediciones report, to support reviewers who expect English figure text.
   withdrawn from the deliverable (N=0) due to lack of provenance; figure
   is retained for methodological illustration only."
 
+- p95-comparacion-escenarios.pdf (also PDF):
+  "Same caption as the SVG: p95 latency comparison between cache_hot and cache_cold across 5 runs. Error bars show 95% CI by bootstrap (2000 replicates, seed=42)."
+
+- jacoco coverage summary figures (if present):
+  "Coverage summary derived from JaCoCo XML export (report.csv). Use `docs/mediciones/jacoco/report.xml` as the canonical source for line/branch coverage figures."
+
 - diagramas/er-english.pdf (ER diagram):
   "Entity-relationship diagram (real schema reconstructed from database
   migrations). Use this diagram to map tables and foreign key relations

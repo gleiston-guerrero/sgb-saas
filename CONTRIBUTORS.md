@@ -168,3 +168,6 @@ declara abajo para completar la taxonomía:
 - CRediT Contributor Roles Taxonomy: https://credit.niso.org/
 - `CITATION.cff` (afiliación y nombres completos en formato CFF)
 - `git log --oneline` (evidencia de autoría de cada commit)
+
+Nota: el conteo de commits reproducible y la tabla por autor están en
+`docs/mediciones/roles-commit-counts.txt` (usar `git -c log.mailmap=true shortlog -sne --no-merges --all` para regenerar).
