@@ -19,9 +19,9 @@ foreach ($h in $matches) {
     # Try to resolve object using git
     $proc = Start-Process -FilePath git -ArgumentList "rev-parse --verify --quiet $h^0" -NoNewWindow -PassThru -Wait -ErrorAction SilentlyContinue
     if ($proc.ExitCode -eq 0) {
-        "- $h: OK" | Out-File -FilePath $out -Encoding UTF8 -Append
+        "- $($h): OK" | Out-File -FilePath $out -Encoding UTF8 -Append
     } else {
-        "- $h: MISSING" | Out-File -FilePath $out -Encoding UTF8 -Append
+        "- $($h): MISSING" | Out-File -FilePath $out -Encoding UTF8 -Append
     }
 }
 
