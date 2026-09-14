@@ -14,6 +14,13 @@ reproducible y no dependa de una suma manual, el repositorio incluye
 `.mailmap` con la unificación explícita de alias conocidos; el conteo se
 recalcula con `git -c log.mailmap=true shortlog -sne --no-merges HEAD`.
 
+Nota: los números de commits listados son el resultado de ejecutar el
+comando anterior sobre el `HEAD` actual. Si se reescribe historial
+(p. ej. con `git-filter-repo` o rebase) los conteos pueden cambiar. Para
+reproducir exactamente estos valores, ejecute el mismo comando en el
+`rev` indicado en este documento o en el commit de referencia usado
+por la auditoría.
+
 | Persona | Alias Git considerados | Commits |
 |---|---|---|
 | Irvin Cajas Ibarra | `Theirvin1 <icajasi@msuteq.edu.ec>`, `TheIrvin <irvincajas72@gmail.com>`, `Irvin <icajasi@msuteq.edu.ec>`, `Irvin Cajas <icajasi@msuteq.edu.ec>` | **727** |
