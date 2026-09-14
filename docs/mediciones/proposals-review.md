@@ -29,7 +29,15 @@ Lineas afectadas en DATA-PROVENANCE.md:
 `fd68bba (hash inválido; sin candidato local)`
 ```
 
-Recomendación: si el equipo puede identificar el commit funcional
-equivalente para alguna de estas filas (p. ej. por contenido del archivo
-referido), actualizar la fila correspondiente en DATA-PROVENANCE.md con
-esa referencia y mover el hash antiguo a notas de auditoría.
+Recomendación: se aplicó una corrección rápida no destructiva: las filas
+listadas se anotaron como "sin candidato local" y se agregó una nota de
+auditoría en DATA-PROVENANCE.md indicando que esos hashes no están presentes
+en este clone (posible reescritura histórica o artefactos externos). Si el
+equipo identifica posteriormente un commit funcional equivalente claro,
+puede actualizar la fila correspondiente y mover el hash antiguo a notas
+de auditoría.
+
+Acción tomada: anoté en DATA-PROVENANCE.md las entradas como "sin candidato
+local (audit: no disponible en este clone)" para cerrar la tarea de
+trazabilidad de forma honesta y reproducible. Si quieres que agregue
+commits equivalentes manuales para alguna fila en particular, indícalo.
