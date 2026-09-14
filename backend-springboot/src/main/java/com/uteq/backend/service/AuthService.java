@@ -34,6 +34,12 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
+/**
+ * Service responsible for user authentication and account lifecycle operations
+ * (registration, login, logout, password reset, email verification and token
+ * refresh). Methods are documented individually; this class centralizes
+ * authentication-related business rules and audit logging.
+ */
 public class AuthService {
 
     private static final Logger log = LoggerFactory.getLogger(AuthService.class);
