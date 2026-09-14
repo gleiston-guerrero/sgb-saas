@@ -60,6 +60,13 @@ public class BookController {
             @RequestParam(name = "categoriaId", required = false) Integer categoryId,
             @RequestParam(name = "autorId", required = false) Long authorId,
             @RequestParam(name = "disponible", required = false) Boolean available,
+            // sort con el nombre de PROPIEDAD JPA (title): listWithFilters
+            // alterna entre queries derivadas (necesitan "title") y nativas
+            // (necesitan "titulo") segun los filtros recibidos. BookService
+            // traduce titulo<->title solo antes de invocar la rama nativa
+            // (ver BookService.nativeSort); aca se mantiene "title" para no
+            // romper la rama derivada, que es la que Spring Data valida
+            // contra la entidad Book.
             @PageableDefault(size = 10, sort = "title") Pageable pageable) {
         return ResponseEntity.ok(bookService.listWithFilters(q, statusBookId, categoryId, authorId, available, pageable));
     }
@@ -97,7 +104,9 @@ public class BookController {
             @RequestParam(required = false) String q,
             @RequestParam(name = "anioPublicacion", required = false) Integer yearPublication,
             @RequestParam(name = "estadoIds", required = false) List<Integer> statusIds,
-            @PageableDefault(size = 10) @SortDefault(sort = "date_registration", direction = Sort.Direction.DESC) Pageable pageable) {
+            // sort con el nombre FISICO de columna (fecha_registro): listPending
+            // usa searchByStatuses, query nativa incondicional (BookRepository).
+            @PageableDefault(size = 10) @SortDefault(sort = "fecha_registro", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(bookService.listPending(q, yearPublication, statusIds, pageable));
     }
 
