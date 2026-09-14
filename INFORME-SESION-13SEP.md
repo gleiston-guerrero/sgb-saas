@@ -512,3 +512,176 @@ rama como solución al bug del catálogo — el fix ya está en `main`.
 Queda a criterio del equipo si `fix/errores-inicio` se cierra sin
 mergear una vez visto esto, pero esa decisión no le corresponde a esta
 sesión tomarla en automático.
+
+## 10. Verificación del fix de sort (cuarta sesión) y fusión de `fix/finales`
+
+Esta sesión arrancó porque se reportó una discrepancia: el mensaje del
+commit `81cee86c`/merge `157c04fd` (sección 9) describe un helper
+`BookService.nativeSort()` que, según una lectura independiente
+posterior, "no existe en `BookService.java`" — es decir, que la
+sección 9 podría haber documentado una verificación en vivo que en
+realidad no se hizo, dejando el bug del catálogo (`q` + búsqueda por
+texto) sin arreglar de verdad.
+
+### 10.1 Resultado de la re-verificación: la premisa no se sostuvo
+
+```
+$ grep -n "nativeSort" backend-springboot/src/main/java/com/uteq/backend/service/BookService.java
+124:    return bookRepo.searchByTextOIsbnYCategory(q, categoryId, statusId, available, nativeSort(pageable)).map(this::toDTO);
+126:    return bookRepo.searchByTextOIsbn(q, statusId, available, nativeSort(pageable)).map(this::toDTO);
+179:    private static Pageable nativeSort(Pageable pageable) {
+```
+
+Confirmado además con `git show origin/main:.../BookService.java` (no
+solo el árbol de trabajo local) y con `git show 157c04fd --stat`: el
+helper está commiteado, en el merge correcto, aplicado exactamente en
+las dos llamadas nativas de la rama `q != null`. La sección 9 no
+mintió sobre el código — el diagnóstico de esta sesión de que "el
+helper no existe" era el que estaba equivocado. No se tocó código de
+`BookService.java` ni de los controllers en esta sesión: no hacía
+falta, y duplicar un fix que ya existe habría sido peor que no tocar
+nada.
+
+Lo que sí faltaba, y es la causa real de la duda: la sección 9
+afirmaba verificación en vivo, pero no dejaba pegado el código HTTP
+real de cada request ni el comando exacto — dejaba margen para dudar
+si se había hecho de verdad. Esta sección lo corrige con evidencia
+pegada literal.
+
+### 10.2 Evidencia en vivo (docker compose, Postgres real, imagen reconstruida desde `main` en `851369c2`)
+
+Stack: `docker compose up -d postgres redis`, `docker compose build
+backend`, `docker compose run -d --rm --name sgb_backend_test -p
+18080:8080 backend` (puerto 8080 del host no disponible en esta
+máquina por el rango de exclusión de Windows/Hyper-V, igual que en la
+sesión anterior — limitación del entorno, no del código). Login real
+contra `POST /api/auth/login` con `admin@sgb-saas.local` /
+`Admin123!` para las rutas autenticadas.
+
+| Request | HTTP |
+|---|---|
+| `GET /api/publico/libros?q=cien&sort=title,asc` | **200** |
+| `GET /api/publico/libros?q=a&categoriaId=1&sort=title,asc` | **200** |
+| `GET /api/publico/libros?page=0&size=5&sort=title,asc` (sin `q`, rama derivada) | **200** |
+| `GET /api/publico/libros?categoriaId=1&sort=title,asc` (sin `q`, rama derivada con categoría) | **200** |
+| `GET /api/v1/libros?q=cien&sort=title,asc` (autenticado) | **200** |
+| `GET /api/v1/libros?page=0&size=5` (autenticado, sin `q`) | **200** |
+| `GET /api/v1/libros/pendientes?page=0&size=5` (autenticado) | **200** |
+| `GET /api/v1/prestamos/reportes/inventario?page=0&size=5` (autenticado) | **200** |
+| `GET /api/v1/auditoria?page=0&size=5` (autenticado) | **200** |
+
+Los 9 casos, incluido el que la tarea de esta sesión marcaba como
+sospechoso de seguir roto (`q` + `sort=title,asc` explícito, el
+patrón real que manda el frontend), responden `200`. `mvnw clean
+verify`: `BUILD SUCCESS`, 620/620 tests, sin cambios de código de por
+medio.
+
+### 10.3 Fase 4 (sin cambios de código, verificación de rutina)
+
+```
+nativeQuery=true: 33
+@Procedure: 5
+@NamedStoredProcedureQuery: 5
+```
+
+Idéntico a la sesión anterior — no hubo cambios de código en `src/main`
+en esta sesión, así que este resultado era el esperado, no una
+sorpresa.
+
+### 10.4 Fusión de `fix/finales`
+
+`fix/finales` (Irvin Cajas Ibarra) partía del mismo ancestro común que
+`fix/sort-columnas-nativas` (`8d1b7999`) con 24 commits propios, cero
+solapamiento de archivos con los tocados por el fix de sort o por esta
+sesión (`comm -12` entre ambos `git diff --name-only` dio vacío).
+Merge `--no-ff` limpio, sin conflictos (`8f5ae037`). Trae:
+
+- **Trazabilidad (P6)**: `docs/mediciones/hashes-verification-report.md`,
+  `docs/mediciones/proposed-commit-equivalents.md` y
+  `docs/mediciones/proposals-review.md` — hashes ausentes en
+  `DATA-PROVENANCE.md` anotados con propuestas automáticas de commits
+  equivalentes, filas sin candidato marcadas explícitamente como tal,
+  nada inventado. Scripts reproducibles:
+  `scripts/verify-data-provenance.{sh,ps1}`,
+  `scripts/propose-equivalent-commits.ps1`.
+- **P1 cerrado**: SUS retirado formalmente (`docs/mediciones/sus/`,
+  Camino B, N=0) con `CONSENT.md` documentando la decisión, en vez de
+  dejarlo "a medias" como quedó tras la sesión 1.
+- **P7**: `DemoPublicAccountsIntegrationTest` (bajo
+  `src/test/.../integration/`, requiere el perfil Maven
+  `integration-tests` con Testcontainers para correr — no se ejecuta
+  con `mvnw verify` por defecto, igual que el resto de esa carpeta).
+- **Roles CRediT**: `docs/mediciones/roles-commit-counts.txt`, conteo
+  por autor sobre `HEAD`.
+- **QA parcial**: `docs/mediciones/secrets-scan-report.md`
+  (truffleHog, marcado como intento/parcial por el propio Cajas, no
+  como cobertura completa).
+- Captions en inglés (E3), `docs/informe-final.pdf` recompilado con
+  todas las anotaciones anteriores.
+
+No se resolvió la auditoría de commits faltantes más allá de lo que
+`fix/finales` ya dejó como propuesta — esa es una decisión humana de
+atribución que le corresponde al equipo, no a esta sesión.
+
+### 10.5 Recompilación final del informe
+
+Tras la fusión, `docs/informe-final.pdf` se recompiló una vez más
+(`xelatex` → `bibtex` → `xelatex` → `xelatex`, 102 páginas, sin
+errores) para que el PDF final incluya tanto las anotaciones de
+`fix/finales` como quedar generado sobre el HEAD que ya incluye el fix
+de sort de la sección 9. Digest SHA256 resincronizado en `README.md` y
+`CITATION.cff`:
+
+```
+3244efffbd37c8817f0d405bd08528d92c73a10877bc3ca98fbbcebd6cd5758b
+```
+
+### 10.6 Push y CI
+
+- `git push origin main`: `8d1b7999..121482b4` (dos commits de esta
+  sesión: `8f5ae037` merge de `fix/finales`, `121482b4` recompilación
+  del informe — el fix de sort de la sección 9 seguía siendo el HEAD
+  de `main` desde la sesión anterior, sin cambios de código en esta).
+- Verificado con `git ls-remote origin refs/heads/main` → `121482b4`
+  en el remoto.
+- Tag `v1.0.0` no se tocó, sigue en `3f91a7f7` (verificado con
+  `git ls-remote origin refs/tags/v1.0.0`). Nota aparte: el repositorio
+  local de esta máquina tiene un tag `v1.0.0` **anotado** local que
+  apunta a un commit distinto (`162798815e`, creado por el propio
+  usuario fuera de estas sesiones) y que `git fetch --tags` rechaza
+  sincronizar ("would clobber existing tag") porque diverge del
+  `v1.0.0` remoto. No se tocó ese tag local ni el remoto en esta
+  sesión — la regla es no tocar tags, y eso incluye no "arreglar" una
+  discrepancia preexistente que ninguna sesión de este historial causó.
+  El tag remoto, que es el que cuenta para CI/evaluación, sigue en
+  `3f91a7f7`.
+- GitHub Actions CI para `121482b4`, confirmado con el endpoint de
+  **check-runs** (no el de status legacy):
+
+  ```
+  $ curl -s "https://api.github.com/repos/mloorm14/sgb-saas/commits/121482b4.../check-runs" \
+      -H "Accept: application/vnd.github+json"
+  build-and-test completed success
+  frontend       completed success
+  ```
+
+  Run: `https://github.com/mloorm14/sgb-saas/actions/runs/34801921051`.
+  Ambos jobs `completed`/`success`. Se esperó a que terminaran de
+  verdad (polling real cada 25s) antes de escribir esta línea, no se
+  reportó éxito antes de ver el JSON.
+
+### 10.7 Qué quedó pendiente para el equipo
+
+1. Lo mismo de la sección 8.6 sigue sin resolver: `develop`,
+   `chore/organizar-raiz`, `fix/merge-final-pfc` (overlap probable no
+   confirmado al 100 %), y el stash de scripts de `SRS.pdf`.
+2. `fix/errores-inicio` sigue sin mergear ni borrar (ver 9.6) — su
+   causa raíz ya está resuelta en `main`.
+3. La discrepancia del tag `v1.0.0` local (ver 10.6) — no es nada que
+   ninguna sesión automatizada deba "arreglar" tocando tags; se deja
+   documentada para que el equipo decida si el tag local de esta
+   máquina se realinea manualmente con el remoto o se investiga por
+   qué diverge.
+4. La revisión manual de atribución de commits que `fix/finales` dejó
+   como propuesta automática (`docs/mediciones/proposals-review.md`)
+   sigue pendiente de que el equipo la confirme persona por persona.
