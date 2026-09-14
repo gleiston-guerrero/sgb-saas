@@ -54,7 +54,8 @@ class DemoPublicAccountsIntegrationTest {
                 .parseSignedClaims(tokens.accessToken())
                 .getPayload();
 
-        assertThat(claims.get("correo", String.class)).isEqualTo("lector.demo@sgb-saas.local");
+        // Token debe corresponder al usuario semilla canonical
+        assertThat(claims.get("correo", String.class)).isEqualTo("u@uteq.edu.ec");
         assertThat(claims.get("rol", String.class)).isEqualTo("LECTOR");
     }
 }
