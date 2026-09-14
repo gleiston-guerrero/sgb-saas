@@ -377,3 +377,138 @@ avanzar al siguiente paso, y no hubo que revertir ningún commit.
    candidato documentado para un futuro `CREATE PROCEDURE` adicional
    (mismo patrón de V51), si se decide perseguir el punto P4 más allá
    de lo ya cerrado.
+
+## 9. Fix quirúrgico — bug de producción en el catálogo (tercera sesión)
+
+Contexto: el docente reevaluó `main` en `8d1b7999` y la nota subió de
+2.65 a 4.52/10. Pero había un bug real de producción: `/api/v1/libros`
+(y el catálogo público) devolvía 500. Un compañero de equipo
+(Irvin Cajas Ibarra, rama `fix/errores-inicio`, commit `9a5dd0bc`) ya
+había diagnosticado el síntoma pero lo arregló revirtiendo el runtime
+completo (532 archivos) a un estado anterior a todo el trabajo de esta
+y la sesión anterior — deshaciendo el renombrado a inglés, borrando la
+migración V51 y `ProcedureMappingContractTest`. Esa rama **no se
+mergeó ni se borró**: se leyó solo como referencia, y esta sección
+documenta que su causa raíz ya quedó resuelta en `main` sin ese costo.
+
+### 9.1 Diagnóstico verificado (no asumido)
+
+La causa real: tras el renombrado a inglés, varios
+`@PageableDefault`/`@SortDefault` quedaron con el nombre de propiedad
+JPA en inglés como valor de `sort`, pero la query subyacente es nativa
+(`@Query(nativeQuery=true)` o una función `RETURNS TABLE`) y Spring
+Data para queries nativas **no traduce** propiedad→columna: inyecta el
+valor de `sort` tal cual como texto SQL. Se verificó cada sitio contra
+`db/schema.sql` y el `@Query` real de cada repositorio, no se asumió
+el nombre de columna.
+
+Se encontraron y corrigieron 5 sitios (el enunciado de la tarea traía
+4; se encontró un quinto adicional buscando el mismo patrón):
+
+| Archivo / método | Antes | Después | Query subyacente |
+|---|---|---|---|
+| `BookController.pending()` | `sort=date_registration` | `sort=fecha_registro` | `BookRepository.searchByStatuses` — nativa incondicional |
+| `LoanController.reportInventory()` | `sort=title` | `sort=titulo` | `fn_reporte_inventario` — función `RETURNS TABLE`, nativa incondicional |
+| `AuditController.list()` | `sort=date_time` | `sort=fecha_hora` | `AuditLogAuditRepository.searchWithFilters` — nativa incondicional (5º sitio, no estaba en el enunciado original) |
+| `BookController.list()` | `sort=title` (sin cambio final) | `sort=title` | `BookService.listWithFilters` — **ramifica** entre queries derivadas y nativas (ver 9.2) |
+| `PublicBookController.list()` | `sort=title` (sin cambio final) | `sort=title` | ídem |
+
+### 9.2 Un hallazgo que la tarea no anticipaba: el mismo endpoint sirve dos queries incompatibles
+
+El enunciado pedía cambiar `sort="title"` → `sort="titulo"` también en
+`BookController.list()`/`PublicBookController.list()`. Se probó esa
+versión primero contra un backend real (ver 9.3) y **rompió la rama
+sin `q`**: `BookService.listWithFilters` usa queries *derivadas* de
+Spring Data (`findByStatusId`, `findByCategories_IdAndStatusId`, etc.)
+cuando no hay texto de búsqueda, y esas SÍ validan el `sort` contra la
+entidad `Book` — con `sort=titulo` fallan con
+`PropertyReferenceException: No property 'titulo' found for type
+'Book'; Did you mean 'title'`. Solo cuando hay `q` (o `q`+categoría)
+esa misma clase usa las queries *nativas* que sí necesitan `titulo`.
+
+Un único valor de `sort` en el `@PageableDefault` no puede satisfacer
+ambas ramas a la vez. Se optó por: dejar el default en `title`
+(nombre de propiedad JPA, la entidad real) y agregar
+`BookService.nativeSort(Pageable)`, que traduce `title`→`titulo`
+únicamente antes de invocar `searchByTextOIsbn` y
+`searchByTextOIsbnYCategory` (las dos únicas queries nativas de esa
+rama). La rama derivada recibe el `Pageable` sin tocar.
+
+Esto además corrige el caso real de uso de punta a punta: el
+frontend (`catalogo.component.ts`) manda siempre, explícitamente,
+`sort=title,asc` en cada request — el `@PageableDefault` del backend
+nunca llega a aplicarse cuando el usuario navega el catálogo. Antes
+del fix, cualquier búsqueda con texto desde la UI real caía en la rama
+nativa con `sort=title` y fallaba iguialmente aunque el default del
+controller estuviera "arreglado" al valor equivocado o al correcto
+para la otra rama; con la traducción en `BookService`, el valor que
+llega (sea el default o el explícito del frontend) se traduce
+correctamente justo antes de la query nativa. No hizo falta tocar el
+frontend.
+
+### 9.3 Verificación (Fase 3 — no se saltó)
+
+- `mvnw clean verify` con los 5 archivos modificados: **BUILD SUCCESS,
+  620/620 tests, 0 fallos** (misma cifra que la sesión anterior, sin
+  regresiones).
+- `docker compose` local (imagen reconstruida desde la rama del fix,
+  Postgres real con la semilla de `db/init`, backend expuesto en un
+  puerto alterno porque el 8080 cae en el rango de exclusión de
+  puertos de Windows/Hyper-V en esta máquina — limitación del entorno,
+  no del código): se probaron en vivo, autenticado como
+  `admin@sgb-saas.local` donde aplicaba,
+  - `GET /api/publico/libros` sin filtros, con `q`, con `categoriaId`,
+    con `q`+`categoriaId`, y con `q`+`sort=title,asc` explícito (el
+    caso real del frontend) → **200** en los 5.
+  - `GET /api/v1/libros` sin filtros y con `q` → **200**.
+  - `GET /api/v1/libros/pendientes` → **200** (vacío, no hay libros en
+    esos estados en la semilla — no es un error).
+  - `GET /api/v1/prestamos/reportes/inventario` → **200**.
+  - `GET /api/v1/auditoria` → **200**.
+  - La primera versión del fix (con `sort=titulo` literal en el
+    controller) sí reprodujo el `PropertyReferenceException` de 9.2 en
+    vivo contra `/api/publico/libros` sin `q` y con `categoriaId` — se
+    corrigió antes de commitear, no se llegó a subir esa versión.
+
+### 9.4 Fase 4 — confirmación de que no se perdió nada de lo ganado
+
+Comparado contra `main` antes del fix (`8d1b7999`):
+
+| Métrica | Antes | Después | ¿Cambió? |
+|---|---|---|---|
+| `nativeQuery=true` en `src/main` | 33 | 33 | No |
+| `@Procedure(` en `src/main` | 5 | 5 | No |
+| `@NamedStoredProcedureQuery` en `src/main` | 5 | 5 | No |
+| `docs/mediciones/jacoco/report.csv` | — | — | Sin diff (`git diff main -- docs/mediciones/jacoco/report.csv` vacío) |
+| Archivos modificados | — | 5 (los 5 controllers/service de 9.1) | Ninguno fuera de esos 5 |
+
+Los 5 archivos tocados son exactamente los de la tabla de 9.1, más
+`BookService.java` (el helper de traducción de 9.2). No se tocó
+ninguna migración, entidad, DTO, ni nombre de método/clase fuera de
+esos 5 sitios.
+
+### 9.5 Merge y CI
+
+- `git checkout main && git merge --no-ff fix/sort-columnas-nativas`
+  → merge commit `157c04fd` (sin conflictos).
+- `git push origin main`: `8d1b7999..157c04fd`. Verificado con
+  `git ls-remote origin refs/heads/main` → `157c04fd` en el remoto.
+- Tag `v1.0.0` no se tocó, sigue en `3f91a7f7`.
+- GitHub Actions CI para `157c04fd`: **verde** — run
+  `https://github.com/mloorm14/sgb-saas/actions/runs/34800738848`,
+  ambos jobs `build-and-test` y `frontend` en `success`. Confirmado vía
+  API (`GET /actions/runs/{id}` y `/jobs`), no solo por el mensaje de
+  push.
+
+### 9.6 `fix/errores-inicio`: no se mergeó, no se borró
+
+La rama `fix/errores-inicio` (commit `9a5dd0bc`, de Irvin Cajas
+Ibarra) sigue existiendo tal cual en `origin`, sin tocar. Su síntoma
+(500 en el catálogo) ya está resuelto en `main` de forma quirúrgica
+(ver 9.1–9.5), sin el costo de revertir los ~1,58 puntos de rúbrica
+ganados por el renombrado a inglés (E1), V51 (P4) y
+`ProcedureMappingContractTest`. El equipo no debería resucitar esa
+rama como solución al bug del catálogo — el fix ya está en `main`.
+Queda a criterio del equipo si `fix/errores-inicio` se cierra sin
+mergear una vez visto esto, pero esa decisión no le corresponde a esta
+sesión tomarla en automático.
