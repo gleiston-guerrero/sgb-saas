@@ -31,8 +31,14 @@ Comando reproducible:
 
 ```powershell
 cd backend-springboot
-./mvnw -B verify -Pintegration-tests "-Dtest=DemoAccountMigrationIntegrationTest"
+./mvnw -B test -Dtest=DemoPublicAccountsIntegrationTest
 ```
+
+Notas:
+- El test usa Testcontainers (requiere Docker en el host). Si Docker no
+  está disponible, puede ejecutarse el mismo chequeo levantando una base
+  PostgreSQL local y ejecutando `./mvnw -Dtest=DemoPublicAccountsIntegrationTest test`.
+- La contraseña del usuario semilla es `usuario1` (documentada solo en README como credencial pública para evaluación).
 
 ## Parte (b): sin acceso a prestamos ajenos
 

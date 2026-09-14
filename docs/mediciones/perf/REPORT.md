@@ -188,7 +188,9 @@ fija 42 — un percentil no tiene una fórmula cerrada de IC como la media),
 paleta accesible a daltonismo (Okabe-Ito, naranja `#E69F00` / celeste
 `#56B4E9`):
 
-![p95 cache_caliente vs cache_frio por corrida, con IC 95%](p95-comparacion-escenarios.svg)
+![p95 cache_hot vs cache_cold per run, with 95% CI](p95-comparacion-escenarios.svg)
+
+Caption (English): p95 latency comparison between cache_hot and cache_cold across 5 runs. Error bars show 95% confidence intervals estimated by bootstrap (2000 replicates, seed=42). Color palette: Okabe-Ito (accessible to common forms of color blindness).
 
 ## Análisis breve
 

@@ -19,6 +19,13 @@ de que alguien recuerde el formato cada vez.
   real de `./mvnw clean verify` en `backend-springboot/`. El `.md` de
   evidencia con el análisis va suelto en la misma carpeta, mismo criterio
   de nombre que el resto (`YYYY-MM-DD-descripcion-corta.md`).
+
+  Nota operativa: cuando existan múltiples corridas históricas en esta
+  carpeta, el archivo canónico que debe usarse en los informes es
+  `docs/mediciones/jacoco/report.xml` (la última corrida producida por
+  `./mvnw clean verify` en el árbol actual). Si por alguna razón se
+  referencia una corrida anterior, debe indicarse explícitamente el
+  nombre del archivo usado (p. ej. `kNN-runM` o `report-YYYYMMDD.xml`).
 - Otras subcarpetas se agregan según el tipo de medición (ej. `docs/mediciones/sus/`
   si se hace una encuesta System Usability Scale), siguiendo el mismo
   criterio: una subcarpeta por tipo de evidencia, no todo suelto en la raíz.
