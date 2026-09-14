@@ -23,3 +23,22 @@ Por ahora: el bloque SUS queda retirado (N=0) como evidencia pública
 exigible — el instrumento y los datos agregados se conservan en
 `docs/mediciones/sus/` como evidencia metodológica, pero no se publican
 consentimientos individuales.
+
+Motivo técnico de la retirada (resumen):
+- Análisis del CSV `sus.csv` detectó señales incompatibles con respuestas
+  independientes: tres ítems (Q8, Q9, Q10) con varianza exactamente cero;
+  el campo `sexo` alterna sistemáticamente Femenino/Masculino en las 15
+  filas; el campo `dispositivo` muestra un patrón repetitivo por paridad;
+  además el commit de origen referido en la traza no existe en este árbol.
+  Estas inconsistencias impiden aceptar estas respuestas como evidencia
+  reproducible sin trazabilidad y consentimientos verificables.
+
+Decisión tomada (no destructiva):
+- NO se reescribió el historial Git para intentar restaurar hashes; ese
+  enfoque fue descartado por riesgo a la integridad del repositorio.
+- El dataset `docs/mediciones/sus/sus.csv` se conserva como "dataset
+  retirado" para auditoría interna y validación del pipeline, pero el
+  entregable declara formalmente N=0 y no utiliza los puntajes SUS como
+  evidencia. Si el equipo aporta el instrumento original y los
+  consentimientos verificables, se revertirá la retirada siguiendo el
+  procedimiento documentado arriba.
