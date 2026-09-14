@@ -72,6 +72,29 @@ reproducible con un nombre de archivo cuando en realidad no lo hay.
   fuera del alcance de "tabla o figura con datos cuantitativos" que pide
   esta tarea.
 
+## Verificación de hashes citados
+
+Se ejecutó un verificador automático que confirma si los hashes referenciados
+en la columna "Commit" existen hoy en el árbol de Git de este clone. Resultado
+guardado en `docs/mediciones/hashes-verification-report.md`. Resumen:
+
+- Hashes confirmados (existen en este árbol): 1028ad02, 454be77
+- Hashes no presentes en este árbol (probable reescritura histórica o referencia a commits eliminados):
+  04ce7c5, 06a3470, 20260731, 26f4778, 28928ae, 3538f13, 41407b2, 51607f3,
+  6696bf1, 6d41b88, 82df169, 993b5e7, a0a2aa8, c4ef133, e1f0c25, e90c39b,
+  ea149cc, ecfaf52, fd68bba
+
+Decisión tomada: NO se modificó ni reescribió el historial del repositorio para
+restaurar hashes ausentes (eso dañaría la integridad del historial compartido).
+En cambio, el equipo mantiene evidencia verificable en dos formas:
+
+1. `docs/mediciones/hashes-verification-report.md` contiene la verificación
+   automatizada y debe incluirse junto a este archivo como prueba de auditoría.
+2. Las filas cuyo hash ya no existe quedan anotadas aquí (arriba). Si se desea,
+   se puede actualizar cada fila individual para referenciar un "commit
+   funcional equivalente" conocido en el árbol actual; eso se hará sólo cuando
+   el equipo confirme la equivalencia y quiera la corrección documental.
+
 ## Referencias
 
 - `docs/mediciones/DATA-DICTIONARY.md` (qué campos tiene cada archivo crudo)
