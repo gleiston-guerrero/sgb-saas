@@ -21,7 +21,9 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -119,9 +121,9 @@ public class BookService {
         // Con disponible y/o q, usar queries nativas con filtro stock
         if (q != null && !q.isBlank()) {
             if (categoryId != null) {
-                return bookRepo.searchByTextOIsbnYCategory(q, categoryId, statusId, available, pageable).map(this::toDTO);
+                return bookRepo.searchByTextOIsbnYCategory(q, categoryId, statusId, available, nativeSort(pageable)).map(this::toDTO);
             }
-            return bookRepo.searchByTextOIsbn(q, statusId, available, pageable).map(this::toDTO);
+            return bookRepo.searchByTextOIsbn(q, statusId, available, nativeSort(pageable)).map(this::toDTO);
         }
 
         if (available != null) {
@@ -166,6 +168,21 @@ public class BookService {
     @Transactional(readOnly = true)
     public Page<BookResponseDTO> listWithFilters(String q, Integer statusBookId, Integer categoryId, Long authorId, Pageable pageable) {
         return listWithFilters(q, statusBookId, categoryId, authorId, null, pageable);
+    }
+
+    // listWithFilters alterna entre queries derivadas de Spring Data (Book.title,
+    // Book.java @Column(name="titulo")) y queries nativas de BookRepository, que
+    // no traducen propiedad->columna: Spring Data inyecta el Sort tal cual como
+    // texto SQL. Un mismo Pageable de entrada (siempre en terminos de propiedad
+    // JPA, "title") no sirve para la rama nativa sin traducirlo antes a la
+    // columna fisica ("titulo"). Ver BookController.list/PublicBookController.list.
+    private static Pageable nativeSort(Pageable pageable) {
+        Sort translated = Sort.by(pageable.getSort().stream()
+                .map(order -> "title".equals(order.getProperty())
+                        ? order.withProperty("titulo")
+                        : order)
+                .toList());
+        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), translated);
     }
 
     private Integer resolveStatusId(Integer statusBookId) {
