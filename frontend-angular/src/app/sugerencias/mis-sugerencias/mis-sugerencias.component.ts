@@ -33,7 +33,7 @@ export class MisSugerenciasComponent implements OnInit {
     this.sugerenciaService.listarMias({
       page: this.currentPage,
       size: this.pageSize,
-      sort: 'creadoEn,desc'
+      sort: 'created,desc'
     }).subscribe({
       next: (data) => {
         this.sugerencias = data.content;

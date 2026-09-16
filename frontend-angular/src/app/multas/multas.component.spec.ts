@@ -107,7 +107,7 @@ describe('MultasComponent', () => {
     expect(multaService.listarDetallePorUsuario).toHaveBeenCalledWith(3, jasmine.objectContaining({
       page: 0,
       size: 5,
-      sort: 'estadoMultaId,asc'
+      sort: 'statusFineId,asc'
     }));
     expect(component.multas.length).toBe(2);
     expect(component.esLector).toBeTrue();

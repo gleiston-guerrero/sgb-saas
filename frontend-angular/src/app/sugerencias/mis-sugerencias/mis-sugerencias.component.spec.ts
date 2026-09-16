@@ -29,7 +29,7 @@ describe('MisSugerenciasComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('carga las solicitudes paginadas ordenadas por creadoEn descendente', () => {
+  it('carga las solicitudes paginadas ordenadas por created descendente', () => {
     sugerenciaService.listarMias.and.returnValue(of({ content: [sugerencia(1, 'PENDIENTE')], totalPages: 1 } as any));
 
     fixture.detectChanges();
@@ -37,7 +37,7 @@ describe('MisSugerenciasComponent', () => {
     expect(sugerenciaService.listarMias).toHaveBeenCalledWith({
       page: 0,
       size: 10,
-      sort: 'creadoEn,desc'
+      sort: 'created,desc'
     });
     expect(component.sugerencias.length).toBe(1);
   });

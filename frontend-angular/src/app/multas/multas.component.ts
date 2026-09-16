@@ -122,7 +122,7 @@ export class MultasComponent implements OnInit {
     this.multaService.listarDetallePorUsuario(usuarioId, {
       page: this.currentPage,
       size: this.pageSize,
-      sort: 'estadoMultaId,asc'
+      sort: 'statusFineId,asc'
     }).subscribe({
       next: (data) => {
         this.multas = data.content;
