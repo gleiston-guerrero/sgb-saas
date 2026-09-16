@@ -26,8 +26,10 @@ import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -359,6 +361,35 @@ public class GlobalExceptionHandler {
      */
     public ProblemDetail handleIllegalArgument(IllegalArgumentException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    // ── Parámetros de ruta/query no convertibles ──────────────
+    // p.ej. /multas/usuario/undefined/detalle o ?usuarioId=undefined desde
+    // un frontend con id sin resolver: sin este handler caen en el 500
+    // genérico ("Error no controlado") en vez de un 400 legible.
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    /**
+         * Maneja un parmetro de ruta o query con tipo incompatible.
+     * @param ex excepcin con el nombre y valor del parmetro
+     * @return ProblemDetail con estado 400 y el parmetro problemático
+     */
+    public ProblemDetail handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        log.warn("Parámetro no convertible: {}='{}'", ex.getName(), ex.getValue());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+                "Parámetro '" + ex.getName() + "' con valor inválido: '" + ex.getValue() + "'");
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    /**
+         * Maneja un parmetro de query requerido ausente.
+     * @param ex excepcin con el nombre del parmetro faltante
+     * @return ProblemDetail con estado 400 y el parmetro faltante
+     */
+    public ProblemDetail handleMissingParam(MissingServletRequestParameterException ex) {
+        log.warn("Parámetro requerido ausente: {}", ex.getParameterName());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+                "Falta el parámetro requerido: '" + ex.getParameterName() + "'");
     }
 
     @ExceptionHandler(IllegalStateException.class)

@@ -82,6 +82,16 @@ class FineControllerTest extends WebMvcControllerTestSupport {
                 .andExpect(jsonPath("$.content[0].libroTitulo").value("Clean Code"));
     }
 
+    // Regresión prod (/multas/usuario/undefined/detalle -> 500 "Error no
+    // controlado"): la conversión fallida debe ser 400 legible.
+    @Test
+    void listDetailByUser_conIdNoNumerico_devuelve400() throws Exception {
+        mockMvc.perform(get("/api/v1/multas/usuario/undefined/detalle"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value(
+                        org.hamcrest.Matchers.containsString("usuarioId")));
+    }
+
     @Test
     void pay_withoutBody_paymentFull_devuelve200() throws Exception {
         when(fineService.pay(1L)).thenReturn(new FineActionResponseDTO(1L, true));
