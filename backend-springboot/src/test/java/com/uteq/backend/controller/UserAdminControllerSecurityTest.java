@@ -132,6 +132,19 @@ class UserAdminControllerSecurityTest {
                 .andExpect(status().isNoContent());
     }
 
+    // Regresión prod (PATCH /12/estado -> 400 "El motivo es obligatorio"):
+    // el frontend manda JSON crudo {nuevoEstado, motivo}; el record debe
+    // leer "motivo" (el objectMapper de los otros tests serializa con los
+    // alias y no atrapa un @JsonProperty faltante).
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void changeStatus_conJsonEspanolDelFrontend_sePermite() throws Exception {
+        mockMvc.perform(patch("/api/v1/admin/usuarios/{id}/estado", 12L)
+                        .contentType("application/json")
+                        .content("{\"nuevoEstado\":\"INACTIVO\",\"motivo\":\"Incumplimiento reiterado\"}"))
+                .andExpect(status().isNoContent());
+    }
+
     @Test
     @WithMockUser(roles = "BIBLIOTECARIO")
     void changeStatus_withRoleLibrarian_seRechaza() throws Exception {

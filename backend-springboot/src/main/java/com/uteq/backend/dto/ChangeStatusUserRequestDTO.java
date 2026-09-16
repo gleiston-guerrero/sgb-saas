@@ -12,6 +12,6 @@ public record ChangeStatusUserRequestDTO(
 
         @NotBlank(message = "El motivo es obligatorio")
         @Size(max = 255, message = "El motivo no puede superar los 255 caracteres")
-        String reason
+        @JsonProperty("motivo") String reason
 ) {
 }
