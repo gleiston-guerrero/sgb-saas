@@ -99,7 +99,7 @@ public class ReservationsManagementService {
                         org.springframework.data.domain.PageRequest.of(0, 50,
                                 org.springframework.data.domain.Sort.by(
                                         org.springframework.data.domain.Sort.Direction.DESC,
-                                        "fechaReserva")))
+                                        "dateReservation")))
                 .getContent();
 
         if (reservations.isEmpty()) {
