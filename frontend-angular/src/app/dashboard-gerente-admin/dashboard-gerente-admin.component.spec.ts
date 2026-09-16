@@ -3,52 +3,12 @@ import { provideRouter } from '@angular/router';
 import { DashboardGerenteAdminComponent } from './dashboard-gerente-admin.component';
 import { AuthService } from '../core/services/auth.service';
 
+// Shell exclusivo de ADMIN: GERENTE usa su propio shell en
+// /dashboard-gerente (DashboardGerenteComponent).
 describe('DashboardGerenteAdminComponent', () => {
   let component: DashboardGerenteAdminComponent;
   let fixture: ComponentFixture<DashboardGerenteAdminComponent>;
   let authService: jasmine.SpyObj<AuthService>;
-
-  describe('con rol GERENTE', () => {
-    beforeEach(async () => {
-      // El shell persiste colapso en localStorage: aislar cada test del orden de ejecución.
-      localStorage.clear();
-      authService = jasmine.createSpyObj('AuthService', ['isLoggedIn', 'hasRole', 'logout', 'getCorreo']);
-      authService.isLoggedIn.and.returnValue(true);
-      authService.hasRole.and.callFake((...roles: string[]) => roles.includes('GERENTE'));
-      authService.getCorreo.and.returnValue('gerente@correo.com');
-
-      await TestBed.configureTestingModule({
-        imports: [DashboardGerenteAdminComponent],
-        providers: [
-          provideRouter([]),
-          { provide: AuthService, useValue: authService }
-        ]
-      }).compileComponents();
-
-      fixture = TestBed.createComponent(DashboardGerenteAdminComponent);
-      component = fixture.componentInstance;
-      fixture.detectChanges();
-    });
-
-    it('debería crear el componente', () => {
-      expect(component).toBeTruthy();
-    });
-
-    it('debería mostrar Reportes en el sidebar para GERENTE', () => {
-      const compiled = fixture.nativeElement as HTMLElement;
-      expect(compiled.textContent).toContain('Reportes');
-    });
-
-    it('NO debería mostrar Auditoría en el sidebar para GERENTE (solo ADMIN)', () => {
-      const compiled = fixture.nativeElement as HTMLElement;
-      expect(compiled.textContent).not.toContain('Auditoría');
-    });
-
-    it('debería mostrar nombre del rol como Gerente', () => {
-      const compiled = fixture.nativeElement as HTMLElement;
-      expect(compiled.textContent).toContain('Gerente');
-    });
-  });
 
   describe('con rol ADMIN', () => {
     beforeEach(async () => {
@@ -72,6 +32,18 @@ describe('DashboardGerenteAdminComponent', () => {
       fixture.detectChanges();
     });
 
+    it('debería crear el componente', () => {
+      expect(component).toBeTruthy();
+    });
+
+    it('todas las rutas del sidebar viven bajo /dashboard-admin', () => {
+      const rutas = component.secciones.flatMap(s => s.enlaces.map(e => e.ruta));
+      expect(rutas.length).toBeGreaterThan(0);
+      for (const ruta of rutas) {
+        expect(ruta.startsWith('/dashboard-admin')).toBeTrue();
+      }
+    });
+
     it('debería mostrar Reportes en el sidebar para ADMIN', () => {
       const compiled = fixture.nativeElement as HTMLElement;
       expect(compiled.textContent).toContain('Reportes');
@@ -90,6 +62,38 @@ describe('DashboardGerenteAdminComponent', () => {
     it('debería mostrar nombre del rol como Administrador', () => {
       const compiled = fixture.nativeElement as HTMLElement;
       expect(compiled.textContent).toContain('Administrador');
+    });
+  });
+
+  describe('con rol GERENTE (sin acceso al shell admin)', () => {
+    beforeEach(async () => {
+      localStorage.clear();
+      authService = jasmine.createSpyObj('AuthService', ['isLoggedIn', 'hasRole', 'logout', 'getCorreo']);
+      authService.isLoggedIn.and.returnValue(true);
+      authService.hasRole.and.callFake((...roles: string[]) => roles.includes('GERENTE'));
+      authService.getCorreo.and.returnValue('gerente@correo.com');
+
+      await TestBed.configureTestingModule({
+        imports: [DashboardGerenteAdminComponent],
+        providers: [
+          provideRouter([]),
+          { provide: AuthService, useValue: authService }
+        ]
+      }).compileComponents();
+
+      fixture = TestBed.createComponent(DashboardGerenteAdminComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+    });
+
+    it('NO debería mostrar Reportes del admin en el sidebar para GERENTE (usa su propio shell)', () => {
+      const compiled = fixture.nativeElement as HTMLElement;
+      expect(compiled.textContent).not.toContain('Reportes');
+    });
+
+    it('NO debería mostrar Auditoría en el sidebar para GERENTE (solo ADMIN)', () => {
+      const compiled = fixture.nativeElement as HTMLElement;
+      expect(compiled.textContent).not.toContain('Auditoría');
     });
   });
 });

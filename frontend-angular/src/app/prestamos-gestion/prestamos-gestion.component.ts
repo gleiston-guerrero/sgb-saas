@@ -367,13 +367,17 @@ export class PrestamosGestionComponent implements OnInit {
     let ruta: string[];
     if (url.includes('/dashboard-bibliotecario')) {
       ruta = ['/dashboard-bibliotecario', 'multas'];
+    } else if (url.includes('/dashboard-gerente')) {
+      ruta = ['/dashboard-gerente', 'multas'];
     } else if (url.includes('/dashboard-admin')) {
       ruta = ['/dashboard-admin', 'multas'];
     } else if (url.includes('/dashboard-lector')) {
       ruta = ['/dashboard-lector', 'multas'];
     } else if (this.authService.hasRole('BIBLIOTECARIO')) {
       ruta = ['/dashboard-bibliotecario', 'multas'];
-    } else if (this.authService.hasRole('GERENTE') || this.authService.hasRole('ADMIN')) {
+    } else if (this.authService.hasRole('GERENTE')) {
+      ruta = ['/dashboard-gerente', 'multas'];
+    } else if (this.authService.hasRole('ADMIN')) {
       ruta = ['/dashboard-admin', 'multas'];
     } else {
       ruta = ['/multas'];
