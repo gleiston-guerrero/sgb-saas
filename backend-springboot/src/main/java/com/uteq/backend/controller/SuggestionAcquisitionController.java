@@ -32,8 +32,6 @@ public class SuggestionAcquisitionController {
     }
 
     // ── POST /api/v1/sugerencias-adquisicion ──────────────
-    @PostMapping
-    @PreAuthorize("hasRole('LECTOR')")
     /**
      * Registra create validando los datos de entrada antes de persistir cambios.
      *
@@ -41,6 +39,8 @@ public class SuggestionAcquisitionController {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PostMapping
+    @PreAuthorize("hasRole('LECTOR')")
     public ResponseEntity<SuggestionAcquisitionResponseDTO> create(
             @Valid @RequestBody SuggestionAcquisitionRequestDTO dto,
             Authentication authentication) {
@@ -81,8 +81,6 @@ public class SuggestionAcquisitionController {
     }
 
     // ── PATCH /api/v1/sugerencias-adquisicion/{id}/estado ─
-    @PatchMapping("/{id}/estado")
-    @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
     /**
      * Actualiza change status con las reglas de negocio requeridas por el flujo.
      *
@@ -91,6 +89,8 @@ public class SuggestionAcquisitionController {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PatchMapping("/{id}/estado")
+    @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
     public ResponseEntity<SuggestionAcquisitionResponseDTO> changeStatus(
             @PathVariable Long id,
             @Valid @RequestBody ChangeStatusSuggestionRequestDTO dto,
@@ -137,13 +137,13 @@ public class SuggestionAcquisitionController {
     }
 
     // ── GET /api/v1/sugerencias-adquisicion/reporte-pdf ──
-    @GetMapping("/reporte-pdf")
-    @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
     /**
      * Handles report pdf.
      *
-     * @return response entity<byte[]> with the resulting state after the operation
+     * @return response entity{@code <byte[]>} with the resulting state after the operation
      */
+    @GetMapping("/reporte-pdf")
+    @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
     public ResponseEntity<byte[]> reportPdf() {
         byte[] pdf = reportPdfService.generateReportSuggestionsMostRequested(
                 suggestionService.getMostRequestedList());

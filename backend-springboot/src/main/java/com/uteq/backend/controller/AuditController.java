@@ -31,6 +31,11 @@ public class AuditController {
 
     private final AuditService auditService;
 
+    /**
+     * Constructor con el servicio de auditoría.
+     *
+     * @param auditService servicio de consulta de bitacora_auditoria
+     */
     public AuditController(AuditService auditService) {
         this.auditService = auditService;
     }
@@ -65,12 +70,12 @@ public class AuditController {
     // ── GET /api/v1/auditoria/resumen ────────────────────────
     // Agregación por tabla_afectada: total, hoy, último evento.
     // Misma restricción @PreAuthorize que el listado (GERENTE/ADMIN).
-    @GetMapping("/resumen")
     /**
      * Procesa summary y devuelve el resultado calculado por el backend.
      *
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @GetMapping("/resumen")
     public ResponseEntity<List<SummaryCategoryAuditDTO>> summary() {
         return ResponseEntity.ok(auditService.summary());
     }

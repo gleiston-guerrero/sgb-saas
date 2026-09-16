@@ -14,7 +14,7 @@ import java.util.Optional;
 
 /**
  * CRUD elemental sobre {@code reservaciones}. La expiración masiva vive
- * en {@link ReservationProcedureRepository#spExpireReservationsVencidas}.
+ * en {@link ReservationProcedureRepositoryCustom#spExpireReservationsVencidasProcedure}.
  */
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {

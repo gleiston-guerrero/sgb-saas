@@ -13,8 +13,21 @@ import com.uteq.backend.chatbot.ChatbotTool;
  */
 public abstract class AbstractChatbotTool implements ChatbotTool {
 
+    /** ObjectMapper compartido por todas las tools para armar schemas y errores. */
     protected final ObjectMapper mapper = new ObjectMapper();
 
+    /**
+     * Constructor sin argumentos para las subclases concretas.
+     */
+    protected AbstractChatbotTool() {
+    }
+
+    /**
+     * Arma un nodo de error con el mensaje dado.
+     *
+     * @param message mensaje de error a incluir en el nodo
+     * @return nodo JSON con el error
+     */
     protected ObjectNode errorNode(String message) {
         ObjectNode error = mapper.createObjectNode();
         error.put("error", message);

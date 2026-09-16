@@ -14,12 +14,17 @@ public abstract class AbstractUserAwareTool extends AbstractChatbotTool {
     /** Nombre del parámetro de usuario en schemas y respuestas. */
     public static final String USUARIO_ID = "usuario_id";
 
-    @Override
+    /**
+     * Constructor sin argumentos para las subclases concretas.
+     */
+    protected AbstractUserAwareTool() {
+    }
     /**
      * Retrieves input schema.
      *
      * @return json node with the resulting state after the operation
      */
+    @Override
     public JsonNode getInputSchema() {
         ObjectNode schema = mapper.createObjectNode();
         schema.put("type", "object");
@@ -41,6 +46,8 @@ public abstract class AbstractUserAwareTool extends AbstractChatbotTool {
 
     /**
      * Extrae y valida {@code usuario_id} de los argumentos.
+     *
+     * @param args argumentos de la herramienta con el id del usuario
      * @return el ID, o {@code null} si falta o es inválido.
      */
     protected Long resolveUserId(JsonNode args) {

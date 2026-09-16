@@ -26,8 +26,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private static final Set<String> ESTADOS_DESHABILITADOS = Set.of("INACTIVO", "PENDIENTE_VERIFICACION");
 
     private final UserRepository userRepository;
-
-    @Override
     /**
      * Procesa load user by username y devuelve el resultado calculado por el backend.
      *
@@ -35,6 +33,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      * @throws UsernameNotFoundException si la operacion no puede completarse por validacion, permisos o fallo del recurso asociado
      */
+    @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         com.uteq.backend.entity.User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con correo: " + email));

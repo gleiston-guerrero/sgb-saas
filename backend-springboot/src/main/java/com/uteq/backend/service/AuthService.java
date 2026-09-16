@@ -14,7 +14,6 @@ import com.uteq.backend.repository.RoleRepository;
 import com.uteq.backend.repository.UserRepository;
 import com.uteq.backend.security.JwtService;
 import com.uteq.backend.security.LoginRateLimiter;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -32,14 +31,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-@Service
-@RequiredArgsConstructor
 /**
  * Service responsible for user authentication and account lifecycle operations
  * (registration, login, logout, password reset, email verification and token
  * refresh). Methods are documented individually; this class centralizes
  * authentication-related business rules and audit logging.
  */
+@Service
 public class AuthService {
 
     private static final Logger log = LoggerFactory.getLogger(AuthService.class);
@@ -64,6 +62,48 @@ public class AuthService {
     private final VerificationEmailService verificationEmailService;
     private final ConfigurationSystemService configurationSystemService;
     private final EmailService emailService;
+
+    /**
+     * Constructor con todas las dependencias del servicio.
+     *
+     * @param userRepository repositorio de usuarios
+     * @param roleRepository repositorio de roles
+     * @param statusUserRepository repositorio de estados de usuario
+     * @param passwordEncoder codificador de contraseñas
+     * @param jwtService servicio de emisión y validación de JWT
+     * @param authenticationManager autenticador de Spring Security
+     * @param redisTemplate plantilla Redis para códigos y rate limit
+     * @param loginRateLimiter limitador de intentos de login
+     * @param auditLogAuditRepository repositorio de bitacora_auditoria
+     * @param verificationEmailService servicio de códigos de verificación
+     * @param configurationSystemService servicio de configuración del sistema
+     * @param emailService servicio de envío de correos
+     */
+    public AuthService(UserRepository userRepository,
+                       RoleRepository roleRepository,
+                       StatusUserRepository statusUserRepository,
+                       PasswordEncoder passwordEncoder,
+                       JwtService jwtService,
+                       AuthenticationManager authenticationManager,
+                       RedisTemplate<String, String> redisTemplate,
+                       LoginRateLimiter loginRateLimiter,
+                       AuditLogAuditRepository auditLogAuditRepository,
+                       VerificationEmailService verificationEmailService,
+                       ConfigurationSystemService configurationSystemService,
+                       EmailService emailService) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.statusUserRepository = statusUserRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
+        this.redisTemplate = redisTemplate;
+        this.loginRateLimiter = loginRateLimiter;
+        this.auditLogAuditRepository = auditLogAuditRepository;
+        this.verificationEmailService = verificationEmailService;
+        this.configurationSystemService = configurationSystemService;
+        this.emailService = emailService;
+    }
 
     /**
      * Crea una cuenta nueva con rol LECTOR en estado PENDIENTE_VERIFICACION para permitir el registro

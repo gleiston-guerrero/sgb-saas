@@ -22,35 +22,32 @@ public class QueryLoansTool extends AbstractUserAwareTool {
     public QueryLoansTool(LoanRepository loanRepo) {
         this.loanRepo = loanRepo;
     }
-
-    @Override
     /**
      * Retrieves name.
      *
      * @return resulting text payload
      */
+    @Override
     public String getName() {
         return "consultar_prestamos";
     }
-
-    @Override
     /**
      * Retrieves scription.
      *
      * @return resulting text payload
      */
+    @Override
     public String getDescription() {
         return "Consulta los préstamos activos (no devueltos) de un usuario de la biblioteca. "
                 + "Devuelve títulos, ISBNs, fechas de préstamo y devolución estimada.";
     }
-
-    @Override
     /**
      * Procesa execute y devuelve el resultado calculado por el backend.
      *
      * @param args argumento recibido por la herramienta del chatbot para decidir y ejecutar la accion
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @Override
     public JsonNode execute(JsonNode args) {
         Long userId = resolveUserId(args);
         if (userId == null) {

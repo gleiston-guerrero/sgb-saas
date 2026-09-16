@@ -19,6 +19,13 @@ import java.time.OffsetDateTime;
  *       "prestamos"), el mismo valor que escriben los puntos que auditan.</li>
  *   <li>{@code detalle}: {@code detalles} tal cual.</li>
  * </ul>
+ *
+ * @param id identificador del evento
+ * @param user correo del usuario que originó el evento, null si no se identificó
+ * @param action tipo de operación (INSERT, UPDATE, DELETE, LOGIN_OK, LOGIN_FAIL, LOGOUT)
+ * @param dateTime fecha y hora del evento
+ * @param module tabla afectada
+ * @param detail detalle en texto del evento
  */
 public record EventAuditResponseDTO(
         Long id, @JsonProperty("usuario") String user,

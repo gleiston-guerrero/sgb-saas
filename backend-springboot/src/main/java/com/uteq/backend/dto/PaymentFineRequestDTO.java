@@ -9,6 +9,8 @@ import java.math.BigDecimal;
 /**
  * Body de POST /api/v1/multas/{id}/pago con monto parcial.
  * Si no se envía body (null), se asume pago completo (backward compatible).
+ *
+ * @param amountPaid monto del abono parcial, mayor a cero
  */
 public record PaymentFineRequestDTO(
         @NotNull(message = "El monto a pagar es obligatorio")

@@ -49,8 +49,6 @@ public class FullBackupService {
             return configRepo.save(config);
         });
     }
-
-    @Transactional
     /**
      * Actualiza update configuration con las reglas de negocio requeridas por el flujo.
      *
@@ -59,6 +57,7 @@ public class FullBackupService {
      * @param enabled valor de entrada enabled usado por la operacion para completar su regla de negocio
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @Transactional
     public ConfigurationBackup updateConfiguration(Integer frequencyTimes, Integer daysRetention, Boolean enabled) {
         if (frequencyTimes != null && (frequencyTimes < 1 || frequencyTimes > 168)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "frecuenciaHoras debe estar entre 1 y 168");
@@ -97,14 +96,13 @@ public class FullBackupService {
     public List<RegistrationBackup> listAll() {
         return registrationRepo.findAll();
     }
-
-    @Transactional
     /**
          * Elimina un registro de backup y su archivo en almacenamiento.
      *
      * @param id identificador del registro a eliminar
      * @throws ResponseStatusException si el registro no existe (404)
      */
+    @Transactional
     public void delete(Long id) {
         RegistrationBackup r = registrationRepo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Registro no encontrado"));
@@ -148,7 +146,6 @@ public class FullBackupService {
     }
 
     // ── Registro de ejecución (llamado desde el microservicio Node.js via token interno) ──
-    @Transactional
     /**
      * Registra register start validando los datos de entrada antes de persistir cambios.
      *
@@ -156,6 +153,7 @@ public class FullBackupService {
      * @param executedBy valor de entrada executedBy usado por la operacion para completar su regla de negocio
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @Transactional
     public RegistrationBackup registerStart(String type, Long executedBy) {
         RegistrationBackup r = RegistrationBackup.builder()
                 .type(type)
@@ -164,8 +162,6 @@ public class FullBackupService {
                 .build();
         return registrationRepo.save(r);
     }
-
-    @Transactional
     /**
      * Registra register result validando los datos de entrada antes de persistir cambios.
      *
@@ -177,6 +173,7 @@ public class FullBackupService {
      * @param messageError valor de entrada messageError usado por la operacion para completar su regla de negocio
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @Transactional
     public RegistrationBackup registerResult(Long id, String status, String nameFile,
                                                Long sizeBytes, String pathR2, String messageError) {
         RegistrationBackup r = registrationRepo.findById(id)

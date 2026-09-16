@@ -33,6 +33,14 @@ public class BackupScheduleService {
 
     private final Map<Long, ScheduledFuture<?>> schedulesActives = new HashMap<>();
 
+    /**
+     * Constructor con repositorios, programador y servicio de respaldos.
+     *
+     * @param progRepo repositorio de programaciones
+     * @param userRepo repositorio de usuarios
+     * @param taskScheduler programador de tareas de Spring
+     * @param backupService servicio de generación de respaldos
+     */
     public BackupScheduleService(BackupScheduleRepository progRepo,
                                       UserRepository userRepo,
                                       TaskScheduler taskScheduler,

@@ -27,25 +27,24 @@ public class FullBackupController {
     }
 
     // ── Configuración DR ──────────────────────────────────────────────────────
-    @GetMapping("/config")
-    @PreAuthorize("hasRole('ADMIN')")
     /**
      * Retrieves fig.
      *
-     * @return response entity<configuracion respaldo> with the resulting state after the operation
+     * @return response entity{@code <configuracion respaldo>} with the resulting state after the operation
      */
+    @GetMapping("/config")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ConfigurationBackup> getConfig() {
         return ResponseEntity.ok(service.getConfiguration());
     }
-
-    @PutMapping("/config")
-    @PreAuthorize("hasRole('ADMIN')")
     /**
      * Actualiza update config con las reglas de negocio requeridas por el flujo.
      *
      * @param req datos validados de la peticion con la informacion necesaria para ejecutar la operacion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PutMapping("/config")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ConfigurationBackup> updateConfig(@RequestBody ConfigRequestDTO req) {
         return ResponseEntity.ok(service.updateConfiguration(req.frequencyTimes, req.daysRetention, req.enabled));
     }
@@ -66,28 +65,26 @@ public class FullBackupController {
                 : service.listAll();
         return ResponseEntity.ok(lista);
     }
-
-    @DeleteMapping("/registros/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     /**
      * Elimina o anula delete registration despues de validar que la operacion sea permitida.
      *
      * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @DeleteMapping("/registros/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteRegistration(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
-
-    @GetMapping("/registros/{id}/download")
-    @PreAuthorize("hasRole('ADMIN')")
     /**
      * Genera o entrega download registration a partir de los datos actuales del sistema.
      *
      * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @GetMapping("/registros/{id}/download")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<byte[]> downloadRegistration(@PathVariable Long id) {
         byte[] content = service.download(id);
         return ResponseEntity.ok()
@@ -98,20 +95,17 @@ public class FullBackupController {
     }
 
     // ── Registro de ejecución (llamado desde el microservicio Node.js vía token interno) ──
-    @PostMapping("/registros")
-    @PreAuthorize("hasRole('ADMIN')")
     /**
      * Registra register start validando los datos de entrada antes de persistir cambios.
      *
      * @param req datos validados de la peticion con la informacion necesaria para ejecutar la operacion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PostMapping("/registros")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RegistrationBackup> registerStart(@RequestBody RegistrationStartDTO req) {
         return ResponseEntity.ok(service.registerStart(req.type, req.executedBy));
     }
-
-    @PutMapping("/registros/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     /**
      * Registra register result validando los datos de entrada antes de persistir cambios.
      *
@@ -119,6 +113,8 @@ public class FullBackupController {
      * @param req datos validados de la peticion con la informacion necesaria para ejecutar la operacion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PutMapping("/registros/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RegistrationBackup> registerResult(
             @PathVariable Long id, @RequestBody RegistrationResultDTO req) {
         return ResponseEntity.ok(service.registerResult(

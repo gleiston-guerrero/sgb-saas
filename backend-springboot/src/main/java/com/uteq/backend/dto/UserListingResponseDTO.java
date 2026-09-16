@@ -12,6 +12,14 @@ import java.util.List;
  * {@code UserDetailsServiceImpl} para bloquear el login (ver
  * {@code GlobalExceptionHandler#handleLocked}), así que no hace falta
  * duplicar esa lógica con un JOIN nuevo.
+ *
+ * @param id identificador del usuario
+ * @param name nombre del usuario
+ * @param lastName apellido del usuario
+ * @param email correo del usuario
+ * @param roles nombres de los roles asignados
+ * @param status nombre del estado de la cuenta
+ * @param finesPendientes si está bloqueado por multas pendientes
  */
 public record UserListingResponseDTO(
         Long id, @JsonProperty("nombre") String name, @JsonProperty("apellido") String lastName, @JsonProperty("correo") String email,

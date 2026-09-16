@@ -9,6 +9,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * Similar a UsuarioPrestamosGestionDTO pero enfocado en reservaciones:
  * - cantidadReservasActivas: count de reservas en estado PENDIENTE o LISTA_PARA_RETIRO
  * - limiteReservas: configuracion_sistema ('limite_reservas_por_usuario')
+ *
+ * @param id identificador del usuario
+ * @param nameFull nombre completo del usuario
+ * @param email correo del usuario
+ * @param statusAccount nombre del estado de la cuenta
+ * @param quantityReservationsActives cantidad de reservas activas
+ * @param limitReservations límite de reservas por usuario
  */
 public record UserReservationsManagementDTO(
         Long id, @JsonProperty("nombreCompleto") String nameFull, @JsonProperty("correo") String email, @JsonProperty("estadoCuenta") String statusAccount, @JsonProperty("cantidadReservasActivas") long quantityReservationsActives, @JsonProperty("limiteReservas") int limitReservations

@@ -33,12 +33,11 @@ public class ConfigurationSystemService {
         this.repo = repo;
         this.auditLogAuditRepo = auditLogAuditRepo;
     }
-
-    @Transactional(readOnly = true)
     /**
          * Busca/lista recursos.
      * @return lista o pagina de resultados
      */
+    @Transactional(readOnly = true)
     public List<ConfigurationSystemResponseDTO> list() {
         return repo.findAll().stream()
                 .map(c -> new ConfigurationSystemResponseDTO(c.getKey(), c.getValue()))
@@ -74,14 +73,13 @@ public class ConfigurationSystemService {
                 .build();
         auditLogAuditRepo.save(event);
     }
-
-    @Transactional(readOnly = true)
     /**
      * Consulta get value usando los filtros recibidos y devuelve el resultado solicitado.
      *
      * @param key clave o valor de configuracion que se valida antes de guardarse
      * @return texto generado o recuperado por la operacion
      */
+    @Transactional(readOnly = true)
     public String getValue(String key) {
         String cacheado = cache.get(key);
         if (cacheado != null) {

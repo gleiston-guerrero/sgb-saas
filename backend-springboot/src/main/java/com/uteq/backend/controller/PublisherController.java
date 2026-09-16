@@ -24,42 +24,39 @@ public class PublisherController {
     public PublisherController(PublisherRepository publisherRepository) {
         this.publisherRepository = publisherRepository;
     }
-
-    @GetMapping
     /**
      * Lists publisher.
      *
-     * @return response entity<list<editorial response dto>> with the resulting state after the operation
+     * @return response entity{@code <list<editorial response dto>>} with the resulting state after the operation
      */
+    @GetMapping
     public ResponseEntity<List<PublisherResponseDTO>> list() {
         List<PublisherResponseDTO> publishers = publisherRepository.findAll().stream()
                 .map(e -> new PublisherResponseDTO(e.getId(), e.getName()))
                 .toList();
         return ResponseEntity.ok(publishers);
     }
-
-    @GetMapping("/buscar")
     /**
      * Consulta search usando los filtros recibidos y devuelve el resultado solicitado.
      *
      * @param q texto de busqueda o filtro usado para reducir los resultados devueltos
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @GetMapping("/buscar")
     public ResponseEntity<List<PublisherResponseDTO>> search(@RequestParam String q) {
         return ResponseEntity.ok(
                 publisherRepository.findTop5ByNameContainingIgnoreCase(q).stream()
                         .map(e -> new PublisherResponseDTO(e.getId(), e.getName()))
                         .toList());
     }
-
-    @PostMapping
-    @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
     /**
      * Registra create validando los datos de entrada antes de persistir cambios.
      *
      * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PostMapping
+    @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
     public ResponseEntity<PublisherResponseDTO> create(@Valid @RequestBody PublisherRequestDTO dto) {
         if (publisherRepository.existsByNameIgnoreCase(dto.name())) {
             return ResponseEntity.unprocessableEntity().build();

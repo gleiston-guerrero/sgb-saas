@@ -76,8 +76,6 @@ public class ChatbotOrchestrator {
         this.toolRegistry = toolRegistry;
         this.chatbotRateLimiter = chatbotRateLimiter;
     }
-
-    @Transactional
     /**
      * Envia send message usando los datos y destinatarios recibidos.
      *
@@ -85,6 +83,7 @@ public class ChatbotOrchestrator {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @Transactional
     public MessageChatResponseDTO sendMessage(MessageChatRequestDTO dto, Authentication authentication) {
         Long userId = resolveIdByEmail(authentication.getName());
 
@@ -127,8 +126,6 @@ public class ChatbotOrchestrator {
 
         return new MessageChatResponseDTO(session.getId(), responseFinal, msgAsistente.getCreated());
     }
-
-    @Transactional(readOnly = true)
     /**
      * Consulta get history usando los filtros recibidos y devuelve el resultado solicitado.
      *
@@ -136,6 +133,7 @@ public class ChatbotOrchestrator {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return lista de resultados que coincide con la consulta solicitada
      */
+    @Transactional(readOnly = true)
     public List<MessageChatHistoryDTO> getHistory(UUID sessionId, Authentication authentication) {
         Long userId = resolveIdByEmail(authentication.getName());
         SessionChat session = validateSessionOwnership(sessionId, userId);

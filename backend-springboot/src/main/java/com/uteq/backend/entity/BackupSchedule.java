@@ -6,14 +6,22 @@ import lombok.*;
 import java.time.OffsetDateTime;
 import java.util.Set;
 
+/**
+ * Programación de respaldos automáticos (tabla backup_programacion).
+ */
 @Entity
 @Table(name = "backup_programacion")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class BackupSchedule {
+
+    /**
+     * Constructor sin argumentos para JPA y Jackson.
+     */
+    public BackupSchedule() {
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

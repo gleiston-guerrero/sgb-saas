@@ -22,18 +22,15 @@ public class ConfigurationSystemController {
     public ConfigurationSystemController(ConfigurationSystemService service) {
         this.service = service;
     }
-
-    @GetMapping
     /**
      * Lists configuration sistema.
      *
-     * @return response entity<list<configuracion sistema response dto>> with the resulting state after the operation
+     * @return response entity{@code <list<configuracion sistema response dto>>} with the resulting state after the operation
      */
+    @GetMapping
     public ResponseEntity<List<ConfigurationSystemResponseDTO>> list() {
         return ResponseEntity.ok(service.list());
     }
-
-    @PutMapping("/{clave}")
     /**
      * Actualiza update con las reglas de negocio requeridas por el flujo.
      *
@@ -41,6 +38,7 @@ public class ConfigurationSystemController {
      * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PutMapping("/{clave}")
     public ResponseEntity<ConfigurationSystemResponseDTO> update(
             @PathVariable("clave") String key,
             @Valid @RequestBody ConfigurationSystemRequestDTO dto) {

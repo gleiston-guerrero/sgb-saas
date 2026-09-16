@@ -35,12 +35,12 @@ public class TypeDamage {
     private Boolean active = true;
 
     // Compatibilidad para tests viejos que usan precio
-    @Transient
     /**
      * Retrieves precio.
      *
      * @return big decimal with the resulting state after the operation
      */
+    @Transient
     public BigDecimal getPrice() { return this.value; }
     /**
          * setPrice.

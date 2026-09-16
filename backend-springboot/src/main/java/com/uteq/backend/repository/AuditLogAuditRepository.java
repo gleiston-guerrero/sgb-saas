@@ -54,6 +54,12 @@ public interface AuditLogAuditRepository extends JpaRepository<AuditLogAudit, Lo
     // JPQL/HQL, pero SUM(CASE WHEN ... THEN 1L ELSE 0L END) es una
     // agregacion condicional estandar y produce el mismo resultado sin SQL
     // especifico de un motor.
+    /**
+     * Resume eventos por categoría con totales y actividad de hoy.
+     *
+     * @param fromToday inicio del día actual para el conteo de hoy
+     * @return filas [tablaAfectada, total, hoy, último evento]
+     */
     @Query("SELECT b.tableAfectada, "
             + "COUNT(b), "
             + "SUM(CASE WHEN b.dateTime >= :fromToday THEN 1L ELSE 0L END), "
@@ -65,6 +71,12 @@ public interface AuditLogAuditRepository extends JpaRepository<AuditLogAudit, Lo
 
     // Login fallidos en las últimas 24h (para decidir "Revisar" en sesiones).
     // Migrada de nativeQuery a JPQL (P4): sin sintaxis especifica de motor.
+    /**
+     * Cuenta los logins fallidos desde la fecha dada.
+     *
+     * @param from inicio del rango a contar
+     * @return cantidad de LOGIN_FAIL desde esa fecha
+     */
     @Query("SELECT COUNT(b) FROM AuditLogAudit b "
             + "WHERE b.tableAfectada = 'sesiones' "
             + "AND b.typeOperacion = 'LOGIN_FAIL' "

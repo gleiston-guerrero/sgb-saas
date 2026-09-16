@@ -51,42 +51,40 @@ public class SupplierController {
     }
 
     // Compatibilidad: lista completa para casos antiguos (no usar con 50k)
-    @GetMapping("/todo")
-    @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
     /**
      * Lists todo.
      *
-     * @return response entity<list<proveedor response dto>> with the resulting state after the operation
+     * @return response entity{@code <list<proveedor response dto>>} with the resulting state after the operation
      */
+    @GetMapping("/todo")
+    @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
     public ResponseEntity<List<SupplierResponseDTO>> listAll() {
         List<SupplierResponseDTO> suppliers = supplierRepository.findAll().stream()
                 .map(this::toDTO).toList();
         return ResponseEntity.ok(suppliers);
     }
-
-    @GetMapping("/buscar")
-    @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
     /**
      * Consulta search usando los filtros recibidos y devuelve el resultado solicitado.
      *
      * @param q texto de busqueda o filtro usado para reducir los resultados devueltos
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @GetMapping("/buscar")
+    @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
     public ResponseEntity<List<SupplierResponseDTO>> search(@RequestParam String q) {
         return ResponseEntity.ok(
                 supplierRepository.findTop5ByNameContainingIgnoreCase(q).stream()
                         .map(this::toDTO)
                         .toList());
     }
-
-    @PostMapping
-    @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
     /**
      * Registra create validando los datos de entrada antes de persistir cambios.
      *
      * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PostMapping
+    @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
     public ResponseEntity<SupplierResponseDTO> create(@Valid @RequestBody SupplierRequestDTO dto) {
         if (supplierRepository.existsByNameIgnoreCase(dto.name())) {
             return ResponseEntity.unprocessableEntity().build();
@@ -106,9 +104,6 @@ public class SupplierController {
         return ResponseEntity.created(URI.create("/api/v1/proveedores/" + guardado.getId()))
                 .body(toDTO(guardado));
     }
-
-    @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
     /**
      * Actualiza update con las reglas de negocio requeridas por el flujo.
      *
@@ -116,6 +111,8 @@ public class SupplierController {
      * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
     public ResponseEntity<SupplierResponseDTO> update(@PathVariable Integer id,
                                                            @Valid @RequestBody SupplierRequestDTO dto) {
         return supplierRepository.findById(id)

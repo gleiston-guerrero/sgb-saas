@@ -32,13 +32,18 @@ public class AuditService {
     private final AuditLogAuditRepository auditLogAuditRepo;
     private final UserRepository userRepo;
 
+    /**
+     * Constructor con los repositorios de auditoría y usuarios.
+     *
+     * @param auditLogAuditRepo repositorio de bitacora_auditoria
+     * @param userRepo repositorio para resolver correos por id
+     */
     public AuditService(AuditLogAuditRepository auditLogAuditRepo,
                              UserRepository userRepo) {
         this.auditLogAuditRepo = auditLogAuditRepo;
         this.userRepo = userRepo;
     }
 
-    @Transactional(readOnly = true)
     /**
      * Consulta list usando los filtros recibidos y devuelve el resultado solicitado.
      *
@@ -49,6 +54,7 @@ public class AuditService {
      * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
      * @return pagina de resultados que coincide con los filtros y la paginacion solicitada
      */
+    @Transactional(readOnly = true)
     public Page<EventAuditResponseDTO> list(Long userId, String module,
                                                      OffsetDateTime from, OffsetDateTime until,
                                                      Pageable pageable) {

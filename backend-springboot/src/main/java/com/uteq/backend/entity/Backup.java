@@ -6,14 +6,22 @@ import java.time.OffsetDateTime;
 import java.util.Set;
 import lombok.*;
 
+/**
+ * Respaldo de la base de datos (tabla backups).
+ */
 @Entity
 @Table(name = "backups")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Backup {
+
+    /**
+     * Constructor sin argumentos para JPA y Jackson.
+     */
+    public Backup() {
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

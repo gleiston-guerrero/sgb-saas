@@ -5,14 +5,20 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 // Mapea la tabla "autores" (id BIGINT, por eso Long).
+/**
+ * Autor de libros (catálogo "autores").
+ */
 @Data
-@NoArgsConstructor
 @Entity
 @Table(name = "autores")
 public class Author {
+    /**
+     * Constructor sin argumentos para JPA y Jackson.
+     */
+    public Author() {
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

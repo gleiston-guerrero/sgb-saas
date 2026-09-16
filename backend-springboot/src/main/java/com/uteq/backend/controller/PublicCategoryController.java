@@ -18,13 +18,12 @@ public class PublicCategoryController {
     public PublicCategoryController(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
-
-    @GetMapping
     /**
      * Lists publico category.
      *
-     * @return response entity<list<categoria response dto>> with the resulting state after the operation
+     * @return response entity{@code <list<categoria response dto>>} with the resulting state after the operation
      */
+    @GetMapping
     public ResponseEntity<List<CategoryResponseDTO>> list() {
         List<CategoryResponseDTO> categories = categoryRepository.findAll().stream()
                 .map(c -> new CategoryResponseDTO(c.getId(), c.getName()))

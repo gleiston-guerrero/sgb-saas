@@ -42,6 +42,14 @@ public class BookIsbnLookupService {
     private final String openLibraryUrlBase;
     private final GeminiClient geminiClient;
 
+    /**
+     * Constructor con clientes HTTP y configuración de APIs externas.
+     *
+     * @param urlBase URL base de Google Books
+     * @param timeoutMs timeout en milisegundos para las llamadas externas
+     * @param openLibraryUrlBase URL base de Open Library
+     * @param geminiClient cliente de Gemini para resúmenes, null si no está configurado
+     */
     public BookIsbnLookupService(
             @Value("${app.google-books.url-base}") String urlBase,
             @Value("${app.google-books.timeout-ms}") long timeoutMs,

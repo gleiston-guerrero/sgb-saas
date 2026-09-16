@@ -108,9 +108,6 @@ public class FineController {
 
         return ResponseEntity.ok(result);
     }
-
-    @PostMapping("/{id}/anulacion")
-    @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
     /**
      * Elimina o anula annul despues de validar que la operacion sea permitida.
      *
@@ -119,6 +116,8 @@ public class FineController {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PostMapping("/{id}/anulacion")
+    @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
     public ResponseEntity<FineActionResponseDTO> annul(
             @PathVariable Long id,
             @Valid @RequestBody CancellationFineRequestDTO dto,

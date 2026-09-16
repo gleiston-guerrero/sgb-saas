@@ -6,6 +6,9 @@ import jakarta.validation.constraints.Size;
 
 /**
  * Body de {@code PATCH /api/v1/admin/usuarios/{id}/estado}. El motivo es obligatorio para dejar rastro auditable.
+ *
+ * @param freshStatus nuevo estado (nombre del catálogo estados_usuario)
+ * @param reason motivo del cambio, se persiste en usuario_motivos_cambio
  */
 public record ChangeStatusUserRequestDTO(
         @NotBlank(message = "El nuevo estado es obligatorio") @JsonProperty("nuevoEstado") String freshStatus,

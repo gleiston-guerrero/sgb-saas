@@ -28,9 +28,6 @@ public class LoanReturnController {
         this.loanReturnService = loanReturnService;
         this.userRepo = userRepo;
     }
-
-    @PostMapping("/prestamo/{prestamoId}")
-    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     /**
      * Registra register loan return validando los datos de entrada antes de persistir cambios.
      *
@@ -39,6 +36,8 @@ public class LoanReturnController {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PostMapping("/prestamo/{prestamoId}")
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     public ResponseEntity<LoanReturnFullResponseDTO> registerLoanReturn(
             @PathVariable("prestamoId") Long loanId,
             @Valid @RequestBody LoanReturnRequestDTO dto,
@@ -47,15 +46,14 @@ public class LoanReturnController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(loanReturnService.registerLoanReturn(loanId, dto, librarianId));
     }
-
-    @GetMapping("/historial")
-    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     /**
      * Procesa history loan returns y devuelve el resultado calculado por el backend.
      *
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @GetMapping("/historial")
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     public ResponseEntity<List<LoanReturnHistoryDTO>> historyLoanReturns(
             Authentication authentication) {
         Long librarianId = resolveIdByEmail(authentication.getName());

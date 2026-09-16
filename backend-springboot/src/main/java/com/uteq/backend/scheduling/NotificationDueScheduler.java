@@ -46,11 +46,10 @@ public class NotificationDueScheduler {
         this.notificationService = notificationService;
         this.configurationSystemService = configurationSystemService;
     }
-
-    @Scheduled(fixedRate = 60 * 1000, initialDelay = 60 * 1000)
     /**
      * Notifies notification Vencimiento Scheduler.
      */
+    @Scheduled(fixedRate = 60 * 1000, initialDelay = 60 * 1000)
     public void notifyNextToExpire() {
         final int daysAnticipacion;
         try {

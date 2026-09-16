@@ -22,6 +22,8 @@ public interface ChatbotTool {
     /**
      * JSON Schema del input de la tool. Ejemplo:
      * {@code { "type": "object", "properties": { "query": { "type": "string" } }, "required": ["query"] }}
+     *
+     * @return schema de entrada como nodo JSON
      */
     JsonNode getInputSchema();
 

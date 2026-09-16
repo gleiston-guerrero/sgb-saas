@@ -26,26 +26,22 @@ public class TypeDamageService {
                 t.getCategory() != null ? t.getCategory().getName() : null,
                 t.getTypeCost(), t.getValue());
     }
-
-    @Transactional(readOnly = true)
     /**
          * Lista todos los backups registrados.
      * @return lista de backups ordenados por fecha descendente
      */
+    @Transactional(readOnly = true)
     public List<TypeDamageDTO> listAll() {
         return typeDamageRepo.findAll().stream().map(this::toDTO).toList();
     }
-
-    @Transactional(readOnly = true)
     /**
          * Lista programaciones de backup activas.
      * @return lista de programaciones activas
      */
+    @Transactional(readOnly = true)
     public List<TypeDamageDTO> listActives() {
         return typeDamageRepo.findByActiveTrue().stream().map(this::toDTO).toList();
     }
-
-    @Transactional
     /**
      * Registra create validando los datos de entrada antes de persistir cambios.
      *
@@ -55,6 +51,7 @@ public class TypeDamageService {
      * @param value clave o valor de configuracion que se valida antes de guardarse
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @Transactional
     public TypeDamageDTO create(String name, Integer categoryId, String typeCost, BigDecimal value) {
         if (typeDamageRepo.findByName(name).isPresent()) {
             throw new IllegalArgumentException("Ya existe un tipo de daño con el nombre: " + name);
@@ -71,8 +68,6 @@ public class TypeDamageService {
         TypeDamage guardado = typeDamageRepo.save(type);
         return toDTO(guardado);
     }
-
-    @Transactional
     /**
      * Actualiza update con las reglas de negocio requeridas por el flujo.
      *
@@ -83,6 +78,7 @@ public class TypeDamageService {
      * @param value clave o valor de configuracion que se valida antes de guardarse
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @Transactional
     public TypeDamageDTO update(Integer id, String name, Integer categoryId, String typeCost, BigDecimal value) {
         TypeDamage type = typeDamageRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tipo de daño no encontrado: " + id));
@@ -108,13 +104,12 @@ public class TypeDamageService {
         if ("PORCENTAJE".equals(typeCost) && value.compareTo(BigDecimal.valueOf(100)) > 0)
             throw new IllegalArgumentException("porcentaje no puede superar 100");
     }
-
-    @Transactional
     /**
      * Elimina o anula delete despues de validar que la operacion sea permitida.
      *
      * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
      */
+    @Transactional
     public void delete(Integer id) {
         TypeDamage type = typeDamageRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tipo de daño no encontrado: " + id));

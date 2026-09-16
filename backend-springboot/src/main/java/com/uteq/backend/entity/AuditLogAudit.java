@@ -10,7 +10,6 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.OffsetDateTime;
 
@@ -24,11 +23,16 @@ import java.time.OffsetDateTime;
  */
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "bitacora_auditoria")
 public class AuditLogAudit {
+
+    /**
+     * Constructor sin argumentos para JPA y Jackson.
+     */
+    public AuditLogAudit() {
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

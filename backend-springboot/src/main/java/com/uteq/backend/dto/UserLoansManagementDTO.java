@@ -19,6 +19,16 @@ import java.util.List;
  *                        no es columna)
  * diasPrestamoSugerido viene de configuracion_sistema
  * ('dias_prestamo_default') para prellenar el formulario.
+ *
+ * @param id identificador del usuario
+ * @param nameFull nombre completo del usuario
+ * @param cedula identificación del usuario
+ * @param email correo del usuario
+ * @param typesUser nombres de los roles del usuario
+ * @param statusAccount nombre del estado de la cuenta
+ * @param amountFinesPendientes suma de multas en estado PENDIENTE
+ * @param quantityFinesPendientes cantidad de multas en estado PENDIENTE
+ * @param daysLoanSuggested días de préstamo sugeridos por configuración
  */
 public record UserLoansManagementDTO(
         // id serializa con su nombre: el frontend lo usa para historial,

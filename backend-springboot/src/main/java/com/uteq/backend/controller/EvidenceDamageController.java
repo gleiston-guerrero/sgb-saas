@@ -44,28 +44,26 @@ public class EvidenceDamageController {
         Long librarianId = resolveIdByEmail(authentication.getName());
         return ResponseEntity.ok(loanReturnService.uploadEvidence(registrationDamageId, file, librarianId));
     }
-
-    @GetMapping("/evidencia/{registroDanoId}")
-    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     /**
      * Consulta list evidences usando los filtros recibidos y devuelve el resultado solicitado.
      *
      * @param registrationDamageId identificador del registro que se usa para ubicar el recurso en la base de datos
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @GetMapping("/evidencia/{registroDanoId}")
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     public ResponseEntity<List<EvidenceDamageResponseDTO>> listEvidences(
             @PathVariable("registroDanoId") Long registrationDamageId) {
         return ResponseEntity.ok(loanReturnService.listEvidences(registrationDamageId));
     }
-
-    @GetMapping("/evidencia/{id}/archivo")
-    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     /**
      * Consulta get file usando los filtros recibidos y devuelve el resultado solicitado.
      *
      * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @GetMapping("/evidencia/{id}/archivo")
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     public ResponseEntity<byte[]> getFile(@PathVariable Long id) {
         var evidence = loanReturnService.getFileBinary(id);
         return ResponseEntity.ok()

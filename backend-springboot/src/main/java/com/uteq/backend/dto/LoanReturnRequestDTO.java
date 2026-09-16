@@ -10,6 +10,10 @@ import java.util.List;
 /**
  * Body de POST /api/v1/prestamos/{id}/devolucion.
  * Contiene el estado de la devolución y opcionalmente los daños registrados.
+ *
+ * @param statusLoanReturn estado de la devolución
+ * @param description descripción del estado del material
+ * @param damages daños registrados en la devolución
  */
 public record LoanReturnRequestDTO(
 

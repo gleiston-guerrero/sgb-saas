@@ -28,12 +28,12 @@ public class UserScheduler {
     public UserScheduler(UserRepository userRepo) {
         this.userRepo = userRepo;
     }
-
-    @Scheduled(fixedRate = 60 * 60 * 1000, initialDelay = 60 * 1000) // cada 1 hora
-    @Transactional
     /**
      * Deletes no verificados overdue loans.
      */
+    // cada 1 hora, con 1 minuto de retardo inicial
+    @Scheduled(fixedRate = 60 * 60 * 1000, initialDelay = 60 * 1000)
+    @Transactional
     public void deleteNotVerifiedsOverdues() {
         Instant cutoff = Instant.now().minus(HORAS_EXPIRACION, ChronoUnit.HOURS);
         int eliminados = userRepo.deleteNotVerifiedsBefore(cutoff);

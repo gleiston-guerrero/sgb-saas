@@ -12,6 +12,9 @@ import java.util.UUID;
  * autenticado; si viene poblado, debe ser una sesión del propio usuario
  * (si no, SesionChatNoEncontradaException). {@code texto} es el mensaje del
  * lector hacia el asistente.
+ *
+ * @param sessionId identificador de la sesión, null para crear una nueva
+ * @param text mensaje del lector hacia el asistente
  */
 public record MessageChatRequestDTO( @JsonProperty("sesionId") UUID sessionId,
 

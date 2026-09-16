@@ -60,6 +60,14 @@ public class BackupService {
     @Value("${app.backup.r2.bucket:}")
     private String bucket;
 
+    /**
+     * Constructor con repositorios, JDBC y almacenamiento.
+     *
+     * @param backupRepository repositorio de respaldos
+     * @param userRepository repositorio de usuarios
+     * @param jdbcTemplate plantilla JDBC para volcados
+     * @param storageService servicio de almacenamiento R2
+     */
     public BackupService(BackupRepository backupRepository, UserRepository userRepository, JdbcTemplate jdbcTemplate, BackupStorageService storageService) {
         this.backupRepository = backupRepository;
         this.userRepository = userRepository;
@@ -79,12 +87,10 @@ public class BackupService {
         // registros hasta "ahora", que es el comportamiento correcto.
     }
 
-    private void validateTables(Set<String> tables) {
-        if (tables == null || tables.isEmpty()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe seleccionar al menos una tabla");
+    private void validateTables(Set<String> tables) {        if (tables == null || tables.isEmpty()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe seleccionar al menos una tabla");
         for (String t : tables) if (!TABLAS_PERMITIDAS.contains(t)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tabla no permitida: " + t);
     }
 
-    @Transactional
     /**
      * Genera o entrega generate backup a partir de los datos actuales del sistema.
      *
@@ -95,6 +101,7 @@ public class BackupService {
      * @param type criterio de clasificacion usado para seleccionar la variante o filtro requerido
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @Transactional
     public Backup generateBackup(OffsetDateTime from, OffsetDateTime until, Set<String> tables, String format, String type) {
         validateRange(from, until);
         validateTables(tables);
@@ -229,15 +236,13 @@ public class BackupService {
         }
         return text;
     }
-
-    @Transactional
     /**
      * Elimina o anula delete despues de validar que la operacion sea permitida.
      *
      * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
      */
-    public void delete(Long id) {
-        Backup b = getById(id);
+    @Transactional
+    public void delete(Long id) {        Backup b = getById(id);
           try { storageService.delete(b.getPath()); } catch (Exception ignored) {
               // best-effort: el registro se elimina aunque falle el storage
           }

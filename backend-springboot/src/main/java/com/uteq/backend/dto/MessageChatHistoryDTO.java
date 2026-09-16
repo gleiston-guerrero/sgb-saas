@@ -9,7 +9,11 @@ import java.time.OffsetDateTime;
  * historial necesita exponer QUIÉN escribió cada mensaje (rol USUARIO /
  * ASISTENTE) para que el frontend renderice la burbuja del lado correcto,
  * y {@code MensajeChatResponseDTO} no lleva ese campo -- reutilizarlo
- * perdería información de presentación que es esencial acá.
+ *  perdería información de presentación que es esencial acá.
+ *
+ * @param role rol del autor (USUARIO o ASISTENTE)
+ * @param content contenido del mensaje
+ * @param created fecha de creación
  */
 public record MessageChatHistoryDTO( @JsonProperty("rol") String role, @JsonProperty("contenido") String content, @JsonProperty("creadoEn") OffsetDateTime created
 ) {}

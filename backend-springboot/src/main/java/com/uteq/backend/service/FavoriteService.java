@@ -35,8 +35,6 @@ public class FavoriteService {
         this.bookRepo = bookRepo;
         this.userRepo = userRepo;
     }
-
-    @Transactional
     /**
      * Procesa agregar y devuelve el resultado calculado por el backend.
      *
@@ -44,6 +42,7 @@ public class FavoriteService {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @Transactional
     public FavoriteResponseDTO add(Long bookId, Authentication authentication) {
         Long userId = resolveIdByEmail(authentication.getName());
         Book book = bookRepo.findById(bookId)
@@ -61,14 +60,13 @@ public class FavoriteService {
         Favorite favorite = favoriteRepo.save(new Favorite(userId, bookId));
         return toDTO(favorite, book.getTitle());
     }
-
-    @Transactional
     /**
      * Ejecuta quitar aplicando las validaciones necesarias del proceso.
      *
      * @param bookId identificador del registro que se usa para ubicar el recurso en la base de datos
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      */
+    @Transactional
     public void remove(Long bookId, Authentication authentication) {
         Long userId = resolveIdByEmail(authentication.getName());
         if (!favoriteRepo.existsByUserIdAndBookId(userId, bookId)) {
@@ -76,22 +74,19 @@ public class FavoriteService {
         }
         favoriteRepo.deleteByUserIdAndBookId(userId, bookId);
     }
-
-    @Transactional(readOnly = true)
     /**
      * Consulta list owns usando los filtros recibidos y devuelve el resultado solicitado.
      *
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return lista de resultados que coincide con la consulta solicitada
      */
+    @Transactional(readOnly = true)
     public List<FavoriteResponseDTO> listOwns(Authentication authentication) {
         Long userId = resolveIdByEmail(authentication.getName());
         return favoriteRepo.findByUserId(userId).stream()
                 .map(f -> toDTO(f, title(f.getBookId())))
                 .toList();
     }
-
-    @Transactional(readOnly = true)
     /**
      * Consulta list owns paginado usando los filtros recibidos y devuelve el resultado solicitado.
      *
@@ -99,6 +94,7 @@ public class FavoriteService {
      * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
      * @return pagina de resultados que coincide con los filtros y la paginacion solicitada
      */
+    @Transactional(readOnly = true)
     public Page<FavoriteResponseDTO> listOwnsPaginated(Authentication authentication, Pageable pageable) {
         Long userId = resolveIdByEmail(authentication.getName());
         return favoriteRepo.findByUserId(userId, pageable)

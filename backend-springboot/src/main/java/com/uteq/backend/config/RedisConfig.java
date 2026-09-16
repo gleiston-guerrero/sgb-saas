@@ -54,13 +54,12 @@ public class RedisConfig {
                 .transactionAware()
                 .build();
     }
-
-    @Bean
     /**
      * Handles cache error handler.
      *
      * @return cache error handler with the resulting state after the operation
      */
+    @Bean
     public CacheErrorHandler cacheErrorHandler() {
         return new CacheErrorHandler() {
             private final Logger log = LoggerFactory.getLogger(CacheErrorHandler.class);
@@ -110,14 +109,13 @@ public class RedisConfig {
             }
         };
     }
-
-    @Bean
     /**
      * Procesa redis template y devuelve el resultado calculado por el backend.
      *
      * @param connectionFactory valor de entrada connectionFactory usado por la operacion para completar su regla de negocio
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @Bean
     public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, String> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
