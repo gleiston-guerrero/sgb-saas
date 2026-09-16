@@ -73,7 +73,10 @@ public interface LoanProcedureRepository extends Repository<Loan, Long>, LoanPro
      * herramientas. Se usa en su lugar una @Query nativa (patrón estándar
      * de Spring Data para funciones PostgreSQL que retornan tabla).
      */
-    @Query(value = "SELECT * FROM fn_listar_prestamos_activos_por_usuario(:p_user_id)", nativeQuery = true)
+    @Query(value = "SELECT prestamo_id AS loanId, libro_titulo AS bookTitle, libro_isbn AS bookIsbn, "
+            + "fecha_prestamo AS dateLoan, fecha_devolucion_estimada AS dateLoanReturnEstimada, "
+            + "dias_restantes AS daysRemaining, estado_nombre AS statusName "
+            + "FROM fn_listar_prestamos_activos_por_usuario(:p_user_id)", nativeQuery = true)
     List<LoanActiveProjection> fnListLoansActivesByUser(@Param("p_user_id") Long userId);
 
     /**
