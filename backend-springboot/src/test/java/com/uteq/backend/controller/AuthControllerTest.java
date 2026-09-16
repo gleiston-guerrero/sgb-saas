@@ -308,4 +308,26 @@ class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1));
     }
+
+    // Dev local http://: con cookie-secure=false la cookie sale sin Secure
+    // y con SameSite=Lax (None exige Secure). Llamada directa al controller
+    // con mocks propios para no depender del contexto web.
+    @Test
+    void login_conCookieSecureFalse_emiteLaxSinSecure() {
+        AuthController controller = new AuthController(authService, jwtService);
+        org.springframework.test.util.ReflectionTestUtils.setField(controller, "cookieSecure", false);
+        jakarta.servlet.http.HttpServletRequest request =
+                org.mockito.Mockito.mock(jakarta.servlet.http.HttpServletRequest.class);
+        org.mockito.Mockito.when(request.getRemoteAddr()).thenReturn("127.0.0.1");
+        when(authService.login(any(), anyString()))
+                .thenReturn(new TokenResponseDTO("access-token-x", "refresh-token-y", 3600));
+        when(jwtService.getRefreshExpirationMs()).thenReturn(604_800_000L);
+
+        var response = controller.login(new LoginRequestDTO("valido@correo.com", "password123"), request);
+        String setCookie = response.getHeaders().getFirst("Set-Cookie");
+
+        org.assertj.core.api.Assertions.assertThat(setCookie).contains("SameSite=Lax");
+        org.assertj.core.api.Assertions.assertThat(setCookie).doesNotContain("Secure");
+        org.assertj.core.api.Assertions.assertThat(setCookie).contains("HttpOnly");
+    }
 }

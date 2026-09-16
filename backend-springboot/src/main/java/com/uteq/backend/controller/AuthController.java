@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,6 +37,15 @@ public class AuthController {
 
     private final AuthService authService;
     private final JwtService jwtService;
+
+    // Secure de la cookie refreshToken (app.auth.cookie-secure, default
+    // true). En dev local http:// sin TLS la cookie con Secure=true es
+    // descartada por el navegador: el login devuelve 200 pero sin cookie
+    // y el siguiente refresh falla con 400 "Falta la cookie refreshToken".
+    // Con AUTH_COOKIE_SECURE=false se emite sin Secure y con SameSite=Lax
+    // (SameSite=None exige Secure por especificacion).
+    @Value("${app.auth.cookie-secure:true}")
+    private boolean cookieSecure;
 
     @PostMapping("/registro")
     /**
@@ -178,8 +188,8 @@ public class AuthController {
     private ResponseCookie buildRefreshCookie(String value, long maxAgeMs) {
         return ResponseCookie.from(REFRESH_COOKIE_NAME, value)
                 .httpOnly(true)
-                .secure(true)
-                .sameSite("None")
+                .secure(cookieSecure)
+                .sameSite(cookieSecure ? "None" : "Lax")
                 .path("/api/auth")
                 .maxAge(Duration.ofMillis(maxAgeMs))
                 .build();
