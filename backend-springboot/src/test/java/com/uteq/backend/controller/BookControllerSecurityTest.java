@@ -151,7 +151,8 @@ class BookControllerSecurityTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void update_withRoleAdmin_sePermite() throws Exception {        when(bookService.update(anyLong(), any())).thenReturn(bookCreated());
+    void update_withRoleAdmin_sePermite() throws Exception {
+        when(bookService.update(anyLong(), any())).thenReturn(bookCreated());
 
         mockMvc.perform(put("/api/v1/libros/1")
                         .contentType("application/json")
