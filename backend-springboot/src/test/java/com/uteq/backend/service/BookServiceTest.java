@@ -341,4 +341,50 @@ class BookServiceTest {
         verify(bookRepo).searchByTextOIsbn(anyString(), anyInt(), any(), any(Pageable.class));
         verify(bookRepo, never()).searchByTextOrIsbnAndAuthor(anyString(), any(), anyInt(), any(Pageable.class));
     }
+
+    // 500 /api/publico/libros del 16-sep: sort=titulo (bundle viejo/manual)
+    // sin q debe llegar como title a la rama derivada
+    @Test
+    void listWithFilters_sinQConSortTitulo_derivadaRecibeTitle() {
+        given(statusRepo.findByName("ACTIVO")).willReturn(Optional.of(statusWithName("ACTIVO")));
+        given(bookRepo.findByStatusId(anyInt(), any(Pageable.class))).willReturn(Page.empty());
+
+        bookService.listWithFilters(null, null, null, null,
+                org.springframework.data.domain.PageRequest.of(0, 10,
+                        org.springframework.data.domain.Sort.by("titulo").ascending()));
+
+        verify(bookRepo).findByStatusId(anyInt(),
+                argThat((Pageable p) -> p.getSort().stream()
+                        .anyMatch(o -> o.getProperty().equals("title"))));
+    }
+
+    // Segunda entrada del mapa: fecha_registro -> dateRegistration en derivada
+    @Test
+    void listWithFilters_sinQConSortFechaRegistro_derivadaRecibeDateRegistration() {
+        given(statusRepo.findByName("ACTIVO")).willReturn(Optional.of(statusWithName("ACTIVO")));
+        given(bookRepo.findByStatusId(anyInt(), any(Pageable.class))).willReturn(Page.empty());
+
+        bookService.listWithFilters(null, null, null, null,
+                org.springframework.data.domain.PageRequest.of(0, 10,
+                        org.springframework.data.domain.Sort.by("fecha_registro").descending()));
+
+        verify(bookRepo).findByStatusId(anyInt(),
+                argThat((Pageable p) -> p.getSort().stream()
+                        .anyMatch(o -> o.getProperty().equals("dateRegistration"))));
+    }
+
+    // /pendientes es nativa: sort=title debe traducirse a columna fisica
+    @Test
+    void listPending_conSortTitle_nativaRecibeTitulo() {
+        given(bookRepo.searchByStatuses(any(), any(), any(), any(Pageable.class)))
+                .willReturn(Page.empty());
+
+        bookService.listPending(null, null, java.util.List.of(2),
+                org.springframework.data.domain.PageRequest.of(0, 10,
+                        org.springframework.data.domain.Sort.by("title").ascending()));
+
+        verify(bookRepo).searchByStatuses(any(), any(), any(),
+                argThat((Pageable p) -> p.getSort().stream()
+                        .anyMatch(o -> o.getProperty().equals("titulo"))));
+    }
 }
