@@ -100,7 +100,7 @@ class PublicBookControllerTest {
                 2L, "Sapiens", "9788499926223", "resumen", null,
                 true, "sapiens.jpg", "image/jpeg", 2011, null, null,
                 1, "Editorial X", 1, "Español", 1, "ACTIVO", 3, 3, null,
-                OffsetDateTime.now(), List.of("Historia"), List.of("Yuval Noah Harari"), null, null);
+                OffsetDateTime.now(), List.of("Historia"), List.of("Yuval Noah Harari"), 4, null);
         when(bookService.listWithFilters(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any()))
                 .thenReturn(new PageImpl<>(List.of(dto)));
 
@@ -109,9 +109,11 @@ class PublicBookControllerTest {
                 .andExpect(jsonPath("$.content[0].categorias[0]").value("Historia"))
                 .andExpect(jsonPath("$.content[0].autores[0]").value("Yuval Noah Harari"))
                 .andExpect(jsonPath("$.content[0].tienePortada").value(true))
+                .andExpect(jsonPath("$.content[0].proveedorId").value(4))
                 .andExpect(jsonPath("$.content[0].categories").doesNotExist())
                 .andExpect(jsonPath("$.content[0].authors").doesNotExist())
-                .andExpect(jsonPath("$.content[0].tieneCover").doesNotExist());
+                .andExpect(jsonPath("$.content[0].tieneCover").doesNotExist())
+                .andExpect(jsonPath("$.content[0].supplierId").doesNotExist());
     }
 
     @Test

@@ -27,7 +27,8 @@ public record BookResponseDTO(
         // a inglés los había dejado sin @JsonProperty y la tabla de gestión
         // reventaba renderizando (undefined.length) con datos reales.
         @JsonProperty("categorias") List<String> categories, @JsonProperty("autores") List<String> authors,
-        // Proveedor opcional — null = S/P
-        Integer supplierId,
+        // Proveedor opcional — null = S/P. proveedorId con alias: sin él,
+        // editar un libro perdía el proveedor (undefined en el form).
+        @JsonProperty("proveedorId") Integer supplierId,
         @JsonProperty("proveedor") String supplier
 ) implements Serializable {}

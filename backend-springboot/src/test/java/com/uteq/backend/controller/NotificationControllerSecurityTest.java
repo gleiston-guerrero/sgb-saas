@@ -22,6 +22,7 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 // Mismo patrón que ConfiguracionSistemaControllerSecurityTest/
@@ -66,6 +67,24 @@ class NotificationControllerSecurityTest {
 
         mockMvc.perform(get("/api/v1/notificaciones/usuario/1"))
                 .andExpect(status().isOk());
+    }
+
+    // Regresión: prestamoId llevaba el id de la notificación y no existía
+    // id (el "Préstamo #" mostraba otro número y el track era inestable).
+    @Test
+    @WithMockUser(roles = "LECTOR")
+    void listByUser_serializaIdYPrestamoConKeysCorrectas() throws Exception {
+        var dto = new com.uteq.backend.dto.NotificationResponseDTO(
+                9L, 4L, 2, "Préstamo por vencer",
+                java.time.OffsetDateTime.parse("2026-01-15T10:00:00-05:00"), true,
+                java.time.OffsetDateTime.parse("2026-01-15T10:00:00-05:00"));
+        when(notificationService.listByUser(any(), any(), any()))
+                .thenReturn(new org.springframework.data.domain.PageImpl<>(java.util.List.of(dto)));
+
+        mockMvc.perform(get("/api/v1/notificaciones/usuario/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(9))
+                .andExpect(jsonPath("$.content[0].prestamoId").value(4));
     }
 
     @Test

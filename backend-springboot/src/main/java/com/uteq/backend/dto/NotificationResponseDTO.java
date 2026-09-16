@@ -8,7 +8,9 @@ import java.time.OffsetDateTime;
 // -- MultaService.toDTO() tampoco resuelve el nombre del estado, para no
 // pagar un join/consulta extra solo por legibilidad en un listado paginado.
 public record NotificationResponseDTO(
-        @JsonProperty("prestamoId") Long id, Long loanId, @JsonProperty("tipoNotificacionId") Integer typeNotificationId, @JsonProperty("mensaje") String message, @JsonProperty("fechaEnvio") OffsetDateTime dateEnvio,
+        // id = notificación.id; prestamoId = préstamo real (antes llevaba
+        // el id de la notificación y el "Préstamo #" mostraba otro número).
+        @JsonProperty("id") Long id, @JsonProperty("prestamoId") Long loanId, @JsonProperty("tipoNotificacionId") Integer typeNotificationId, @JsonProperty("mensaje") String message, @JsonProperty("fechaEnvio") OffsetDateTime dateEnvio,
         boolean enviadoOk,
         @JsonProperty("creadoEn") OffsetDateTime created
 ) {

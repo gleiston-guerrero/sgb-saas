@@ -32,9 +32,11 @@ export class MultaService {
     );
   }
 
-  // POST /v1/multas/{id}/pago (sin body): solo BIBLIOTECARIO/GERENTE.
-  pagar(id: number): Observable<MultaAccionResponse> {
-    return this.http.post<MultaAccionResponse>(`${this.apiUrl}/${id}/pago`, {}).pipe(
+  // POST /v1/multas/{id}/pago (sin body): el backend responde el mismo
+  // Map o_* que el parcial (ver FineController.pay). Sin callers hoy;
+  // se tipa como PagoMultaResponse para no mentir el contrato.
+  pagar(id: number): Observable<PagoMultaResponse> {
+    return this.http.post<PagoMultaResponse>(`${this.apiUrl}/${id}/pago`, {}).pipe(
       catchError(err => this.manejarError(err))
     );
   }

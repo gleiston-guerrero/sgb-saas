@@ -279,4 +279,22 @@ class SuggestionAcquisitionControllerSecurityTest {
         mockMvc.perform(get("/api/v1/sugerencias-adquisicion/mias"))
                 .andExpect(status().isOk());
     }
+
+    // Regresión: usuarioId llevaba el id de la sugerencia y no existía id
+    // (track inestable + PATCH /{id}/estado con undefined).
+    @Test
+    @WithMockUser(roles = "LECTOR")
+    void listOwns_serializaIdYUsuarioConKeysCorrectas() throws Exception {
+        var dto = new com.uteq.backend.dto.SuggestionAcquisitionResponseDTO(
+                5L, 7L, "Dune", "Frank Herbert", "9780441172719",
+                "Clásico", "PENDIENTE", null, java.time.OffsetDateTime.now());
+        org.springframework.data.domain.Page<com.uteq.backend.dto.SuggestionAcquisitionResponseDTO> page =
+                new org.springframework.data.domain.PageImpl<>(java.util.List.of(dto));
+        when(suggestionService.listOwns(any(), any())).thenReturn(page);
+
+        mockMvc.perform(get("/api/v1/sugerencias-adquisicion/mias"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(5))
+                .andExpect(jsonPath("$.content[0].usuarioId").value(7));
+    }
 }
