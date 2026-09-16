@@ -65,7 +65,9 @@ class FineControllerTest extends WebMvcControllerTestSupport {
 
         mockMvc.perform(get("/api/v1/multas/usuario/2"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].monto").value(3.50));
+                .andExpect(jsonPath("$.content[0].monto").value(3.50))
+                .andExpect(jsonPath("$.content[0].id").value(1))
+                .andExpect(jsonPath("$.content[0].prestamoId").value(10));
     }
 
     @Test
@@ -79,7 +81,9 @@ class FineControllerTest extends WebMvcControllerTestSupport {
 
         mockMvc.perform(get("/api/v1/multas/usuario/2/detalle"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].libroTitulo").value("Clean Code"));
+                .andExpect(jsonPath("$.content[0].libroTitulo").value("Clean Code"))
+                .andExpect(jsonPath("$.content[0].id").value(1))
+                .andExpect(jsonPath("$.content[0].prestamoId").value(10));
     }
 
     // Regresión prod (/multas/usuario/undefined/detalle -> 500 "Error no
