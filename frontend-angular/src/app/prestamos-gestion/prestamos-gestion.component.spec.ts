@@ -85,6 +85,21 @@ describe('PrestamosGestionComponent', () => {
     expect(prestamoService.buscarUsuarioPorCorreo).not.toHaveBeenCalled();
   });
 
+  // Regresión prod (/gestion/historial?usuarioId=undefined -> 500):
+  // respuesta sin id no dispara historial ni reserva-activa.
+  it('no consulta historial ni reserva si la respuesta trae id indefinido', () => {
+    prestamoService.buscarUsuarioPorCorreo.and.returnValue(
+      of({ ...usuarioActivo(), id: undefined } as any)
+    );
+
+    component.correoBusqueda = 'ana.perez@correo.com';
+    component.buscarUsuario();
+
+    expect(prestamoService.historial).not.toHaveBeenCalled();
+    expect(prestamoService.reservaActiva).not.toHaveBeenCalled();
+    expect(component.errorBusqueda).toBe('La respuesta no trae identificador de usuario.');
+  });
+
   it('detecta el Caso C (bloqueado por multas pendientes) y no consulta reservas', () => {
     const bloqueado: UsuarioPrestamos = {
       ...usuarioActivo(),

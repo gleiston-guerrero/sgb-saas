@@ -259,6 +259,10 @@ export class PrestamosGestionComponent implements OnInit {
       next: (usuario) => {
         this.usuario = usuario;
         this.buscando = false;
+        if (usuario?.id == null) {
+          this.errorBusqueda = 'La respuesta no trae identificador de usuario.';
+          return;
+        }
         this.diasReserva = usuario.diasPrestamoSugerido;
         this.cargarHistorial(usuario.id);
         if (this.estaBloqueado) return;

@@ -108,6 +108,11 @@ export class MultasComponent implements OnInit {
     this.prestamoService.buscarUsuarioPorCorreo(correo).subscribe({
       next: (usuario) => {
         this.usuarioSeleccionado = usuario;
+        if (usuario?.id == null) {
+          this.cargando = false;
+          this.errorMsg = 'La respuesta no trae identificador de usuario.';
+          return;
+        }
         this.cargarMultas(usuario.id);
       },
       error: () => {
