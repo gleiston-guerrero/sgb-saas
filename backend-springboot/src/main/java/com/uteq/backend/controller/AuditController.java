@@ -86,7 +86,7 @@ public class AuditController {
      */
 
     @GetMapping("/export")
-    public ResponseEntity<byte[]> export(@RequestParam(defaultValue = "csv") String format,
+    public ResponseEntity<byte[]> export(@RequestParam(name = "formato", defaultValue = "csv") String format,
                                          @RequestParam(name = "usuarioId", required = false) Long userId,
                                          @RequestParam(name = "modulo", required = false) String module,
                                          @RequestParam(name = "desde", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
