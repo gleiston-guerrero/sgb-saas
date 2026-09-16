@@ -181,6 +181,23 @@ class SuggestionAcquisitionControllerSecurityTest {
                 .andExpect(status().isForbidden());
     }
 
+    // Regresión: el ISBN viajaba aliasado como titulo (celda título = ISBN
+    // y confirmar-adquisicion con undefined). Contrato isbn/titulo/autor.
+    @Test
+    @WithMockUser(roles = "GERENTE")
+    void mostPedidos_serializaIsbnYTituloConKeysCorrectas() throws Exception {
+        when(suggestionService.getMostRequested(any())).thenReturn(new org.springframework.data.domain.PageImpl<>(
+                java.util.List.of(new com.uteq.backend.dto.SuggestionGroupedDTO(
+                        "9781449373320", "Dune", "Frank Herbert", 4L))));
+
+        mockMvc.perform(get("/api/v1/sugerencias-adquisicion/mas-pedidos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].isbn").value("9781449373320"))
+                .andExpect(jsonPath("$.content[0].titulo").value("Dune"))
+                .andExpect(jsonPath("$.content[0].autor").value("Frank Herbert"))
+                .andExpect(jsonPath("$.content[0].cantidad").value(4));
+    }
+
     @Test
     @WithMockUser(roles = "ADMIN")
     void confirmAcquisition_withRoleAdmin_confirmaBulk() throws Exception {
