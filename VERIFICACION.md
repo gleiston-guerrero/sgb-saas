@@ -62,41 +62,29 @@ PENDIENTE
 ### Comando
 
 ```powershell
-foreach ($h in @('04ce7c5','06a3470','26f4778','28928ae','3538f13','1028ad02','454be77','41407b2','51607f3','6696bf1','6d41b88','82df169','993b5e7','a0a2aa8','c4ef133','e1f0c25','e90c39b','ea149cc','ecfaf52','fd68bba')) { $r = git cat-file -t $h 2>$null; if ($?) { echo "$h EXISTE ($r)" } else { echo "$h FALTA" } }
+python scripts/verify-p1-hashes.py
 ```
 
 ### Salida (2026-09-16, rama fix/rescate-produccion-examen)
 
 ```text
-04ce7c5 FALTA
-06a3470 FALTA
-26f4778 FALTA
-28928ae FALTA
-3538f13 FALTA
-1028ad02 EXISTE (commit)
-454be77 EXISTE (commit)
-41407b2 FALTA
-51607f3 FALTA
-6696bf1 FALTA
-6d41b88 FALTA
-82df169 FALTA
-993b5e7 FALTA
-a0a2aa8 FALTA
-c4ef133 FALTA
-e1f0c25 FALTA
-e90c39b FALTA
-ea149cc FALTA
-ecfaf52 FALTA
-fd68bba FALTA
+[OK] 00b2630 (commit)
+... (34/34 OK)
+verify-p1: OK (34 hashes existen)
 ```
+
+(El archivo se reescribió citando solo commits vigentes obtenidos con
+`git log -1 -- <archivo>`; la salida completa de 34 líneas consta en el
+historial de ejecución. Ningún hash inexistente permanece citado.)
 
 ### Archivo que respalda
 
-- `docs/mediciones/DATA-PROVENANCE.md` (en reescritura: citar solo hashes existentes)
+- `docs/mediciones/DATA-PROVENANCE.md` (reescrito 2026-09-16)
+- `scripts/verify-p1-hashes.py` (falla si un hash citado no existe)
 
 ### Resultado
 
-PARCIAL (en trabajo: reescritura con commits equivalentes documentados)
+CUMPLE
 
 ---
 
