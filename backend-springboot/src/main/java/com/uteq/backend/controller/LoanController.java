@@ -429,10 +429,11 @@ public class LoanController {
             @RequestParam(required = false) Short stockDispMin,
             @RequestParam(required = false) Short stockDispMax,
             @RequestParam(name = "ubicacion", required = false) String location,
-            // sort con el nombre FISICO de columna (titulo): reportInventoryPaginated
-            // usa fn_reporte_inventario, funcion RETURNS TABLE incondicionalmente
-            // nativa (LoanProcedureRepository).
-            @PageableDefault(size = 20, sort = "titulo") Pageable pageable) {
+            // Sin sort por defecto: reportInventoryPaginated solo lee
+            // pageSize/offset hacia fn_reporte_inventario (el orden lo fija
+            // la funcion); un sort aqui viajaria en el PageImpl sin
+            // aplicarse al SQL.
+            @PageableDefault(size = 20) Pageable pageable) {
         return ResponseEntity.ok(loanService.reportInventoryPaginated(
                 categoryId, statusStock, busqueda, publisherId, supplierId, statusBookId, languageId,
                 yearFrom, yearUntil, stockTotalMin, stockTotalMax, stockDispMin, stockDispMax, location, pageable));

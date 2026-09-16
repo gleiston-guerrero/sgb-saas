@@ -70,7 +70,9 @@ public class FineController {
     public ResponseEntity<Page<FineDetailResponseDTO>> listDetailByUser(
             @PathVariable("usuarioId") Long userId,
             Authentication authentication,
-            @PageableDefault(size = 10, sort = "statusFineId") Pageable pageable) {
+            // id como segundo criterio: statusFineId tiene cardinalidad 3 y
+            // sin desempate la paginacion puede duplicar/saltar filas.
+            @PageableDefault(size = 10, sort = {"statusFineId", "id"}) Pageable pageable) {
         return ResponseEntity.ok(
                 fineService.listDetailByUser(userId, authentication, pageable));
     }
