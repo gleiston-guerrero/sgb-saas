@@ -205,6 +205,9 @@ public class BookService {
     }
 
     private static Pageable remapSort(Pageable pageable, Map<String, String> mapping) {
+        if (pageable == null || pageable.isUnpaged()) {
+            return pageable;
+        }
         Sort translated = Sort.by(pageable.getSort().stream()
                 .map(order -> mapping.containsKey(order.getProperty())
                         ? order.withProperty(mapping.get(order.getProperty()))

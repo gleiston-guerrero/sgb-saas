@@ -16,7 +16,9 @@ import com.uteq.backend.repository.UserRepository;
 import com.uteq.backend.repository.projection.SummaryFinancialFinesProjection;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -42,6 +44,27 @@ public class FineService {
     private final UserRepository userRepo;
     private final BookRepository bookRepo;
     private final LoanRepository loanRepo;
+
+    // Sorts legacy en español que aún mandan clientes viejos o peticiones
+    // manuales (ver 400 "Could not resolve attribute 'estadoMultaId'").
+    // Se traducen al atributo JPA antes de la query; el resto pasa igual.
+    // No se renombra nada: es solo tolerancia de entrada.
+    private static final Map<String, String> SORT_LEGACY = Map.of(
+            "estadoMultaId", "statusFineId",
+            "fechaGenerada", "dateGenerated",
+            "fechaPagada", "datePaid");
+
+    private static Pageable sortTolerante(Pageable pageable) {
+        if (pageable == null || pageable.isUnpaged()) {
+            return pageable;
+        }
+        Sort traducido = Sort.by(pageable.getSort().stream()
+                .map(orden -> SORT_LEGACY.containsKey(orden.getProperty())
+                        ? orden.withProperty(SORT_LEGACY.get(orden.getProperty()))
+                        : orden)
+                .toList());
+        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), traducido);
+    }
 
     // La auditoria de esta tabla ya no se hace aqui: trg_auditoria_multas
     // (V49__auditoria_triggers_negocio.sql) audita INSERT/UPDATE/DELETE a nivel de motor.
@@ -75,7 +98,7 @@ public class FineService {
     @Transactional(readOnly = true)
     public Page<FineResponseDTO> listByUser(Long userId, Authentication authentication, Pageable pageable) {
         validateAccessUser(userId, authentication);
-        return fineRepo.findByUserId(userId, pageable).map(this::toDTO);
+        return fineRepo.findByUserId(userId, sortTolerante(pageable)).map(this::toDTO);
     }
 
     /**
@@ -92,7 +115,7 @@ public class FineService {
     @Transactional(readOnly = true)
     public Page<FineDetailResponseDTO> listDetailByUser(Long userId, Authentication authentication, Pageable pageable) {
         validateAccessUser(userId, authentication);
-        return fineRepo.findByUserId(userId, pageable).map(this::toDetailDTO);
+        return fineRepo.findByUserId(userId, sortTolerante(pageable)).map(this::toDetailDTO);
     }
 
     /**

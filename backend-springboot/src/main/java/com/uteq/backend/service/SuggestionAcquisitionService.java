@@ -10,11 +10,13 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 // crear() resuelve el usuarioId desde el Authentication; cambiarEstado() registra quién revisó.
 // La auditoria de esta tabla ya no se hace aqui: trg_auditoria_sugerencias_adquisicion
@@ -27,6 +29,24 @@ public class SuggestionAcquisitionService {
 
     private final SuggestionAcquisitionRepository suggestionRepo;
     private final UserRepository userRepo;
+
+    // Sorts legacy en español de clientes viejos o peticiones manuales
+    // (ver 500 "No property 'creadoEn'"). Se traducen al atributo JPA;
+    // el resto pasa igual. No se renombra nada.
+    private static final Map<String, String> SORT_LEGACY = Map.of(
+            "creadoEn", "created");
+
+    private static Pageable sortTolerante(Pageable pageable) {
+        if (pageable == null || pageable.isUnpaged()) {
+            return pageable;
+        }
+        Sort traducido = Sort.by(pageable.getSort().stream()
+                .map(orden -> SORT_LEGACY.containsKey(orden.getProperty())
+                        ? orden.withProperty(SORT_LEGACY.get(orden.getProperty()))
+                        : orden)
+                .toList());
+        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), traducido);
+    }
 
     public SuggestionAcquisitionService(SuggestionAcquisitionRepository suggestionRepo,
                                          UserRepository userRepo) {
@@ -68,7 +88,7 @@ public class SuggestionAcquisitionService {
      */
     public Page<SuggestionAcquisitionResponseDTO> listOwns(Authentication authentication, Pageable pageable) {
         Long userId = resolveIdByEmail(authentication.getName());
-        return suggestionRepo.findByUserId(userId, pageable).map(this::toDTO);
+        return suggestionRepo.findByUserId(userId, sortTolerante(pageable)).map(this::toDTO);
     }
 
     // Solo GERENTE/ADMIN llegan acá: listado sin filtrar por dueño.
@@ -81,10 +101,11 @@ public class SuggestionAcquisitionService {
      * @return pagina de resultados que coincide con los filtros y la paginacion solicitada
      */
     public Page<SuggestionAcquisitionResponseDTO> listAll(String status, Pageable pageable) {
+        Pageable tolerante = sortTolerante(pageable);
         if (status == null || status.isBlank()) {
-            return suggestionRepo.findAll(pageable).map(this::toDTO);
+            return suggestionRepo.findAll(tolerante).map(this::toDTO);
         }
-        return suggestionRepo.findByStatus(status, pageable).map(this::toDTO);
+        return suggestionRepo.findByStatus(status, tolerante).map(this::toDTO);
     }
 
     @Transactional
