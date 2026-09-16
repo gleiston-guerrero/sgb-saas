@@ -24,7 +24,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -78,6 +80,31 @@ class LoanReturnControllerTest extends WebMvcControllerTestSupport {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"descripcion\":\"sin estado\"}"))
                 .andExpect(status().isBadRequest());
+    }
+
+    // Regresión: los daños anidados llegaban con tipoDanoId/nombreCustom/
+    // precioCobrado en null porque DamageItemDTO no tenía alias.
+    @Test
+    void registerLoanReturn_conDanosEspanol_mapeaAnidados() throws Exception {
+        when(userRepo.findByEmail("biblio@correo.com")).thenReturn(Optional.of(librarian()));
+        when(loanReturnService.registerLoanReturn(eq(1L), any(), eq(8L)))
+                .thenReturn(new LoanReturnFullResponseDTO(
+                        1L, null, false, BigDecimal.ZERO, false, BigDecimal.ZERO, BigDecimal.ZERO, List.of()));
+
+        mockMvc.perform(post("/api/v1/devoluciones/prestamo/1")
+                .principal(mockAuth)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"estadoDevolucion":"MALO","descripcion":"roto","danos":[{"tipoDanoId":3,"nombreCustom":"Rasgado","precioCobrado":5}]}
+                                """))
+                .andExpect(status().isCreated());
+
+        verify(loanReturnService).registerLoanReturn(eq(1L),
+                argThat(dto -> dto.damages() != null && dto.damages().size() == 1
+                        && dto.damages().get(0).typeDamageId() == 3
+                        && "Rasgado".equals(dto.damages().get(0).nameCustom())
+                        && new BigDecimal("5").compareTo(dto.damages().get(0).priceCobrado()) == 0),
+                eq(8L));
     }
 
     @Test

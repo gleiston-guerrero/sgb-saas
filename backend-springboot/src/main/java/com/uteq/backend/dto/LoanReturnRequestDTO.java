@@ -23,8 +23,8 @@ public record LoanReturnRequestDTO(
      * @param priceCobrado valor de entrada priceCobrado usado por la operacion para completar su regla de negocio
      */
     public record DamageItemDTO(
-            Integer typeDamageId,
-            String nameCustom,
-            BigDecimal priceCobrado
+            @JsonProperty("tipoDanoId") Integer typeDamageId,
+            @JsonProperty("nombreCustom") String nameCustom,
+            @JsonProperty("precioCobrado") BigDecimal priceCobrado
     ) {}
 }

@@ -15,6 +15,6 @@ public record CodeVerificationRequestDTO(
         // siquiera consultar Redis.
         @NotBlank
         @Pattern(regexp = "\\d{6}", message = "El código debe tener exactamente 6 dígitos")
-        String code
+        @JsonProperty("codigo") String code
 ) {
 }

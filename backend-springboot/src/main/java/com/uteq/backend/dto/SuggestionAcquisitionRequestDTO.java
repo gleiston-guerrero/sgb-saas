@@ -10,7 +10,7 @@ public record SuggestionAcquisitionRequestDTO(
         @NotBlank(message = "El título sugerido es obligatorio")
         @Size(max = 255, message = "El título no puede superar 255 caracteres") @JsonProperty("titulo") String title,
 
-        @Size(max = 150, message = "El autor no puede superar 150 caracteres") String author,
+        @Size(max = 150, message = "El autor no puede superar 150 caracteres") @JsonProperty("autor") String author,
 
         @Pattern(regexp = "^[0-9]{13}$", message = "El ISBN debe tener 13 dígitos numéricos, sin guiones")
         String isbn,

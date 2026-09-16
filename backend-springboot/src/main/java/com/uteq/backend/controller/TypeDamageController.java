@@ -2,6 +2,7 @@ package com.uteq.backend.controller;
 
 import com.uteq.backend.dto.TypeDamageDTO;
 import com.uteq.backend.service.TypeDamageService;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -81,9 +82,9 @@ public class TypeDamageController {
      */
 
     public record TypeDamageRequestDTO(
-            @NotBlank String name,
-            @NotNull Integer categoryId,
-            @NotBlank String typeCost,
-            @NotNull @DecimalMin("0") BigDecimal value
+            @NotBlank @JsonProperty("nombre") String name,
+            @NotNull @JsonProperty("categoriaId") Integer categoryId,
+            @NotBlank @JsonProperty("tipoCosto") String typeCost,
+            @NotNull @DecimalMin("0") @JsonProperty("valor") BigDecimal value
     ) {}
 }

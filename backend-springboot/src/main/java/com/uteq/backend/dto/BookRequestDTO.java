@@ -1,13 +1,17 @@
 package com.uteq.backend.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 
 import java.util.Set;
 
+// Los alias en español son el contrato con el frontend (LibroRequest):
+// el refactor a inglés los había eliminado y crear/editar libros
+// devolvía 400 (título/editorial/idioma/estado nulos).
 public record BookRequestDTO(
 
         @NotBlank(message = "El título es obligatorio")
-        @Size(max = 255, message = "El título no puede superar 255 caracteres") String title,
+        @Size(max = 255, message = "El título no puede superar 255 caracteres") @JsonProperty("titulo") String title,
 
         @NotBlank(message = "El ISBN es obligatorio")
         @Pattern(regexp = "^[0-9]{10,13}$", message = "ISBN debe tener 10 a 13 dígitos numéricos")
@@ -15,40 +19,40 @@ public record BookRequestDTO(
         String isbn,
 
         @NotNull(message = "El año de publicación es obligatorio")
-        @Min(value = 1950, message = "El año no puede ser menor a 1950") Integer yearPublication,
+        @Min(value = 1950, message = "El año no puede ser menor a 1950") @JsonProperty("anioPublicacion") Integer yearPublication,
 
         @Min(value = 1, message = "El número de páginas debe ser mayor a 0")
-        @Max(value = 4100, message = "El número de páginas no puede superar 4100") Integer numberPages,
+        @Max(value = 4100, message = "El número de páginas no puede superar 4100") @JsonProperty("numeroPaginas") Integer numberPages,
 
         @Digits(integer = 3, fraction = 2, message = "Precio base inválido (máx 250.00 con 2 decimales)")
         @DecimalMin(value = "0.00", message = "El precio base debe ser mayor o igual a 0")
-        @DecimalMax(value = "250.00", message = "El precio base no puede superar 250.00") java.math.BigDecimal priceBase,
+        @DecimalMax(value = "250.00", message = "El precio base no puede superar 250.00") @JsonProperty("precioBase") java.math.BigDecimal priceBase,
 
-        @Size(max = 2000, message = "El resumen no puede superar 2000 caracteres") String summary,
+        @Size(max = 2000, message = "El resumen no puede superar 2000 caracteres") @JsonProperty("resumen") String summary,
 
         // Ubicación física (ej. "Estante A-12"). Opcional: un libro puede
         // no tener estantería asignada todavía, mismo criterio que resumen.
-        @Size(max = 50, message = "La ubicación física no puede superar 50 caracteres") String locationPhysical,
+        @Size(max = 50, message = "La ubicación física no puede superar 50 caracteres") @JsonProperty("ubicacionFisica") String locationPhysical,
 
-        @Size(max = 1000) String coverUrl,
+        @Size(max = 1000) @JsonProperty("portadaUrl") String coverUrl,
 
-        @NotNull(message = "La editorial es obligatoria") Integer publisherId,
+        @NotNull(message = "La editorial es obligatoria") @JsonProperty("editorialId") Integer publisherId,
 
-        @NotNull(message = "El idioma es obligatorio") Integer languageId,
+        @NotNull(message = "El idioma es obligatorio") @JsonProperty("idiomaId") Integer languageId,
 
-        @NotNull(message = "El estado es obligatorio") Integer statusId,
+        @NotNull(message = "El estado es obligatorio") @JsonProperty("estadoId") Integer statusId,
 
         @NotNull
         @Min(0)
         Integer stockTotal,
 
         @NotNull
-        @Min(0) Integer stockAvailable,
+        @Min(0) @JsonProperty("stockDisponible") Integer stockAvailable,
 
         // Ids de categorias/autores existentes (opcionales, un libro puede no tenerlos).
-        Set<Integer> categoryIds,
-        Set<Integer> authorIds,
+        @JsonProperty("categoriaIds") Set<Integer> categoryIds,
+        @JsonProperty("autorIds") Set<Integer> authorIds,
 
         // Proveedor opcional: null o ausente = S/P (Sin proveedor).
-        Integer supplierId
+        @JsonProperty("proveedorId") Integer supplierId
 ) {}

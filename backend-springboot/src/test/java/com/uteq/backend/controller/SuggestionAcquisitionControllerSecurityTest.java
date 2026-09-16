@@ -29,6 +29,7 @@ import java.time.OffsetDateTime;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -97,6 +98,22 @@ class SuggestionAcquisitionControllerSecurityTest {
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(requestValid())))
                 .andExpect(status().isCreated());
+    }
+
+    // Regresión: el formulario manda `autor` pero el record leía `author`
+    // sin alias y el autor se perdía en silencio.
+    @Test
+    @WithMockUser(roles = "LECTOR")
+    void create_conAutorEspanol_mapeaAutor() throws Exception {
+        when(suggestionService.create(any(), any())).thenReturn(responseCreated());
+
+        mockMvc.perform(post("/api/v1/sugerencias-adquisicion")
+                        .contentType("application/json")
+                        .content("{\"titulo\":\"Dune\",\"autor\":\"Frank Herbert\",\"justificacion\":\"Clásico\"}"))
+                .andExpect(status().isCreated());
+
+        verify(suggestionService).create(
+                argThat(dto -> "Frank Herbert".equals(dto.author())), any());
     }
 
     // Regresion: BIBLIOTECARIO no es LECTOR ni GERENTE/ADMIN -- no debería

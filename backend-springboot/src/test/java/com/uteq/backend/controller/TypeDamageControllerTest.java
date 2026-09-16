@@ -79,6 +79,22 @@ class TypeDamageControllerTest extends WebMvcControllerTestSupport {
                 .andExpect(status().isBadRequest());
     }
 
+    // Regresión: el frontend manda {nombre, categoriaId, tipoCosto, valor}
+    // pero el record leía name/typeCost/value/categoryId sin alias -> 400.
+    // (El JSON trae valor 5 sin escala: el mock acepta cualquier BigDecimal.)
+    @Test
+    void create_conJsonEspanolDelFrontend_devuelve201() throws Exception {
+        when(typeDamageService.create(eq("Rasgado"), eq(2), eq("FIJO"), any())).thenReturn(dto());
+
+        mockMvc.perform(post("/api/v1/tipos-dano")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"nombre":"Rasgado","categoriaId":2,"tipoCosto":"FIJO","valor":5}
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(3));
+    }
+
     @Test
     void update_existing_devuelve200() throws Exception {
         when(typeDamageService.update(eq(3), eq("Rasgado"), eq(2), eq("FIJO"), any()))

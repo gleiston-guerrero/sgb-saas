@@ -309,6 +309,31 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.id").value(1));
     }
 
+    // Regresión prod: el frontend manda {correo, codigo} pero el record
+    // leía `code` sin alias -> 400 por el @Pattern sobre null.
+    @Test
+    void verifyEmail_conJsonEspanolDelFrontend_devuelve200() throws Exception {
+        when(authService.verifyEmail(anyString(), anyString(), anyString())).thenReturn(new com.uteq.backend.dto.UserResponseDTO(1L, "Juan", "Perez", java.util.List.of("LECTOR")));
+
+        mockMvc.perform(post("/api/auth/verificar-correo")
+                        .contentType("application/json")
+                        .content("{\"correo\":\"test@correo.com\",\"codigo\":\"123456\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1));
+    }
+
+    // Regresión prod: el frontend manda {correo, codigo, nuevaPassword}
+    // pero `freshPassword` no tenía alias -> 400 @NotBlank.
+    @Test
+    void reset_conJsonEspanolDelFrontend_devuelve204() throws Exception {
+        doNothing().when(authService).resetPassword(anyString(), anyString(), anyString());
+
+        mockMvc.perform(post("/api/auth/reset")
+                        .contentType("application/json")
+                        .content("{\"correo\":\"test@correo.com\",\"codigo\":\"123456\",\"nuevaPassword\":\"Nueva123!\"}"))
+                .andExpect(status().isNoContent());
+    }
+
     // Dev local http://: con cookie-secure=false la cookie sale sin Secure
     // y con SameSite=Lax (None exige Secure). Llamada directa al controller
     // con mocks propios para no depender del contexto web.
