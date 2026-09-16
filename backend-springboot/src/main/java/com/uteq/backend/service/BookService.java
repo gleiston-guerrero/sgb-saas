@@ -123,6 +123,9 @@ public class BookService {
             if (categoryId != null) {
                 return bookRepo.searchByTextOIsbnYCategory(q, categoryId, statusId, available, nativeSort(pageable)).map(this::toDTO);
             }
+            if (authorId != null) {
+                return bookRepo.searchByTextOrIsbnAndAuthor(q, authorId, statusId, nativeSort(pageable)).map(this::toDTO);
+            }
             return bookRepo.searchByTextOIsbn(q, statusId, available, nativeSort(pageable)).map(this::toDTO);
         }
 
