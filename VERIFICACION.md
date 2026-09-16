@@ -44,16 +44,22 @@ make verify
 ### Salida
 
 ```text
-(PENDIENTE: el target se crea en esta rama; pegar salida verde aquí)
+(PENDIENTE máquina con make: en Windows sin make instalado se verificó
+la secuencia exacta paso a paso — p1=0, p2=0 (5 DOI), p6=0, p7=0,
+p12=0, mvn javadoc:javadoc BUILD SUCCESS. El target existe en el
+Makefile y encadena esos mismos pasos.)
 ```
 
 ### Archivo que respalda
 
 - `Makefile` (target `verify`)
+- `scripts/verify-p1-hashes.py`, `verify-p2-dois.py`, `verify-p6-javadoc.py`,
+  `verify-p7-names.py`, `verify-p12-secrets.py`
 
 ### Resultado
 
-PENDIENTE
+PARCIAL (target creado y pasos verdes por separado; falta corrida `make`
+de punta a punta en máquina con make)
 
 ---
 
@@ -206,10 +212,12 @@ CUMPLE (pendiente `mvn javadoc:javadoc` sin error; ver comando abajo)
 cd backend-springboot; ./mvnw -B javadoc:javadoc
 ```
 
-### Salida
+### Salida (2026-09-16)
 
 ```text
-(PENDIENTE: pegar cola de la salida + BUILD SUCCESS)
+[INFO] Building  0.0.1-SNAPSHOT
+[INFO] BUILD SUCCESS
+[INFO] Total time:  26.557 s
 ```
 
 ---
@@ -265,15 +273,23 @@ PARCIAL (nodos TikZ del PRISMA en español). Responsable: Marlon.
 cd backend-springboot; ./mvnw -B test -Dtest=DemoAccountMigrationIntegrationTest
 ```
 
-### Salida
+### Salida (2026-09-16)
 
 ```text
-(PENDIENTE: pegar Tests run + BUILD SUCCESS)
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 60.68 s -- in com.uteq.backend.integration.DemoAccountMigrationIntegrationTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+BUILD SUCCESS
 ```
+
+(El test hace login con `u@uteq.edu.ec / usuario1`, aserta rol
+`[LECTOR]` en el JWT decodificado y cuenta activa/verificada. El 403
+ante recurso ajeno está cubierto por `LoanServiceTest`,
+`ReservationServiceTest`, `NotificationServiceTest` y los
+`*ControllerSecurityTest` — ver `docs/mediciones/demo-account.md`.)
 
 ### Resultado
 
-PARCIAL (tests existen y asertan rol LECTOR; falta pegar evidencia + 403 en expediente)
+CUMPLE
 
 ---
 
