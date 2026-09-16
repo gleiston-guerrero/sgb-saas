@@ -21,6 +21,10 @@ import java.util.List;
  * ('dias_prestamo_default') para prellenar el formulario.
  */
 public record UserLoansManagementDTO(
-        @JsonProperty("cantidadMultasPendientes") Long id, @JsonProperty("nombreCompleto") String nameFull,
-        String cedula, @JsonProperty("correo") String email, @JsonProperty("tiposUsuario") List<String> typesUser, @JsonProperty("estadoCuenta") String statusAccount, @JsonProperty("montoMultasPendientes") BigDecimal amountFinesPendientes, Long quantityFinesPendientes, @JsonProperty("diasPrestamoSugerido") Integer daysLoanSuggested
+        // id serializa con su nombre: el frontend lo usa para historial,
+        // reserva-activa y multas-detalle. El refactor a inglés había puesto
+        // acá @JsonProperty("cantidadMultasPendientes") y todas esas rutas
+        // pedían /usuario/undefined/... en prod.
+        Long id, @JsonProperty("nombreCompleto") String nameFull,
+        String cedula, @JsonProperty("correo") String email, @JsonProperty("tiposUsuario") List<String> typesUser, @JsonProperty("estadoCuenta") String statusAccount, @JsonProperty("montoMultasPendientes") BigDecimal amountFinesPendientes, @JsonProperty("cantidadMultasPendientes") Long quantityFinesPendientes, @JsonProperty("diasPrestamoSugerido") Integer daysLoanSuggested
 ) {}

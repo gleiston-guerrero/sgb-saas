@@ -49,6 +49,23 @@ class LoansManagementControllerTest extends WebMvcControllerTestSupport {
                 .andExpect(jsonPath("$.nombreCompleto").value("Ana Pérez"));
     }
 
+    // Contrato con ventanilla (usuario.id): el refactor a inglés había
+    // puesto @JsonProperty("cantidadMultasPendientes") sobre el id y las
+    // rutas historial/reserva-activa/multas pedían /usuario/undefined/.
+    // id=7 y conteo=3 a propósito distintos para que no se enmascaren.
+    @Test
+    void searchUser_serializaIdYCantidadConKeysCorrectas() throws Exception {
+        when(loansManagementService.searchByEmail("ana@correo.com"))
+                .thenReturn(new UserLoansManagementDTO(
+                        7L, "Ana Pérez", "0102030405", "ana@correo.com",
+                        List.of("LECTOR"), "ACTIVO", BigDecimal.ZERO, 3L, 7));
+
+        mockMvc.perform(get("/api/v1/prestamos/gestion/buscar-usuario").param("correo", "ana@correo.com"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(7))
+                .andExpect(jsonPath("$.cantidadMultasPendientes").value(3));
+    }
+
     @Test
     void searchUser_emailInvalid_devuelve400() throws Exception {
         mockMvc.perform(get("/api/v1/prestamos/gestion/buscar-usuario").param("correo", "no-es-correo"))
