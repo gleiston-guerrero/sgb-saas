@@ -79,6 +79,22 @@ describe('LibrosComponent', () => {
     expect(component.libros.length).toBe(1);
   });
 
+  // Regresión prod (TypeError: reading 'length' con datos reales):
+  // filas sin autores/categorias (null o ausentes) se normalizan a []
+  // y la vista renderiza 'Sin autor' sin lanzar.
+  it('normaliza filas sin autores ni categorias y renderiza sin lanzar', () => {
+    const filaRota = { id: 2, isbn: '9788499926223', titulo: 'Sapiens', autores: null, categorias: undefined };
+    libroService.listar.and.returnValue(of({ content: [filaRota], totalPages: 1 } as any));
+
+    component.cargarLibros();
+    fixture.detectChanges();
+
+    expect(component.libros.length).toBe(1);
+    expect(component.libros[0].autores).toEqual([]);
+    expect(component.libros[0].categorias).toEqual([]);
+    expect(fixture.nativeElement.textContent).toContain('Sin autor');
+  });
+
   it('carga el catálogo de categorías y autores para los selects del formulario', () => {
     expect(categoriaService.listar).toHaveBeenCalled();
     expect(autorService.listar).toHaveBeenCalled();

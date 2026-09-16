@@ -91,6 +91,29 @@ class PublicBookControllerTest {
                 .andExpect(jsonPath("$.content[0].titulo").value("Clean Code"));
     }
 
+    // Contrato con el frontend (Libro.categorias/autores/tienePortada):
+    // el refactor a inglés había dejado estos 3 campos sin @JsonProperty
+    // y la tabla de gestión reventaba con undefined.length en prod.
+    @Test
+    void list_serializaListasYPortadaConAliasEspanol() throws Exception {
+        BookResponseDTO dto = new BookResponseDTO(
+                2L, "Sapiens", "9788499926223", "resumen", null,
+                true, "sapiens.jpg", "image/jpeg", 2011, null, null,
+                1, "Editorial X", 1, "Español", 1, "ACTIVO", 3, 3, null,
+                OffsetDateTime.now(), List.of("Historia"), List.of("Yuval Noah Harari"), null, null);
+        when(bookService.listWithFilters(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any()))
+                .thenReturn(new PageImpl<>(List.of(dto)));
+
+        mockMvc.perform(get("/api/publico/libros"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].categorias[0]").value("Historia"))
+                .andExpect(jsonPath("$.content[0].autores[0]").value("Yuval Noah Harari"))
+                .andExpect(jsonPath("$.content[0].tienePortada").value(true))
+                .andExpect(jsonPath("$.content[0].categories").doesNotExist())
+                .andExpect(jsonPath("$.content[0].authors").doesNotExist())
+                .andExpect(jsonPath("$.content[0].tieneCover").doesNotExist());
+    }
+
     @Test
     void list_withFilterCategory_withoutToken_responde200YDelega() throws Exception {
         when(bookService.listWithFilters(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.eq(5), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any()))

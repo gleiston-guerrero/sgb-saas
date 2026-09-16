@@ -19,11 +19,14 @@ public record BookResponseDTO(
         // GET /api/v1/libros/{id}/portada con su Content-Type dinámico.
         // tienePortada es true cuando portadaImagen != null (el frontend
         // decide con esto si mostrarla o pedirla al endpoint).
-        Boolean tieneCover, @JsonProperty("portadaNombre") String coverName, @JsonProperty("portadaTipo") String coverType, @JsonProperty("anioPublicacion") Integer yearPublication, @JsonProperty("numeroPaginas") Integer numberPages, @JsonProperty("precioBase") java.math.BigDecimal priceBase, @JsonProperty("editorialId") Integer publisherId, @JsonProperty("editorial") String publisher, @JsonProperty("idiomaId") Integer languageId, @JsonProperty("idioma") String language, @JsonProperty("estadoId") Integer statusId, @JsonProperty("estado") String status,
+        @JsonProperty("tienePortada") Boolean tieneCover, @JsonProperty("portadaNombre") String coverName, @JsonProperty("portadaTipo") String coverType, @JsonProperty("anioPublicacion") Integer yearPublication, @JsonProperty("numeroPaginas") Integer numberPages, @JsonProperty("precioBase") java.math.BigDecimal priceBase, @JsonProperty("editorialId") Integer publisherId, @JsonProperty("editorial") String publisher, @JsonProperty("idiomaId") Integer languageId, @JsonProperty("idioma") String language, @JsonProperty("estadoId") Integer statusId, @JsonProperty("estado") String status,
         Integer stockTotal, @JsonProperty("stockDisponible") Integer stockAvailable,
         @JsonProperty("ubicacionFisica") String locationPhysical, @JsonProperty("fechaRegistro") OffsetDateTime dateRegistration,
-        // Solo nombres de categorías/autores (@JsonProperty("autores") List<String> serializable para el cache).
-        List<String> categories, List<String> authors,
+        // Solo nombres de categorías/autores. Los alias en español son el
+        // contrato con el frontend (Libro.categorias/autores): el refactor
+        // a inglés los había dejado sin @JsonProperty y la tabla de gestión
+        // reventaba renderizando (undefined.length) con datos reales.
+        @JsonProperty("categorias") List<String> categories, @JsonProperty("autores") List<String> authors,
         // Proveedor opcional — null = S/P
         Integer supplierId,
         @JsonProperty("proveedor") String supplier
