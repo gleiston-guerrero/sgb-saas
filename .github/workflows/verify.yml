@@ -21,6 +21,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # P1 (hashes citados) y P11 (shortlog/rev-list) exigen historia
+          # completa: el checkout superficial (fetch-depth: 1) los hace
+          # fallar aunque la evidencia sea correcta.
+          fetch-depth: 0
 
       - name: Set up Python 3
         uses: actions/setup-python@v5
