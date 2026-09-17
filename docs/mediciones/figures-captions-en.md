@@ -34,7 +34,7 @@ English in-figure text).
 
 - figuras/fig-jacoco-paquetes (new, P8):
   "JaCoCo instruction coverage by package (top 12), from the canonical
-  docs/mediciones/jacoco/report.csv (49 instrumented classes)."
+  docs/mediciones/jacoco/report.csv (54 instrumented classes)."
 
 - figuras/fig-lighthouse-puntajes (new, P8):
   "Mean Lighthouse scores per category and profile, post-fix production
