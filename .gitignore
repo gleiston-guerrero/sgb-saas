@@ -44,6 +44,10 @@ db/init/
 # Scratch files de verificación de bundle (temporales, no versionar)
 live-bundle*.js
 
+# Plan local de recuperacion de nota (documento de trabajo del equipo,
+# NO entregable: no incluir en commits, evidencia, ni tag evaluado)
+PLAN_RECUPERACION_NOTA_8_HONESTO.md
+
 # Graphify MCP Local Artefacts
 graphify-out/
 graph.json
