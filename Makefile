@@ -259,15 +259,13 @@ clean:
 	rm -rf frontend-angular/node_modules/.cache
 	rm -rf db/init
 
-# make verify: EV-2 del examen suspenso -- ejecuta las comprobaciones
-# automáticas del expediente (VERIFICACION.md) y sale 0 solo si todas
-# pasan. Python 3 + git + red (solo p2) + Maven (solo javadoc). Cada
-# script falla con código distinto de cero ante el primer incumplimiento.
+# make verify: EV-2 del examen suspenso -- delega en el orquestador
+# scripts/verify-all.py (unica fuente de verdad; mismo script corre con
+# `python scripts/verify-all.py` donde no hay GNU Make). Clasifica cada
+# punto P1-P12 como "evidencia válida", "PENDIENTE" (visible, nunca
+# aprobado: P3, P5-parcial, firmas P11) o "FALLO", y sale 0 solo si no
+# hay ningun FALLO. Requiere: Python 3 + git + red (p2) + Maven/JDK 21
+# (javadoc, P10) + Docker (P10 Testcontainers; sin Docker ese punto
+# queda PENDIENTE-bloqueado, nunca exito).
 verify:
-	python scripts/verify-p1-hashes.py
-	python scripts/verify-p2-dois.py
-	python scripts/verify-p6-javadoc.py
-	python scripts/verify-p7-names.py
-	python scripts/verify-p12-secrets.py
-	cd backend-springboot && ./mvnw -B javadoc:javadoc
-	@echo "verify: OK"
+	python scripts/verify-all.py
