@@ -16,6 +16,12 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class BackendApplication {
 
+    /**
+     * Constructor sin argumentos para el contenedor de Spring.
+     */
+    public BackendApplication() {
+    }
+
 	/**
      * Handles main.
      *

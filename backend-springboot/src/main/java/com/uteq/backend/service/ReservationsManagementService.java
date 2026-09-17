@@ -51,13 +51,13 @@ public class ReservationsManagementService {
     }
 
     // ── GET /gestion/buscar-usuario?correo= ──────────────────
-    @Transactional(readOnly = true)
     /**
      * Consulta search by email usando los filtros recibidos y devuelve el resultado solicitado.
      *
      * @param email texto de busqueda o filtro usado para reducir los resultados devueltos
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @Transactional(readOnly = true)
     public UserReservationsManagementDTO searchByEmail(String email) {
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException(USUARIO_NO_ENCONTRADO));
@@ -81,13 +81,13 @@ public class ReservationsManagementService {
     // ── GET /gestion/historial-reservaciones?usuarioId= ───────
     // Retorna las reservaciones del usuario con el título del libro
     // resuelto en batch (3 queries: reservaciones, libros, estados).
-    @Transactional(readOnly = true)
     /**
      * Procesa history reservations y devuelve el resultado calculado por el backend.
      *
      * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
      * @return lista de resultados que coincide con la consulta solicitada
      */
+    @Transactional(readOnly = true)
     public List<HistoryReservationDTO> historyReservations(Long userId) {
         // Validar que el usuario exista
         if (!userRepo.existsById(userId)) {
@@ -99,7 +99,7 @@ public class ReservationsManagementService {
                         org.springframework.data.domain.PageRequest.of(0, 50,
                                 org.springframework.data.domain.Sort.by(
                                         org.springframework.data.domain.Sort.Direction.DESC,
-                                        "fechaReserva")))
+                                        "dateReservation")))
                 .getContent();
 
         if (reservations.isEmpty()) {

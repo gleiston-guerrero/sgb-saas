@@ -4,6 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+/**
+ * Body de POST /api/v1/autores y PUT (nombre del catálogo).
+ *
+ * @param name nombre del autor
+ */
 public record AuthorRequestDTO(
         @NotBlank(message = "El nombre es obligatorio")
         @Size(max = 150, message = "El nombre no puede superar 150 caracteres") @JsonProperty("nombre") String name

@@ -135,6 +135,22 @@ class BookControllerSecurityTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
+    void create_conJsonEspanolDelFrontend_sePermite() throws Exception {
+        when(bookService.create(any())).thenReturn(bookCreated());
+
+        // JSON crudo tal como lo manda LibrosComponent (keys en español).
+        // Sin los @JsonProperty el título/editorial/idioma/estado llegaban
+        // null y esto era 400 "El título es obligatorio".
+        mockMvc.perform(post("/api/v1/libros")
+                        .contentType("application/json")
+                        .content("""
+                                {"titulo":"Clean Code","isbn":"9780132350884","anioPublicacion":2008,"editorialId":1,"idiomaId":1,"estadoId":1,"stockTotal":3,"stockDisponible":3}
+                                """))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
     void update_withRoleAdmin_sePermite() throws Exception {
         when(bookService.update(anyLong(), any())).thenReturn(bookCreated());
 

@@ -2,6 +2,7 @@ package com.uteq.backend.controller;
 
 import com.uteq.backend.dto.TypeDamageDTO;
 import com.uteq.backend.service.TypeDamageService;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -24,31 +25,27 @@ public class TypeDamageController {
     public TypeDamageController(TypeDamageService typeDamageService) {
         this.typeDamageService = typeDamageService;
     }
-
-    @GetMapping
-    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     /**
      * Lists tipo damage report.
      *
-     * @return response entity<list<tipo damage report dto>> with the resulting state after the operation
+     * @return response entity{@code <list<tipo damage report dto>>} with the resulting state after the operation
      */
+    @GetMapping
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     public ResponseEntity<List<TypeDamageDTO>> list() {
         return ResponseEntity.ok(typeDamageService.listAll());
     }
-
-    @PostMapping
     /**
      * Registra create validando los datos de entrada antes de persistir cambios.
      *
      * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PostMapping
     public ResponseEntity<TypeDamageDTO> create(@Valid @RequestBody TypeDamageRequestDTO dto) {
         TypeDamageDTO created = typeDamageService.create(dto.name(), dto.categoryId(), dto.typeCost(), dto.value());
         return ResponseEntity.created(URI.create("/api/v1/tipos-dano/" + created.id())).body(created);
     }
-
-    @PutMapping("/{id}")
     /**
      * Actualiza update con las reglas de negocio requeridas por el flujo.
      *
@@ -56,17 +53,17 @@ public class TypeDamageController {
      * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PutMapping("/{id}")
     public ResponseEntity<TypeDamageDTO> update(@PathVariable Integer id, @Valid @RequestBody TypeDamageRequestDTO dto) {
         return ResponseEntity.ok(typeDamageService.update(id, dto.name(), dto.categoryId(), dto.typeCost(), dto.value()));
     }
-
-    @DeleteMapping("/{id}")
     /**
      * Elimina o anula delete despues de validar que la operacion sea permitida.
      *
      * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         typeDamageService.delete(id);
         return ResponseEntity.noContent().build();
@@ -81,9 +78,9 @@ public class TypeDamageController {
      */
 
     public record TypeDamageRequestDTO(
-            @NotBlank String name,
-            @NotNull Integer categoryId,
-            @NotBlank String typeCost,
-            @NotNull @DecimalMin("0") BigDecimal value
+            @NotBlank @JsonProperty("nombre") String name,
+            @NotNull @JsonProperty("categoriaId") Integer categoryId,
+            @NotBlank @JsonProperty("tipoCosto") String typeCost,
+            @NotNull @DecimalMin("0") @JsonProperty("valor") BigDecimal value
     ) {}
 }

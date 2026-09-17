@@ -70,7 +70,9 @@ public class FineController {
     public ResponseEntity<Page<FineDetailResponseDTO>> listDetailByUser(
             @PathVariable("usuarioId") Long userId,
             Authentication authentication,
-            @PageableDefault(size = 10, sort = "statusFineId") Pageable pageable) {
+            // id como segundo criterio: statusFineId tiene cardinalidad 3 y
+            // sin desempate la paginacion puede duplicar/saltar filas.
+            @PageableDefault(size = 10, sort = {"statusFineId", "id"}) Pageable pageable) {
         return ResponseEntity.ok(
                 fineService.listDetailByUser(userId, authentication, pageable));
     }
@@ -106,9 +108,6 @@ public class FineController {
 
         return ResponseEntity.ok(result);
     }
-
-    @PostMapping("/{id}/anulacion")
-    @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
     /**
      * Elimina o anula annul despues de validar que la operacion sea permitida.
      *
@@ -117,6 +116,8 @@ public class FineController {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PostMapping("/{id}/anulacion")
+    @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
     public ResponseEntity<FineActionResponseDTO> annul(
             @PathVariable Long id,
             @Valid @RequestBody CancellationFineRequestDTO dto,

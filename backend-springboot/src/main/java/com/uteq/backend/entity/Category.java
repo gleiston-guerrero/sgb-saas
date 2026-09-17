@@ -6,14 +6,21 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 // Mapea la tabla "categorias".
+/**
+ * Categoría de libros (catálogo "categorias").
+ */
 @Data
-@NoArgsConstructor
 @Entity
 @Table(name = "categorias")
 public class Category {
+
+    /**
+     * Constructor sin argumentos para JPA y Jackson.
+     */
+    public Category() {
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

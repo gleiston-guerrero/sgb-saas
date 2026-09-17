@@ -29,14 +29,13 @@ public class SubscriptionAvailabilityService {
         this.bookRepo = bookRepo;
         this.notificationService = notificationService;
     }
-
-    @Transactional
     /**
      * Ejecuta suscribir aplicando las validaciones necesarias del proceso.
      *
      * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
      * @param bookId identificador del registro que se usa para ubicar el recurso en la base de datos
      */
+    @Transactional
     public void subscribe(Long userId, Long bookId) {
         userRepo.findById(userId).orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado: " + userId));
         Book book = bookRepo.findById(bookId).orElseThrow(() -> new EntityNotFoundException("Libro no encontrado: " + bookId));
@@ -53,35 +52,32 @@ public class SubscriptionAvailabilityService {
             notificationService.notifyBookAvailable(userId, bookId, book.getTitle());
         }
     }
-
-    @Transactional
     /**
      * Ejecuta desuscribir aplicando las validaciones necesarias del proceso.
      *
      * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
      * @param bookId identificador del registro que se usa para ubicar el recurso en la base de datos
      */
+    @Transactional
     public void unsubscribe(Long userId, Long bookId) {
         subscriptionRepo.deleteByUserIdAndBookId(userId, bookId);
     }
-
-    @Transactional(readOnly = true)
     /**
      * Consulta list books ids usando los filtros recibidos y devuelve el resultado solicitado.
      *
      * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
      * @return lista de resultados que coincide con la consulta solicitada
      */
+    @Transactional(readOnly = true)
     public List<Long> listBooksIds(Long userId) {
         return subscriptionRepo.findByUserId(userId).stream().map(SubscriptionAvailability::getBookId).toList();
     }
-
-    @Transactional
     /**
      * Envia notify disponibles usando los datos y destinatarios recibidos.
      *
      * @param bookId identificador del registro que se usa para ubicar el recurso en la base de datos
      */
+    @Transactional
     public void notifyAvailable(Long bookId) {
         Book book = bookRepo.findById(bookId).orElseThrow(() -> new EntityNotFoundException("Libro no encontrado: " + bookId));
         if (book.getStockAvailable() == null || book.getStockAvailable() <= 0) return;

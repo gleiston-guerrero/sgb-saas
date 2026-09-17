@@ -61,14 +61,14 @@ public class LoansManagementController {
     // Autocompletado predictivo: retorna hasta 3 usuarios cuyo correo
     // contenga el texto ingresado (case-insensitive). El frontend lo usa
     // para el dropdown y el placeholder dinámico.
-    @GetMapping("/sugerencias-usuarios")
-    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     /**
      * Procesa suggestions users y devuelve el resultado calculado por el backend.
      *
      * @param email texto de busqueda o filtro usado para reducir los resultados devueltos
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @GetMapping("/sugerencias-usuarios")
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     public ResponseEntity<List<UserSuggestionDTO>> suggestionsUsers(
             @RequestParam("correo") String email) {
         return ResponseEntity.ok(loansManagementService.suggestionsUsers(email));
@@ -77,14 +77,14 @@ public class LoansManagementController {
     // ── GET /api/v1/prestamos/gestion/reserva-activa?usuarioId= ──
     // 404 cuando el usuario NO tiene reserva vigente -> el frontend cae al
     // Caso B (préstamo directo). No es un error para el usuario final.
-    @GetMapping("/reserva-activa")
-    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     /**
      * Procesa reservation active y devuelve el resultado calculado por el backend.
      *
      * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @GetMapping("/reserva-activa")
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     public ResponseEntity<ReservationActiveDTO> reservationActive(@RequestParam("usuarioId") Long userId) {
         return ResponseEntity.ok(loansManagementService.reservationActive(userId));
     }
@@ -92,14 +92,14 @@ public class LoansManagementController {
     // ── GET /api/v1/prestamos/gestion/historial?usuarioId= ────
     // Historial reciente (tope interno en el service) para la línea de
     // tiempo; lista vacía si el usuario no tiene préstamos.
-    @GetMapping("/historial")
-    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     /**
      * Procesa history y devuelve el resultado calculado por el backend.
      *
      * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @GetMapping("/historial")
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     public ResponseEntity<List<HistoryLoanDTO>> history(@RequestParam("usuarioId") Long userId) {
         return ResponseEntity.ok(loansManagementService.history(userId));
     }

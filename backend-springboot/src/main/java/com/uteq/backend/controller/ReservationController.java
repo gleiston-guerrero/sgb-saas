@@ -28,8 +28,6 @@ public class ReservationController {
     }
 
     // ── POST /api/v1/reservaciones ────────────────────────
-    @PostMapping
-    @PreAuthorize("hasAnyRole('LECTOR','BIBLIOTECARIO','GERENTE')")
     /**
      * Registra create validando los datos de entrada antes de persistir cambios.
      *
@@ -37,6 +35,8 @@ public class ReservationController {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PostMapping
+    @PreAuthorize("hasAnyRole('LECTOR','BIBLIOTECARIO','GERENTE')")
     public ResponseEntity<ReservationResponseDTO> create(
             @Valid @RequestBody ReservationRequestDTO dto,
             Authentication authentication) {
@@ -47,24 +47,23 @@ public class ReservationController {
     // ── GET /api/v1/reservaciones/hoy ──────────────────────
     // Dashboard del bibliotecario: reservaciones que vencen hoy, sin
     // paginar (volumen bajo por diseño -- es "las de hoy", no el histórico).
-    @GetMapping("/hoy")
-    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     /**
      * Handles reservations de hoy.
      *
-     * @return response entity<list<reservacion hoy response dto>> with the resulting state after the operation
+     * @return response entity{@code <list<reservacion hoy response dto>>} with the resulting state after the operation
      */
+    @GetMapping("/hoy")
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     public ResponseEntity<List<ReservationTodayResponseDTO>> reservationsToday() {
         return ResponseEntity.ok(reservationService.searchReservationsToday());
     }
-
-    @GetMapping("/proximas")
-    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     /**
      * Handles reservations proximas.
      *
-     * @return response entity<list<reservacion hoy response dto>> with the resulting state after the operation
+     * @return response entity{@code <list<reservacion hoy response dto>>} with the resulting state after the operation
      */
+    @GetMapping("/proximas")
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     public ResponseEntity<List<ReservationTodayResponseDTO>> reservationsNexts() {
         return ResponseEntity.ok(reservationService.searchReservationsNexts());
     }
@@ -74,8 +73,6 @@ public class ReservationController {
     // (PENDIENTE -> CANCELADA) la reservación de un lector. Es la acción
     // manual que faltaba del RF-10: hasta ahora el LECTOR podía crear y el
     // sistema expirar, pero nadie podía marcar "listo para retirar".
-    @PatchMapping("/{id}/estado")
-    @PreAuthorize("hasAnyRole('LECTOR','BIBLIOTECARIO','GERENTE','ADMIN')")
     /**
      * Actualiza change status con las reglas de negocio requeridas por el flujo.
      *
@@ -84,6 +81,8 @@ public class ReservationController {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PatchMapping("/{id}/estado")
+    @PreAuthorize("hasAnyRole('LECTOR','BIBLIOTECARIO','GERENTE','ADMIN')")
     public ResponseEntity<ReservationResponseDTO> changeStatus(
             @PathVariable Long id,
             @Valid @RequestBody ChangeStatusReservationRequestDTO dto,

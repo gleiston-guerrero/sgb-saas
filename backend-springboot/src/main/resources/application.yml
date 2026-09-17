@@ -73,6 +73,12 @@ notificaciones:
   minutos-anticipacion-vencimiento: ${NOTIF_MINUTOS_ANTICIPACION_VENCIMIENTO:15}
 
 app:
+  auth:
+    # Secure de la cookie refreshToken. true en prod (https + SameSite=None
+    # para cross-site Render). En dev local http://localhost:4200 la cookie
+    # con Secure se descarta y el refresh falla con 400: arrancar con
+    # AUTH_COOKIE_SECURE=false (pasa a SameSite=Lax, ver AuthController).
+    cookie-secure: ${AUTH_COOKIE_SECURE:true}
   cache:
     libros:
       # TTL del listado de libros (GET /api/v1/libros). Se invalida con @CacheEvict al mutar.

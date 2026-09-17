@@ -107,7 +107,7 @@ describe('MultasComponent', () => {
     expect(multaService.listarDetallePorUsuario).toHaveBeenCalledWith(3, jasmine.objectContaining({
       page: 0,
       size: 5,
-      sort: 'estadoMultaId,asc'
+      sort: 'statusFineId,asc'
     }));
     expect(component.multas.length).toBe(2);
     expect(component.esLector).toBeTrue();
@@ -172,6 +172,20 @@ describe('MultasComponent', () => {
     expect(prestamoService.buscarUsuarioPorCorreo).toHaveBeenCalledWith('juan.perez@correo.com');
     expect(component.usuarioSeleccionado?.id).toBe(3);
     expect(multaService.listarDetallePorUsuario).toHaveBeenCalledWith(3, jasmine.anything());
+  });
+
+  // Regresión prod (/multas/usuario/undefined/detalle -> 500):
+  // respuesta sin id no dispara la carga de multas.
+  it('no carga multas si la búsqueda trae usuario sin id', () => {
+    authService.hasRole.and.returnValue(false);
+    prestamoService.buscarUsuarioPorCorreo.and.returnValue(of({ ...mockUsuario, id: undefined } as any));
+    fixture.detectChanges();
+    multaService.listarDetallePorUsuario.calls.reset();
+
+    component.onBuscarAhora('juan.perez@correo.com');
+
+    expect(multaService.listarDetallePorUsuario).not.toHaveBeenCalled();
+    expect(component.errorMsg).toBe('La respuesta no trae identificador de usuario.');
   });
 
   it('registra un pago parcial correctamente', () => {

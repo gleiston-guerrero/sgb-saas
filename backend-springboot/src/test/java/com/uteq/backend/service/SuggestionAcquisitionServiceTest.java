@@ -58,7 +58,8 @@ class SuggestionAcquisitionServiceTest {
         given(authentication.getName()).willReturn("lector@correo.com");
         given(userRepo.findByEmail("lector@correo.com")).willReturn(Optional.of(userWithId(7L)));
         Page<SuggestionAcquisition> page = new PageImpl<>(List.of(suggestionWithId(1L, 7L)));
-        given(suggestionRepo.findByUserId(7L, Pageable.unpaged())).willReturn(page);
+        given(suggestionRepo.findByUserId(org.mockito.ArgumentMatchers.eq(7L),
+                org.mockito.ArgumentMatchers.any(Pageable.class))).willReturn(page);
 
         Page<SuggestionAcquisitionResponseDTO> result =
                 suggestionService.listOwns(authentication, Pageable.unpaged());
@@ -67,11 +68,31 @@ class SuggestionAcquisitionServiceTest {
         assertThat(result.getContent().get(0).userId()).isEqualTo(7L);
     }
 
+    // ── Regresión prod (?sort=creadoEn -> 500): el sort legacy en español
+    // se traduce al atributo JPA antes de la query ──
+    @Test
+    void listOwns_conSortLegacyCreadoEn_repoRecibeCreated() {
+        given(authentication.getName()).willReturn("lector@correo.com");
+        given(userRepo.findByEmail("lector@correo.com")).willReturn(Optional.of(userWithId(7L)));
+        given(suggestionRepo.findByUserId(org.mockito.ArgumentMatchers.eq(7L),
+                org.mockito.ArgumentMatchers.any(Pageable.class)))
+                .willReturn(Page.empty());
+
+        suggestionService.listOwns(authentication,
+                org.springframework.data.domain.PageRequest.of(0, 10,
+                        org.springframework.data.domain.Sort.by("creadoEn").descending()));
+
+        org.mockito.Mockito.verify(suggestionRepo).findByUserId(
+                org.mockito.ArgumentMatchers.eq(7L),
+                org.mockito.ArgumentMatchers.argThat((Pageable p) ->
+                        p.getSort().stream().anyMatch(o -> o.getProperty().equals("created"))));
+    }
+
     // ── Test 3: listarTodas sin filtro de estado trae todas ──
     @Test
     void listTodas_withoutFilterStatus_traeTodas() {
         Page<SuggestionAcquisition> page = new PageImpl<>(List.of(suggestionWithId(1L, 7L)));
-        given(suggestionRepo.findAll(Pageable.unpaged())).willReturn(page);
+        given(suggestionRepo.findAll(org.mockito.ArgumentMatchers.any(Pageable.class))).willReturn(page);
 
         Page<SuggestionAcquisitionResponseDTO> result =
                 suggestionService.listAll(null, Pageable.unpaged());

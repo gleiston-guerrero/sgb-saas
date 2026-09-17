@@ -16,35 +16,33 @@ public record CoverImageDTO(
         byte[] bytes,
         String contentType
 ) {
-    @Override
     /**
      * Procesa equals y devuelve el resultado calculado por el backend.
      *
      * @param o valor de entrada o usado por la operacion para completar su regla de negocio
      * @return true cuando la comprobacion se cumple; false en caso contrario
      */
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof CoverImageDTO otro)) return false;
         return Arrays.equals(bytes, otro.bytes) && Objects.equals(contentType, otro.contentType);
     }
-
-    @Override
     /**
      * Checks whether hash code.
      *
      * @return generated identifier of the affected record
      */
+    @Override
     public int hashCode() {
         return 31 * Arrays.hashCode(bytes) + Objects.hashCode(contentType);
     }
-
-    @Override
     /**
      * Handles to string.
      *
      * @return resulting text payload
      */
+    @Override
     public String toString() {
         return "PortadaImagenDTO[bytes=" + Arrays.toString(bytes) + ", contentType=" + contentType + "]";
     }

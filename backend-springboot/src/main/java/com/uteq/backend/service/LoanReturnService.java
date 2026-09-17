@@ -97,8 +97,6 @@ public class LoanReturnService {
         this.evidenceDamageRepo = evidenceDamageRepo;
         this.configurationSystemService = configurationSystemService;
     }
-
-    @Transactional
     /**
      * Registra register loan return validando los datos de entrada antes de persistir cambios.
      *
@@ -107,6 +105,7 @@ public class LoanReturnService {
      * @param librarianId valor de entrada librarianId usado por la operacion para completar su regla de negocio
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @Transactional
     public LoanReturnFullResponseDTO registerLoanReturn(
             Long loanId, LoanReturnRequestDTO dto, Long librarianId) {
 
@@ -235,12 +234,11 @@ public class LoanReturnService {
                 amountTotal,
                 damagesRegistrados);
     }
-
-    @Transactional(readOnly = true)
     /**
          * Busca/lista recursos.
      * @return lista o pagina de resultados
      */
+    @Transactional(readOnly = true)
     public List<TypeDamageDTO> listTypesDamage() {
         return typeDamageRepo.findByActiveTrue().stream()
                 .map(t -> new TypeDamageDTO(t.getId(), t.getName(),
@@ -249,14 +247,13 @@ public class LoanReturnService {
                         t.getTypeCost(), t.getValue()))
                 .toList();
     }
-
-    @Transactional(readOnly = true)
     /**
      * Procesa history loan returns y devuelve el resultado calculado por el backend.
      *
      * @param librarianId valor de entrada librarianId usado por la operacion para completar su regla de negocio
      * @return lista de resultados que coincide con la consulta solicitada
      */
+    @Transactional(readOnly = true)
     public List<LoanReturnHistoryDTO> historyLoanReturns(Long librarianId) {
         List<RegistrationDamage> registrations = registrationDamageRepo
                 .findTop10ByLibrarianIdOrderByDateRegistrationDesc(
@@ -318,8 +315,6 @@ public class LoanReturnService {
     }
 
     // ── Evidencia fotográfica ──────────────────────────────
-
-    @Transactional
     /**
      * Procesa upload evidence y devuelve el resultado calculado por el backend.
      *
@@ -328,6 +323,7 @@ public class LoanReturnService {
      * @param librarianId valor de entrada librarianId usado por la operacion para completar su regla de negocio
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @Transactional
     public EvidenceDamageResponseDTO uploadEvidence(Long registrationDamageId, MultipartFile file, Long librarianId) {
         RegistrationDamage registration = registrationDamageRepo.findById(registrationDamageId)
                 .orElseThrow(() -> new EntityNotFoundException("Registro de daño no encontrado: " + registrationDamageId));
@@ -369,14 +365,13 @@ public class LoanReturnService {
                 evidence.getFileType(),
                 evidence.getSubido());
     }
-
-    @Transactional(readOnly = true)
     /**
      * Consulta list evidences usando los filtros recibidos y devuelve el resultado solicitado.
      *
      * @param registrationDamageId identificador del registro que se usa para ubicar el recurso en la base de datos
      * @return lista de resultados que coincide con la consulta solicitada
      */
+    @Transactional(readOnly = true)
     public List<EvidenceDamageResponseDTO> listEvidences(Long registrationDamageId) {
         return evidenceDamageRepo.findByRegistrationDamageId(registrationDamageId).stream()
                 .map(e -> new EvidenceDamageResponseDTO(
@@ -384,14 +379,13 @@ public class LoanReturnService {
                         e.getFileName(), e.getFileType(), e.getSubido()))
                 .toList();
     }
-
-    @Transactional(readOnly = true)
     /**
      * Consulta get file evidence usando los filtros recibidos y devuelve el resultado solicitado.
      *
      * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @Transactional(readOnly = true)
     public EvidenceDamageResponseDTO getFileEvidence(Long id) {
         EvidenceDamage evidence = evidenceDamageRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Evidencia no encontrada: " + id));
@@ -399,14 +393,13 @@ public class LoanReturnService {
                 evidence.getId(), evidence.getRegistrationDamageId(),
                 evidence.getFileName(), evidence.getFileType(), evidence.getSubido());
     }
-
-    @Transactional(readOnly = true)
     /**
      * Consulta get file binario usando los filtros recibidos y devuelve el resultado solicitado.
      *
      * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @Transactional(readOnly = true)
     public EvidenceDamageFileDTO getFileBinary(Long id) {
         EvidenceDamage evidence = evidenceDamageRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Evidencia no encontrada: " + id));

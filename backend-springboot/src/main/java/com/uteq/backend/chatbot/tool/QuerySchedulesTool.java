@@ -17,23 +17,21 @@ public class QuerySchedulesTool extends AbstractKnowledgeBaseTool {
     public QuerySchedulesTool(BaseKnowledgeRepository baseKnowledgeRepo) {
         super(baseKnowledgeRepo);
     }
-
-    @Override
     /**
      * Retrieves name.
      *
      * @return resulting text payload
      */
+    @Override
     public String getName() {
         return "consultar_horarios";
     }
-
-    @Override
     /**
      * Retrieves scription.
      *
      * @return resulting text payload
      */
+    @Override
     public String getDescription() {
         return "Consulta los horarios de apertura de la biblioteca. "
                 + "Incluye horarios de lunes a viernes, sábados y días especiales.";

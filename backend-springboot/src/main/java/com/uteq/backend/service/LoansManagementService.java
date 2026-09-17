@@ -105,13 +105,13 @@ public class LoansManagementService {
     }
 
     // ── GET /gestion/buscar-usuario?correo= ──────────────────
-    @Transactional(readOnly = true)
     /**
      * Consulta search by email usando los filtros recibidos y devuelve el resultado solicitado.
      *
      * @param email texto de busqueda o filtro usado para reducir los resultados devueltos
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @Transactional(readOnly = true)
     public UserLoansManagementDTO searchByEmail(String email) {
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException(USUARIO_NO_ENCONTRADO));
@@ -140,13 +140,13 @@ public class LoansManagementService {
     // ── GET /gestion/sugerencias-usuarios?correo= ───────────
     // Autocompletado predictivo: retorna hasta 3 usuarios cuyo correo
     // contenga el texto ingresado (case-insensitive).
-    @Transactional(readOnly = true)
     /**
      * Procesa suggestions users y devuelve el resultado calculado por el backend.
      *
      * @param email texto de busqueda o filtro usado para reducir los resultados devueltos
      * @return lista de resultados que coincide con la consulta solicitada
      */
+    @Transactional(readOnly = true)
     public List<UserSuggestionDTO> suggestionsUsers(String email) {
         if (email == null || email.trim().length() < 2) {
             return List.of();
@@ -164,13 +164,13 @@ public class LoansManagementService {
     // ── GET /gestion/reserva-activa?usuarioId= ───────────────
     // 404 (EntityNotFoundException) si no hay reserva vigente: el frontend
     // interpreta ese 404 como "Caso B: préstamo directo".
-    @Transactional(readOnly = true)
     /**
      * Procesa reservation active y devuelve el resultado calculado por el backend.
      *
      * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @Transactional(readOnly = true)
     public ReservationActiveDTO reservationActive(Long userId) {
         List<Integer> idsVigentes = ESTADOS_RESERVA_VIGENTE.stream()
                 .map(this::idStatusReservation)
@@ -212,13 +212,13 @@ public class LoansManagementService {
     // agrupadas), nunca una por fila. Lista vacía si el usuario no tiene
     // préstamos: el frontend muestra "Este usuario no tiene préstamos
     // registrados".
-    @Transactional(readOnly = true)
     /**
      * Procesa history y devuelve el resultado calculado por el backend.
      *
      * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
      * @return lista de resultados que coincide con la consulta solicitada
      */
+    @Transactional(readOnly = true)
     public List<HistoryLoanDTO> history(Long userId) {
         List<Loan> loans = loanRepo.findByUserIdOrderByIdDesc(userId);
         if (loans.isEmpty()) {

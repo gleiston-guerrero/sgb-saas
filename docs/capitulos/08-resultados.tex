@@ -41,7 +41,14 @@ en \texttt{docs/mediciones/perf/REPORT.md}. Detalle completo del
 protocolo (comando exacto, entorno, semillas) en el
 \autoref{cap:materiales-metodos}.
 
-\textbf{Estadística descriptiva (5 corridas agregadas).}
+\textbf{Estadística descriptiva (5 corridas agregadas, serie 2026-09-17).}
+La serie anterior (julio/agosto 2026, \texttt{REPORT.md}) queda como
+historia metodológica; los números de abajo son la re-medición exigida
+al cierre, ejecutada el 2026-09-17 contra el \emph{stack} local
+reconstruido desde el commit \texttt{fcda4808} (imágenes
+\texttt{sgb-saas-backend/frontend} recompiladas ese día, 50~VUs,
+mismo perfil de \texttt{k6/opts.js}). Resumen por corrida y SHA-256 de
+los NDJSON en \texttt{docs/mediciones/perf/REPORT.md}.
 
 \begin{table}[h]
 \centering
@@ -51,19 +58,40 @@ protocolo (comando exacto, entorno, semillas) en el
 \toprule
 Escenario & $n$ & Media & Mediana & $\sigma$ & IC95\% media & p90 & p95 & p99 \\
 \midrule
-cache\_caliente & 9\,929 & 18,89 & 5,49 & 150,74 & [15,93; 21,86] & 11,66 & \textbf{19,49} & 104,79 \\
-cache\_frio     & 10\,074 & 4,84 & 4,34 & 2,88 & [4,78; 4,89] & 6,70 & \textbf{7,50} & 12,32 \\
+cache\_caliente & 9\,821 & 29,84 & 22,63 & 29,86 & [29,25; 30,43] & 46,99 & \textbf{65,60} & 129,36 \\
+cache\_frio     & 10\,006 & 11,01 & 10,30 & 3,41 & [10,95; 11,08] & 15,06 & \textbf{17,13} & 23,24 \\
 \bottomrule
 \end{tabular}
-\caption{Estadística descriptiva de \texttt{http\_req\_duration} (ms) por escenario, 5 corridas agregadas}
+\caption{Estadística descriptiva de \texttt{http\_req\_duration} (ms) por escenario, 5 corridas agregadas (serie 2026-09-17)}
 \label{tab:res-perf-descriptivo}
 \end{table}
 
 Ambos umbrales exigidos se cumplen con margen amplio: p95
-$19{,}49$\,ms $<200$\,ms (caliente), p95 $7{,}50$\,ms $<500$\,ms (frío)
+$65{,}60$\,ms $<200$\,ms (caliente), p95 $17{,}13$\,ms $<500$\,ms (frío)
 (ver \autoref{tab:res-perf-descriptivo}).
-Tasa de error HTTP $\geq$500: $0{,}00$\,\% (0 de 20\,003 peticiones
-totales).
+Tasa de error HTTP $\geq$500: $0{,}00$\,\% (0 de 19\,827 peticiones
+totales). La distribución completa y el \emph{throughput} por corrida
+se visualizan en las \autoref{fig:res-perf-distribucion} y
+\autoref{fig:res-perf-throughput}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\textwidth]{mediciones/figuras/fig-k6-distribucion-latencia.pdf}
+\caption{Latency distribution of \texttt{http\_req\_duration} per scenario,
+5 runs pooled (2026-09-17 series). Generated from the versioned k6 NDJSON
+raws with \texttt{scripts/generar-figuras-evaluacion.py}.}
+\label{fig:res-perf-distribucion}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\textwidth]{mediciones/figuras/fig-k6-throughput.pdf}
+\caption{Throughput (req/s) per run and scenario, \texttt{GET
+/api/v1/libros} under 50~VUs (2026-09-17 series). Generated from the
+versioned k6 NDJSON raws with
+\texttt{scripts/generar-figuras-evaluacion.py}.}
+\label{fig:res-perf-throughput}
+\end{figure}
 
 \textbf{Comparación estadística pareada.} Prueba de Wilcoxon de rangos
 con signo sobre el p95 de cada una de las 5 corridas (no sobre el
@@ -73,8 +101,9 @@ límite de potencia estadística de $n=5$ pares con dirección
 perfectamente consistente (\texttt{cache\_caliente}~$>$~\texttt{cache\_frio}
 en las 5 corridas, sin excepción; el $p$-valor exacto de dos colas mínimo
 alcanzable con $n=5$ es exactamente $0{,}0625$). Tamaño de efecto de
-Cliff's delta $=-0{,}68$ (efecto \textbf{grande}, convención
-$|\delta|\geq0{,}474$).
+Cliff's delta $=-1{,}00$ (efecto \textbf{grande}, convención
+$|\delta|\geq0{,}474$; dirección perfectamente consistente en las 5
+corridas).
 
 \textbf{Correcciones por comparaciones múltiples.} No aplican en este
 estudio: se realizó una única comparación pareada planificada
@@ -186,7 +215,18 @@ cobertura.
 \textbf{Estadística descriptiva (ambas corridas, local).}
 \emph{Baseline} (2026-08-16): 1~\emph{High}, 1~\emph{Medium}, 5~\emph{Low},
 2~\emph{Informational}. \emph{Ajax Spider} (2026-08-17): 2~\emph{High},
-2~\emph{Medium}, 5~\emph{Low}, 2~\emph{Informational}.
+2~\emph{Medium}, 5~\emph{Low}, 2~\emph{Informational}
+(ver \autoref{fig:res-zap-riesgos}).
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.7\textwidth]{mediciones/figuras/fig-zap-riesgos.pdf}
+\caption{ZAP Ajax Spider alerts by risk level (local stack, 2026-08-17,
+11 alerts). Source:
+\texttt{docs/mediciones/sec/zap/2026-08-17-zap-ajax-full-report.json};
+generated with \texttt{scripts/generar-figuras-evaluacion.py}.}
+\label{fig:res-zap-riesgos}
+\end{figure}
 
 \textbf{Los 2 hallazgos \emph{High} del Ajax Spider, explicados con
 honestidad, no ocultados ni retirados del reporte.} Los archivos
@@ -338,7 +378,17 @@ Domain/Entity & --- & Excluido & N/A \\
 \label{tab:res-jacoco-capas-vigente}
 \end{table}
 
-\textbf{Interpretación por capa (vigente al cierre, \autoref{tab:res-jacoco-capas-vigente}).} La medición vigente deja \texttt{controller} por encima del umbral interno (97,03\,\% de líneas; 75,51\,\% de ramas) y \texttt{service} cruza el umbral en líneas (87,38\,\%) y ramas (77,70\,\%). El detalle numérico queda en el XML versionado para evitar mezclar cifras de cierre con cifras históricas dentro del texto defendido.
+\textbf{Interpretación por capa (vigente al cierre, \autoref{tab:res-jacoco-capas-vigente}).} La medición vigente deja \texttt{controller} por encima del umbral interno (97,03\,\% de líneas; 75,51\,\% de ramas) y \texttt{service} cruza el umbral en líneas (87,38\,\%) y ramas (77,70\,\%). El detalle numérico queda en el XML versionado para evitar mezclar cifras de cierre con cifras históricas dentro del texto defendido. La \autoref{fig:res-jacoco-paquetes} desagrega la cobertura de instrucciones por paquete desde el CSV canónico.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\textwidth]{mediciones/figuras/fig-jacoco-paquetes.pdf}
+\caption{JaCoCo instruction coverage by package (top 12), from the
+canonical \texttt{docs/mediciones/jacoco/report.csv} (49 instrumented
+classes). Generated with
+\texttt{scripts/generar-figuras-evaluacion.py}.}
+\label{fig:res-jacoco-paquetes}
+\end{figure}
 
 La capa \texttt{Domain/Entity} (\texttt{com.uteq.backend.entity}) está deliberadamente excluida de la medición JaCoCo, tal como se declara en \texttt{backend-springboot/pom.xml} mediante las exclusiones: \texttt{com/uteq/backend/entity/**} (entidades JPA con getters/setters generados por Lombok, sin lógica de negocio propia), \texttt{com/uteq/backend/dto/**} (DTOs de transporte, solo estructura de datos), \texttt{com/uteq/backend/config/**} (configuración de beans/framework, probada indirectamente por tests de integración), y \texttt{com/uteq/backend/BackendApplication.class} (punto de entrada, sin lógica testable aislada). Estas exclusiones reflejan que dichos paquetes no aportan lógica de negocio medible en términos de cobertura de línea/rama; el código testable con lógica de negocio real reside en \texttt{service}, \texttt{controller}, \texttt{scheduling} y \texttt{security}, que sí son medidos. Con esas capas por encima del umbral de líneas al cierre, el equipo mantiene la exclusión de entidades/DTOs/config como decisión de diseño documentada y razonada.
 
@@ -515,7 +565,17 @@ SEO & 100,0 $\pm$ 0,0 & 100,0 $\pm$ 0,0 & $\geq$90 \\
 \label{tab:res-lighthouse-perfiles}
 \end{table}
 
-Como resume \autoref{tab:res-lighthouse-perfiles}, las 4 categorías cumplen su umbral en \textbf{ambos perfiles} (móvil y escritorio), en las 6 corridas individuales (3 por perfil). Escritorio alcanza 100,0 en todas las categorías (DT 0,0); móvil alcanza 100,0 en Accessibility, Best Practices y SEO, y 86,3 $\pm$ 1,5 en Performance (margen cómodo sobre 80). Se cumple con margen el requisito de la Guía: ``al menos tres corridas por perfil (mobile, desktop) con media y desviación típica por categoría'' (P4/B.10).
+Como resume \autoref{tab:res-lighthouse-perfiles}, las 4 categorías cumplen su umbral en \textbf{ambos perfiles} (móvil y escritorio), en las 6 corridas individuales (3 por perfil). Escritorio alcanza 100,0 en todas las categorías (DT 0,0); móvil alcanza 100,0 en Accessibility, Best Practices y SEO, y 86,3 $\pm$ 1,5 en Performance (margen cómodo sobre 80). Se cumple con margen el requisito de la Guía: ``al menos tres corridas por perfil (mobile, desktop) con media y desviación típica por categoría'' (P4/B.10). La \autoref{fig:res-lighthouse-medias} visualiza esas medias post-fix.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\textwidth]{mediciones/figuras/fig-lighthouse-puntajes.pdf}
+\caption{Mean Lighthouse scores per category and profile, post-fix
+production round (2026-08-18, 3 runs per profile). Computed from the
+versioned \texttt{lhci-*-prod-20260818-*.json} raws with
+\texttt{scripts/generar-figuras-evaluacion.py}.}
+\label{fig:res-lighthouse-medias}
+\end{figure}
 
 \section{Bloque 5 -- Usabilidad (SUS)}
 \label{sec:res-usabilidad}

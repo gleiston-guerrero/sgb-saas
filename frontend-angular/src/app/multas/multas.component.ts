@@ -108,6 +108,11 @@ export class MultasComponent implements OnInit {
     this.prestamoService.buscarUsuarioPorCorreo(correo).subscribe({
       next: (usuario) => {
         this.usuarioSeleccionado = usuario;
+        if (usuario?.id == null) {
+          this.cargando = false;
+          this.errorMsg = 'La respuesta no trae identificador de usuario.';
+          return;
+        }
         this.cargarMultas(usuario.id);
       },
       error: () => {
@@ -122,7 +127,7 @@ export class MultasComponent implements OnInit {
     this.multaService.listarDetallePorUsuario(usuarioId, {
       page: this.currentPage,
       size: this.pageSize,
-      sort: 'estadoMultaId,asc'
+      sort: 'statusFineId,asc'
     }).subscribe({
       next: (data) => {
         this.multas = data.content;

@@ -8,5 +8,5 @@ import jakarta.validation.constraints.Size;
 public record ResetPasswordRequestDTO(
         @NotBlank @Email @JsonProperty("correo") String email,
         @NotBlank @JsonProperty("codigo") String code,
-        @NotBlank @Size(min = 8, max = 72) String freshPassword
+        @NotBlank @Size(min = 8, max = 72) @JsonProperty("nuevaPassword") String freshPassword
 ) {}

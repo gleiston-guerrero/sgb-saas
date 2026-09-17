@@ -35,35 +35,32 @@ public class QueryReservationsTool extends AbstractUserAwareTool {
         this.statusReservationRepo = statusReservationRepo;
         this.bookRepo = bookRepo;
     }
-
-    @Override
     /**
      * Retrieves name.
      *
      * @return resulting text payload
      */
+    @Override
     public String getName() {
         return "consultar_reservaciones";
     }
-
-    @Override
     /**
      * Retrieves scription.
      *
      * @return resulting text payload
      */
+    @Override
     public String getDescription() {
         return "Consulta las reservas vigentes (PENDIENTE o LISTA_PARA_RETIRO) de un usuario de la biblioteca. "
                 + "Devuelve el listado con libro, fechas y estado.";
     }
-
-    @Override
     /**
      * Procesa execute y devuelve el resultado calculado por el backend.
      *
      * @param args argumento recibido por la herramienta del chatbot para decidir y ejecutar la accion
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @Override
     public JsonNode execute(JsonNode args) {
         Long userId = resolveUserId(args);
         if (userId == null) {

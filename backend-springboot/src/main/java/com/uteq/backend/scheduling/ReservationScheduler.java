@@ -52,10 +52,10 @@ public class ReservationScheduler {
     // initialDelay de 60s para no competir con Flyway/seed en el arranque
     // (antes el primer disparo era inmediato y fallaba en contexto de test
     // con H2 vacío o en Postgres antes de terminar el seed).
-    @Scheduled(fixedRate = 15 * 60 * 1000, initialDelay = 60 * 1000)
     /**
      * Handles expirar reservations Vencidas.
      */
+    @Scheduled(fixedRate = 15 * 60 * 1000, initialDelay = 60 * 1000)
     public void expireOverdueReservations() {
         List<Integer> statusIds = ESTADOS_RESERVA_POR_EXPIRAR.stream()
                 .map(this::idStatus)

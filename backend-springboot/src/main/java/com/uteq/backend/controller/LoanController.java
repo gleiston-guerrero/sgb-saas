@@ -43,8 +43,6 @@ public class LoanController {
     }
 
     // ── POST /api/v1/prestamos ────────────────────────────
-    @PostMapping
-    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     /**
      * Registra create validando los datos de entrada antes de persistir cambios.
      *
@@ -52,6 +50,8 @@ public class LoanController {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PostMapping
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     public ResponseEntity<LoanResponseDTO> create(
             @Valid @RequestBody LoanRequestDTO dto,
             Authentication authentication) {
@@ -60,14 +60,14 @@ public class LoanController {
     }
 
     // ── POST /api/v1/prestamos/{id}/devolucion ────────────
-    @PostMapping("/{id}/devolucion")
-    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     /**
      * Registra register loan return validando los datos de entrada antes de persistir cambios.
      *
      * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PostMapping("/{id}/devolucion")
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     public ResponseEntity<LoanReturnResponseDTO> registerLoanReturn(@PathVariable Long id) {
         return ResponseEntity.ok(loanService.registerLoanReturn(id));
     }
@@ -75,8 +75,6 @@ public class LoanController {
     // ── POST /api/v1/prestamos/{id}/renovacion ────────────
     // LECTOR solo su propio préstamo (verificado dentro de
     // PrestamoService.renovar()); BIBLIOTECARIO/GERENTE/ADMIN, cualquiera.
-    @PostMapping("/{id}/renovacion")
-    @PreAuthorize("hasAnyRole('LECTOR','BIBLIOTECARIO','GERENTE','ADMIN')")
     /**
      * Actualiza renew con las reglas de negocio requeridas por el flujo.
      *
@@ -84,6 +82,8 @@ public class LoanController {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PostMapping("/{id}/renovacion")
+    @PreAuthorize("hasAnyRole('LECTOR','BIBLIOTECARIO','GERENTE','ADMIN')")
     public ResponseEntity<RenewalResponseDTO> renew(
             @PathVariable Long id, Authentication authentication) {
         return ResponseEntity.ok(loanService.renew(id, authentication));
@@ -109,8 +109,6 @@ public class LoanController {
     }
 
     // ── GET /api/v1/prestamos/usuario/{usuarioId}/activos ─
-    @GetMapping("/usuario/{usuarioId}/activos")
-    @PreAuthorize("hasAnyRole('LECTOR','BIBLIOTECARIO','GERENTE')")
     /**
      * Consulta list actives by user usando los filtros recibidos y devuelve el resultado solicitado.
      *
@@ -118,6 +116,8 @@ public class LoanController {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @GetMapping("/usuario/{usuarioId}/activos")
+    @PreAuthorize("hasAnyRole('LECTOR','BIBLIOTECARIO','GERENTE')")
     public ResponseEntity<List<LoanActiveResponseDTO>> listActivesByUser(
             @PathVariable("usuarioId") Long userId,
             Authentication authentication) {
@@ -429,10 +429,11 @@ public class LoanController {
             @RequestParam(required = false) Short stockDispMin,
             @RequestParam(required = false) Short stockDispMax,
             @RequestParam(name = "ubicacion", required = false) String location,
-            // sort con el nombre FISICO de columna (titulo): reportInventoryPaginated
-            // usa fn_reporte_inventario, funcion RETURNS TABLE incondicionalmente
-            // nativa (LoanProcedureRepository).
-            @PageableDefault(size = 20, sort = "titulo") Pageable pageable) {
+            // Sin sort por defecto: reportInventoryPaginated solo lee
+            // pageSize/offset hacia fn_reporte_inventario (el orden lo fija
+            // la funcion); un sort aqui viajaria en el PageImpl sin
+            // aplicarse al SQL.
+            @PageableDefault(size = 20) Pageable pageable) {
         return ResponseEntity.ok(loanService.reportInventoryPaginated(
                 categoryId, statusStock, busqueda, publisherId, supplierId, statusBookId, languageId,
                 yearFrom, yearUntil, stockTotalMin, stockTotalMax, stockDispMin, stockDispMax, location, pageable));

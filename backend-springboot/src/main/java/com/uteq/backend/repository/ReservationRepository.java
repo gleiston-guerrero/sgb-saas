@@ -14,7 +14,7 @@ import java.util.Optional;
 
 /**
  * CRUD elemental sobre {@code reservaciones}. La expiración masiva vive
- * en {@link ReservationProcedureRepository#spExpireReservationsVencidas}.
+ * en {@link ReservationProcedureRepositoryCustom#spExpireReservationsVencidasProcedure}.
  */
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
@@ -49,13 +49,13 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     // INTERVAL '1 day' (literal de intervalo especifico de PostgreSQL, sin
     // equivalente portable en JPQL).
     @Query(value = """
-        SELECT r.id AS reservacionId,
-               u.nombre || ' ' || u.apellido AS usuarioNombre,
-               u.correo AS usuarioCorreo,
-               l.titulo AS libroTitulo,
-               l.isbn AS libroIsbn,
-               er.nombre AS estadoNombre,
-               r.fecha_limite_retiro AS fechaLimiteRetiro
+        SELECT r.id AS reservationId,
+               u.nombre || ' ' || u.apellido AS userName,
+               u.correo AS userEmail,
+               l.titulo AS bookTitle,
+               l.isbn AS bookIsbn,
+               er.nombre AS statusName,
+               r.fecha_limite_retiro AS dateLimitPickup
         FROM reservaciones r
         JOIN usuarios u ON u.id = r.usuario_id
         JOIN libros l ON l.id = r.libro_id
@@ -68,13 +68,13 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<ReservationTodayProjection> searchReservationsToday();
 
     @Query(value = """
-        SELECT r.id AS reservacionId,
-               u.nombre || ' ' || u.apellido AS usuarioNombre,
-               u.correo AS usuarioCorreo,
-               l.titulo AS libroTitulo,
-               l.isbn AS libroIsbn,
-               er.nombre AS estadoNombre,
-               r.fecha_limite_retiro AS fechaLimiteRetiro
+        SELECT r.id AS reservationId,
+               u.nombre || ' ' || u.apellido AS userName,
+               u.correo AS userEmail,
+               l.titulo AS bookTitle,
+               l.isbn AS bookIsbn,
+               er.nombre AS statusName,
+               r.fecha_limite_retiro AS dateLimitPickup
         FROM reservaciones r
         JOIN usuarios u ON u.id = r.usuario_id
         JOIN libros l ON l.id = r.libro_id

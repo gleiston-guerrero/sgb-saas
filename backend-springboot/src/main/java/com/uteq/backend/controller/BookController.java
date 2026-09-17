@@ -25,6 +25,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+/**
+ * Catálogo de libros: búsqueda pública autenticada y gestión
+ * (BIBLIOTECARIO/GERENTE/ADMIN), más portadas e ISBN externo.
+ */
 @RestController
 @RequestMapping("/api/v1/libros")
 @Validated
@@ -33,6 +37,12 @@ public class BookController {
     private final BookService bookService;
     private final BookIsbnLookupService bookIsbnLookupService;
 
+    /**
+     * Constructor con los servicios del catálogo.
+     *
+     * @param bookService servicio CRUD y búsquedas del catálogo
+     * @param bookIsbnLookupService servicio de autocompletado por ISBN externo
+     */
     public BookController(BookService bookService, BookIsbnLookupService bookIsbnLookupService) {
         this.bookService = bookService;
         this.bookIsbnLookupService = bookIsbnLookupService;
@@ -131,14 +141,14 @@ public class BookController {
     // Proxy de la portada de Google Books: el backend descarga el
     // thumbnail y lo devuelve como binario (el navegador no debe llamar
     // a Google Books directo). Igual que /{id}/portada, 404 si no hay.
-    @GetMapping("/lookup-isbn/portada")
-    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     /**
      * Procesa lookup isbn cover y devuelve el resultado calculado por el backend.
      *
      * @param isbn valor de entrada isbn usado por la operacion para completar su regla de negocio
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @GetMapping("/lookup-isbn/portada")
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     public ResponseEntity<byte[]> lookupIsbnCover(
             @RequestParam @Pattern(regexp = "^[0-9]{10,13}$", message = "ISBN debe tener 10 a 13 dígitos")
             @Size(min = 10, max = 13, message = "El ISBN debe tener entre 10 y 13 caracteres") String isbn) {
@@ -149,27 +159,27 @@ public class BookController {
     }
 
     // ── GET /api/v1/libros/{id} ───────────────────────────
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('LECTOR','BIBLIOTECARIO','GERENTE','ADMIN')")
     /**
      * Consulta search usando los filtros recibidos y devuelve el resultado solicitado.
      *
      * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('LECTOR','BIBLIOTECARIO','GERENTE','ADMIN')")
     public ResponseEntity<BookResponseDTO> search(@PathVariable Long id) {
         return ResponseEntity.ok(bookService.searchById(id));
     }
 
     // ── POST /api/v1/libros ───────────────────────────────
-    @PostMapping
-    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     /**
      * Registra create validando los datos de entrada antes de persistir cambios.
      *
      * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PostMapping
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     public ResponseEntity<BookResponseDTO> create(
             @Valid @RequestBody BookRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -177,8 +187,6 @@ public class BookController {
     }
 
     // ── PUT /api/v1/libros/{id} ───────────────────────────
-    @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     /**
      * Actualiza update con las reglas de negocio requeridas por el flujo.
      *
@@ -186,6 +194,8 @@ public class BookController {
      * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     public ResponseEntity<BookResponseDTO> update(
             @PathVariable Long id,
             @Valid @RequestBody BookRequestDTO dto) {
@@ -193,14 +203,14 @@ public class BookController {
     }
 
     // ── DELETE /api/v1/libros/{id} ────────────────────────
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     /**
      * Elimina o anula delete despues de validar que la operacion sea permitida.
      *
      * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         bookService.delete(id);
         return ResponseEntity.noContent().build();
@@ -230,14 +240,14 @@ public class BookController {
     // autenticados, igual que el resto del catálogo. 404 (no un
     // placeholder) si el libro no existe o no tiene portada -- eso es
     // decisión del frontend.
-    @GetMapping("/{id}/portada")
-    @PreAuthorize("hasAnyRole('LECTOR','BIBLIOTECARIO','GERENTE','ADMIN')")
     /**
      * Consulta get cover usando los filtros recibidos y devuelve el resultado solicitado.
      *
      * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @GetMapping("/{id}/portada")
+    @PreAuthorize("hasAnyRole('LECTOR','BIBLIOTECARIO','GERENTE','ADMIN')")
     public ResponseEntity<byte[]> getCover(@PathVariable Long id) {
         CoverImageDTO cover = bookService.getCover(id);
         return ResponseEntity.ok()

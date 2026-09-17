@@ -1,4 +1,4 @@
-.PHONY: up down test test-backend test-frontend bench audit docs clean all check-latex-tools pdfs
+.PHONY: up down test test-backend test-frontend bench audit docs clean all check-latex-tools pdfs verify
 
 # make up: regenera db/init/01-consolidado.sql (schema + procs + seed, ver
 # scripts/build-init-sql.sh) y levanta todos los servicios (Postgres, Redis,
@@ -258,3 +258,16 @@ clean:
 	rm -rf frontend-angular/dist
 	rm -rf frontend-angular/node_modules/.cache
 	rm -rf db/init
+
+# make verify: EV-2 del examen suspenso -- ejecuta las comprobaciones
+# automáticas del expediente (VERIFICACION.md) y sale 0 solo si todas
+# pasan. Python 3 + git + red (solo p2) + Maven (solo javadoc). Cada
+# script falla con código distinto de cero ante el primer incumplimiento.
+verify:
+	python scripts/verify-p1-hashes.py
+	python scripts/verify-p2-dois.py
+	python scripts/verify-p6-javadoc.py
+	python scripts/verify-p7-names.py
+	python scripts/verify-p12-secrets.py
+	cd backend-springboot && ./mvnw -B javadoc:javadoc
+	@echo "verify: OK"

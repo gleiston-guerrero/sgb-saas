@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -123,34 +124,39 @@ public class BookService {
             if (categoryId != null) {
                 return bookRepo.searchByTextOIsbnYCategory(q, categoryId, statusId, available, nativeSort(pageable)).map(this::toDTO);
             }
+            if (authorId != null) {
+                return bookRepo.searchByTextOrIsbnAndAuthor(q, authorId, statusId, nativeSort(pageable)).map(this::toDTO);
+            }
             return bookRepo.searchByTextOIsbn(q, statusId, available, nativeSort(pageable)).map(this::toDTO);
         }
 
         if (available != null) {
+            Pageable derived = derivedSort(pageable);
             if (categoryId != null) {
                 if (available) {
-                    return bookRepo.findByCategories_IdAndStatusIdAndStockAvailableGreaterThan(categoryId, statusId, 0, pageable).map(this::toDTO);
+                    return bookRepo.findByCategories_IdAndStatusIdAndStockAvailableGreaterThan(categoryId, statusId, 0, derived).map(this::toDTO);
                 } else {
-                    return bookRepo.findByCategories_IdAndStatusIdAndStockAvailableEquals(categoryId, statusId, 0, pageable).map(this::toDTO);
+                    return bookRepo.findByCategories_IdAndStatusIdAndStockAvailableEquals(categoryId, statusId, 0, derived).map(this::toDTO);
                 }
             }
             if (available) {
-                return bookRepo.findByStatusIdAndStockAvailableGreaterThan(statusId, 0, pageable).map(this::toDTO);
+                return bookRepo.findByStatusIdAndStockAvailableGreaterThan(statusId, 0, derived).map(this::toDTO);
             } else {
-                return bookRepo.findByStatusIdAndStockAvailableEquals(statusId, 0, pageable).map(this::toDTO);
+                return bookRepo.findByStatusIdAndStockAvailableEquals(statusId, 0, derived).map(this::toDTO);
             }
         }
 
+        Pageable derived = derivedSort(pageable);
         if (categoryId != null && authorId != null) {
-            return bookRepo.findByCategories_IdAndAuthors_IdAndStatusId(categoryId, authorId, statusId, pageable).map(this::toDTO);
+            return bookRepo.findByCategories_IdAndAuthors_IdAndStatusId(categoryId, authorId, statusId, derived).map(this::toDTO);
         }
         if (categoryId != null) {
-            return bookRepo.findByCategories_IdAndStatusId(categoryId, statusId, pageable).map(this::toDTO);
+            return bookRepo.findByCategories_IdAndStatusId(categoryId, statusId, derived).map(this::toDTO);
         }
         if (authorId != null) {
-            return bookRepo.findByAuthors_IdAndStatusId(authorId, statusId, pageable).map(this::toDTO);
+            return bookRepo.findByAuthors_IdAndStatusId(authorId, statusId, derived).map(this::toDTO);
         }
-        return bookRepo.findByStatusId(statusId, pageable).map(this::toDTO);
+        return bookRepo.findByStatusId(statusId, derived).map(this::toDTO);
     }
 
     /**
@@ -173,13 +179,38 @@ public class BookService {
     // listWithFilters alterna entre queries derivadas de Spring Data (Book.title,
     // Book.java @Column(name="titulo")) y queries nativas de BookRepository, que
     // no traducen propiedad->columna: Spring Data inyecta el Sort tal cual como
-    // texto SQL. Un mismo Pageable de entrada (siempre en terminos de propiedad
-    // JPA, "title") no sirve para la rama nativa sin traducirlo antes a la
-    // columna fisica ("titulo"). Ver BookController.list/PublicBookController.list.
+    // texto SQL. Los clientes mandan ambas convenciones (frontend nuevo: "title";
+    // bundles viejos/peticiones manuales: "titulo", como el 500 de /api/publico/libros
+    // del 16-sep): cada rama traduce a la suya para que el Sort nunca llegue
+    // sin traducir a la query. Ver BookController.list/PublicBookController.list.
+    private static final Map<String, String> SORT_TO_COLUMN = Map.of(
+            "title", "titulo",
+            "dateRegistration", "fecha_registro",
+            "yearPublication", "anio_publicacion",
+            "stockAvailable", "stock_disponible",
+            "stockTotal", "stock_total");
+    private static final Map<String, String> SORT_TO_PROPERTY = Map.of(
+            "titulo", "title",
+            "fecha_registro", "dateRegistration",
+            "anio_publicacion", "yearPublication",
+            "stock_disponible", "stockAvailable",
+            "stock_total", "stockTotal");
+
     private static Pageable nativeSort(Pageable pageable) {
+        return remapSort(pageable, SORT_TO_COLUMN);
+    }
+
+    private static Pageable derivedSort(Pageable pageable) {
+        return remapSort(pageable, SORT_TO_PROPERTY);
+    }
+
+    private static Pageable remapSort(Pageable pageable, Map<String, String> mapping) {
+        if (pageable == null || pageable.isUnpaged()) {
+            return pageable;
+        }
         Sort translated = Sort.by(pageable.getSort().stream()
-                .map(order -> "title".equals(order.getProperty())
-                        ? order.withProperty("titulo")
+                .map(order -> mapping.containsKey(order.getProperty())
+                        ? order.withProperty(mapping.get(order.getProperty()))
                         : order)
                 .toList());
         return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), translated);
@@ -216,7 +247,7 @@ public class BookService {
         }
         Short yearShort = yearPublication != null ? yearPublication.shortValue() : null;
         try {
-            return bookRepo.searchByStatuses(statuses, q, yearShort, pageable).map(this::toDTO);
+            return bookRepo.searchByStatuses(statuses, q, yearShort, nativeSort(pageable)).map(this::toDTO);
         } catch (Exception e) {
             log.error("listarPendientes error consultando {} libros con estados {}", statuses.size(), q, e);
             throw new RuntimeException("Error interno al listar libros pendientes", e);

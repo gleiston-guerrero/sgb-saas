@@ -25,8 +25,6 @@ public class FlexibleOffsetDateTimeDeserializer extends StdDeserializer<OffsetDa
             .toFormatter();
 
     public FlexibleOffsetDateTimeDeserializer() { super(OffsetDateTime.class); }
-
-    @Override
     /**
      * Procesa deserialize y devuelve el resultado calculado por el backend.
      *
@@ -35,6 +33,7 @@ public class FlexibleOffsetDateTimeDeserializer extends StdDeserializer<OffsetDa
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      * @throws IOException si la operacion no puede completarse por validacion, permisos o fallo del recurso asociado
      */
+    @Override
     public OffsetDateTime deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         String text = p.getText();
         if (text == null || text.isBlank()) return null;

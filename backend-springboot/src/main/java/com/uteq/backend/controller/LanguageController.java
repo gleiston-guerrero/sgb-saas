@@ -24,42 +24,39 @@ public class LanguageController {
     public LanguageController(LanguageRepository languageRepository) {
         this.languageRepository = languageRepository;
     }
-
-    @GetMapping
     /**
      * Lists language.
      *
-     * @return response entity<list<idioma response dto>> with the resulting state after the operation
+     * @return response entity{@code <list<idioma response dto>>} with the resulting state after the operation
      */
+    @GetMapping
     public ResponseEntity<List<LanguageResponseDTO>> list() {
         List<LanguageResponseDTO> languages = languageRepository.findAll().stream()
                 .map(i -> new LanguageResponseDTO(i.getId(), i.getName()))
                 .toList();
         return ResponseEntity.ok(languages);
     }
-
-    @GetMapping("/buscar")
     /**
      * Consulta search usando los filtros recibidos y devuelve el resultado solicitado.
      *
      * @param q texto de busqueda o filtro usado para reducir los resultados devueltos
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @GetMapping("/buscar")
     public ResponseEntity<List<LanguageResponseDTO>> search(@RequestParam String q) {
         return ResponseEntity.ok(
                 languageRepository.findTop5ByNameContainingIgnoreCase(q).stream()
                         .map(i -> new LanguageResponseDTO(i.getId(), i.getName()))
                         .toList());
     }
-
-    @PostMapping
-    @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
     /**
      * Registra create validando los datos de entrada antes de persistir cambios.
      *
      * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PostMapping
+    @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
     public ResponseEntity<LanguageResponseDTO> create(@Valid @RequestBody LanguageRequestDTO dto) {
         if (languageRepository.existsByNameIgnoreCase(dto.name())) {
             return ResponseEntity.unprocessableEntity().build();

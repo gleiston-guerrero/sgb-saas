@@ -6,6 +6,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * Resultado ligero para el autocompletado de usuarios en la ventanilla
  * de préstamos (GET /api/v1/prestamos/gestion/sugerencias-usuarios).
  * Solo los campos necesarios para el dropdown predictivo.
+ *
+ * @param id identificador del usuario
+ * @param nameFull nombre completo del usuario
+ * @param email correo del usuario
+ * @param statusAccount nombre del estado de la cuenta
  */
 public record UserSuggestionDTO(
         Long id, @JsonProperty("nombreCompleto") String nameFull, @JsonProperty("correo") String email,

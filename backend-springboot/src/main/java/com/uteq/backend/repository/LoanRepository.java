@@ -42,10 +42,10 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
     // (fecha::date - NOW()::date)::INTEGER, cast/aritmetica de fechas
     // especifica de PostgreSQL sin equivalente portable en JPQL para
     // calcular dias_restantes como columna proyectada.
-    @Query(value = "SELECT p.id AS prestamo_id, l.titulo AS libro_titulo, l.isbn AS libro_isbn, "
-            + "p.fecha_prestamo, p.fecha_devolucion_estimada, "
-            + "(p.fecha_devolucion_estimada::date - NOW()::date)::INTEGER AS dias_restantes, "
-            + "ep.nombre AS estado_nombre "
+    @Query(value = "SELECT p.id AS loanId, l.titulo AS bookTitle, l.isbn AS bookIsbn, "
+            + "p.fecha_prestamo AS dateLoan, p.fecha_devolucion_estimada AS dateLoanReturnEstimada, "
+            + "(p.fecha_devolucion_estimada::date - NOW()::date)::INTEGER AS daysRemaining, "
+            + "ep.nombre AS statusName "
             + "FROM prestamos p "
             + "JOIN libros l ON l.id = p.libro_id "
             + "JOIN estados_prestamo ep ON ep.id = p.estado_prestamo_id "

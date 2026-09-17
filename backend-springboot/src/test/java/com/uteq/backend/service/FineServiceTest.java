@@ -130,6 +130,24 @@ class FineServiceTest {
                 .isInstanceOf(AuthorizationDeniedException.class);
     }
 
+    // ── Regresión prod (?sort=estadoMultaId -> 400): el sort legacy en
+    // español se traduce al atributo JPA antes de la query ──
+    @Test
+    void listByUser_conSortLegacyEstadoMultaId_repoRecibeStatusFineId() {
+        Authentication auth = authComoRole("gerente@correo.com", "GERENTE");
+        given(fineRepo.findByUserId(org.mockito.ArgumentMatchers.eq(2L),
+                org.mockito.ArgumentMatchers.any(org.springframework.data.domain.Pageable.class)))
+                .willReturn(org.springframework.data.domain.Page.empty());
+
+        fineService.listByUser(2L, auth,
+                org.springframework.data.domain.PageRequest.of(0, 5,
+                        org.springframework.data.domain.Sort.by("estadoMultaId").ascending()));
+
+        verify(fineRepo).findByUserId(org.mockito.ArgumentMatchers.eq(2L),
+                org.mockito.ArgumentMatchers.argThat((org.springframework.data.domain.Pageable p) ->
+                        p.getSort().stream().anyMatch(o -> o.getProperty().equals("statusFineId"))));
+    }
+
     // ── Test 7: resumen financiero mapea la proyección a DTO ──
     @Test
     void reportSummaryFinancial_withData_mapeaProjectionADTO() {

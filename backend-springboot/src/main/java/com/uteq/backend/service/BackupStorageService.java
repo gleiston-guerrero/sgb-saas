@@ -27,6 +27,11 @@ public class BackupStorageService {
     private static final String AES_GCM = "AES/GCM/NoPadding";
     private static final int GCM_IV_LENGTH = 12;
     private static final int GCM_TAG_LENGTH = 128;
+    /**
+     * Constructor con el cliente S3 compatible (R2), opcional en local.
+     *
+     * @param s3Client cliente S3, null si no está configurado
+     */
     public BackupStorageService(@org.springframework.beans.factory.annotation.Autowired(required = false) S3Client s3Client) { this.s3Client = s3Client; }
     /**
          * isR2Configured.

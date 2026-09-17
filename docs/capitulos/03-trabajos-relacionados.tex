@@ -123,52 +123,52 @@ análisis que este capítulo no está en condiciones de sostener todavía.
 \begin{figure}[h]
 \centering
 \begin{tikzpicture}[
-    node distance=0.55cm and 1.6cm,
+    node distance=0.55cm and 1.4cm,
     box/.style={rectangle, draw=verdeuteq, thick, rounded corners,
-      fill=grisclaro, text width=6.6cm, align=center, minimum height=1.1cm,
+      fill=grisclaro, text width=7.0cm, align=center, minimum height=1.2cm,
       font=\small},
     excl/.style={rectangle, draw=gapcolor, thick, rounded corners,
-      fill=white, text width=5.2cm, align=left, minimum height=1.1cm,
+      fill=white, text width=5.6cm, align=left, minimum height=1.2cm,
       font=\footnotesize},
     arr/.style={-{Latex[length=2.2mm]}, thick, draw=verdeuteq}
   ]
   \node[box] (identificados)
-    {\textbf{Identificados}\\[2pt] Grupo~A: 15 referencias\\
-     (13 de curación previa del equipo + 2 de búsqueda dirigida
-     Crossref/IEEE~Xplore para esta tarea)};
+    {\textbf{Identified}\\[2pt] Group~A: 15 records\\
+     (13 from prior team curation + 2 from targeted
+     Crossref/IEEE~Xplore search for this task)};
   \node[box, below=of identificados] (duplicados)
-    {\textbf{Tras eliminar duplicados}\\[2pt] 15 referencias\\
-     (0 duplicados encontrados)};
+    {\textbf{After removing duplicates}\\[2pt] 15 records\\
+     (0 duplicates found)};
   \node[box, below=of duplicados] (cribados)
-    {\textbf{Cribados por título/resumen}\\[2pt] 15 evaluados\\
-     0 excluidos en esta fase};
+    {\textbf{Screened by title/abstract}\\[2pt] 15 assessed\\
+     0 excluded at this stage};
   \node[excl, right=of cribados] (nota1)
-    {Los 15 ya habían sido pre-filtrados por relevancia temática con
-     SGB-SaaS antes de incorporarse al acervo -- por eso el cribado de
-     título/resumen no excluye nada adicional aquí.};
+    {The 15 records had already been pre-filtered for topical
+     relevance to SGB-SaaS before entering the pool -- hence
+     title/abstract screening excludes nothing further here.};
   \node[box, below=of cribados] (textocompleto)
-    {\textbf{Evaluados a texto completo / resumen extendido}\\[2pt]
-     15 evaluados};
+    {\textbf{Assessed in full text / extended abstract}\\[2pt]
+     15 assessed};
   \node[excl, right=of textocompleto] (nota2)
-    {5 excluidos de la tabla comparativa primaria: son revisiones o
-     artículos de posición que sintetizan el estado del arte
+    {5 excluded from the primary comparison table: reviews or
+     position papers synthesising the state of the art
      (\citet{ayinde2026ai, liabor2023cataloging, adetayo2023chatgpt,
-     yan2023chatbotsslr, ayemowa2024genai}), no sistemas primarios
-     directamente comparables fila a fila. Se mantienen citados en la
-     \autoref{sec:panorama-relacionados} como contexto.};
+     yan2023chatbotsslr, ayemowa2024genai}), not primary systems
+     directly comparable row by row. Kept cited in
+     \autoref{sec:panorama-relacionados} as context.};
   \node[box, below=of textocompleto, fill=verdelight!25] (incluidos)
-    {\textbf{Incluidos en la tabla comparativa de sistemas primarios}\\[2pt]
-     \textbf{10 referencias} (\autoref{tab:trabajos-comparativa})};
+    {\textbf{Included in the primary-systems comparison table}\\[2pt]
+     \textbf{10 records} (\autoref{tab:trabajos-comparativa})};
 
   \draw[arr] (identificados) -- (duplicados);
   \draw[arr] (duplicados) -- (cribados);
   \draw[arr] (cribados) -- (textocompleto);
   \draw[arr] (textocompleto) -- (incluidos);
 \end{tikzpicture}
-\caption{Flujo de selección adaptado de PRISMA~2020 para el Grupo~A
-  (dominio bibliotecario y arquitectura de acceso a datos comparable).
-  El Grupo~B (15 referencias de apoyo metodológico, \autoref{sec:proceso-seleccion})
-  no se somete a este embudo.}
+\caption{Selection flow adapted from PRISMA~2020 for Group~A
+  (library domain and comparable data-access architecture).
+  Group~B (15 methodological support references, \autoref{sec:proceso-seleccion})
+  is not subject to this funnel.}
 \label{fig:prisma-flow}
 \end{figure}
 

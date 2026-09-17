@@ -369,3 +369,35 @@ sus 3 reglas de negocio corre en Java -- se señala aquí porque una
 primera pasada de clasificación automática por coincidencia de texto
 la contó por error como híbrida, hasta revisar el valor completo del
 campo.
+
+La \autoref{fig:diseno-endpoints-roles} cuantifica el otro eje de la
+estrategia híbrida: el control de acceso por rol sobre la API. Cada
+barra cuenta las anotaciones \texttt{@PreAuthorize} de método que
+mencionan al rol (79 anotaciones en los controladores del backend):
+\texttt{GERENTE} aparece en las 79, \texttt{ADMIN} en 75,
+\texttt{BIBLIOTECARIO} en 37 y \texttt{LECTOR} en 12 -- el rol gestor
+concentra la superficie operativa, con administración plena reservada
+al rol \texttt{ADMIN}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\textwidth]{mediciones/figuras/fig-endpoints-roles.pdf}
+\caption{Backend API authorization annotations per role (79 method-level
+\texttt{@PreAuthorize} annotations). Counted from the versioned
+controllers with \texttt{scripts/generar-figuras-evaluacion.py}.}
+\label{fig:diseno-endpoints-roles}
+\end{figure}
+
+La \autoref{fig:diseno-migraciones} muestra la evolución del esquema
+versionado: migraciones Flyway acumuladas en el tiempo (ADR-013). Cada
+punto es la fecha de incorporación de un archivo \texttt{V*.sql} en
+\texttt{database/migrations/}, trazable con \texttt{git log}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\textwidth]{mediciones/figuras/fig-migraciones-acumuladas.pdf}
+\caption{Cumulative versioned Flyway migrations over time
+(\texttt{database/migrations/V*.sql}). Generated from \texttt{git log}
+with \texttt{scripts/generar-figuras-evaluacion.py}.}
+\label{fig:diseno-migraciones}
+\end{figure}

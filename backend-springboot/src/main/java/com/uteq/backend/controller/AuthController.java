@@ -10,13 +10,15 @@ import com.uteq.backend.dto.TokenResponseDTO;
 import com.uteq.backend.dto.UserResponseDTO;
 import com.uteq.backend.security.JwtService;
 import com.uteq.backend.service.AuthService;
+import com.uteq.backend.service.ServiceTemporarilyNotAvailableException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,9 +28,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
 
+/**
+ * Autenticación pública pre-login: registro, verificación, login,
+ * refresh por cookie HttpOnly, logout y recuperación de contraseña.
+ */
 @RestController
 @RequestMapping("/api/auth")
-@RequiredArgsConstructor
 public class AuthController {
 
     private static final String BEARER_PREFIX = "Bearer ";
@@ -37,13 +42,32 @@ public class AuthController {
     private final AuthService authService;
     private final JwtService jwtService;
 
-    @PostMapping("/registro")
+    /**
+     * Constructor con los servicios de autenticación y JWT.
+     *
+     * @param authService servicio de registro, login y tokens
+     * @param jwtService servicio de emisión y validación de JWT
+     */
+    public AuthController(AuthService authService, JwtService jwtService) {
+        this.authService = authService;
+        this.jwtService = jwtService;
+    }
+
+    // Secure de la cookie refreshToken (app.auth.cookie-secure, default
+    // true). En dev local http:// sin TLS la cookie con Secure=true es
+    // descartada por el navegador: el login devuelve 200 pero sin cookie
+    // y el siguiente refresh falla con 400 "Falta la cookie refreshToken".
+    // Con AUTH_COOKIE_SECURE=false se emite sin Secure y con SameSite=Lax
+    // (SameSite=None exige Secure por especificacion).
+    @Value("${app.auth.cookie-secure:true}")
+    private boolean cookieSecure;
     /**
      * Procesa registration y devuelve el resultado calculado por el backend.
      *
      * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PostMapping("/registro")
     public ResponseEntity<UserResponseDTO> registration(@Valid @RequestBody RegistrationRequestDTO dto) {
         UserResponseDTO user = authService.register(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
@@ -52,7 +76,6 @@ public class AuthController {
     // Sin JWT: el usuario aún no puede loguearse (PENDIENTE_VERIFICACION).
     // Regenera el código de 6 dígitos en Redis cuando el anterior expiró
     // (TTL 10 min) y el usuario quedó bloqueado sin intervención de ADMIN.
-    @PostMapping("/reenviar-codigo")
     /**
          * Reenvia el codigo de verificacion para una cuenta pendiente.
      * @param dto email de la cuenta
@@ -60,12 +83,11 @@ public class AuthController {
      * @throws EntityNotFoundException si email no existe
      * @throws IllegalArgumentException si ya verificado
      */
+    @PostMapping("/reenviar-codigo")
     public ResponseEntity<Void> resendCode(@Valid @RequestBody ResendCodeRequestDTO dto) {
         authService.resendCode(dto.email());
         return ResponseEntity.noContent().build();
     }
-
-    @PostMapping("/solicitar-reset")
     /**
          * Inicia recuperacion de contrasena enviando codigo por email.
      * @param dto email de la cuenta
@@ -73,18 +95,19 @@ public class AuthController {
      * @throws EntityNotFoundException si email no existe
      * @throws ServiceTemporarilyNotAvailableException si Redis no disponible
      */
+    @PostMapping("/solicitar-reset")
     public ResponseEntity<Void> requestReset(@Valid @RequestBody RequestResetRequestDTO dto) {
         authService.requestReset(dto.email());
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/reset")
     /**
      * Procesa reset y devuelve el resultado calculado por el backend.
      *
      * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PostMapping("/reset")
     public ResponseEntity<Void> reset(@Valid @RequestBody ResetPasswordRequestDTO dto) {
         authService.resetPassword(dto.email(), dto.code(), dto.freshPassword());
         return ResponseEntity.noContent().build();
@@ -92,7 +115,6 @@ public class AuthController {
 
     // Sin JWT: el recién registrado aún no puede loguearse.
     // La identidad se prueba con el código de un solo uso.
-    @PostMapping("/verificar-correo")
     /**
          * Verifica codigo de activacion y activa la cuenta.
      * @param dto email y codigo de verificacion
@@ -100,13 +122,12 @@ public class AuthController {
      * @return ResponseEntity con UserResponseDTO activado
      * @throws IllegalArgumentException si codigo invalido/expirado
      */
+    @PostMapping("/verificar-correo")
     public ResponseEntity<UserResponseDTO> verifyEmail(
             @Valid @RequestBody CodeVerificationRequestDTO dto, HttpServletRequest request) {
         UserResponseDTO user = authService.verifyEmail(dto.email(), dto.code(), getIpSource(request));
         return ResponseEntity.ok(user);
     }
-
-    @PostMapping("/login")
     /**
      * Procesa login y devuelve el resultado calculado por el backend.
      *
@@ -114,6 +135,7 @@ public class AuthController {
      * @param request datos validados de la peticion con la informacion necesaria para ejecutar la operacion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PostMapping("/login")
     public ResponseEntity<TokenResponseDTO> login(@Valid @RequestBody LoginRequestDTO dto, HttpServletRequest request) {
         TokenResponseDTO tokens = authService.login(dto, getIpSource(request));
         ResponseCookie cookie = buildRefreshCookie(tokens.refreshToken(), jwtService.getRefreshExpirationMs());
@@ -178,8 +200,8 @@ public class AuthController {
     private ResponseCookie buildRefreshCookie(String value, long maxAgeMs) {
         return ResponseCookie.from(REFRESH_COOKIE_NAME, value)
                 .httpOnly(true)
-                .secure(true)
-                .sameSite("None")
+                .secure(cookieSecure)
+                .sameSite(cookieSecure ? "None" : "Lax")
                 .path("/api/auth")
                 .maxAge(Duration.ofMillis(maxAgeMs))
                 .build();

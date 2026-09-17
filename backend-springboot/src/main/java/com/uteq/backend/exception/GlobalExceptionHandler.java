@@ -26,8 +26,10 @@ import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -51,159 +53,152 @@ public class GlobalExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     // ── Registro y préstamos ──────────────────────────────────
-
-    @ExceptionHandler(EmailAlreadyRegisteredException.class)
     /**
          * Maneja el caso en que el correo ya est registrado en el sistema.
      * @param ex excepcin que indica que el correo ya est registrado
      * @return ProblemDetail con estado 409 y el mensaje del conflicto
      */
+    @ExceptionHandler(EmailAlreadyRegisteredException.class)
     public ProblemDetail handleEmailAlreadyRegistered(EmailAlreadyRegisteredException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
     }
-
-    @ExceptionHandler(EmailDomainNotAllowedException.class)
     /**
          * Maneja el caso en que el correo pertenece a un dominio no permitido.
      * @param ex excepcin que indica que el dominio del correo no est permitido
      * @return ProblemDetail con estado 403 y el mensaje de denegacin
      */
+    @ExceptionHandler(EmailDomainNotAllowedException.class)
     public ProblemDetail handleEmailDomainNotAllowed(EmailDomainNotAllowedException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
     }
-
-    @ExceptionHandler(LimitLoansExceededException.class)
     /**
          * Maneja el caso en que el lector supera el tope mximo de prstamos activos.
      * @param ex excepcin que indica que se excedi el tope de prstamos
      * @return ProblemDetail con estado 409 y el mensaje del lmite
      */
+    @ExceptionHandler(LimitLoansExceededException.class)
     public ProblemDetail handleLimitLoansExceeded(LimitLoansExceededException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
     }
-
-    @ExceptionHandler(StatusReservationInitialNotConfiguredException.class)
     /**
          * Maneja la falta de configuracin inicial del estado de reservacin en el sistema.
      * @param ex excepcin que indica que la configuracin inicial del estado falta
      * @return ProblemDetail con estado 503 y el mensaje de la falta de configuracin
      */
+    @ExceptionHandler(StatusReservationInitialNotConfiguredException.class)
     public ProblemDetail handleStatusReservationInitialNotConfigured(StatusReservationInitialNotConfiguredException ex) {
         // Falta seed de configuración del sistema → 503.
         return ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
     }
 
     // ── Autenticación ─────────────────────────────────────────
-
-    @ExceptionHandler(BadCredentialsException.class)
     /**
          * Maneja credenciales invlidas en el intento de autenticacin.
      * @param ex excepcin de credenciales incorrectas
      * @return ProblemDetail con estado 401 y mensaje de credenciales invlidas
      */
+    @ExceptionHandler(BadCredentialsException.class)
     public ProblemDetail handleBadCredentials(BadCredentialsException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "Credenciales inválidas");
     }
 
     // Intentos de login agotados en la ventana vigente → 429.
-    @ExceptionHandler(LoginRateLimitExceededException.class)
     /**
          * Maneja el agotamiento de intentos de login en la ventana vigente.
      * @param ex excepcin que indica que se agot el lmite de intentos
      * @return ProblemDetail con estado 429 y el mensaje del lmite
      */
+    @ExceptionHandler(LoginRateLimitExceededException.class)
     public ProblemDetail handleLoginRateLimitExceeded(LoginRateLimitExceededException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage());
     }
 
     // Lector agotó el cupo de mensajes del chatbot en la ventana vigente → 429.
-    @ExceptionHandler(ChatbotRateLimitExceededException.class)
     /**
          * Maneja el agotamiento del cupo de mensajes del chatbot en la ventana vigente.
      * @param ex excepcin que indica que se agot el rate limit del chatbot
      * @return ProblemDetail con estado 429 y el mensaje del lmite
      */
+    @ExceptionHandler(ChatbotRateLimitExceededException.class)
     public ProblemDetail handleChatbotRateLimitExceeded(ChatbotRateLimitExceededException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage());
     }
 
     // Sesión de chat inexistente o de otro usuario → 404.
-    @ExceptionHandler(SessionChatNotFoundException.class)
     /**
          * Maneja el caso en que la sesin de chat no existe o pertenece a otro usuario.
      * @param ex excepcin que indica que la sesin de chat no fue encontrada
      * @return ProblemDetail con estado 404 y el mensaje de sesin no encontrada
      */
+    @ExceptionHandler(SessionChatNotFoundException.class)
     public ProblemDetail handleSessionChatNotFound(SessionChatNotFoundException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     // Refresh token inválido, expirado o de usuario inexistente → 401.
-    @ExceptionHandler(RefreshTokenInvalidException.class)
     /**
          * Maneja un token de refresco invlido, expirado o de usuario inexistente.
      * @param ex excepcin que indica que el refresh token es invlido
      * @return ProblemDetail con estado 401 y el mensaje del token invlido
      */
+    @ExceptionHandler(RefreshTokenInvalidException.class)
     public ProblemDetail handleRefreshTokenInvalid(RefreshTokenInvalidException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 
     // Cuenta bloqueada por multas pendientes → 423.
-    @ExceptionHandler(LockedException.class)
     /**
          * Maneja una cuenta bloqueada por multas pendientes.
      * @param ex excepcin de cuenta bloqueada (Locked)
      * @return ProblemDetail con estado 423 y mensaje de cuenta bloqueada
      */
+    @ExceptionHandler(LockedException.class)
     public ProblemDetail handleLocked(LockedException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.LOCKED,
                 "Cuenta bloqueada por multas pendientes. Regularice su situación para continuar.");
     }
 
     // Cuenta inactiva o pendiente de verificación → 403.
-    @ExceptionHandler(DisabledException.class)
     /**
          * Maneja una cuenta inactiva o pendiente de verificacin.
      * @param ex excepcin de cuenta deshabilitada (Disabled)
      * @return ProblemDetail con estado 403 y mensaje de cuenta inactiva
      */
+    @ExceptionHandler(DisabledException.class)
     public ProblemDetail handleDisabled(DisabledException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN,
                 "Cuenta inactiva o pendiente de verificación.");
     }
 
     // Autenticado sin el rol requerido para el método → 403.
-    @ExceptionHandler(AuthorizationDeniedException.class)
     /**
          * Maneja el caso en que el usuario autenticado carece del rol requerido para el mtodo.
      * @param ex excepcin de autorizacin denegada
      * @return ProblemDetail con estado 403 y mensaje de permisos insuficientes
      */
+    @ExceptionHandler(AuthorizationDeniedException.class)
     public ProblemDetail handleAuthorizationDenied(AuthorizationDeniedException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN,
                 "No tiene permisos para realizar esta acción.");
     }
 
     // ── Validación ────────────────────────────────────────────
-
-    @ExceptionHandler(ConstraintViolationException.class)
     /**
          * Maneja violaciones de restricciones de validacin (anotaciones de Bean Validation).
      * @param ex excepcin con las restricciones violadas
      * @return ProblemDetail con estado 400 y los mensajes de violacin
      */
+    @ExceptionHandler(ConstraintViolationException.class)
     public ProblemDetail handleConstraintViolation(ConstraintViolationException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
     /**
          * Maneja errores de validacin de argumentos del mtodo (MethodArgumentNotValid).
      * Recopila los errores de cada campo y los devuelve en la propiedad 'errores' del ProblemDetail.
      * @param ex excepcin con los errores de validacin por campo
      * @return ProblemDetail con estado 400, mensaje general y lista de errores por campo
      */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleValidation(MethodArgumentNotValidException ex) {
         Map<String, String> detalles = new HashMap<>();
         for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
@@ -231,13 +226,12 @@ public class GlobalExceptionHandler {
             default -> field;
         };
     }
-
-    @ExceptionHandler(HttpMessageNotReadableException.class)
     /**
          * Maneja un cuerpo de solicitud malformado o no legible.
      * @param ex excepcin de cuerpo de solicitud no legible
      * @return ProblemDetail con estado 400 y detalle del error del cuerpo
      */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
     public ProblemDetail handleBodyMalformed(HttpMessageNotReadableException ex) {
         String detail = Objects.toString(
                 ex.getMostSpecificCause().getMessage(), "El cuerpo de la solicitud no es válido");
@@ -245,90 +239,85 @@ public class GlobalExceptionHandler {
     }
 
     // ── Recursos ──────────────────────────────────────────────
-
-    @ExceptionHandler(EntityNotFoundException.class)
     /**
          * Maneja el caso en que una entidad no fue encontrada en la base de datos.
      * @param ex excepcin de entidad no encontrada (EntityNotFoundException)
      * @return ProblemDetail con estado 404 y el mensaje de no encontrado
      */
+    @ExceptionHandler(EntityNotFoundException.class)
     public ProblemDetail handleNotFound(EntityNotFoundException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     // Ruta o recurso estático inexistente (ej. Swagger en perfil prod) → 404.
-    @ExceptionHandler(NoResourceFoundException.class)
     /**
          * Maneja el caso en que un recurso esttico o ruta no existe (ej. Swagger en perfil prod).
      * @param ex excepcin de recurso no encontrado
      * @return ProblemDetail con estado 404 y mensaje de recurso no encontrado
      */
+    @ExceptionHandler(NoResourceFoundException.class)
     public ProblemDetail handleNotResourceFound(NoResourceFoundException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "Recurso no encontrado");
     }
 
     // ── Reglas de préstamo (cada motivo con su excepción) ─────
-
-    @ExceptionHandler(LoanOverdueException.class)
     /**
          * Maneja un prstamo vencido que no ha sido devuelto.
      * @param ex excepcin que indica que el prstamo est vencido
      * @return ProblemDetail con estado 409 y el mensaje del prstamo vencido
      */
+    @ExceptionHandler(LoanOverdueException.class)
     public ProblemDetail handleLoanOverdue(LoanOverdueException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
     }
-
-    @ExceptionHandler(LimitRenewalsExceededException.class)
     /**
          * Maneja el caso en que se excede el tope de renovaciones del prstamo.
      * @param ex excepcin que indica que se excedi el lmite de renovaciones
      * @return ProblemDetail con estado 409 y el mensaje del lmite de renovaciones
      */
+    @ExceptionHandler(LimitRenewalsExceededException.class)
     public ProblemDetail handleLimitRenewalsExceeded(LimitRenewalsExceededException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
     }
-
-    @ExceptionHandler(ReservedMaterialException.class)
     /**
          * Maneja el caso en que el material de un prstamo ya est reservado por otro usuario.
      * @param ex excepcin que indica que el material ya est reservado
      * @return ProblemDetail con estado 409 y el mensaje de material reservado
      */
+    @ExceptionHandler(ReservedMaterialException.class)
     public ProblemDetail handleReservedMaterial(ReservedMaterialException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
     }
 
     // Código de verificación incorrecto o expirado → 400.
-    @ExceptionHandler(CodeVerificationInvalidException.class)
     /**
          * Maneja un cdigo de verificacin incorrecto o expirado.
      * @param ex excepcin que indica que el cdigo de verificacin es invlido
      * @return ProblemDetail con estado 400 y el mensaje del cdigo invlido
      */
+    @ExceptionHandler(CodeVerificationInvalidException.class)
     public ProblemDetail handleCodeVerificationInvalid(CodeVerificationInvalidException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     // Dependencia externa caída (Redis/SMTP) → 503.
-    @ExceptionHandler(ServiceTemporarilyNotAvailableException.class)
     /**
          * Maneja la indisponibilidad temporal de una dependencia externa (Redis/SMTP).
      * @param ex excepcin que indica que el servicio est temporalmente no disponible
      * @return ProblemDetail con estado 503 y el mensaje del servicio no disponible
      */
+    @ExceptionHandler(ServiceTemporarilyNotAvailableException.class)
     public ProblemDetail handleServiceTemporarilyNotAvailable(ServiceTemporarilyNotAvailableException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
     }
 
     // ── Acceso a datos ────────────────────────────────────────
-
-    @ExceptionHandler(InvalidDataAccessApiUsageException.class)
     /**
          * Maneja un parmetro de ordenamiento invlido en una consulta.
      * @param ex excepcin con el parmetro de ordenamiento invlido
      * @return ProblemDetail con estado 400 y mensaje de parmetro de ordenamiento invlido
      */
+    @ExceptionHandler(InvalidDataAccessApiUsageException.class)
     public ProblemDetail handleSortInvalid(InvalidDataAccessApiUsageException ex) {
         log.warn("Parámetro de ordenamiento inválido", ex);
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
@@ -336,13 +325,13 @@ public class GlobalExceptionHandler {
     }
 
     // Dependencia de datos agotada o caída → 503.
-    @ExceptionHandler({DataAccessResourceFailureException.class, UncategorizedDataAccessException.class})
     /**
          * Maneja una falla de conexin o acceso a la dependencia de datos (Redis/BD).
      * Devuelve 503 con mensaje indicando indisponibilidad temporal del servicio de almacenamiento.
      * @param ex excepcin de fallo de acceso a datos
      * @return ProblemDetail con estado 503 y detalle de la falla de almacenamiento
      */
+    @ExceptionHandler({DataAccessResourceFailureException.class, UncategorizedDataAccessException.class})
     public ProblemDetail handleDataAccessResourceFailure(DataAccessException ex) {
         log.error("Fallo de acceso a dependencia de datos (Redis/BD) {}: {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         String root = Objects.toString(ex.getMostSpecificCause().getMessage(), ex.getMessage());
@@ -350,23 +339,48 @@ public class GlobalExceptionHandler {
                 + (root != null ? " (" + root.substring(0, Math.min(200, root.length())) + ")" : "");
         return ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, detail);
     }
-
-    @ExceptionHandler(IllegalArgumentException.class)
     /**
          * Maneja un argumento ilegal pasado a un mtodo.
      * @param ex excepcin de argumento ilegal
      * @return ProblemDetail con estado 400 y el mensaje del argumento ilegal
      */
+    @ExceptionHandler(IllegalArgumentException.class)
     public ProblemDetail handleIllegalArgument(IllegalArgumentException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
-    @ExceptionHandler(IllegalStateException.class)
+    // ── Parámetros de ruta/query no convertibles ──────────────
+    // p.ej. /multas/usuario/undefined/detalle o ?usuarioId=undefined desde
+    // un frontend con id sin resolver: sin este handler caen en el 500
+    // genérico ("Error no controlado") en vez de un 400 legible.
+    /**
+         * Maneja un parmetro de ruta o query con tipo incompatible.
+     * @param ex excepcin con el nombre y valor del parmetro
+     * @return ProblemDetail con estado 400 y el parmetro problemático
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ProblemDetail handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        log.warn("Parámetro no convertible: {}='{}'", ex.getName(), ex.getValue());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+                "Parámetro '" + ex.getName() + "' con valor inválido: '" + ex.getValue() + "'");
+    }
+    /**
+         * Maneja un parmetro de query requerido ausente.
+     * @param ex excepcin con el nombre del parmetro faltante
+     * @return ProblemDetail con estado 400 y el parmetro faltante
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ProblemDetail handleMissingParam(MissingServletRequestParameterException ex) {
+        log.warn("Parámetro requerido ausente: {}", ex.getParameterName());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+                "Falta el parámetro requerido: '" + ex.getParameterName() + "'");
+    }
     /**
          * Maneja un estado ilegal de negocio (operacin no vlida en el estado actual).
      * @param ex excepcin de estado ilegal
      * @return ProblemDetail con estado 409 y el mensaje del estado ilegal
      */
+    @ExceptionHandler(IllegalStateException.class)
     public ProblemDetail handleIllegalState(IllegalStateException ex) {
         log.warn("Estado ilegal de negocio", ex);
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
@@ -418,7 +432,6 @@ public class GlobalExceptionHandler {
     }
 
     // Reenvía el status indicado por el servicio (400, 404, etc.).
-    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
     /**
      * Reenvía el status HTTP indicado por un ResponseStatusException del servicio.
      *
@@ -430,6 +443,7 @@ public class GlobalExceptionHandler {
      * @param ex excepcion capturada que se transforma en una respuesta HTTP controlada
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
     public ProblemDetail handleResponseStatus(org.springframework.web.server.ResponseStatusException ex) {
         return ProblemDetail.forStatusAndDetail(
                 HttpStatus.valueOf(ex.getStatusCode().value()),
@@ -438,8 +452,6 @@ public class GlobalExceptionHandler {
     }
 
     // ── Fallback ──────────────────────────────────────────────
-
-    @ExceptionHandler(Exception.class)
     /**
      * Fallback para cualquier excepcin no controlada.
      * Devuelve 500 con detalle del error (limitado a 300 caracteres).
@@ -451,6 +463,7 @@ public class GlobalExceptionHandler {
      * @param ex excepcion capturada que se transforma en una respuesta HTTP controlada
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @ExceptionHandler(Exception.class)
     public ProblemDetail handleGeneric(Exception ex) {
         log.error("Error no controlado: {}", ex.getMessage(), ex);
         String msg = ex.getMessage();

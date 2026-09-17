@@ -89,13 +89,13 @@ public class PublicBookController {
     }
 
     // ── GET /api/publico/libros/{id} ─────────────────────────────────
-    @GetMapping("/{id}")
     /**
      * Consulta get usando los filtros recibidos y devuelve el resultado solicitado.
      *
      * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @GetMapping("/{id}")
     public BookResponseDTO get(@PathVariable Long id) {
         return bookService.searchByIdPublic(id);
     }
@@ -107,13 +107,13 @@ public class PublicBookController {
     // autenticado). Mismo armado de ResponseEntity que el endpoint
     // autenticado de LibroController: Content-Type dinámico según
     // portada_tipo, 404 si el libro no existe o no tiene portada.
-    @GetMapping("/{id}/portada")
     /**
      * Procesa cover y devuelve el resultado calculado por el backend.
      *
      * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @GetMapping("/{id}/portada")
     public ResponseEntity<byte[]> cover(@PathVariable Long id) {
         CoverImageDTO cover = bookService.getCover(id);
         return ResponseEntity.ok()

@@ -10,11 +10,13 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 // crear() resuelve el usuarioId desde el Authentication; cambiarEstado() registra quién revisó.
 // La auditoria de esta tabla ya no se hace aqui: trg_auditoria_sugerencias_adquisicion
@@ -28,13 +30,29 @@ public class SuggestionAcquisitionService {
     private final SuggestionAcquisitionRepository suggestionRepo;
     private final UserRepository userRepo;
 
+    // Sorts legacy en español de clientes viejos o peticiones manuales
+    // (ver 500 "No property 'creadoEn'"). Se traducen al atributo JPA;
+    // el resto pasa igual. No se renombra nada.
+    private static final Map<String, String> SORT_LEGACY = Map.of(
+            "creadoEn", "created");
+
+    private static Pageable sortTolerante(Pageable pageable) {
+        if (pageable == null || pageable.isUnpaged()) {
+            return pageable;
+        }
+        Sort traducido = Sort.by(pageable.getSort().stream()
+                .map(orden -> SORT_LEGACY.containsKey(orden.getProperty())
+                        ? orden.withProperty(SORT_LEGACY.get(orden.getProperty()))
+                        : orden)
+                .toList());
+        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), traducido);
+    }
+
     public SuggestionAcquisitionService(SuggestionAcquisitionRepository suggestionRepo,
                                          UserRepository userRepo) {
         this.suggestionRepo = suggestionRepo;
         this.userRepo = userRepo;
     }
-
-    @Transactional
     /**
      * Registra create validando los datos de entrada antes de persistir cambios.
      *
@@ -42,6 +60,7 @@ public class SuggestionAcquisitionService {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @Transactional
     public SuggestionAcquisitionResponseDTO create(SuggestionAcquisitionRequestDTO dto, Authentication authentication) {
         Long userId = resolveIdByEmail(authentication.getName());
 
@@ -57,8 +76,6 @@ public class SuggestionAcquisitionService {
 
         return toDTO(suggestionRepo.save(suggestion));
     }
-
-    @Transactional(readOnly = true)
     /**
      * Consulta list owns usando los filtros recibidos y devuelve el resultado solicitado.
      *
@@ -66,13 +83,13 @@ public class SuggestionAcquisitionService {
      * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
      * @return pagina de resultados que coincide con los filtros y la paginacion solicitada
      */
+    @Transactional(readOnly = true)
     public Page<SuggestionAcquisitionResponseDTO> listOwns(Authentication authentication, Pageable pageable) {
         Long userId = resolveIdByEmail(authentication.getName());
-        return suggestionRepo.findByUserId(userId, pageable).map(this::toDTO);
+        return suggestionRepo.findByUserId(userId, sortTolerante(pageable)).map(this::toDTO);
     }
 
     // Solo GERENTE/ADMIN llegan acá: listado sin filtrar por dueño.
-    @Transactional(readOnly = true)
     /**
      * Consulta list todas usando los filtros recibidos y devuelve el resultado solicitado.
      *
@@ -80,14 +97,14 @@ public class SuggestionAcquisitionService {
      * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
      * @return pagina de resultados que coincide con los filtros y la paginacion solicitada
      */
+    @Transactional(readOnly = true)
     public Page<SuggestionAcquisitionResponseDTO> listAll(String status, Pageable pageable) {
+        Pageable tolerante = sortTolerante(pageable);
         if (status == null || status.isBlank()) {
-            return suggestionRepo.findAll(pageable).map(this::toDTO);
+            return suggestionRepo.findAll(tolerante).map(this::toDTO);
         }
-        return suggestionRepo.findByStatus(status, pageable).map(this::toDTO);
+        return suggestionRepo.findByStatus(status, tolerante).map(this::toDTO);
     }
-
-    @Transactional
     /**
      * Actualiza change status con las reglas de negocio requeridas por el flujo.
      *
@@ -96,6 +113,7 @@ public class SuggestionAcquisitionService {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @Transactional
     public SuggestionAcquisitionResponseDTO changeStatus(Long id, String freshStatus, Authentication authentication) {
         SuggestionAcquisition suggestion = suggestionRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(SUGERENCIA_NO_ENCONTRADA + id));
@@ -109,23 +127,22 @@ public class SuggestionAcquisitionService {
 
     // ── Gestión por demanda: lo más pedido primero ──
     // El orden vive en el JPQL; el sort del Pageable se ignora a propósito.
-    @Transactional(readOnly = true)
     /**
      * Consulta get most pedidos usando los filtros recibidos y devuelve el resultado solicitado.
      *
      * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
      * @return pagina de resultados que coincide con los filtros y la paginacion solicitada
      */
+    @Transactional(readOnly = true)
     public Page<SuggestionGroupedDTO> getMostRequested(Pageable pageable) {
         Pageable effective = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
         return suggestionRepo.findMostRequestedGrouped(effective);
     }
-
-    @Transactional(readOnly = true)
     /**
          * Busca/lista recursos.
      * @return lista o pagina de resultados
      */
+    @Transactional(readOnly = true)
     public List<SuggestionGroupedDTO> getMostRequestedList() {
         return suggestionRepo
                 .findMostRequestedGrouped(PageRequest.of(0, Integer.MAX_VALUE))

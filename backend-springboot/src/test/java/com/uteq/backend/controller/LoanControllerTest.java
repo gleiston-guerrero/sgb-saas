@@ -218,6 +218,20 @@ class LoanControllerTest extends WebMvcControllerTestSupport {
                 .andExpect(jsonPath("$.content[0].titulo").value("Clean Code"));
     }
 
+    // Regresión: stockTotal no se serializaba y stockDisponible llevaba
+    // el total (Total=undefined, Disponible=Total en el reporte).
+    @Test
+    void reportInventory_serializaStocksConKeysCorrectas() throws Exception {
+        when(loanService.reportInventoryPaginated(any(), any(), any(), any(), any(), any(), any(),
+                any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(new PageImpl<>(List.of(inventory())));
+
+        mockMvc.perform(get("/api/v1/prestamos/reportes/inventario"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].stockTotal").value(3))
+                .andExpect(jsonPath("$.content[0].stockDisponible").value(1));
+    }
+
     @Test
     void reportInventoryTodo_devuelve200() throws Exception {
         when(loanService.reportInventory(any(), any(), any(), any(), any(), any(), any(),

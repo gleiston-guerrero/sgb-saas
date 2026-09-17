@@ -29,6 +29,7 @@ import java.time.OffsetDateTime;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -99,6 +100,22 @@ class SuggestionAcquisitionControllerSecurityTest {
                 .andExpect(status().isCreated());
     }
 
+    // Regresión: el formulario manda `autor` pero el record leía `author`
+    // sin alias y el autor se perdía en silencio.
+    @Test
+    @WithMockUser(roles = "LECTOR")
+    void create_conAutorEspanol_mapeaAutor() throws Exception {
+        when(suggestionService.create(any(), any())).thenReturn(responseCreated());
+
+        mockMvc.perform(post("/api/v1/sugerencias-adquisicion")
+                        .contentType("application/json")
+                        .content("{\"titulo\":\"Dune\",\"autor\":\"Frank Herbert\",\"justificacion\":\"Clásico\"}"))
+                .andExpect(status().isCreated());
+
+        verify(suggestionService).create(
+                argThat(dto -> "Frank Herbert".equals(dto.author())), any());
+    }
+
     // Regresion: BIBLIOTECARIO no es LECTOR ni GERENTE/ADMIN -- no debería
     // poder sugerir adquisiciones en nombre propio (ese flujo es del
     // lector) ni gestionarlas (eso es del gerente).
@@ -162,6 +179,23 @@ class SuggestionAcquisitionControllerSecurityTest {
     void mostPedidos_withRoleReader_seRechaza() throws Exception {
         mockMvc.perform(get("/api/v1/sugerencias-adquisicion/mas-pedidos"))
                 .andExpect(status().isForbidden());
+    }
+
+    // Regresión: el ISBN viajaba aliasado como titulo (celda título = ISBN
+    // y confirmar-adquisicion con undefined). Contrato isbn/titulo/autor.
+    @Test
+    @WithMockUser(roles = "GERENTE")
+    void mostPedidos_serializaIsbnYTituloConKeysCorrectas() throws Exception {
+        when(suggestionService.getMostRequested(any())).thenReturn(new org.springframework.data.domain.PageImpl<>(
+                java.util.List.of(new com.uteq.backend.dto.SuggestionGroupedDTO(
+                        "9781449373320", "Dune", "Frank Herbert", 4L))));
+
+        mockMvc.perform(get("/api/v1/sugerencias-adquisicion/mas-pedidos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].isbn").value("9781449373320"))
+                .andExpect(jsonPath("$.content[0].titulo").value("Dune"))
+                .andExpect(jsonPath("$.content[0].autor").value("Frank Herbert"))
+                .andExpect(jsonPath("$.content[0].cantidad").value(4));
     }
 
     @Test
@@ -244,5 +278,23 @@ class SuggestionAcquisitionControllerSecurityTest {
 
         mockMvc.perform(get("/api/v1/sugerencias-adquisicion/mias"))
                 .andExpect(status().isOk());
+    }
+
+    // Regresión: usuarioId llevaba el id de la sugerencia y no existía id
+    // (track inestable + PATCH /{id}/estado con undefined).
+    @Test
+    @WithMockUser(roles = "LECTOR")
+    void listOwns_serializaIdYUsuarioConKeysCorrectas() throws Exception {
+        var dto = new com.uteq.backend.dto.SuggestionAcquisitionResponseDTO(
+                5L, 7L, "Dune", "Frank Herbert", "9780441172719",
+                "Clásico", "PENDIENTE", null, java.time.OffsetDateTime.now());
+        org.springframework.data.domain.Page<com.uteq.backend.dto.SuggestionAcquisitionResponseDTO> page =
+                new org.springframework.data.domain.PageImpl<>(java.util.List.of(dto));
+        when(suggestionService.listOwns(any(), any())).thenReturn(page);
+
+        mockMvc.perform(get("/api/v1/sugerencias-adquisicion/mias"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(5))
+                .andExpect(jsonPath("$.content[0].usuarioId").value(7));
     }
 }

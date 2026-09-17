@@ -33,8 +33,6 @@ public class UserAdminController {
     // ── GET /api/v1/admin/usuarios?filtro=&page=&size=&mios= ────
     // F8-gerente: ?mios=true filtra por creado_por propio (el service además
     // fuerza ese filtro para GERENTE aunque no mande el flag).
-    @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     /**
      * Consulta list usando los filtros recibidos y devuelve el resultado solicitado.
      *
@@ -44,6 +42,8 @@ public class UserAdminController {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     public ResponseEntity<Page<UserListingResponseDTO>> list(
             @RequestParam(name = "filtro", required = false) String filter,
             @RequestParam(required = false, defaultValue = "false") boolean mios,
@@ -54,8 +54,6 @@ public class UserAdminController {
 
     // ── PATCH /api/v1/admin/usuarios/{id}/rol ─────────────
     // F8-gerente: GERENTE limitado en service a sus creados + LECTOR/BIBLIOTECARIO.
-    @PatchMapping("/{id}/rol")
-    @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     /**
      * Actualiza change role con las reglas de negocio requeridas por el flujo.
      *
@@ -64,6 +62,8 @@ public class UserAdminController {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PatchMapping("/{id}/rol")
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     public ResponseEntity<Void> changeRole(
             @PathVariable Long id,
             @Valid @RequestBody ChangeRoleRequestDTO dto,
@@ -74,8 +74,6 @@ public class UserAdminController {
 
     // ── PATCH /api/v1/admin/usuarios/{id}/estado ──────────
     // F8-gerente: GERENTE limitado en service a sus creados + ACTIVO/INACTIVO.
-    @PatchMapping("/{id}/estado")
-    @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     /**
      * Actualiza change status con las reglas de negocio requeridas por el flujo.
      *
@@ -84,6 +82,8 @@ public class UserAdminController {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PatchMapping("/{id}/estado")
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     public ResponseEntity<Void> changeStatus(
             @PathVariable Long id,
             @Valid @RequestBody ChangeStatusUserRequestDTO dto,
@@ -94,8 +94,6 @@ public class UserAdminController {
 
     // ── POST /api/v1/admin/usuarios ──────────
     // F8-gerente: GERENTE crea solo LECTOR/BIBLIOTECARIO (service lo verifica).
-    @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     /**
      * Registra create validando los datos de entrada antes de persistir cambios.
      *
@@ -103,6 +101,8 @@ public class UserAdminController {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     public ResponseEntity<UserResponseDTO> create(@Valid @RequestBody CreateUserAdminRequestDTO dto, Authentication authentication) {
         UserResponseDTO created = userAdminService.createUser(dto, authentication);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);

@@ -8,6 +8,10 @@ import java.util.UUID;
  * Respuesta de POST /api/v1/chatbot/mensajes: la sesión sobre la que se
  * respondió (la existente o la recién creada), la respuesta del asistente
  * y el timestamp en que se persistió esa respuesta.
+ *
+ * @param sessionId identificador de la sesión
+ * @param response respuesta del asistente
+ * @param timestamp fecha en que se persistió la respuesta
  */
 public record MessageChatResponseDTO( @JsonProperty("sesionId") UUID sessionId, @JsonProperty("respuesta") String response,
         OffsetDateTime timestamp

@@ -21,9 +21,6 @@ public class SubscriptionAvailabilityController {
         this.service = service;
         this.userRepo = userRepo;
     }
-
-    @PostMapping("/{libroId}/suscripciones")
-    @PreAuthorize("isAuthenticated()")
     /**
      * Procesa suscribir y devuelve el resultado calculado por el backend.
      *
@@ -31,14 +28,13 @@ public class SubscriptionAvailabilityController {
      * @param auth identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PostMapping("/{libroId}/suscripciones")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> subscribe(@PathVariable("libroId") Long bookId, Authentication auth) {
         Long userId = resolveUserId(auth);
         service.subscribe(userId, bookId);
         return ResponseEntity.ok().build();
     }
-
-    @DeleteMapping("/{libroId}/suscripciones")
-    @PreAuthorize("isAuthenticated()")
     /**
      * Procesa desuscribir y devuelve el resultado calculado por el backend.
      *
@@ -46,20 +42,21 @@ public class SubscriptionAvailabilityController {
      * @param auth identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @DeleteMapping("/{libroId}/suscripciones")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> unsubscribe(@PathVariable("libroId") Long bookId, Authentication auth) {
         Long userId = resolveUserId(auth);
         service.unsubscribe(userId, bookId);
         return ResponseEntity.noContent().build();
     }
-
-    @GetMapping("/suscripciones/mias")
-    @PreAuthorize("isAuthenticated()")
     /**
      * Procesa mis subscriptions y devuelve el resultado calculado por el backend.
      *
      * @param auth identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @GetMapping("/suscripciones/mias")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<Long>> mySubscriptions(Authentication auth) {
         Long userId = resolveUserId(auth);
         return ResponseEntity.ok(service.listBooksIds(userId));

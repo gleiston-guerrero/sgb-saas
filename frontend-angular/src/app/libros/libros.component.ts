@@ -224,8 +224,16 @@ export class LibrosComponent implements OnInit, OnDestroy {
       categoriaId: this.categoriaFiltro ? Number(this.categoriaFiltro) : undefined
     }).subscribe({
       next: (data) => {
-        this.libros = data.content;
-        this.totalPages = data.totalPages;
+        // Normalizar: el backend garantiza [] pero ante cualquier forma
+        // vieja/incompleta (autores/categorias null) la tabla reventaba
+        // renderizando undefined.length. Cinturón y tirantes con la
+        // plantilla, que también usa ?? [].
+        this.libros = (data.content ?? []).map(l => ({
+          ...l,
+          autores: l.autores ?? [],
+          categorias: l.categorias ?? []
+        }));
+        this.totalPages = data.totalPages ?? 0;
         this.cargando = false;
       },
       error: () => {

@@ -5,18 +5,25 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import jakarta.persistence.Column;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Libro del catálogo (tabla libros).
+ */
 @Data
-@NoArgsConstructor
 @Entity
 @Table(name = "libros")
 public class Book {
+
+    /**
+     * Constructor sin argumentos para JPA y Jackson.
+     */
+    public Book() {
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

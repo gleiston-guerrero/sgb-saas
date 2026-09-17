@@ -160,7 +160,9 @@ este capítulo:
 \begin{itemize}[leftmargin=1.2cm]
   \item \textbf{Cajas}: autor del mayor volumen de commits del proyecto
     (727 commits humanos sin merges según
-    \texttt{git -c log.mailmap=true shortlog -sne --no-merges HEAD}),
+    \texttt{git -c log.mailmap=true shortlog -sne --no-merges HEAD} al
+    rev de redacción; conteos vigentes por rol en
+    \texttt{CONTRIBUCIONES.md}),
     concentrados en el backend Spring Boot -- servicios, controladores,
     la validación estricta de \texttt{@Procedure}/
     \texttt{@NamedStoredProcedureQuery} para los procedimientos
@@ -173,14 +175,41 @@ este capítulo:
     verificada contra Crossref), de los scripts de medición
     (\texttt{k6/}, \texttt{scripts/perf-analysis.py}) y del análisis
     estadístico del \autoref{cap:resultados}. 329 commits humanos sin
-    merges según la misma consulta con \texttt{.mailmap}.
+    merges según la misma consulta con \texttt{.mailmap} (cifra al rev
+    de redacción; conteos vigentes por rol en
+    \texttt{CONTRIBUCIONES.md}).
   \item \textbf{Panamá}: autor de los componentes de frontend de
     Préstamos, Reservaciones y Multas (\texttt{frontend-angular/}) y de
     varias historias de usuario en \texttt{docs/requisitos/}. 291
     commits humanos sin merges según la misma consulta con
-    \texttt{.mailmap}. Asignado a la ejecución de las pruebas SUS
-    pendientes (OBS-08, \autoref{sec:tf-sus}).
+    \texttt{.mailmap} (cifra al rev de redacción; conteos vigentes por
+    rol en \texttt{CONTRIBUCIONES.md}). Asignado a la ejecución de las
+    pruebas SUS pendientes (OBS-08, \autoref{sec:tf-sus}).
 \end{itemize}
+
+La actividad temporal y el reparto por autor se visualizan en las
+\autoref{fig:decl-commits-mensuales} y \autoref{fig:decl-commits-autores},
+generadas desde \texttt{git log} con
+\texttt{scripts/generar-figuras-evaluacion.py} (conteos sin merges,
+con \texttt{.mailmap}).
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\textwidth]{mediciones/figuras/fig-commits-mensuales.pdf}
+\caption{Commit activity per month (no merges). Generated from
+\texttt{git log} with
+\texttt{scripts/generar-figuras-evaluacion.py}.}
+\label{fig:decl-commits-mensuales}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.7\textwidth]{mediciones/figuras/fig-commits-autores.pdf}
+\caption{Commits by author (no merges, identities unified with
+\texttt{.mailmap}). Generated from \texttt{git shortlog} with
+\texttt{scripts/generar-figuras-evaluacion.py}.}
+\label{fig:decl-commits-autores}
+\end{figure}
 
 \textbf{Nota sobre "Supervision".} La guía CRediT reserva este rol
 típicamente para quien dirige el trabajo sin ser autor operativo directo

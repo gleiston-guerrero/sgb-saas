@@ -14,33 +14,39 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/categorias-dano")
+/**
+ * Catálogo de categorías de daño (gestión ADMIN, lectura extendida).
+ */
 public class CategoryDamageController {
 
     private final CategoryDamageRepository repo;
 
+    /**
+     * Constructor con el repositorio de categorías de daño.
+     *
+     * @param repo repositorio del catálogo de categorías de daño
+     */
     public CategoryDamageController(CategoryDamageRepository repo) {
         this.repo = repo;
     }
-
-    @GetMapping
-    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     /**
      * Lists category damage report.
      *
-     * @return response entity<list<categoria damage report dto>> with the resulting state after the operation
+     * @return response entity{@code <list<categoria damage report dto>>} with the resulting state after the operation
      */
+    @GetMapping
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
     public ResponseEntity<List<CategoryDamageDTO>> list() {
         return ResponseEntity.ok(repo.findAll().stream().map(c -> new CategoryDamageDTO(c.getId(), c.getName())).toList());
     }
-
-    @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
     /**
      * Registra create validando los datos de entrada antes de persistir cambios.
      *
      * @param req datos validados de la peticion con la informacion necesaria para ejecutar la operacion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryDamageDTO> create(@RequestBody CategoryRequest req) {
         if (req.name() == null || req.name().isBlank()) return ResponseEntity.badRequest().build();
         if (repo.findByName(req.name()).isPresent()) return ResponseEntity.unprocessableEntity().build();
@@ -49,9 +55,6 @@ public class CategoryDamageController {
         CategoryDamage g = repo.save(c);
         return ResponseEntity.created(URI.create("/api/v1/categorias-dano/" + g.getId())).body(new CategoryDamageDTO(g.getId(), g.getName()));
     }
-
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     /**
      * Actualiza update con las reglas de negocio requeridas por el flujo.
      *
@@ -59,6 +62,8 @@ public class CategoryDamageController {
      * @param req datos validados de la peticion con la informacion necesaria para ejecutar la operacion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryDamageDTO> update(@PathVariable Integer id, @RequestBody CategoryRequest req) {
         CategoryDamage c = repo.findById(id).orElse(null);
         if (c == null) return ResponseEntity.notFound().build();
@@ -66,15 +71,14 @@ public class CategoryDamageController {
         CategoryDamage g = repo.save(c);
         return ResponseEntity.ok(new CategoryDamageDTO(g.getId(), g.getName()));
     }
-
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     /**
      * Elimina o anula delete despues de validar que la operacion sea permitida.
      *
      * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         CategoryDamage c = repo.findById(id).orElse(null);
         if (c == null) return ResponseEntity.notFound().build();

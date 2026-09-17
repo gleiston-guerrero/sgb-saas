@@ -22,35 +22,32 @@ public class QueryFinesTool extends AbstractUserAwareTool {
         this.fineRepo = fineRepo;
         this.statusFineRepo = statusFineRepo;
     }
-
-    @Override
     /**
      * Retrieves name.
      *
      * @return resulting text payload
      */
+    @Override
     public String getName() {
         return "consultar_multas";
     }
-
-    @Override
     /**
      * Retrieves scription.
      *
      * @return resulting text payload
      */
+    @Override
     public String getDescription() {
         return "Consulta las multas pendientes de pago de un usuario de la biblioteca. "
                 + "Devuelve el saldo total adeudado y la cantidad de multas pendientes.";
     }
-
-    @Override
     /**
      * Procesa execute y devuelve el resultado calculado por el backend.
      *
      * @param args argumento recibido por la herramienta del chatbot para decidir y ejecutar la accion
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @Override
     public JsonNode execute(JsonNode args) {
         Long userId = resolveUserId(args);
         if (userId == null) {

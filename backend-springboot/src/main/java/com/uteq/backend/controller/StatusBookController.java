@@ -21,13 +21,12 @@ public class StatusBookController {
     public StatusBookController(StatusBookRepository statusBookRepository) {
         this.statusBookRepository = statusBookRepository;
     }
-
-    @GetMapping
     /**
      * Lists status book.
      *
-     * @return response entity<list<estado book response dto>> with the resulting state after the operation
+     * @return response entity{@code <list<estado book response dto>>} with the resulting state after the operation
      */
+    @GetMapping
     public ResponseEntity<List<StatusBookResponseDTO>> list() {
         List<StatusBookResponseDTO> statuses = statusBookRepository.findAll().stream()
                 .map(e -> new StatusBookResponseDTO(e.getId(), e.getName()))

@@ -27,8 +27,6 @@ public class FavoriteController {
     }
 
     // ── POST /api/v1/favoritos/{libroId} ──────────────────
-    @PostMapping("/{libroId}")
-    @PreAuthorize("hasRole('LECTOR')")
     /**
      * Procesa agregar y devuelve el resultado calculado por el backend.
      *
@@ -36,6 +34,8 @@ public class FavoriteController {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PostMapping("/{libroId}")
+    @PreAuthorize("hasRole('LECTOR')")
     public ResponseEntity<FavoriteResponseDTO> add(
             @PathVariable("libroId") Long bookId, Authentication authentication) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -43,8 +43,6 @@ public class FavoriteController {
     }
 
     // ── DELETE /api/v1/favoritos/{libroId} ────────────────
-    @DeleteMapping("/{libroId}")
-    @PreAuthorize("hasRole('LECTOR')")
     /**
      * Procesa quitar y devuelve el resultado calculado por el backend.
      *
@@ -52,6 +50,8 @@ public class FavoriteController {
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @DeleteMapping("/{libroId}")
+    @PreAuthorize("hasRole('LECTOR')")
     public ResponseEntity<Void> remove(
             @PathVariable("libroId") Long bookId, Authentication authentication) {
         favoriteService.remove(bookId, authentication);
@@ -80,15 +80,14 @@ public class FavoriteController {
             @PageableDefault(size = 10, sort = "agregado") Pageable pageable) {
         return ResponseEntity.ok(favoriteService.listOwnsPaginated(authentication, pageable));
     }
-
-    @GetMapping("/todo")
-    @PreAuthorize("hasRole('LECTOR')")
     /**
      * Consulta list owns todo usando los filtros recibidos y devuelve el resultado solicitado.
      *
      * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @GetMapping("/todo")
+    @PreAuthorize("hasRole('LECTOR')")
     public ResponseEntity<List<FavoriteResponseDTO>> listOwnsAll(Authentication authentication) {
         return ResponseEntity.ok(favoriteService.listOwns(authentication));
     }

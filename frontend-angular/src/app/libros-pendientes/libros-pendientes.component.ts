@@ -137,7 +137,8 @@ export class LibrosPendientesComponent implements OnInit, OnDestroy {
   abrirRevision(libro: Libro): void {
     const current = this.router.url;
     let base = '/dashboard-bibliotecario/libros';
-    if (current.includes('dashboard-admin')) base = '/dashboard-admin/libros';
+    if (current.includes('dashboard-gerente')) base = '/dashboard-gerente/libros';
+    else if (current.includes('dashboard-admin')) base = '/dashboard-admin/libros';
     else if (current.includes('/libros') && !current.includes('dashboard')) base = '/libros';
     this.router.navigate([base], { queryParams: { revision: libro.id } });
   }

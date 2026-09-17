@@ -12,51 +12,56 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
+/**
+ * Catálogo de categorías (lectura autenticada, gestión GERENTE/ADMIN).
+ */
 @RestController
 @RequestMapping("/api/v1/categorias")
 public class CategoryController {
 
     private final CategoryRepository categoryRepository;
 
+    /**
+     * Constructor con el repositorio de categorías.
+     *
+     * @param categoryRepository repositorio del catálogo de categorías
+     */
     public CategoryController(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
-
-    @GetMapping
     /**
      * Lists category.
      *
-     * @return response entity<list<categoria response dto>> with the resulting state after the operation
+     * @return response entity{@code <list<categoria response dto>>} with the resulting state after the operation
      */
+    @GetMapping
     public ResponseEntity<List<CategoryResponseDTO>> list() {
         List<CategoryResponseDTO> categories = categoryRepository.findAll().stream()
                 .map(c -> new CategoryResponseDTO(c.getId(), c.getName()))
                 .toList();
         return ResponseEntity.ok(categories);
     }
-
-    @GetMapping("/buscar")
     /**
      * Consulta search usando los filtros recibidos y devuelve el resultado solicitado.
      *
      * @param q texto de busqueda o filtro usado para reducir los resultados devueltos
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @GetMapping("/buscar")
     public ResponseEntity<List<CategoryResponseDTO>> search(@RequestParam String q) {
         return ResponseEntity.ok(
                 categoryRepository.findTop5ByNameContainingIgnoreCase(q).stream()
                         .map(c -> new CategoryResponseDTO(c.getId(), c.getName()))
                         .toList());
     }
-
-    @PostMapping
-    @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
     /**
      * Registra create validando los datos de entrada antes de persistir cambios.
      *
      * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
      * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
      */
+    @PostMapping
+    @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
     public ResponseEntity<CategoryResponseDTO> create(@Valid @RequestBody CategoryRequestDTO dto) {
         if (categoryRepository.existsByNameIgnoreCase(dto.name())) {
             return ResponseEntity.unprocessableEntity().build();

@@ -48,13 +48,16 @@ public interface FineProcedureRepository extends Repository<Fine, Long>, FinePro
             @Param("p_monto_pagado") java.math.BigDecimal amountPaid
     );
 
-    @Query(value = "SELECT * FROM fn_reporte_resumen_financiero_multas(:p_desde, :p_hasta)", nativeQuery = true)
+    @Query(value = "SELECT total_recaudado AS totalRecaudado, total_pendiente AS totalPending "
+            + "FROM fn_reporte_resumen_financiero_multas(:p_desde, :p_hasta)", nativeQuery = true)
     SummaryFinancialFinesProjection fnReportSummaryFinancial(
             @Param("p_desde") OffsetDateTime from,
             @Param("p_hasta") OffsetDateTime until
     );
 
-    @Query(value = "SELECT * FROM fn_pagos_recientes(:p_limit)", nativeQuery = true)
+    @Query(value = "SELECT multa_id AS fineId, monto_pagado AS amountPaid, fecha_pagada AS datePaid, "
+            + "usuario_correo AS userEmail, usuario_nombre AS userName, libro_titulo AS bookTitle "
+            + "FROM fn_pagos_recientes(:p_limit)", nativeQuery = true)
     java.util.List<RecentPaymentProjection> fnPaymentsRecientes(
             @Param("p_limit") Integer limit
     );

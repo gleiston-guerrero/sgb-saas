@@ -23,11 +23,15 @@ public class AuditAspect {
 
     private final UserRepository userRepository;
 
+    /**
+     * Constructor con el repositorio de usuarios.
+     *
+     * @param userRepository repositorio para resolver el id por correo
+     */
     public AuditAspect(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    @Around("@annotation(tx)")
     /**
      * Procesa set current user y devuelve el resultado calculado por el backend.
      *
@@ -36,6 +40,7 @@ public class AuditAspect {
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      * @throws Throwable si la operacion no puede completarse por validacion, permisos o fallo del recurso asociado
      */
+    @Around("@annotation(tx)")
     public Object setCurrentUser(ProceedingJoinPoint pjp, org.springframework.transaction.annotation.Transactional tx) throws Throwable {
         if (!tx.readOnly()) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();

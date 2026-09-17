@@ -308,4 +308,51 @@ class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1));
     }
+
+    // Regresión prod: el frontend manda {correo, codigo} pero el record
+    // leía `code` sin alias -> 400 por el @Pattern sobre null.
+    @Test
+    void verifyEmail_conJsonEspanolDelFrontend_devuelve200() throws Exception {
+        when(authService.verifyEmail(anyString(), anyString(), anyString())).thenReturn(new com.uteq.backend.dto.UserResponseDTO(1L, "Juan", "Perez", java.util.List.of("LECTOR")));
+
+        mockMvc.perform(post("/api/auth/verificar-correo")
+                        .contentType("application/json")
+                        .content("{\"correo\":\"test@correo.com\",\"codigo\":\"123456\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1));
+    }
+
+    // Regresión prod: el frontend manda {correo, codigo, nuevaPassword}
+    // pero `freshPassword` no tenía alias -> 400 @NotBlank.
+    @Test
+    void reset_conJsonEspanolDelFrontend_devuelve204() throws Exception {
+        doNothing().when(authService).resetPassword(anyString(), anyString(), anyString());
+
+        mockMvc.perform(post("/api/auth/reset")
+                        .contentType("application/json")
+                        .content("{\"correo\":\"test@correo.com\",\"codigo\":\"123456\",\"nuevaPassword\":\"Nueva123!\"}"))
+                .andExpect(status().isNoContent());
+    }
+
+    // Dev local http://: con cookie-secure=false la cookie sale sin Secure
+    // y con SameSite=Lax (None exige Secure). Llamada directa al controller
+    // con mocks propios para no depender del contexto web.
+    @Test
+    void login_conCookieSecureFalse_emiteLaxSinSecure() {
+        AuthController controller = new AuthController(authService, jwtService);
+        org.springframework.test.util.ReflectionTestUtils.setField(controller, "cookieSecure", false);
+        jakarta.servlet.http.HttpServletRequest request =
+                org.mockito.Mockito.mock(jakarta.servlet.http.HttpServletRequest.class);
+        org.mockito.Mockito.when(request.getRemoteAddr()).thenReturn("127.0.0.1");
+        when(authService.login(any(), anyString()))
+                .thenReturn(new TokenResponseDTO("access-token-x", "refresh-token-y", 3600));
+        when(jwtService.getRefreshExpirationMs()).thenReturn(604_800_000L);
+
+        var response = controller.login(new LoginRequestDTO("valido@correo.com", "password123"), request);
+        String setCookie = response.getHeaders().getFirst("Set-Cookie");
+
+        org.assertj.core.api.Assertions.assertThat(setCookie).contains("SameSite=Lax");
+        org.assertj.core.api.Assertions.assertThat(setCookie).doesNotContain("Secure");
+        org.assertj.core.api.Assertions.assertThat(setCookie).contains("HttpOnly");
+    }
 }

@@ -28,6 +28,7 @@ export class AppComponent {
   mostrarMenuUsuario = false;
   enRutaBibliotecario = false;
   enRutaAdmin = false;
+  enRutaGerente = false;
   enRutaLector = false;
   enRutaPublica = true;
   enRutaCatalogoPublico = false;
@@ -52,6 +53,7 @@ export class AppComponent {
         const url = (event as NavigationEnd).urlAfterRedirects || (event as NavigationEnd).url;
         this.enRutaBibliotecario = url.startsWith('/dashboard-bibliotecario');
         this.enRutaAdmin = url.startsWith('/dashboard-admin');
+        this.enRutaGerente = url.startsWith('/dashboard-gerente');
         this.enRutaLector = url.startsWith('/dashboard-lector');
         this.enRutaPublica = url.startsWith('/no-autorizado');
         // Portal público ('/' y '/portal/*') trae su propio nav: el header global no se muestra ahí.
@@ -83,20 +85,28 @@ export class AppComponent {
     { ruta: '/notificaciones', etiqueta: 'Notificaciones', icono: 'notifications' }
   ];
 
-  // Navbar compartido del staff: roles por enlace con hasRole(), espejo de los guards y @PreAuthorize.
+  // Navbar compartido del staff: cada enlace lleva el prefijo completo de
+  // su shell (nunca rutas sueltas: no existen fuera de los dashboards).
   enlacesStaff: EnlaceNav[] = [
-    // Entrada al panel con sidebar GERENTE/ADMIN (mismo patron que Cajas).
-    { ruta: '/dashboard-admin', etiqueta: 'Panel', icono: 'dashboard', roles: ['GERENTE', 'ADMIN'] },
-    { ruta: '/libros', etiqueta: 'Libros', icono: 'inventory_2', roles: ['BIBLIOTECARIO', 'GERENTE', 'ADMIN'] },
-    { ruta: '/prestamos/gestion', etiqueta: 'Préstamos', icono: 'assignment_return', roles: ['BIBLIOTECARIO', 'GERENTE'] },
-    { ruta: '/reservaciones', etiqueta: 'Reservaciones', icono: 'event_available', roles: ['BIBLIOTECARIO', 'GERENTE'] },
-    { ruta: '/multas', etiqueta: 'Multas', icono: 'payments', roles: ['BIBLIOTECARIO', 'GERENTE'] },
-    { ruta: '/dashboard-admin/reportes', etiqueta: 'Reportes', icono: 'bar_chart', roles: ['GERENTE', 'ADMIN'] },
-    { ruta: '/sugerencias/gestion', etiqueta: 'Sugerencias', icono: 'lightbulb', roles: ['GERENTE', 'ADMIN'] },
+    { ruta: '/dashboard-bibliotecario', etiqueta: 'Panel', icono: 'dashboard', roles: ['BIBLIOTECARIO'] },
+    { ruta: '/dashboard-gerente', etiqueta: 'Panel', icono: 'dashboard', roles: ['GERENTE'] },
+    { ruta: '/dashboard-admin', etiqueta: 'Panel', icono: 'dashboard', roles: ['ADMIN'] },
+    { ruta: '/dashboard-bibliotecario/libros', etiqueta: 'Libros', icono: 'inventory_2', roles: ['BIBLIOTECARIO'] },
+    { ruta: '/dashboard-gerente/libros', etiqueta: 'Libros', icono: 'inventory_2', roles: ['GERENTE'] },
+    { ruta: '/dashboard-admin/libros', etiqueta: 'Libros', icono: 'inventory_2', roles: ['ADMIN'] },
+    { ruta: '/dashboard-bibliotecario/prestamos/gestion', etiqueta: 'Préstamos', icono: 'assignment_return', roles: ['BIBLIOTECARIO'] },
+    { ruta: '/dashboard-gerente/prestamos/gestion', etiqueta: 'Préstamos', icono: 'assignment_return', roles: ['GERENTE'] },
+    { ruta: '/dashboard-bibliotecario/reservaciones', etiqueta: 'Reservaciones', icono: 'event_available', roles: ['BIBLIOTECARIO'] },
+    { ruta: '/dashboard-gerente/reservaciones', etiqueta: 'Reservaciones', icono: 'event_available', roles: ['GERENTE'] },
+    { ruta: '/dashboard-bibliotecario/multas', etiqueta: 'Multas', icono: 'payments', roles: ['BIBLIOTECARIO'] },
+    { ruta: '/dashboard-gerente/multas', etiqueta: 'Multas', icono: 'payments', roles: ['GERENTE'] },
+    { ruta: '/dashboard-gerente/reportes', etiqueta: 'Reportes', icono: 'bar_chart', roles: ['GERENTE'] },
+    { ruta: '/dashboard-admin/reportes', etiqueta: 'Reportes', icono: 'bar_chart', roles: ['ADMIN'] },
+    { ruta: '/dashboard-gerente/sugerencias/gestion', etiqueta: 'Sugerencias', icono: 'lightbulb', roles: ['GERENTE'] },
+    { ruta: '/dashboard-admin/sugerencias/gestion', etiqueta: 'Sugerencias', icono: 'lightbulb', roles: ['ADMIN'] },
     { ruta: '/dashboard-admin/admin/usuarios', etiqueta: 'Usuarios', icono: 'manage_accounts', roles: ['ADMIN'] },
     { ruta: '/dashboard-admin/auditoria', etiqueta: 'Auditoría', icono: 'receipt_long', roles: ['ADMIN'] },
-    { ruta: '/dashboard-admin/admin/configuracion', etiqueta: 'Configuración', icono: 'settings', roles: ['ADMIN'] },
-    { ruta: '/dashboard-gerente', etiqueta: 'Dashboard', icono: 'dashboard', roles: ['GERENTE'] }
+    { ruta: '/dashboard-admin/admin/configuracion', etiqueta: 'Configuración', icono: 'settings', roles: ['ADMIN'] }
   ];
 
   private obtenerNombreRuta(url: string): string {

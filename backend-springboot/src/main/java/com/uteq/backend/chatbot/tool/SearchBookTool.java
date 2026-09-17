@@ -24,34 +24,31 @@ public class SearchBookTool extends AbstractChatbotTool {
     public SearchBookTool(BookService bookService) {
         this.bookService = bookService;
     }
-
-    @Override
     /**
      * Retrieves name.
      *
      * @return resulting text payload
      */
+    @Override
     public String getName() {
         return "buscar_libro";
     }
-
-    @Override
     /**
      * Retrieves scription.
      *
      * @return resulting text payload
      */
+    @Override
     public String getDescription() {
         return "Busca libros en el catálogo de la biblioteca por título, autor o tema. "
                 + "Devuelve los resultados más relevantes con su disponibilidad actual.";
     }
-
-    @Override
     /**
      * Retrieves input schema.
      *
      * @return json node with the resulting state after the operation
      */
+    @Override
     public JsonNode getInputSchema() {
         ObjectNode schema = mapper.createObjectNode();
         schema.put("type", "object");
@@ -70,14 +67,13 @@ public class SearchBookTool extends AbstractChatbotTool {
 
         return schema;
     }
-
-    @Override
     /**
      * Procesa execute y devuelve el resultado calculado por el backend.
      *
      * @param args argumento recibido por la herramienta del chatbot para decidir y ejecutar la accion
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
+    @Override
     public JsonNode execute(JsonNode args) {
         String query = args.path(PARAM_QUERY).asText("");
         List<BookSuggestionDTO> results = bookService.suggest(query);
