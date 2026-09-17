@@ -1,5 +1,13 @@
 # Evidencia — Bloque C.1: prueba de carga real sobre GET /api/v1/libros (cache Redis)
 
+> **Serie vigente al cierre: 2026-09-17** (5 corridas nuevas, sección
+> dedicada al final de este archivo). La serie julio/agosto 2026 que
+> describía este reporte queda como historia metodológica: sus NDJSON
+> ya no están en el árbol y sus cifras fueron reemplazadas en el
+> capítulo de resultados por la re-medición. Los nombres de archivo
+> (`k6-run1.json` … `k6-run5.json`) se reutilizan para la serie
+> vigente; no coexisten dos series en el árbol.
+
 ## Cabecera de medición
 
 - **Fecha (ISO 8601 UTC)**: 2026-07-31T02:54:00Z a 2026-07-31T03:00:00Z
@@ -246,3 +254,96 @@ Caption (English): p95 latency comparison between cache_hot and cache_cold acros
    de que el cache no tenga efecto, sino de que la comparación no aísla
    limpiamente ese efecto del costo distinto de las consultas de cada
    escenario.
+
+---
+
+# Serie vigente al cierre — 2026-09-17 (re-medición exigida, 5 corridas)
+
+## Cabecera de medición
+
+- **Fecha (UTC)**: 2026-09-16T23:58Z a 2026-09-17T00:12Z (corridas 1–5,
+  secuenciales, ~106 s cada una).
+- **Commit medido**: `fcda4808` (rama `fix/rescate-produccion-examen`).
+  Imágenes `sgb-saas-backend:latest` y `sgb-saas-frontend:latest`
+  reconstruidas con `docker compose up -d --build` el mismo día
+  (la imagen previa era del 2026-08-17 y no reflejaba el código
+  vigente). PostgreSQL 16 + Redis 7 sanos (`health: healthy`);
+  backend `healthy` antes de la corrida 1.
+- **URL medida**: `http://backend:8080` dentro de la red
+  `sgb-saas_default` (k6 corre en contenedor `grafana/k6:latest`,
+  digest `sha256:5221b6…0c6cdec`, misma red que el backend).
+- **Perfil de carga**: 50 VUs, ramp-up 10 s / sostenido 30 s /
+  ramp-down 10 s por escenario (`k6/opts.js`); escenarios
+  `cache_caliente` y `cache_frio` secuenciales (el segundo arranca en
+  t+55 s), umbrales `p95<200ms` / `p95<500ms` / `http_req_failed==0`.
+- **Autenticación**: login real en `setup()` con
+  `admin@sgb-saas.local` (seed `db/seed.sql`); 1 login por corrida,
+  sin fricción con el rate limiter (éxito resetea el contador).
+- **Comando** (equivalente a `make bench`, corridas 1–5):
+  `docker run --rm --network sgb-saas_default -v <repo>/k6:/scripts
+  -v <repo>/docs/mediciones/perf:/out grafana/k6 run --out
+  json=/out/k6-runN.json /scripts/libros-listado-test.js`
+- **Análisis**: `python3 scripts/perf-analysis.py
+  docs/mediciones/perf/k6-run*.json` (agregado + Wilcoxon pareado +
+  Cliff's delta + SVG/PDF `p95-comparacion-escenarios` regenerados).
+
+## Custodia de los NDJSON crudos
+
+Los 5 NDJSON (~15 MB cada uno) **no se versionan en git** por higiene
+de repositorio (regla `.gitignore`: `docs/mediciones/perf/k6-run*.json`,
+decisión vigente del equipo). En su lugar se versiona aquí el
+SHA-256 de cada archivo, el resumen por corrida y el agregado
+completo, más el comando exacto para repetir la medición:
+
+| Corrida | SHA-256 (`k6-runN.json`) |
+|---|---|
+| 1 | `72C7826906F3DD2CB88C596CBB5FE7B10A32DC50CBD3BAFCD4198C77F0E05CF8` |
+| 2 | `832B30226512FDAF0B1BA51D0FD345239696CAC04E253A393115D1B5E0BEA27C` |
+| 3 | `D3CDADAC626F5562064479D9D99BC8C3573F6B707637AAB5674FA0F9C20B9D1B` |
+| 4 | `3A82D71062B45A8402C3B63E3269810F51470677560044286DC32B210F186ACA` |
+| 5 | `EB88454D83BA8C2B2C57A4B11AFFA8793C36A108EDD2615E60A8A3B657A0517A` |
+
+## Resumen por corrida (consola de k6, thresholds evaluados por k6)
+
+| Corrida | cache_caliente p95 | cache_frio p95 | checks OK | Umbral caliente (<200ms) | Umbral frío (<500ms) |
+|---|---|---|---|---|---|
+| 1 | 129.63ms | 18.39ms | 3907/3907 | ✅ pasa | ✅ pasa |
+| 2 | 41.57ms | 18.71ms | 3972/3972 | ✅ pasa | ✅ pasa |
+| 3 | 31.16ms | 15.68ms | 3985/3985 | ✅ pasa | ✅ pasa |
+| 4 | 32.53ms | 15.75ms | 3983/3983 | ✅ pasa | ✅ pasa |
+| 5 | 32.49ms | 16.60ms | 3985/3985 | ✅ pasa | ✅ pasa |
+
+## Agregado (`perf-analysis.py`, salida real)
+
+- cache_caliente: n=9821, media 29.84ms, mediana 22.63ms, σ 29.86ms,
+  IC95% media [29.25, 30.43], p50 22.63, p90 46.99, **p95 65.60**,
+  p99 129.36, error 5xx 0.00%, throughput 196.42 req/s.
+- cache_frio: n=10006, media 11.01ms, mediana 10.30ms, σ 3.41ms,
+  IC95% media [10.95, 11.08], p50 10.30, p90 15.06, **p95 17.13**,
+  p99 23.24, error 5xx 0.00%, throughput 200.12 req/s.
+- Total: 19 827 peticiones, 0 errores 5xx.
+- Wilcoxon pareado sobre p95 por corrida: estadístico 0.0000,
+  p-valor 0.0625 (mínimo exacto alcanzable con n=5, sin significancia
+  convencional por potencia, no por falta de efecto).
+- Cliff's delta = -1.0000 (efecto grande, dirección perfectamente
+  consistente en las 5 corridas).
+
+## Umbrales — veredicto serie vigente
+
+| Umbral | Exigido | Obtenido | Cumple |
+|---|---|---|---|
+| p95 cache caliente | < 200ms | 65.60ms | ✅ Sí |
+| p95 cache frío | < 500ms | 17.13ms | ✅ Sí |
+| Tasa de error HTTP ≥500 | 0% | 0.00% (0 de 19 827) | ✅ Sí |
+
+## Notas honestas de la serie vigente
+
+1. La corrida 1 repite el hallazgo colateral histórico: cola pesada
+   en `cache_caliente` (p95 129.63ms) por warm-up de JVM/JIT tras
+   reconstruir la imagen; las corridas 2–5 estabilizan (31–42ms).
+   No se descartó ni se repitió la corrida 1.
+2. La limitación metodológica de `cache_frio` (páginas fuera de rango
+   por tabla semilla pequeña) sigue vigente y declarada en el
+   capítulo de resultados y en amenazas a la validez.
+3. Ningún dato fue ajustado; ningún umbral fue modificado para
+   acomodar resultados.
