@@ -24,21 +24,13 @@ El despliegue público usa **Render** (aplicación), **Neon** (PostgreSQL) y **U
 https://biblora-sgb.onrender.com
 ```
 
-### Credenciales demo (tribunal evaluador)
+### Acceso para el tribunal evaluador
 
-Cuenta preconfigurada en la semilla real `db/seed.sql` (usuario administrador de desarrollo / demo). Mismos valores que usa el entorno local y el script k6 (`admin@sgb-saas.local` / `Admin123!`).
-
-| Campo | Valor |
-|-------|-------|
-| **Rol** | Administrador / Tribunal (`ADMIN`) |
-| **Usuario / Email** | `admin@sgb-saas.local` |
-| **Contraseña** | `Admin123!` |
-
-```text
-Rol:      Administrador / Tribunal
-Email:    admin@sgb-saas.local
-Password: Admin123!
-```
+El tribunal evalúa con las cuentas demo por rol listadas abajo
+(LECTOR, BIBLIOTECARIO, GERENTE — ver “Cuenta demo”). La cuenta
+`ADMIN` del sistema **no se publica en este README**: el acceso
+administrativo para el tribunal se coordina fuera del repositorio.
+Ninguna contraseña de administrador figura en este archivo.
 
 ### Cuenta demo LECTOR (punto 7 de la rúbrica)
 
@@ -202,19 +194,20 @@ Convención de commits: [Conventional Commits](https://www.conventionalcommits.o
 ## 🔑 Credenciales de desarrollo (local)
 
 Al inicializar la base de datos con `db/schema.sql` + `db/seed.sql` (montados
-en `docker-entrypoint-initdb.d/`), se crea el mismo usuario administrador
-documentado arriba en la sección **Despliegue y Acceso Demo**:
+en `docker-entrypoint-initdb.d/`), se crea el usuario administrador de
+desarrollo (`admin@sgb-saas.local`, rol `ADMIN`). La contraseña inicial
+vive únicamente en `db/seed.sql` (entorno local): no se publica en este
+archivo.
 
-| Campo      | Valor                     |
-|------------|---------------------------|
-| Correo     | `admin@sgb-saas.local`    |
-| Contraseña | `Admin123!`               |
-| Rol        | `ADMIN`                   |
+| Campo      | Valor                  |
+|------------|------------------------|
+| Correo     | `admin@sgb-saas.local` |
+| Rol        | `ADMIN`                |
 
-Fuente verificada: `db/seed.sql` (comentario «Contraseña en texto plano: Admin123!» + `INSERT` de `admin@sgb-saas.local`). No existe un `V2__insert_data.sql` en este repositorio; Flyway `V2__rbac_normalizado.sql` no inserta ese usuario.
-
-⚠️ Solo para entornos locales de desarrollo / demo académica. Nunca usar estas credenciales
-en un entorno con datos personales reales.
+⚠️ Solo para entornos locales de desarrollo / demo académica. Nunca usar
+esas credenciales en un entorno con datos personales reales. En cualquier
+despliegue real la contraseña del seed debe rotarse en el primer arranque
+(acción humana pendiente para producción: ver P10).
 
 ### 👤 Cuenta demo (para evaluación — credenciales públicas)
 
@@ -231,7 +224,7 @@ admin real y con rol limitado (LECTOR, sin permisos administrativos)**:
 | Rol        | `LECTOR`               |
 
 Este usuario es el que el tribunal puede usar para entrar sin
-registrarse. No modifica ni comparte la cuenta `admin@sgb-saas.local`.
+registrarse (rol limitado LECTOR, sin permisos administrativos).
 
 ⚠️ **Nota de corrección (2026-08-23, verificación pre-defensa):** una
 auditoría en vivo contra producción, horas antes de la defensa, encontró que
@@ -275,9 +268,8 @@ real de un integrante del equipo:
 > ⚠️ Mismo criterio que el resto de esta sección: credenciales **solo**
 > para evaluación académica / entorno demo.
 
-Para los 4 roles del sistema, el tribunal puede entrar con:
+Para los roles de demostración, el tribunal puede entrar con:
 
-- **ADMIN** — `admin@sgb-saas.local`
 - **GERENTE** — `gerente.demo@sgb-saas.local`
 - **BIBLIOTECARIO** — `bibliotecario.demo@sgb-saas.local`
 - **LECTOR** — `lector.demo@sgb-saas.local` o `u@uteq.edu.ec` (LECTOR).
