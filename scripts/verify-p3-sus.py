@@ -7,7 +7,9 @@ NUNCA aprueba P3: su salida es siempre PENDIENTE — no puntuable, con
 N=0. Solo falla (exit 1) ante contradiccion documental.
 
 Controles:
-  1. docs/mediciones/sus/README.md existe y declara N=0 + retirada;
+   0. el dataset retirado y sus derivados NO existen en el arbol
+      evaluado (sus.csv, sus_boxplot.*, sus_items_breakdown.*);
+   1. docs/mediciones/sus/README.md existe y declara N=0 + retirada;
   2. ningun .tex de docs/capitulos o informe cita los artefactos
      retirados (sus.csv, sus_items_breakdown, sus_boxplot) como evidencia;
   3. la seccion P3 de VERIFICACION.md declara N=0 y estado no aprobado
@@ -28,6 +30,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 README_SUS = ROOT / "docs" / "mediciones" / "sus" / "README.md"
 VERIFICACION = ROOT / "VERIFICACION.md"
+SUS_DIR = ROOT / "docs" / "mediciones" / "sus"
 
 ARTEFACTOS_RETIRADOS = ("sus.csv", "sus_items_breakdown", "sus_boxplot")
 
@@ -38,6 +41,15 @@ def falla(mensaje: str) -> int:
 
 
 def main() -> int:
+    # 0. Artefactos retirados ausentes del arbol evaluado (Piso 3).
+    presentes = sorted(p.name for p in SUS_DIR.iterdir()
+                       if p.name == "sus.csv"
+                       or p.name.startswith("sus_boxplot")
+                       or p.name.startswith("sus_items_breakdown"))
+    if presentes:
+        return falla(f"artefactos SUS retirados presentes en el arbol: {', '.join(presentes)}")
+    print("verify-p3: OK (sin sus.csv ni derivados en el arbol evaluado)")
+
     # 1. Declaracion de retirada con N=0.
     try:
         texto = README_SUS.read_text(encoding="utf-8", errors="replace")
