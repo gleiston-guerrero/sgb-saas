@@ -34,15 +34,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 BASE_JAVA = ROOT / "backend-springboot" / "src" / "main" / "java"
 
-TOTAL_ESPERADO = 22
-RUTINA_ESPERADA = 22
+TOTAL_ESPERADO = 20
+RUTINA_ESPERADA = 20
 
 # Rutinas pineadas por archivo (nombres distintos esperados).
+# (FineProcedureRepository salio: sus 3 rutinas migraron. Ver MIGRADAS.)
 RUTINAS_POR_ARCHIVO: dict[str, set[str]] = {
-    "FineProcedureRepository.java": {
-        "fn_reporte_resumen_financiero_multas",
-        "fn_pagos_recientes",
-    },
     "LoanProcedureRepository.java": {
         "fn_listar_prestamos_activos_por_usuario",
         "fn_reporte_libros_mas_prestados",
@@ -55,7 +52,6 @@ RUTINAS_POR_ARCHIVO: dict[str, set[str]] = {
     },
 }
 SITIOS_RUTINA_POR_ARCHIVO = {
-    "FineProcedureRepository.java": 2,
     "LoanProcedureRepository.java": 20,
 }
 
@@ -109,6 +105,12 @@ MIGRADAS = [
     ("FineProcedureRepository.spPaymentParcialFine",
      "wrapper V54 proc_pago_parcial_multa + StoredProcedureQuery posicional (mismas 4 claves)",
      "P5SpikeIT.s9e"),
+    ("FineProcedureRepository.fnReportSummaryFinancial",
+     "Criteria CASE (mismo patron que summaryByCategory) + cero NUMERIC(12,2)",
+     "P5SpikeIT.s10 + FineServiceTest 9/9"),
+    ("FineProcedureRepository.fnPaymentsRecientes",
+     "Criteria cartesiana PAGADA + setMaxResults (default 5)",
+     "P5SpikeIT.s10 + FineServiceTest 9/9"),
 ]
 
 # CALL nativos en *CustomImpl pineados por archivo (bajan solo con @Procedure real).

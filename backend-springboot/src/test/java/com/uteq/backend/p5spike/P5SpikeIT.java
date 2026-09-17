@@ -287,8 +287,7 @@ class P5SpikeIT {
                 .isGreaterThan(java.math.BigDecimal.ZERO);
     }
 
-    private Long sembrarMultaPendiente() {
-        Long loanId = loanProcRepo.spCreateLoanProcedure(2L, 1L, 1L, 7);
+    private Long sembrarMultaPendiente() {        Long loanId = loanProcRepo.spCreateLoanProcedure(2L, 1L, 1L, 7);
         em.createNativeQuery("UPDATE prestamos SET fecha_devolucion_estimada = NOW() - INTERVAL '2 days' WHERE id = ?")
                 .setParameter(1, loanId)
                 .executeUpdate();
@@ -298,5 +297,32 @@ class P5SpikeIT {
         return (Long) em.createNativeQuery("SELECT id FROM multas WHERE prestamo_id = ?")
                 .setParameter(1, loanId)
                 .getSingleResult();
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void s10_resumenYPagos_equivalenAFuncion() {
+        Long pagadaId = sembrarMultaPendiente();
+        fineProcRepo.spPayFineProcedure(pagadaId);
+        sembrarMultaPendiente();
+
+        var resumen = fineProcRepo.fnReportSummaryFinancial(null, null);
+        var filaFn = (Object[]) em.createNativeQuery(
+                "SELECT * FROM fn_reporte_resumen_financiero_multas(NULL, NULL)")
+                .getSingleResult();
+        assertThat(resumen.getTotalRecaudado()).isEqualTo(filaFn[0]);
+        assertThat(resumen.getTotalPending()).isEqualTo(filaFn[1]);
+
+        var pagos = fineProcRepo.fnPaymentsRecientes(5);
+        var filasFn = em.createNativeQuery("SELECT * FROM fn_pagos_recientes(5)").getResultList();
+        assertThat(pagos).hasSize(filasFn.size()).isNotEmpty();
+        for (int i = 0; i < pagos.size(); i++) {
+            Object[] f = (Object[]) filasFn.get(i);
+            assertThat(pagos.get(i).getFineId()).isEqualTo(((Number) f[0]).longValue());
+            assertThat(pagos.get(i).getAmountPaid()).isEqualTo(f[1]);
+            assertThat(pagos.get(i).getUserEmail()).isEqualTo(f[3]);
+            assertThat(pagos.get(i).getUserName()).isEqualTo(f[4]);
+            assertThat(pagos.get(i).getBookTitle()).isEqualTo(f[5]);
+        }
     }
 }
