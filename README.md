@@ -282,7 +282,7 @@ Para los 4 roles del sistema, el tribunal puede entrar con:
 - **BIBLIOTECARIO** — `bibliotecario.demo@sgb-saas.local`
 - **LECTOR** — `lector.demo@sgb-saas.local` o `u@uteq.edu.ec` (LECTOR).
 
-## 📦 Imágenes Docker publicadas (tag `v1.0.0`)
+## 📦 Imágenes Docker publicadas (tags versionados)
 
 Las imágenes se publican en GitHub Container Registry (GHCR) por el
 workflow `publish-ghcr.yml`, que se dispara con el push de un tag (no por
@@ -296,6 +296,13 @@ estuviera cerrado); las imágenes que ese tag prematuro llegó a publicar en
 GHCR quedaron como artefacto histórico sin representar el estado final del
 proyecto, y no tienen relación con las imágenes publicadas bajo el tag
 definitivo descrito aquí.
+
+Examen suspenso: el tag `v1.1.0` publica
+`ghcr.io/gleiston-guerrero/sgb-saas-backend:v1.1.0` y
+`ghcr.io/gleiston-guerrero/sgb-saas-frontend:v1.1.0`. El namespace es el
+owner actual del repositorio (`github.repository_owner`): tras la mudanza
+desde `mloorm14/sgb-saas`, el namespace fijo anterior fallaba con
+`permission_denied` (ver commit `c70be06d`).
 
 ## 🔁 Reproducibilidad (D.1 / D.2)
 

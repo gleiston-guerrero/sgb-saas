@@ -197,6 +197,43 @@ Wilcoxon p=0.0625 (mínimo exacto con n=5) | Cliff's delta=-1.00 (grande)
 CUMPLE (5/5 corridas, umbrales con margen, 0% errores; limitaciones
 warm-up corrida 1 y constructo cache_frio declaradas)
 
+### Verificador + versionado (2026-09-18, rama codex/asegurar-8-examen)
+
+```powershell
+python scripts/verify-p4-k6.py
+git ls-files docs/mediciones/perf/k6-run*.json   # vacio = ignorados
+git add -f docs/mediciones/perf/k6-run*.json     # solo tras OK del verificador
+```
+
+```text
+verify-p4: OK (existen 5 corridas)
+verify-p4: OK (NDJSON legible, ambos escenarios en las 5)
+verify-p4: OK (SHA-256 de las 5 coincide con REPORT.md)
+verify-p4: OK (agregado coincide: p95 [65.6, 17.13], error 0%)
+verify-p4: OK (5 corridas crudas versionables y fieles al reporte)
+```
+
+Los 5 NDJSON (~74 MB) quedan versionados por exigencia literal de la
+guía (decisión documentada; antes gitignorados por higiene; regla
+retirada de `.gitignore` con nota).
+Efecto colateral conocido de `perf-analysis.py`: reescribe el SVG/PDF
+p95 con datos idénticos (solo fecha e IDs aleatorios); se restauraron
+con `git checkout` para no meter ruido — ver `verify-p4-k6.py`.
+
+Incidente 2026-09-16 (transparencia): los 5 JSON del worktree
+aparecieron volteados a CRLF a las 21:38 (mismo segundo, +1 byte por
+línea, datos intactos) por un proceso local no identificado, con
+`core.autocrlf=true` y sin regla en `.gitattributes`. Como `git status`
+normaliza CRLF contra el índice, no mostró ningún `AM` y el cambio era
+invisible para git pero rompía el SHA crudo. Los blobs commiteados se
+verificaron intactos por hash (`run1 = 72C782…` = REPORT.md). Fix
+sistémico: `docs/mediciones/perf/k6-run*.json -text -diff` en
+`.gitattributes` (bytes idénticos en checkout/add en cualquier OS,
+mismo precedente que los `*.pdf`), worktree restaurado por borrado +
+checkout forzado, y guardia CRLF con mensaje accionable dentro de
+`verify-p4-k6.py`. Lección: ningún hash crudo es estable en Windows
+sin regla `-text`.
+
 ---
 
 ## P5 — nativeQuery (peso 1,1)
@@ -357,8 +394,34 @@ MANIFIESTO: 9 figuras x (svg+pdf)
 ### Resultado
 
 CUMPLE en contenido (15/15 referenciadas, reproducibles, sin
-decorativas; SUS excluida a propósito); compilación XeLaTeX y
-revisión visual pendientes (sin toolchain en este entorno)
+decorativas; SUS excluida a propósito); compilación XeLaTeX VERIFICADA
+abajo; revisión visual humana sigue pendiente
+
+### Verificador + compilación (2026-09-18, MiKTeX local)
+
+```powershell
+python scripts/verify-p8-p9-figures.py
+cd docs; xelatex -interaction=nonstopmode -halt-on-error informe-final.tex
+bibtex informe-final
+xelatex -interaction=nonstopmode -halt-on-error informe-final.tex
+xelatex -interaction=nonstopmode -halt-on-error informe-final.tex
+```
+
+```text
+verify-p8-p9: OK (15 entornos figure)
+verify-p8-p9: OK (15 labels unicos)
+verify-p8-p9: OK (las 15 citadas; 0 rotas)
+verify-p8-p9: OK (14 includegraphics existen en disco)
+verify-p8-p9: OK (0 palabras espanolas en .svg versionados)
+verify-p8-p9: OK (captions de figuras en ingles)
+xelatex x1/x2/x3: exit 0; bibtex: exit 0
+Output written on informe-final.pdf (109 pages).
+```
+
+Sin `^!` (errores), sin referencias indefinidas y sin citas
+indefinidas en la pasada final. El PDF recompilado no se versiona
+(fuentes intactas; es ruido de build): se restauró con
+`git checkout -- docs/informe-final.pdf`.
 
 ---
 
@@ -371,8 +434,11 @@ CUMPLE en contenido (nodos TikZ del PRISMA en
 académico; caption F1 también; conteos 15/15/15/15/10, criterios,
 citas y metodología intactos; anchos ajustados 6.6→7.0cm /
 5.2→5.6cm contra solapes; 5/6 captions de figuras ya estaban en
-inglés; 9 figuras nuevas con texto en inglés); revisión visual
-post-compilación pendiente (sin toolchain en este entorno)
+inglés; 9 figuras nuevas con texto en inglés); verificado con
+`scripts/verify-p8-p9-figures.py` (0 español en .svg versionados y en
+captions de figuras; tablas fuera de alcance); revisión visual humana
+post-compilación sigue pendiente (la compilación sí está verificada,
+ver P8)
 
 ---
 
@@ -381,22 +447,27 @@ post-compilación pendiente (sin toolchain en este entorno)
 ### Comando
 
 ```powershell
-cd backend-springboot; ./mvnw -B test -Dtest=DemoAccountMigrationIntegrationTest
+cd backend-springboot; ./mvnw -B test -Dtest=DemoAccountAuthorizationIntegrationTest -DfailIfNoTests=false
 ```
 
-### Salida (2026-09-16)
+### Salida (2026-09-17, rama codex/asegurar-8-examen)
 
 ```text
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 60.68 s -- in com.uteq.backend.integration.DemoAccountMigrationIntegrationTest
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 71.16 s -- in com.uteq.backend.integration.DemoAccountAuthorizationIntegrationTest
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
-(El test hace login con `u@uteq.edu.ec / usuario1`, aserta rol
-`[LECTOR]` en el JWT decodificado y cuenta activa/verificada. El 403
-ante recurso ajeno está cubierto por `LoanServiceTest`,
-`ReservationServiceTest`, `NotificationServiceTest` y los
-`*ControllerSecurityTest` — ver `docs/mediciones/demo-account.md`.)
+Evidencia literal pedida por la guía, con cero mocks: login HTTP real
+con `u@uteq.edu.ec / usuario1`, JWT decodificado con rol `[LECTOR]`,
+403 real contra endpoint solo-ADMIN (`GET /api/v1/admin/usuarios`) y
+403 real contra multas de otro usuario
+(`GET /api/v1/multas/usuario/{ajenoId}`, sin fixture: el control
+compara IDs antes de consultar). Infraestructura real: PostgreSQL y
+Redis en Testcontainers, migraciones Flyway versionadas, cadena de
+seguridad completa (sin `addFilters = false`). Complemento previo:
+`DemoAccountMigrationIntegrationTest` (login + rol + cuenta
+activa/verificada) — ver `docs/mediciones/demo-account.md`.
 
 ### Resultado
 
@@ -409,16 +480,24 @@ CUMPLE
 ### Comando
 
 ```powershell
-git -c log.mailmap=true shortlog -sne --no-merges fcda4808
+git -c log.mailmap=true shortlog -sne --no-merges 9f370270
 git log --no-merges --author=<icajasi|mloorm14|mpanamam> --format=%h -- <área>
 ```
 
-### Salida (rev fcda4808)
+### Salida (rev 9f370270 = fix CRLF k6 en codex)
 
 ```text
-763 Irvin Cajas Ibarra / 343 Marlon Loor Medranda / 317 Moises Panama Murillo
-(+1 TeilorSuit no atribuible, +1 bot excluido; total no-merges 1425)
+763 Irvin Cajas Ibarra / 343 Marlon Loor Medranda / 324 Moises Panama Murillo
+(+1 TeilorSuit no atribuible, +1 bot excluido; total no-merges 1432)
 ```
+
+Doble commit aplicado: conteos generados contra el SHA del commit de
+evidencia (`9f370270`) y commiteados en el commit siguiente (que suma
++1 a Panamá, declarado en `CONTRIBUCIONES.md`).
+`roles-commit-counts.txt` verificado byte a byte contra el shortlog
+en vivo (UTF-16 preservado). Nota: la cadena b82ae0e2→82fcfec1 queda
+en historial como re-sincronización previa al incidente CRLF; los
+conteos vigentes son los de este rev.
 
 ### Archivo que respalda
 
