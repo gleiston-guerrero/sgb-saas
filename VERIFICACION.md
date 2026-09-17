@@ -121,7 +121,7 @@ PENDIENTEs visibles: P3 N=0, P5 parcial, P10 sin Docker, firmas P11).
 python scripts/verify-p1-hashes.py
 ```
 
-### Salida (2026-09-17, rev d92ba03a, completa)
+### Salida (2026-09-17, rama fix/fase01-sus-n0, completa)
 
 ```text
 [OK] 00b2630 (commit)
@@ -134,6 +134,7 @@ python scripts/verify-p1-hashes.py
 [OK] 4d69f244 (commit)
 [OK] 5f3e5e5 (commit)
 [OK] 5f3e5e5b (commit)
+[OK] 6549becb (commit)
 [OK] 6bce625 (commit)
 [OK] 6bce6257 (commit)
 [OK] 75d635b (commit)
@@ -144,6 +145,7 @@ python scripts/verify-p1-hashes.py
 [OK] 862672b2 (commit)
 [OK] 9a46712 (commit)
 [OK] 9a467125 (commit)
+[OK] 9f370270 (commit)
 [OK] bca23c2 (commit)
 [OK] bca23c2c (commit)
 [OK] d8443e6 (commit)
@@ -156,9 +158,10 @@ python scripts/verify-p1-hashes.py
 [OK] e3f3f7fa (commit)
 [OK] e6909a5 (commit)
 [OK] e6909a5d (commit)
+[OK] e8477021 (commit)
 [OK] ed42c42 (commit)
 [OK] ed42c421 (commit)
-verify-p1: OK (34 hashes existen)
+verify-p1: OK (35 hashes existen)
 ```
 
 ### Archivo que respalda
@@ -168,10 +171,11 @@ verify-p1: OK (34 hashes existen)
 
 ### Resultado
 
-Verificado que los 34 hashes existen. Pendiente de contenido (no de
-existencia): la fila `1028ad02` no respalda el reporte JaCoCo (ese commit
-solo toca `docs/basedatos/CATALOGO-SP.md`) y las filas 1–2 dicen que los
-NDJSON se retiraron cuando están versionados. Fix en fase P1.
+Cerrado 100 %: los 35 hashes existen y cada fila apunta al commit que
+realmente tocó el archivo (fila 4 → `e8477021`, regeneración JaCoCo del
+2026-09-17; filas 1–2 declaran los NDJSON versionados con SHA en
+REPORT.md; `.svg`/`.pdf` → `6549becb`). La sección "Verificación de
+hashes citados" de `DATA-PROVENANCE.md` pega las 35 salidas tal cual.
 
 ---
 
