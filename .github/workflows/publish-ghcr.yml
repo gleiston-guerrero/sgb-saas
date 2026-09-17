@@ -3,6 +3,12 @@
 # pushes a ramas ni con pull requests: el CI de validacion (tests, lint,
 # auditoria SQL) sigue viviendo en ci.yml.
 #
+# El namespace de las imagenes es el owner actual del repositorio
+# (${{ github.repository_owner }}): tras la mudanza de mloorm14/sgb-saas
+# a gleiston-guerrero/sgb-saas, el namespace fijo anterior hacia que el
+# push fallara con permission_denied (el GITHUB_TOKEN no escribe en el
+# namespace personal de otro usuario).
+#
 # Usa ${{ github.ref_name }} (el nombre del tag que disparo el workflow)
 # como tag de la imagen desde el archivo de repositorio, para que el mismo
 # job sirva para un tag de prueba (v1.0.0-test1) y para el tag real
@@ -49,8 +55,8 @@ jobs:
           file: backend-springboot/Dockerfile
           push: true
           tags: |
-            ghcr.io/mloorm14/sgb-saas-backend:${{ github.ref_name }}
-            ghcr.io/mloorm14/sgb-saas-backend:latest
+            ghcr.io/${{ github.repository_owner }}/sgb-saas-backend:${{ github.ref_name }}
+            ghcr.io/${{ github.repository_owner }}/sgb-saas-backend:latest
 
       - name: Build y push — frontend
         id: build-frontend
@@ -59,8 +65,8 @@ jobs:
           context: ./frontend-angular
           push: true
           tags: |
-            ghcr.io/mloorm14/sgb-saas-frontend:${{ github.ref_name }}
-            ghcr.io/mloorm14/sgb-saas-frontend:latest
+            ghcr.io/${{ github.repository_owner }}/sgb-saas-frontend:${{ github.ref_name }}
+            ghcr.io/${{ github.repository_owner }}/sgb-saas-frontend:latest
 
       # Los digests salen como output de build-push-action (NO de buildx
       # con cache-loader): se imprimen aca para poder copiarlos a mano.
