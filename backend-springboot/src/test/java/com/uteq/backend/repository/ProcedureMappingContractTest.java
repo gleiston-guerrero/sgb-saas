@@ -66,23 +66,48 @@ class ProcedureMappingContractTest {
                 .containsEntry("Multa.anularMulta", "proc_anular_multa");
     }
 
+    /**
+     * P5: las funciones tabulares fn_* migraron a Criteria/JPQL en los
+     * fragmentos Custom (mismas firmas, sin SQL nativo). Ningún método de
+     * reporte tabular puede volver a ser @Query nativa; las funciones SQL
+     * quedan en BD solo para psql directo.
+     */
     @Test
-    void tableReturningFunctions_remainNativeQueriesBecauseJpaProcedureDoesNotMapSetReturningFunctions() {
-        Set<String> nativeFunctionMethods = Arrays.stream(LoanProcedureRepository.class.getDeclaredMethods())
-                .filter(method -> method.isAnnotationPresent(Query.class))
-                .map(Method::getName)
-                .collect(Collectors.toSet());
+    void tableReturningFunctions_useNoNativeQueryAfterP5() throws NoSuchMethodException {
+        assertNoNative(LoanProcedureRepository.class, "fnListLoansActivesByUser", Long.class);
+        assertNoNative(LoanProcedureRepository.class, "fnReportBooksMostLoaned",
+                Integer.class, java.time.OffsetDateTime.class, java.time.OffsetDateTime.class);
+        assertNoNative(LoanProcedureRepository.class, "fnReportIndexDelinquency", Integer.class);
+        assertNoNative(LoanProcedureRepository.class, "fnReportUsageByPeriod",
+                String.class, java.time.OffsetDateTime.class, java.time.OffsetDateTime.class);
+        assertNoNative(LoanProcedureRepository.class, "fnReportBooksMostLoanedDetailed",
+                Integer.class, java.time.OffsetDateTime.class, java.time.OffsetDateTime.class, Integer.class);
+        assertNoNative(LoanProcedureRepository.class, "fnReportInventory",
+                Integer.class, String.class, String.class, Integer.class, Integer.class,
+                Integer.class, Integer.class, Short.class, Short.class, Short.class,
+                Short.class, Short.class, Short.class, String.class);
+        assertNoNative(LoanProcedureRepository.class, "fnReportLoansOverdues",
+                Integer.class, String.class, Integer.class);
+        assertNoNative(LoanProcedureRepository.class, "fnReportCategoriesDemanded",
+                Integer.class, java.time.OffsetDateTime.class, java.time.OffsetDateTime.class);
+        assertNoNative(FineProcedureRepository.class, "fnReportSummaryFinancial",
+                java.time.OffsetDateTime.class, java.time.OffsetDateTime.class);
+        assertNoNative(FineProcedureRepository.class, "fnPaymentsRecientes", Integer.class);
+    }
 
-        assertThat(nativeFunctionMethods)
-                .contains(
-                        "fnListLoansActivesByUser",
-                        "fnReportBooksMostLoaned",
-                        "fnReportIndexDelinquency",
-                        "fnReportUsageByPeriod",
-                        "fnReportInventory",
-                        "fnReportLoansOverdues",
-                        "fnReportCategoriesDemanded"
-                );
+    private void assertNoNative(
+            Class<?> repositoryType,
+            String methodName,
+            Class<?>... parameterTypes
+    ) throws NoSuchMethodException {
+        // getMethod (no getDeclaredMethod): los reportes viven en el
+        // fragmento Custom heredado, con las mismas firmas para los
+        // consumidores (LoanService/FineService intactos).
+        Method method = repositoryType.getMethod(methodName, parameterTypes);
+        Query query = method.getAnnotation(Query.class);
+        assertThat(query == null || !query.nativeQuery())
+                .as("%s must not be implemented as native @Query", methodName)
+                .isTrue();
     }
 
     private void assertProcedure(

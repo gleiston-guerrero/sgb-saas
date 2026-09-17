@@ -24,7 +24,7 @@ import com.uteq.backend.repository.ReservationRepository;
 import com.uteq.backend.repository.UserRepository;
 import com.uteq.backend.repository.projection.BookMostLoanedDetailedProjection;
 import com.uteq.backend.repository.projection.BookMostLoanedProjection;
-import com.uteq.backend.repository.projection.LoanActiveProjection;
+import com.uteq.backend.repository.projection.LoanActiveBaseProjection;
 import com.uteq.backend.repository.projection.ReportCategoriesDemandedProjection;
 import com.uteq.backend.repository.projection.ReportInventoryProjection;
 import com.uteq.backend.repository.projection.ReportDelinquencyProjection;
@@ -499,19 +499,8 @@ public class LoanService {
                 p.getStatusLoanId());
     }
 
-    private LoanActiveResponseDTO toDTO(LoanActiveProjection p) {
-        return new LoanActiveResponseDTO(
-                p.getLoanId(),
-                p.getBookTitle(),
-                p.getBookIsbn(),
-                p.getDateLoan() != null ? p.getDateLoan().atOffset(ZoneOffset.UTC) : null,
-                p.getDateLoanReturnEstimada() != null ? p.getDateLoanReturnEstimada().atOffset(ZoneOffset.UTC) : null,
-                p.getDaysRemaining(),
-                p.getStatusName());
-    }
-
     private LoanActiveResponseDTO toDTO(
-            com.uteq.backend.repository.projection.LoanActiveBaseProjection p) {
+            LoanActiveBaseProjection p) {
         return new LoanActiveResponseDTO(
                 p.getLoanId(),
                 p.getBookTitle(),
@@ -811,7 +800,7 @@ public class LoanService {
 
     private void validateLimitLoans(Long userId) {
         int maxLoans = configurationSystemService.getIntegerValue("max_prestamos_usuario");
-        List<LoanActiveProjection> actives = loanProcRepo.fnListLoansActivesByUser(userId);
+        List<LoanActiveBaseProjection> actives = loanProcRepo.fnListLoansActivesByUser(userId);
         if (actives.size() >= maxLoans) {
             throw new LimitLoansExceededException(
                     "El usuario ya tiene " + actives.size() + " préstamos activos. El máximo permitido es " + maxLoans + ".");

@@ -34,25 +34,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 BASE_JAVA = ROOT / "backend-springboot" / "src" / "main" / "java"
 
-TOTAL_ESPERADO = 20
-RUTINA_ESPERADA = 20
+TOTAL_ESPERADO = 0
+RUTINA_ESPERADA = 0
 
 # Rutinas pineadas por archivo (nombres distintos esperados).
-# (FineProcedureRepository salio: sus 3 rutinas migraron. Ver MIGRADAS.)
+# Vacío: las 23 rutinas migraron (ver MIGRADAS). Cualquier nativeQuery
+# o FROM fn_/sp_ que reaparezca falla el verificador.
 RUTINAS_POR_ARCHIVO: dict[str, set[str]] = {
-    "LoanProcedureRepository.java": {
-        "fn_listar_prestamos_activos_por_usuario",
-        "fn_reporte_libros_mas_prestados",
-        "fn_reporte_indice_morosidad",
-        "fn_reporte_uso_por_periodo",
-        "fn_reporte_libros_mas_prestados_detallado",
-        "fn_reporte_inventario",
-        "fn_reporte_prestamos_vencidos",
-        "fn_reporte_categorias_demandadas",
-    },
 }
 SITIOS_RUTINA_POR_ARCHIVO = {
-    "LoanProcedureRepository.java": 20,
 }
 
 # Consultas ordinarias pineadas: archivo -> [(ordinal, motivo tecnico)].
@@ -111,6 +101,30 @@ MIGRADAS = [
     ("FineProcedureRepository.fnPaymentsRecientes",
      "Criteria cartesiana PAGADA + setMaxResults (default 5)",
      "P5SpikeIT.s10 + FineServiceTest 9/9"),
+    ("LoanProcedureRepository.fnListLoansActivesByUser",
+     "JPQL cartesiana (base sin dias; LoanService solo usa size)",
+     "P5TabularSpikeIT.t1"),
+    ("LoanProcedureRepository.fnReportBooksMostLoaned",
+     "Criteria GROUP/COUNT + maxResults (NULL = todo, como LIMIT NULL)",
+     "P5TabularSpikeIT.t2"),
+    ("LoanProcedureRepository.fnReportIndexDelinquency[+Paginated]",
+     "Criteria filas PENDIENTE + AVG Java ROUND(,1) + ORDER/LIMIT en Java",
+     "P5TabularSpikeIT.t3"),
+    ("LoanProcedureRepository.fnReportUsageByPeriod[+Paginated]",
+     "Criteria date_trunc + FULL OUTER en Java (TreeMap)",
+     "P5TabularSpikeIT.t4"),
+    ("LoanProcedureRepository.fnReportBooksMostLoanedDetailed[+Paginated]",
+     "Criteria filas + string_agg en Java (TreeSet, defaults) + pct",
+     "P5TabularSpikeIT.t5"),
+    ("LoanProcedureRepository.fnReportInventory[+Paginated]",
+     "Criteria 14 filtros + agregados en Java + estado_disponibilidad",
+     "P5TabularSpikeIT.t6"),
+    ("LoanProcedureRepository.fnReportLoansOverdues[+Paginated]",
+     "Criteria ventana + dias/multa en Java (tarifa config, default 1)",
+     "P5TabularSpikeIT.t7"),
+    ("LoanProcedureRepository.fnReportCategoriesDemanded[+Paginated]",
+     "Criteria GROUP/COUNT + pct en Java (limite ignorado como la funcion)",
+     "P5TabularSpikeIT.t8"),
 ]
 
 # CALL nativos en *CustomImpl pineados por archivo (bajan solo con @Procedure real).
