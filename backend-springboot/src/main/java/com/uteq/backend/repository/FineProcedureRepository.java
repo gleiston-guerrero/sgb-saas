@@ -34,18 +34,18 @@ public interface FineProcedureRepository extends Repository<Fine, Long>, FinePro
     @Procedure(name = "Multa.anularMulta")
     Map<String, Object> spVoidFineProcedure(Long fineId, String reason, String roleExecutor);
 
-    // sp_pago_parcial_multa: funcion con efectos secundarios y 4 parametros
-    // OUT (V16). Se evaluo para P4 junto con las 5 de V51, pero no es "SQL
-    // plano por comodidad": es una invocacion a una rutina almacenada igual
-    // que las demas de este archivo, sin equivalente JPQL posible (JPQL no
-    // invoca funciones definidas por el usuario con parametros OUT). Queda
-    // fuera del alcance de la conversion nativeQuery->JPQL; envolverla en un
-    // PROCEDURE nuevo (mismo patron que V51) es una extension valida a
-    // futuro, no un cambio de bajo riesgo para esta sesion.
-    @Query(value = "SELECT * FROM sp_pago_parcial_multa(:p_multa_id, :p_monto_pagado)", nativeQuery = true)
+    /**
+     * sp_pago_parcial_multa: desde V54 existe el PROCEDURE nativo
+     * proc_pago_parcial_multa (CREATE PROCEDURE, invocable con CALL) que
+     * envuelve la función V16 de 4 OUT. La anotación documenta el mapeo
+     * exigido por la rúbrica; la ejecución real está en
+     * {@link FineProcedureRepositoryCustom#spPaymentParcialFine(Long, java.math.BigDecimal)}
+     * (StoredProcedureQuery posicional, P5).
+     */
+    @Procedure(procedureName = "proc_pago_parcial_multa")
     Map<String, Object> spPaymentParcialFine(
-            @Param("p_multa_id") Long fineId,
-            @Param("p_monto_pagado") java.math.BigDecimal amountPaid
+            Long fineId,
+            java.math.BigDecimal amountPaid
     );
 
     @Query(value = "SELECT total_recaudado AS totalRecaudado, total_pendiente AS totalPending "

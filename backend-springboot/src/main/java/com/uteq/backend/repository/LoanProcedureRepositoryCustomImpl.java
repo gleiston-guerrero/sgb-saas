@@ -1,8 +1,9 @@
 package com.uteq.backend.repository;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.ParameterMode;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
+import jakarta.persistence.StoredProcedureQuery;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -21,15 +22,12 @@ class LoanProcedureRepositoryCustomImpl implements LoanProcedureRepositoryCustom
      * envuelve la función sp_crear_prestamo -- valida stock disponible y
      * bloqueo por multas del lector.
      *
-     * <p>Se invoca con {@code CALL} y binding exclusivamente posicional
-     * (sin nombres de parámetro) porque el proxy estándar de
-     * {@code @Procedure}/{@code @NamedStoredProcedureQuery} de Hibernate 6
-     * genera sintaxis de parámetros nombrados de PostgreSQL dentro del
-     * escape JDBC {@code {call ...}}, que pgjdbc rechaza
-     * (spring-projects/spring-data-jpa#3393). PostgreSQL exige un
-     * placeholder posicional también para cada parámetro OUT en un CALL
-     * emitido desde SQL plano (no PL/pgSQL); su valor no importa, se
-     * convención escribir NULL.
+     * <p>Se invoca con {@code StoredProcedureQuery} JPA y binding
+     * exclusivamente posicional (sin nombres de parámetro) porque el proxy
+     * estándar de {@code @Procedure}/{@code @NamedStoredProcedureQuery} de
+     * Hibernate 6 genera sintaxis de parámetros nombrados de PostgreSQL
+     * dentro del escape JDBC {@code {call ...}}, que pgjdbc rechaza
+     * (spring-projects/spring-data-jpa#3393). Sin SQL nativo: P5.
      *
      * @param userId identifier of the lector requesting the loan
      * @param bookId identifier of the book to loan
@@ -39,14 +37,18 @@ class LoanProcedureRepositoryCustomImpl implements LoanProcedureRepositoryCustom
      */
     @Override
     public Long spCreateLoanProcedure(Long userId, Long bookId, Long librarianId, Integer daysLoan) {
-        Query q = em.createNativeQuery("CALL proc_crear_prestamo(?1, ?2, ?3, ?4, NULL)");
-        q.setParameter(1, userId);
-        q.setParameter(2, bookId);
-        q.setParameter(3, librarianId);
-        q.setParameter(4, daysLoan);
-        Object result = q.getSingleResult();
-        Object value = (result instanceof Object[] row) ? row[0] : result;
-        return ((Number) value).longValue();
+        StoredProcedureQuery sp = em.createStoredProcedureQuery("proc_crear_prestamo");
+        sp.registerStoredProcedureParameter(1, Long.class, ParameterMode.IN);
+        sp.registerStoredProcedureParameter(2, Long.class, ParameterMode.IN);
+        sp.registerStoredProcedureParameter(3, Long.class, ParameterMode.IN);
+        sp.registerStoredProcedureParameter(4, Integer.class, ParameterMode.IN);
+        sp.registerStoredProcedureParameter(5, Long.class, ParameterMode.OUT);
+        sp.setParameter(1, userId);
+        sp.setParameter(2, bookId);
+        sp.setParameter(3, librarianId);
+        sp.setParameter(4, daysLoan);
+        sp.execute();
+        return (Long) sp.getOutputParameterValue(5);
     }
 
     /**
@@ -62,13 +64,17 @@ class LoanProcedureRepositoryCustomImpl implements LoanProcedureRepositoryCustom
      */
     @Override
     public Map<String, Object> spRegisterLoanReturn(Long loanId) {
-        Query q = em.createNativeQuery("CALL proc_registrar_devolucion(?1, NULL, NULL, NULL)");
-        q.setParameter(1, loanId);
-        Object[] row = (Object[]) q.getSingleResult();
+        StoredProcedureQuery sp = em.createStoredProcedureQuery("proc_registrar_devolucion");
+        sp.registerStoredProcedureParameter(1, Long.class, ParameterMode.IN);
+        sp.registerStoredProcedureParameter(2, Long.class, ParameterMode.OUT);
+        sp.registerStoredProcedureParameter(3, Boolean.class, ParameterMode.OUT);
+        sp.registerStoredProcedureParameter(4, BigDecimal.class, ParameterMode.OUT);
+        sp.setParameter(1, loanId);
+        sp.execute();
         Map<String, Object> result = new HashMap<>();
-        result.put("o_prestamo_id", ((Number) row[0]).longValue());
-        result.put("o_hubo_multa", (Boolean) row[1]);
-        result.put("o_monto_multa", row[2] != null ? new BigDecimal(row[2].toString()) : null);
+        result.put("o_prestamo_id", (Long) sp.getOutputParameterValue(2));
+        result.put("o_hubo_multa", (Boolean) sp.getOutputParameterValue(3));
+        result.put("o_monto_multa", (BigDecimal) sp.getOutputParameterValue(4));
         return result;
     }
 }

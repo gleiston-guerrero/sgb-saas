@@ -34,13 +34,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 BASE_JAVA = ROOT / "backend-springboot" / "src" / "main" / "java"
 
-TOTAL_ESPERADO = 23
-RUTINA_ESPERADA = 23
+TOTAL_ESPERADO = 22
+RUTINA_ESPERADA = 22
 
 # Rutinas pineadas por archivo (nombres distintos esperados).
 RUTINAS_POR_ARCHIVO: dict[str, set[str]] = {
     "FineProcedureRepository.java": {
-        "sp_pago_parcial_multa",
         "fn_reporte_resumen_financiero_multas",
         "fn_pagos_recientes",
     },
@@ -56,7 +55,7 @@ RUTINAS_POR_ARCHIVO: dict[str, set[str]] = {
     },
 }
 SITIOS_RUTINA_POR_ARCHIVO = {
-    "FineProcedureRepository.java": 3,
+    "FineProcedureRepository.java": 2,
     "LoanProcedureRepository.java": 20,
 }
 
@@ -98,13 +97,26 @@ MIGRADAS = [
     ("AuditLogAuditRepository.searchWithFilters",
      "Criteria dinamico + Sort fecha_hora->dateTime (controller y exportCsv a dateTime)",
      "P5SpikeIT.s8 + AuditServiceTest 4/4"),
+    ("LoanProcedureRepositoryCustomImpl.spCreateLoanProcedure/spRegisterLoanReturn",
+     "createStoredProcedureQuery posicional (proc_crear_prestamo/proc_registrar_devolucion)",
+     "P5SpikeIT.s1/s9a + LoanFineProcedureIntegrationTest (CI)"),
+    ("FineProcedureRepositoryCustomImpl.spPayFineProcedure/spVoidFineProcedure",
+     "createStoredProcedureQuery posicional (proc_pagar_multa/proc_anular_multa)",
+     "P5SpikeIT.s9b/s9c + LoanFineProcedureIntegrationTest (CI)"),
+    ("ReservationProcedureRepositoryCustomImpl.spExpireReservationsVencidasProcedure",
+     "createStoredProcedureQuery posicional (proc_expirar_reservaciones_vencidas)",
+     "P5SpikeIT.s9d"),
+    ("FineProcedureRepository.spPaymentParcialFine",
+     "wrapper V54 proc_pago_parcial_multa + StoredProcedureQuery posicional (mismas 4 claves)",
+     "P5SpikeIT.s9e"),
 ]
 
 # CALL nativos en *CustomImpl pineados por archivo (bajan solo con @Procedure real).
+# En cero: los 5 CALL migraron a StoredProcedureQuery posicional.
 CALL_NATIVOS_POR_ARCHIVO = {
-    "LoanProcedureRepositoryCustomImpl.java": 2,
-    "FineProcedureRepositoryCustomImpl.java": 2,
-    "ReservationProcedureRepositoryCustomImpl.java": 1,
+    "LoanProcedureRepositoryCustomImpl.java": 0,
+    "FineProcedureRepositoryCustomImpl.java": 0,
+    "ReservationProcedureRepositoryCustomImpl.java": 0,
 }
 
 PATRON_RUTINA = re.compile(r"FROM\s+(fn_\w+|sp_\w+)", re.IGNORECASE)

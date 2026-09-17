@@ -6,6 +6,10 @@ import com.uteq.backend.entity.Reservation;
 import com.uteq.backend.entity.AuditLogAudit;
 import com.uteq.backend.repository.AuditLogAuditRepository;
 import com.uteq.backend.repository.BookRepository;
+import com.uteq.backend.repository.FineProcedureRepository;
+import com.uteq.backend.repository.LoanProcedureRepository;
+import com.uteq.backend.repository.LoanRepository;
+import com.uteq.backend.repository.ReservationProcedureRepository;
 import com.uteq.backend.repository.LoanRepository;
 import com.uteq.backend.repository.ReservationRepository;
 import com.uteq.backend.repository.StatusReservationRepository;
@@ -63,6 +67,15 @@ class P5SpikeIT {
 
     @Autowired
     private AuditLogAuditRepository auditoria;
+
+    @Autowired
+    private LoanProcedureRepository loanProcRepo;
+
+    @Autowired
+    private FineProcedureRepository fineProcRepo;
+
+    @Autowired
+    private ReservationProcedureRepository reservationProcRepo;
 
     @Test
     void s1_procedurePosicionalCreaPrestamo() {
@@ -204,8 +217,7 @@ class P5SpikeIT {
     }
 
     private void sembrarBitacora(Long userId, String tipo, String modulo,
-            String detalles, OffsetDateTime cuando) {
-        AuditLogAudit e = AuditLogAudit.builder()
+            String detalles, OffsetDateTime cuando) {        AuditLogAudit e = AuditLogAudit.builder()
                 .userId(userId)
                 .typeOperacion(tipo)
                 .tableAfectada(modulo)
@@ -215,12 +227,76 @@ class P5SpikeIT {
         auditoria.save(e);
     }
 
-    private void sembrarReserva(Long userId, Long bookId, Integer statusId, OffsetDateTime limite) {        Reservation r = new Reservation();
+    private void sembrarReserva(Long userId, Long bookId, Integer statusId, OffsetDateTime limite) {
+        Reservation r = new Reservation();
         r.setUserId(userId);
         r.setBookId(bookId);
         r.setStatusReservationId(statusId);
         r.setDateReservation(limite.minusDays(3));
         r.setDateLimitPickup(limite);
         reservations.save(r);
+    }
+
+    @Test
+    void s9a_devolucionSinAtraso_noGeneraMulta() {
+        Long loanId = loanProcRepo.spCreateLoanProcedure(2L, 1L, 1L, 7);
+        var result = loanProcRepo.spRegisterLoanReturn(loanId);
+        assertThat(result.get("o_prestamo_id")).isEqualTo(loanId);
+        assertThat(result.get("o_hubo_multa")).isEqualTo(false);
+        assertThat(result.get("o_monto_multa")).isNull();
+    }
+
+    @Test
+    void s9b_pagoTotal_desbloquea() {
+        Long fineId = sembrarMultaPendiente();
+        var result = fineProcRepo.spPayFineProcedure(fineId);
+        assertThat(result.get("o_multa_id")).isEqualTo(fineId);
+        assertThat(result.get("o_usuario_desbloqueado")).isEqualTo(true);
+    }
+
+    @Test
+    void s9c_anulacionGerente_desbloquea() {
+        Long fineId = sembrarMultaPendiente();
+        var result = fineProcRepo.spVoidFineProcedure(fineId, "spike P5", "GERENTE");
+        assertThat(result.get("o_multa_id")).isEqualTo(fineId);
+        assertThat(result.get("o_usuario_desbloqueado")).isEqualTo(true);
+    }
+
+    @Test
+    void s9d_expirarVencidas_cuentaExpiradas() {
+        Integer pend = statuses.findByName("PENDIENTE").orElseThrow().getId();
+        OffsetDateTime ayer = LocalDate.now(java.time.ZoneId.systemDefault())
+                .minusDays(1).atStartOfDay(java.time.ZoneId.systemDefault()).toOffsetDateTime();
+        sembrarReserva(2L, 2L, pend, ayer);
+        Integer expiradas = reservationProcRepo.spExpireReservationsVencidasProcedure();
+        assertThat(expiradas).isGreaterThanOrEqualTo(1);
+    }
+
+    @Test
+    void s9e_pagoParcial_mantienePendienteConSaldo() {
+        Long fineId = sembrarMultaPendiente();
+        java.math.BigDecimal total = (java.math.BigDecimal) em
+                .createNativeQuery("SELECT monto FROM multas WHERE id = ?")
+                .setParameter(1, fineId)
+                .getSingleResult();
+        java.math.BigDecimal abono = total.divide(new java.math.BigDecimal("2"));
+        var result = fineProcRepo.spPaymentParcialFine(fineId, abono);
+        assertThat(result.get("o_multa_id")).isEqualTo(fineId);
+        assertThat(result.get("o_estado")).isEqualTo("PENDIENTE");
+        assertThat((java.math.BigDecimal) result.get("o_saldo_restante"))
+                .isGreaterThan(java.math.BigDecimal.ZERO);
+    }
+
+    private Long sembrarMultaPendiente() {
+        Long loanId = loanProcRepo.spCreateLoanProcedure(2L, 1L, 1L, 7);
+        em.createNativeQuery("UPDATE prestamos SET fecha_devolucion_estimada = NOW() - INTERVAL '2 days' WHERE id = ?")
+                .setParameter(1, loanId)
+                .executeUpdate();
+        em.flush();
+        em.clear();
+        loanProcRepo.spRegisterLoanReturn(loanId);
+        return (Long) em.createNativeQuery("SELECT id FROM multas WHERE prestamo_id = ?")
+                .setParameter(1, loanId)
+                .getSingleResult();
     }
 }
