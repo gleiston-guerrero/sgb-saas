@@ -186,6 +186,20 @@ siguen existiendo y ejecutándose).
   ADR-013" presente en `PrestamoProcedureRepository.java`; con esta
   actualización, esa deuda documental queda saldada.
 
+### Matiz 2026-09-17 (spike desechable, no commiteado)
+
+Un probe `@Procedure(procedureName = "proc_crear_prestamo")` contra
+PostgreSQL real (Testcontainers, Hibernate 7.2.12) **sí alcanzó el
+motor**: falló con el error de negocio `El usuario 999997 no existe`,
+no con error de sintaxis de llamada. Conclusión precisa: el bloqueo
+#3393 afecta a parámetros **nombrados** (`nombre => ?` en `{call}`) y
+a `FUNCTION` invocadas con `call`; las llamadas posicionales contra
+`PROCEDURE` reales funcionan. Esto no reabre las 22 tabulares
+(`RETURNS TABLE` no tiene vía `CallableStatement` por diseño JPA) ni
+`sp_pago_parcial_multa` (es `FUNCTION` con OUT: requeriría wrapper
+`PROCEDURE` estilo V51 + test de equivalencia, pendiente explícito).
+La excepción técnica se mantiene, ahora con el límite delimitado.
+
 ## Referencias
 
 - [[adr-011-gestor-base-datos]] (PostgreSQL como motor que hace posible PL/pgSQL)

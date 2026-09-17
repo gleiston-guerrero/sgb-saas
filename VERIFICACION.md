@@ -25,7 +25,8 @@ git status --short
 * b93a351d test: limpieza whitespace en BookControllerSecurityTest
 * 41f1b557 docs(examen): P6 javadoc limpio + EV-2 make verify + P10 evidencia
 * 822e5d42 docs(javadoc): P6 doclint limpio y 100% documentado
-v1.1.0 -> 545f8c8f (anterior al cierre; lo mueve el admin, ver EV-3)
+v1.1.0 -> 0d99b0d6 (verificado local+remoto; tras integrar esta rama a
+main, el admin lo mueve al SHA final de main, ver EV-3)
 árbol: solo archivos del expediente (este .md, 4 capítulos, REPORT perf,
 p95 svg/pdf, CONTRIBUCIONES.md, figuras/×18, script generador)
 ```
@@ -52,35 +53,59 @@ mover el tag, crear tags alternativos o modificar el historial.
 
 ## EV-2 — `make verify`
 
+### Diseño (2026-09-18, rama fix/examen-evidencia)
+
+El target delega en `scripts/verify-all.py` (única fuente de verdad;
+`python scripts/verify-all.py` es el equivalente exacto donde no hay
+GNU Make — `Get-Command make` vacío en este Windows). Clasifica cada
+punto como `evidencia válida`, `PENDIENTE` (visible, nunca aprobado:
+P3, P5-parcial, firmas P11) o `FALLO`; sale 0 solo si no hay ningún
+`FALLO`. P10 corre `DemoAccountAuthorizationIntegrationTest` en
+subproceso y exige `Tests run: 3, Failures: 0, Errors: 0, Skipped: 0`
+(sin Docker, omitidos o resumen no verificable: PENDIENTE-bloqueado,
+nunca éxito).
+
 ### Comando
 
 ```powershell
 make verify
 ```
 
-### Salida (2026-09-17, secuencia exacta del target, sin `make` en Windows)
+### Salida (corrida real, rama fix/examen-evidencia)
 
 ```text
-verify-p1: OK (34 hashes existen) — exit 0
-verify-p2: OK (5 DOI resuelven) — exit 0
-verify-p6: OK (100.00% >= 90.00%, 405/405 métodos) — exit 0
-verify-p7: OK (0.00% <= 5.00%) — exit 0
-verify-p12: OK (árbol limpio, 1362 archivos revisados) — exit 0
-[INFO] BUILD SUCCESS (mvn javadoc:javadoc, 8.260 s) — exit 0
+P1: evidencia válida
+P2: evidencia válida
+P3: PENDIENTE — no puntuable
+P4: evidencia válida
+P5: pendiente documentado (excepcion tecnica)
+P6: evidencia válida
+P7: evidencia válida
+P8/P9: evidencia válida
+P10: evidencia válida (3/0/0/0, cero mocks)
+P11: FALLO (por diseño en esta corrida: documentos citan rev anterior;
+  tras el recount del cierre queda en verde — ver salida final abajo)
+P12: evidencia válida
+Javadoc: evidencia válida (BUILD SUCCESS)
+verify-all: FALLO (única causa: P11)
 ```
+
+(Salidas completas por script en sus secciones. La corrida `make`
+literal queda pendiente de entorno con GNU Make: en CI corre el job
+`verify` (push a ramas + `workflow_dispatch`, sin secretos); hasta su
+primer verde se registra "make verify no ejecutado localmente".)
 
 ### Archivo que respalda
 
-- `Makefile` (target `verify`: esos 6 pasos en ese orden)
-- `scripts/verify-p1-hashes.py`, `verify-p2-dois.py`, `verify-p6-javadoc.py`,
-  `verify-p7-names.py`, `verify-p12-secrets.py`
+- `Makefile` (target `verify` → `python scripts/verify-all.py`)
+- `scripts/verify-all.py` + `verify-p{1,2,3,4,5,6,7,8-p9,11,12}.py`
+- `.github/workflows/verify.yml` (job CI)
 
 ### Resultado
 
-PARCIAL (los 6 pasos del target, verdes uno por uno con exit 0 el
-2026-09-17; falta la corrida `make verify` de punta a punta en
-máquina con make instalado — `Get-Command make` vacío en este
-entorno Windows)
+PARCIAL (orquestador completo y P11-fail-by-design verificado en
+comportamiento; falta corrida final en verde tras recount + `make`
+literal en entorno con GNU Make)
 
 ---
 
@@ -187,8 +212,10 @@ Wilcoxon p=0.0625 (mínimo exacto con n=5) | Cliff's delta=-1.00 (grande)
 
 - `docs/mediciones/perf/REPORT.md` (serie vigente 2026-09-17: fecha,
   commit, URL, VUs/duración, tabla por corrida, agregado, SHA-256)
-- NDJSON crudos (~15 MB c/u) no versionados por higiene
-  (`.gitignore`: `k6-run*.json`); sus SHA-256 constan en REPORT.md
+- NDJSON crudos (~15 MB c/u): ver subsección de versionado abajo
+  (sus SHA-256 constan en REPORT.md)
+- `docs/mediciones/perf/k6-run1..5.json` versionados en el árbol
+  (serie vigente; SHA arriba)
 - `docs/mediciones/perf/p95-comparacion-escenarios.svg/.pdf`
   (regenerados de la serie vigente)
 
@@ -282,6 +309,30 @@ reservaciones)
 PARCIAL (excepción técnica documentada: inventario verificable
 completo; ninguna migración forzada "a ciegas"; 10 consultas
 legítimas intactas)
+
+### Spike 2026-09-18 (sonda desechable, no commiteada)
+
+```powershell
+./mvnw -B test -Dtest=TmpSpCallProbeTest -DfailIfNoTests=false
+```
+
+```text
+PROBE hibernate=7.2.12.Final
+PROBE RESULTADO: @Procedure FALLO [JpaSystemException: ... El usuario 999997 no existe
+  <- GenericJDBCException <- PSQLException: ERROR: El usuario 999997 no existe]
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+```
+
+Lectura: la ruta `@Procedure` **posicional** contra `PROCEDURE`
+reales SÍ alcanza el motor en este stack (falló con error de negocio
+LB404, no con error de sintaxis de llamada) — el bloqueo #3393 afecta
+a parámetros nombrados y a `FUNCTION` vía `call` (matiz agregado a
+ADR-006). Las 22 tabulares siguen sin vía JPA por diseño; para
+`sp_pago_parcial_multa` (FUNCTION con OUT) la única migración válida
+sería wrapper `PROCEDURE` estilo V51 + test de equivalencia: trabajo
+real pendiente, no ejecutado en este turno por riesgo/alcance. P5 se
+calcula literal según rúbrica con esta excepción; el evaluador podría
+mantenerlo parcial.
 
 ---
 

@@ -314,7 +314,25 @@ guía):
 make all   # = up → test → bench → audit → docs → compilar PDF del informe
 ```
 
-Targets disponibles: `up` `down` `test` `bench` `audit` `docs` `all` `clean`.
+Targets disponibles: `up` `down` `test` `bench` `audit` `docs` `all` `clean` `verify`.
+
+### Verificación del expediente (`make verify`)
+
+```bash
+make verify   # = scripts/verify-all.py: P1-P12 + javadoc en un solo comando
+```
+
+- Clasifica cada punto como `evidencia válida`, `PENDIENTE` (visible,
+  nunca aprobado: P3, P5-parcial, firmas P11) o `FALLO`; sale 0 solo
+  si no hay ningún `FALLO`. Un exit 0 con pendientes significa
+  coherencia/reproducibilidad de la evidencia disponible, no
+  cumplimiento académico total.
+- Requisitos: Python 3 + git + red (P2) + JDK 21/Maven (javadoc, P10)
+  + Docker (P10 Testcontainers; sin Docker ese punto queda
+  `PENDIENTE-bloqueado`, nunca éxito). Sin GNU Make (Windows):
+  `python scripts/verify-all.py` — es el mismo código que invoca el
+  target, no un atajo distinto.
+- Detalle por punto y salidas reales: `VERIFICACION.md`.
 
 ### Compilación del informe (cómo regenerar el PDF)
 

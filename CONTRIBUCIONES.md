@@ -64,10 +64,20 @@ Writing–review 3.
   **763/343/324** (este archivo). Re-sincronizar al cierre con los
   comandos de la cabecera.
 
-## Firmas
+## Firmas y autorizaciones (bloqueo humano explícito)
 
-Pendientes: este archivo es la base verificable (roles, conteos,
-SHA). La aceptación firmada la realiza cada integrante fuera del
-repositorio al cierre; no se falsifica aquí ninguna firma. Para el
-tag de entrega (EV-3/EV-4, solo el administrador): incluir este
-archivo con roles, conteos y SHA verificables.
+Estado: PENDIENTES. Este archivo es la base verificable (roles,
+conteos, SHA); las firmas/autorizaciones auténticas las aporta cada
+integrante fuera de la automatización. No se ha escrito ni simulado
+ninguna firma, correo o aprobación en este documento.
+
+Estructura para cuando el equipo las aporte (no rellenar sin ellas):
+
+| Integrante | Correo institucional | Firma/fecha | Alcance aceptado |
+|---|---|---|---|
+| (pendiente) | (pendiente) | (pendiente) | Roles CRediT y puntos declarados arriba |
+| (pendiente) | (pendiente) | (pendiente) | Roles CRediT y puntos declarados arriba |
+| (pendiente) | (pendiente) | (pendiente) | Roles CRediT y puntos declarados arriba |
+
+Para el tag de entrega (EV-3/EV-4, solo el administrador): incluir
+este archivo con roles, conteos y SHA verificables.
