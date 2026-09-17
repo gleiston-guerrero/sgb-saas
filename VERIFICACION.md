@@ -1,11 +1,15 @@
 # Expediente de verificación — examen suspenso SGB-SaaS (EV-1)
 
-Rama defendida: `fix/rescate-produccion-examen`.
+Rama de trabajo: `fix/fase01-sus-n0` (rev `d92ba03a`, 2026-09-17).
 Cierre: viernes 18-sep-2026 23:55. Etiqueta `v1.1.0`: la mueve el admin al final (ver EV-3).
 
 > Regla: ninguna salida está escrita a mano. Todo bloque `Salida` viene de
-> ejecutar el `Comando` tal cual. Los puntos con `Estado: PENDIENTE`
-> indican el comando exacto que falta correr + quién lo cierra.
+> ejecutar el `Comando` tal cual sobre el SHA y fecha indicados. Los puntos
+> con `Estado: PENDIENTE` indican qué falta y quién lo cierra; nunca cuentan
+> como éxito.
+> Evidencia completa de la corrida: `docs/evidencia/examen/d92ba03a/`
+> (`verify-all.txt` con cabecera SHA/fecha/comando/salida/código,
+> `xelatex-1/2/3.txt`, `bibtex.txt`).
 
 ## Pisos 1–4
 
@@ -14,66 +18,70 @@ Cierre: viernes 18-sep-2026 23:55. Etiqueta `v1.1.0`: la mueve el admin al final
 ```powershell
 git log --oneline --graph -5
 git rev-parse v1.1.0
+git rev-parse "v1.1.0^{}"
 git status --short
 ```
 
-### Salida (2026-09-17, rama fix/rescate-produccion-examen)
+### Salida (2026-09-17, rev d92ba03a)
 
 ```text
-* <sha-cierre> docs(examen): P3/P4/P5/P8/P9/P11 + EV-1/EV-2 (este expediente)
-* fcda4808 fix(frontend): shell propio para GERENTE sin depender de /dashboard-admin
-* b93a351d test: limpieza whitespace en BookControllerSecurityTest
-* 41f1b557 docs(examen): P6 javadoc limpio + EV-2 make verify + P10 evidencia
-* 822e5d42 docs(javadoc): P6 doclint limpio y 100% documentado
-v1.1.0 -> 0d99b0d6 (verificado local+remoto; tras integrar esta rama a
-main, el admin lo mueve al SHA final de main, ver EV-3)
-árbol: solo archivos del expediente (este .md, 4 capítulos, REPORT perf,
-p95 svg/pdf, CONTRIBUCIONES.md, figuras/×18, script generador)
+* d92ba03a fix(examen): verificadores de solo lectura y UTF-8 sin PYTHONUTF8
+* 50f517d8 docs(examen): plantilla EV-4 con titularidad por punto, sin firmas simuladas
+* 902e5133 test(examen): endurece verify-p3 y notebook SUS en modo N=0 ejecutado
+* c52fc402 docs(examen): actualiza referencias al retiro SUS del arbol
+* 1c28085f docs(examen): retira dataset SUS mock del arbol, N=0 consistente
+v1.1.0 -> 6803730704269737bce4e4c17b7b61bb89702380 (tag anotado)
+v1.1.0^{} -> bec80ecbd8973d93b45894155981ad4409a405c8 (commit, anterior al cierre)
+?? docs/evidencia/
 ```
 
 ### Archivo que respalda
 
 - Historial del repositorio (`git log`)
-- Sin movimientos de tags, sin merges, sin reescritura de historial,
-  sin tocar `main` en este turno
+- Sin movimientos de tags, sin merges, sin reescritura de historial
 
 ### Resultado
 
-PENDIENTE solo por el tag (piso 1 exige `v1.1.0` sobre commit
-anterior al cierre; lo mueve únicamente el admin)
+Piso 1 en regla a esta fecha (tag existe, anterior al cierre); el admin
+mueve `v1.1.0` al SHA final de entrega. Piso 4: identidad de trabajo
+`MoisesPanama <mpanamam@uteq.edu.ec>` (institucional); ver EV-4 para
+autoría por punto. Riesgo Piso 3 en tratamiento explícito: Fase 0.1
+retiró `sus.csv` y derivados del árbol (P3 declara N=0); sin fechas
+futuras en este expediente.
 
 ### EV-3/EV-4 (tag y entrega)
 
 Tras la validación final, el administrador mueve `v1.1.0` al commit
-de entrega aprobada. Este expediente ya incluye `CONTRIBUCIONES.md`
-con roles, conteos y SHA verificables. Prohibido para el agente:
-mover el tag, crear tags alternativos o modificar el historial.
+de entrega aprobada. `CONTRIBUCIONES.md` trae titularidad por punto con
+SHAs verificables y aceptaciones pendientes (las llena cada integrante).
+Prohibido para el agente: mover el tag, crear tags alternativos o
+modificar el historial.
 
 ---
 
 ## EV-2 — `make verify`
 
-### Diseño (2026-09-18, rama fix/examen-evidencia)
+### Diseño
 
 El target delega en `scripts/verify-all.py` (única fuente de verdad;
 `python scripts/verify-all.py` es el equivalente exacto donde no hay
-GNU Make — `Get-Command make` vacío en este Windows). Clasifica cada
-punto como `evidencia válida`, `PENDIENTE` (visible, nunca aprobado:
-P3, P5-parcial, firmas P11) o `FALLO`; sale 0 solo si no hay ningún
-`FALLO`. P10 corre `DemoAccountAuthorizationIntegrationTest` en
-subproceso y exige `Tests run: 3, Failures: 0, Errors: 0, Skipped: 0`
-(sin Docker, omitidos o resumen no verificable: PENDIENTE-bloqueado,
-nunca éxito).
+GNU Make — sin `make` en este Windows). Clasifica cada punto como
+`evidencia válida`, `PENDIENTE` (visible, nunca aprobado: P3, P5-parcial,
+P10-bloqueado, firmas P11) o `FALLO`; sale 0 solo si no hay ningún
+`FALLO`. Solo lectura: ningún verificador modifica NDJSON, figuras, PDF
+ni evidencia (P4 genera su gráfico en temporal vía `SGB_PERF_GRAFICO`).
+UTF-8 interno: no requiere `PYTHONUTF8=1` en Windows.
 
 ### Comando
 
 ```powershell
-make verify
+python scripts/verify-all.py
 ```
 
-### Salida (corrida real, rama fix/examen-evidencia)
+### Salida (2026-09-17, rev d92ba03a, salida completa en `docs/evidencia/examen/d92ba03a/verify-all.txt`)
 
 ```text
+===== verify-all: resumen P1-P12 =====
 P1: evidencia válida
 P2: evidencia válida
 P3: PENDIENTE — no puntuable
@@ -82,34 +90,30 @@ P5: pendiente documentado (excepcion tecnica)
 P6: evidencia válida
 P7: evidencia válida
 P8/P9: evidencia válida
-P10: evidencia válida (3/0/0/0, cero mocks)
-P11: FALLO (por diseño en esta corrida: documentos citan rev anterior;
-  tras el recount del cierre queda en verde — ver salida final abajo)
+P10: PENDIENTE
+P11: conteos verificables (firmas externas pendientes)
 P12: evidencia válida
 Javadoc: evidencia válida (BUILD SUCCESS)
-verify-all: FALLO (única causa: P11)
+verify-all: exit 0 = coherencia/reproducibilidad de la evidencia disponible, NO cumplimiento academico total (P3 y firmas no puntuan)
 ```
 
-(Salidas completas por script en sus secciones. La corrida `make`
-literal queda pendiente de entorno con GNU Make: en CI corre el job
-`verify` (push a ramas + `workflow_dispatch`, sin secretos); hasta su
-primer verde se registra "make verify no ejecutado localmente".)
+Código de salida: 0.
 
 ### Archivo que respalda
 
 - `Makefile` (target `verify` → `python scripts/verify-all.py`)
 - `scripts/verify-all.py` + `verify-p{1,2,3,4,5,6,7,8-p9,11,12}.py`
 - `.github/workflows/verify.yml` (job CI)
+- `docs/evidencia/examen/d92ba03a/verify-all.txt` (343 líneas: cabecera + salida + código)
 
 ### Resultado
 
-PARCIAL (orquestador completo y P11-fail-by-design verificado en
-comportamiento; falta corrida final en verde tras recount + `make`
-literal en entorno con GNU Make)
+Operativo (orquestador completo, solo lectura, UTF-8, exit 0 sin FALLO;
+PENDIENTEs visibles: P3 N=0, P5 parcial, P10 sin Docker, firmas P11).
 
 ---
 
-## P1 — Procedencia de datos (18/20 hashes inexistentes), peso 1,4
+## P1 — Procedencia de datos (peso 1,4)
 
 ### Comando
 
@@ -117,26 +121,57 @@ literal en entorno con GNU Make)
 python scripts/verify-p1-hashes.py
 ```
 
-### Salida (2026-09-16, rama fix/rescate-produccion-examen)
+### Salida (2026-09-17, rev d92ba03a, completa)
 
 ```text
 [OK] 00b2630 (commit)
-... (34/34 OK)
+[OK] 00b26306 (commit)
+[OK] 1028ad02 (commit)
+[OK] 437ebe5 (commit)
+[OK] 437ebe5b (commit)
+[OK] 454be77 (commit)
+[OK] 4d69f24 (commit)
+[OK] 4d69f244 (commit)
+[OK] 5f3e5e5 (commit)
+[OK] 5f3e5e5b (commit)
+[OK] 6bce625 (commit)
+[OK] 6bce6257 (commit)
+[OK] 75d635b (commit)
+[OK] 75d635b1 (commit)
+[OK] 7debd0b (commit)
+[OK] 7debd0b1 (commit)
+[OK] 862672b (commit)
+[OK] 862672b2 (commit)
+[OK] 9a46712 (commit)
+[OK] 9a467125 (commit)
+[OK] bca23c2 (commit)
+[OK] bca23c2c (commit)
+[OK] d8443e6 (commit)
+[OK] d8443e66 (commit)
+[OK] df09f0d (commit)
+[OK] df09f0db (commit)
+[OK] df11c6e (commit)
+[OK] df11c6ed (commit)
+[OK] e3f3f7f (commit)
+[OK] e3f3f7fa (commit)
+[OK] e6909a5 (commit)
+[OK] e6909a5d (commit)
+[OK] ed42c42 (commit)
+[OK] ed42c421 (commit)
 verify-p1: OK (34 hashes existen)
 ```
 
-(El archivo se reescribió citando solo commits vigentes obtenidos con
-`git log -1 -- <archivo>`; la salida completa de 34 líneas consta en el
-historial de ejecución. Ningún hash inexistente permanece citado.)
-
 ### Archivo que respalda
 
-- `docs/mediciones/DATA-PROVENANCE.md` (reescrito 2026-09-16)
-- `scripts/verify-p1-hashes.py` (falla si un hash citado no existe)
+- `docs/mediciones/DATA-PROVENANCE.md`
+- `scripts/verify-p1-hashes.py` (falla si un hash citado no es commit)
 
 ### Resultado
 
-CUMPLE
+Verificado que los 34 hashes existen. Pendiente de contenido (no de
+existencia): la fila `1028ad02` no respalda el reporte JaCoCo (ese commit
+solo toca `docs/basedatos/CATALOGO-SP.md`) y las filas 1–2 dicen que los
+NDJSON se retiraron cuando están versionados. Fix en fase P1.
 
 ---
 
@@ -148,7 +183,7 @@ CUMPLE
 python scripts/verify-p2-dois.py
 ```
 
-### Salida (2026-09-17)
+### Salida (2026-09-17, rev d92ba03a, completa)
 
 ```text
 [OK] 10.5281/zenodo.21712467 (published, 1 archivo(s)) <- VERIFICACION.md, docs\capitulos\00-portada.tex, docs\capitulos\02-introduccion.tex, docs\checklists\fair.md, docs\informe-entrega-3.tex
@@ -161,29 +196,45 @@ verify-p2: OK (5 DOI resuelven)
 
 ### Archivo que respalda
 
-- `scripts/verify-p2-dois.py` (verifica vía API Zenodo: doi.org da 404 transitorios)
+- `scripts/verify-p2-dois.py` (barre `*.cff/*.md/*.tex/*.txt`; API Zenodo para `10.5281`, `doi.org` para el resto; excluye el plan local no entregable)
 - `CITATION.cff` (doi 10.5281/zenodo.22741050)
 
 ### Resultado
 
-CUMPLE (nota: el 404 de la guía sobre 22636466 no reproduce; el depósito existe y está publicado con archivos)
+Los 5 DOI resuelven vía API Zenodo. Pendiente de criterio estricto: el
+`22636466` sigue declarado en portada, introducción, declaraciones y
+FAIR y la guía exige resolución por `doi.org` (donde da 404). Fix en
+fase P2: eliminarlo de fuentes y derivados.
 
 ---
 
 ## P3 — SUS (peso 1,4)
 
+### Comando
+
+```powershell
+python scripts/verify-p3-sus.py
+```
+
+### Salida (2026-09-17, rev d92ba03a, completa)
+
+```text
+verify-p3: OK (sin sus.csv ni derivados en el arbol evaluado)
+verify-p3: OK (sus/README.md declara N=0 y dataset retirado)
+verify-p3: OK (ningun .tex cita artefactos SUS retirados)
+verify-p3: OK (P3 declara N=0 y estado no aprobado, sin CUMPLE)
+verify-p3: PENDIENTE — no puntuable (N=0, sin respuestas reales)
+```
+
 ### Resultado
 
-PARCIAL DELIBERADO (0-15%, no se cerrará con datos): el dataset fue
-retirado por el propio equipo (`docs/mediciones/sus/README.md`:
-patrones incompatibles con respuestas independientes, N=0 en todo el
-entregable). No se fabricará evidencia: sin instrumento real con
-consentimientos verificables no se puede cerrar. El dataset previo
-(`sus.csv`, 15 respuestas aparentes) se retiró del árbol evaluado en
-Fase 0.1 — solo permanece en el historial Git — junto con sus figuras
-derivadas; nunca fue ni es evidencia válida; no se recalcula Brooke/SUS
-ni se presentan métricas. El informe (capítulos 01, 08-Bloque 5, 09-RQ3,
-10, 11, 12, 13, 14) declara $N=0$ de forma consistente.
+PENDIENTE deliberado y honesto (0 %, no se cerrará con datos): N=0 en
+todo el entregable, sin instrumento versionado con respuestas ni
+consentimientos verificables. Fase 0.1 retiró `sus.csv` (15 respuestas
+aparentes) y sus 4 derivados del árbol; el notebook
+`scripts/sus-analysis.ipynb` corre en modo N=0 con salidas reales
+(5/5 celdas ejecutadas, cero puntajes, cero gráficos). No se fabricará
+evidencia.
 
 ---
 
@@ -192,75 +243,45 @@ ni se presentan métricas. El informe (capítulos 01, 08-Bloque 5, 09-RQ3,
 ### Comando
 
 ```powershell
-docker compose up -d --build
-docker run --rm --network sgb-saas_default -v "<repo>/k6:/scripts" -v "<repo>/docs/mediciones/perf:/out" grafana/k6 run --out json=/out/k6-runN.json /scripts/libros-listado-test.js  # N=1..5
-python3 scripts/perf-analysis.py docs/mediciones/perf/k6-run*.json
-```
-
-### Salida (2026-09-17, commit fcda4808, stack reconstruido, 50 VUs)
-
-```text
-run1: caliente p95=129.63ms frio p95=18.39ms checks 3907/3907 OK
-run2: caliente p95=41.57ms  frio p95=18.71ms checks 3972/3972 OK
-run3: caliente p95=31.16ms  frio p95=15.68ms checks 3985/3985 OK
-run4: caliente p95=32.53ms  frio p95=15.75ms checks 3983/3983 OK
-run5: caliente p95=32.49ms  frio p95=16.60ms checks 3985/3985 OK
-agregado: caliente p95=65.60ms (<200) | frio p95=17.13ms (<500) | error 5xx 0.00% (0/19827)
-Wilcoxon p=0.0625 (mínimo exacto con n=5) | Cliff's delta=-1.00 (grande)
-```
-
-### Archivo que respalda
-
-- `docs/mediciones/perf/REPORT.md` (serie vigente 2026-09-17: fecha,
-  commit, URL, VUs/duración, tabla por corrida, agregado, SHA-256)
-- NDJSON crudos (~15 MB c/u): ver subsección de versionado abajo
-  (sus SHA-256 constan en REPORT.md)
-- `docs/mediciones/perf/k6-run1..5.json` versionados en el árbol
-  (serie vigente; SHA arriba)
-- `docs/mediciones/perf/p95-comparacion-escenarios.svg/.pdf`
-  (regenerados de la serie vigente)
-
-### Resultado
-
-CUMPLE (5/5 corridas, umbrales con margen, 0% errores; limitaciones
-warm-up corrida 1 y constructo cache_frio declaradas)
-
-### Verificador + versionado (2026-09-18, rama codex/asegurar-8-examen)
-
-```powershell
 python scripts/verify-p4-k6.py
-git ls-files docs/mediciones/perf/k6-run*.json   # vacio = ignorados
-git add -f docs/mediciones/perf/k6-run*.json     # solo tras OK del verificador
 ```
+
+### Salida (2026-09-17, rev d92ba03a, completa)
 
 ```text
 verify-p4: OK (existen 5 corridas)
+verify-p4: OK (5 archivos en LF, sin CRLF)
 verify-p4: OK (NDJSON legible, ambos escenarios en las 5)
 verify-p4: OK (SHA-256 de las 5 coincide con REPORT.md)
-verify-p4: OK (agregado coincide: p95 [65.6, 17.13], error 0%)
+verify-p4: OK (agregado coincide por escenario: n exacto, p95 [65.6, 17.13], error 0%)
 verify-p4: OK (5 corridas crudas versionables y fieles al reporte)
 ```
 
-Los 5 NDJSON (~74 MB) quedan versionados por exigencia literal de la
-guía (decisión documentada; antes gitignorados por higiene; regla
-retirada de `.gitignore` con nota).
-Efecto colateral conocido de `perf-analysis.py`: reescribe el SVG/PDF
-p95 con datos idénticos (solo fecha e IDs aleatorios); se restauraron
-con `git checkout` para no meter ruido — ver `verify-p4-k6.py`.
+Serie vigente (REPORT.md): por corrida caliente p95 129.63/41.57/31.16/
+32.53/32.49 ms y frío p95 18.39/18.71/15.68/15.75/16.60 ms; agregado
+caliente p95=65.60 ms (<200), frío p95=17.13 ms (<500), error 5xx 0.00 %;
+Wilcoxon p=0.0625, Cliff's delta=-1.00.
+
+### Archivo que respalda
+
+- `docs/mediciones/perf/REPORT.md` (serie vigente: fecha, commit, URL,
+  VUs/duración, tabla por corrida, agregado, SHA-256)
+- `docs/mediciones/perf/k6-run1..5.json` versionados (~15 MB c/u)
+- `docs/mediciones/perf/p95-comparacion-escenarios.svg/.pdf`
+
+### Resultado
+
+Verificado contra crudos. Pendiente documental (fase P4): unificar
+cifras viejas en Resumen/Abstract/capítulos, declarar Wilcoxon no
+significativo con n=5 y el límite hot/cold (caliente más lento que frío:
+la caché no se presenta como mejora demostrada).
 
 Incidente 2026-09-16 (transparencia): los 5 JSON del worktree
-aparecieron volteados a CRLF a las 21:38 (mismo segundo, +1 byte por
-línea, datos intactos) por un proceso local no identificado, con
-`core.autocrlf=true` y sin regla en `.gitattributes`. Como `git status`
-normaliza CRLF contra el índice, no mostró ningún `AM` y el cambio era
-invisible para git pero rompía el SHA crudo. Los blobs commiteados se
-verificaron intactos por hash (`run1 = 72C782…` = REPORT.md). Fix
-sistémico: `docs/mediciones/perf/k6-run*.json -text -diff` en
-`.gitattributes` (bytes idénticos en checkout/add en cualquier OS,
-mismo precedente que los `*.pdf`), worktree restaurado por borrado +
-checkout forzado, y guardia CRLF con mensaje accionable dentro de
-`verify-p4-k6.py`. Lección: ningún hash crudo es estable en Windows
-sin regla `-text`.
+aparecieron volteados a CRLF a las 21:38 por un proceso local no
+identificado, con `core.autocrlf=true` y sin regla en `.gitattributes`.
+Los blobs commiteados se verificaron intactos por hash. Fix sistémico:
+`docs/mediciones/perf/k6-run*.json -text -diff` en `.gitattributes` y
+guardia CRLF dentro de `verify-p4-k6.py`.
 
 ---
 
@@ -269,21 +290,19 @@ sin regla `-text`.
 ### Comando
 
 ```powershell
-git grep -n "nativeQuery = true" -- backend-springboot/src/main/java | Measure-Object -Line
-git grep -n "FROM fn_\|FROM sp_\|SELECT \* FROM sp_" -- backend-springboot/src/main/java | Measure-Object -Line
+python scripts/verify-p5-nativequery.py
 ```
 
-### Salida (2026-09-17, commit fcda4808)
+### Salida (2026-09-17, rev d92ba03a)
 
 ```text
-33 nativeQuery = true en total:
-  AuditLogAuditRepository.java:1, BookRepository.java:6,
-  FineProcedureRepository.java:3, LoanProcedureRepository.java:20,
-  LoanRepository.java:1, ReservationRepository.java:2
-23 invocan rutinas (22 fn_* RETURNS TABLE + 1 sp_pago_parcial_multa);
-10 son CRUD/filtros legítimos sin fn_/sp_ (bitácora, libros, préstamos,
-reservaciones)
+verify-p5: OK (inventario 33=23+10 coincide)
 ```
+
+Detalle: 33 `nativeQuery = true` en total (AuditLogAuditRepository:1,
+BookRepository:6, FineProcedureRepository:3, LoanProcedureRepository:20,
+LoanRepository:1, ReservationRepository:2); 23 invocan rutinas
+(`fn_*`/`sp_pago_parcial_multa`), 10 son SELECT sin rutinas.
 
 ### Clasificación
 
@@ -291,49 +310,22 @@ reservaciones)
   equivalente JPA/`@Procedure` — JPA 2.1/`CallableStatement` solo
   expone escalar/OUT o `REF_CURSOR`, no `SETOF/TABLE` vía
   `SELECT * FROM fn_()`; reescribir a cursor rompería el contrato SQL
-  público e impediría `psql` directo. Limitación pgjdbc documentada
-  (Hibernate genera `{call ...}` que pgjdbc rechaza;
-  `spring-data-jpa#3393` sin fix) — ver
-  `docs/adr/adr-006-acceso-datos-orm-sp.md` y
+  público e impediría `psql` directo. Limitación pgjdbc documentada —
+  ver `docs/adr/adr-006-acceso-datos-orm-sp.md` y
   `docs/capitulos/14-anexos.tex` ("Alcance de corrección").
 - **`sp_pago_parcial_multa`** (`FUNCTION ... RETURNS record` con 4
-  OUT, `V16__multas_pago_parcial.sql`): investigado (firma, OUT
-  `o_multa_id/o_estado/o_saldo_restante/o_usuario_desbloqueado`,
-  transacción con `SELECT ... FOR UPDATE`, caller
-  `FineService.payPartial`). **No migrado**: 0 tests ejercitan su SQL
+  OUT, `V16__multas_pago_parcial.sql`): 0 tests ejercitan su SQL
   real (solo mocks en `FineControllerTest`), así que la equivalencia
   `@Procedure` no queda demostrada; migrar sin prueba violaría la
   regla del plan. Se mantiene con justificación técnica.
 
 ### Resultado
 
-PARCIAL (excepción técnica documentada: inventario verificable
-completo; ninguna migración forzada "a ciegas"; 10 consultas
-legítimas intactas)
-
-### Spike 2026-09-18 (sonda desechable, no commiteada)
-
-```powershell
-./mvnw -B test -Dtest=TmpSpCallProbeTest -DfailIfNoTests=false
-```
-
-```text
-PROBE hibernate=7.2.12.Final
-PROBE RESULTADO: @Procedure FALLO [JpaSystemException: ... El usuario 999997 no existe
-  <- GenericJDBCException <- PSQLException: ERROR: El usuario 999997 no existe]
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
-```
-
-Lectura: la ruta `@Procedure` **posicional** contra `PROCEDURE`
-reales SÍ alcanza el motor en este stack (falló con error de negocio
-LB404, no con error de sintaxis de llamada) — el bloqueo #3393 afecta
-a parámetros nombrados y a `FUNCTION` vía `call` (matiz agregado a
-ADR-006). Las 22 tabulares siguen sin vía JPA por diseño; para
-`sp_pago_parcial_multa` (FUNCTION con OUT) la única migración válida
-sería wrapper `PROCEDURE` estilo V51 + test de equivalencia: trabajo
-real pendiente, no ejecutado en este turno por riesgo/alcance. P5 se
-calcula literal según rúbrica con esta excepción; el evaluador podría
-mantenerlo parcial.
+PARCIAL documentado, 0 % a criterio estricto (la guía exige cero
+`nativeQuery=true` para rutinas): inventario verificable completo;
+migración real pendiente en fase P5 (camino crítico a 8,0). Nota: una
+sonda desechable no versionada citada antes en este expediente se
+retiró del mismo; su conclusión técnica vive en ADR-006.
 
 ---
 
@@ -343,9 +335,10 @@ mantenerlo parcial.
 
 ```powershell
 python scripts/verify-p6-javadoc.py
+cd backend-springboot; ./mvnw -B javadoc:javadoc
 ```
 
-### Salida (2026-09-17)
+### Salida (2026-09-17, rev d92ba03a)
 
 ```text
 Javadoc audit
@@ -359,6 +352,9 @@ javadoc_return_tags=375
 javadoc_throws_tags=80
 files_with_missing_javadocs=0
 verify-p6: OK (100.00% >= 90.00%)
+[INFO] BUILD SUCCESS
+[INFO] Total time:  4.514 s
+>> Javadoc: evidencia válida (BUILD SUCCESS)
 ```
 
 ### Archivo que respalda
@@ -367,21 +363,10 @@ verify-p6: OK (100.00% >= 90.00%)
 
 ### Resultado
 
-CUMPLE (pendiente `mvn javadoc:javadoc` sin error; ver comando abajo)
-
-### Comando (segunda parte)
-
-```powershell
-cd backend-springboot; ./mvnw -B javadoc:javadoc
-```
-
-### Salida (2026-09-17)
-
-```text
-[INFO] Building  0.0.1-SNAPSHOT
-[INFO] BUILD SUCCESS
-[INFO] Total time:  8.260 s
-```
+100 % con el conteo del auditor (métodos públicos explícitos) y
+`mvn javadoc:javadoc` BUILD SUCCESS. Pendiente de criterio amplio
+(fase P6): constructores, interfaces y proyecciones (64,1 % según el
+evaluador) y reescritura de 231 plantillas genéricas.
 
 ---
 
@@ -393,7 +378,7 @@ cd backend-springboot; ./mvnw -B javadoc:javadoc
 python scripts/verify-p7-names.py
 ```
 
-### Salida (2026-09-16)
+### Salida (2026-09-17, rev d92ba03a, completa)
 
 ```text
 Types: 0/286 flagged (0.00%)
@@ -404,52 +389,17 @@ verify-p7: OK (0.00% <= 5.00%)
 
 ### Archivo que respalda
 
-- `scripts/verify-p7-names.py` → `scripts/audit-english-names.py` (criterio oficial: backend)
+- `scripts/verify-p7-names.py` → `scripts/audit-english-names.py`
 
 ### Resultado
 
-CUMPLE
+Cerrado 100 %.
 
 ---
 
 ## P8 — Figuras ≥ 15 (peso 0,8)
 
 ### Comando
-
-```powershell
-python3 scripts/generar-figuras-evaluacion.py
-```
-
-### Salida (2026-09-17)
-
-```text
-k6: caliente n=9821, frio n=10006
-OK fig-k6-distribucion-latencia, fig-k6-throughput, fig-jacoco-paquetes,
-   fig-lighthouse-puntajes, fig-zap-riesgos, fig-commits-mensuales,
-   fig-commits-autores, fig-endpoints-roles, fig-migraciones-acumuladas
-   (cada una .svg + .pdf en docs/mediciones/figuras/)
-endpoints: 79 @PreAuthorize method annotations
-MANIFIESTO: 9 figuras x (svg+pdf)
-```
-
-### Archivo que respalda
-
-- `scripts/generar-figuras-evaluacion.py` (fuentes solo versionadas:
-  k6 NDJSON, `jacoco/report.csv`, lighthouse/zap JSON, `git log`,
-  `@PreAuthorize`; paleta Okabe-Ito; texto en inglés)
-- Cableado con `\label` + `\autoref` + párrafo: 2 en Bloque 1,
-  1 en Bloque 2 (ZAP), 1 en Bloque 3 (JaCoCo), 1 en Bloque 4
-  (Lighthouse), 2 al cierre del cap. 06, 2 en cap. 13 (autoría)
-- `docs/mediciones/figures-captions-en.md` (checklist ampliado)
-- Total: 6 previas + 9 nuevas = **15 figuras**
-
-### Resultado
-
-CUMPLE en contenido (15/15 referenciadas, reproducibles, sin
-decorativas; SUS excluida a propósito); compilación XeLaTeX VERIFICADA
-abajo; revisión visual humana sigue pendiente
-
-### Verificador + compilación (2026-09-18, MiKTeX local)
 
 ```powershell
 python scripts/verify-p8-p9-figures.py
@@ -459,6 +409,8 @@ xelatex -interaction=nonstopmode -halt-on-error informe-final.tex
 xelatex -interaction=nonstopmode -halt-on-error informe-final.tex
 ```
 
+### Salida (2026-09-17, rev d92ba03a; logs en `docs/evidencia/examen/d92ba03a/xelatex-{1,2,3}.txt`, `bibtex.txt`)
+
 ```text
 verify-p8-p9: OK (15 entornos figure)
 verify-p8-p9: OK (15 labels unicos)
@@ -466,14 +418,34 @@ verify-p8-p9: OK (las 15 citadas; 0 rotas)
 verify-p8-p9: OK (14 includegraphics existen en disco)
 verify-p8-p9: OK (0 palabras espanolas en .svg versionados)
 verify-p8-p9: OK (captions de figuras en ingles)
+verify-p8-p9: OK (15/15 figuras referenciadas; figuras en ingles)
 xelatex x1/x2/x3: exit 0; bibtex: exit 0
 Output written on informe-final.pdf (109 pages).
 ```
 
-Sin `^!` (errores), sin referencias indefinidas y sin citas
-indefinidas en la pasada final. El PDF recompilado no se versiona
-(fuentes intactas; es ruido de build): se restauró con
+Sin errores (`^!`), sin referencias indefinidas en la pasada final; solo
+avisos benignos (inputenc ignorado con motor utf8, tokens hyperref en
+strings PDF, `h`→`ht` en floats). El PDF recompilado no se versiona en
+esta fase (fix Piso 2 pendiente con SHA): se restauró con
 `git checkout -- docs/informe-final.pdf`.
+
+Generador de las 9 figuras nuevas (`scripts/generar-figuras-evaluacion.py`,
+corrida 2026-09-17): k6 caliente n=9821/frío n=10006; 79 `@PreAuthorize`;
+manifiesto 9 figuras × (svg+pdf) en `docs/mediciones/figuras/`. Total:
+6 previas + 9 nuevas = **15 figuras**.
+
+### Archivo que respalda
+
+- `scripts/generar-figuras-evaluacion.py` (fuentes solo versionadas)
+- `docs/mediciones/figures-captions-en.md`
+- `docs/evidencia/examen/d92ba03a/xelatex-3.txt` (109 páginas, exit 0)
+
+### Resultado
+
+Verificado en contenido (15/15) y compilación (109 páginas, exit 0).
+Pendiente visual/técnico (fase P8/P9): C4-N2 recortado, DER real con
+PK/FK/cardinalidades, JaCoCo "top 12", textos babel en PRISMA; revisión
+visual humana.
 
 ---
 
@@ -481,16 +453,11 @@ indefinidas en la pasada final. El PDF recompilado no se versiona
 
 ### Resultado
 
-CUMPLE en contenido (nodos TikZ del PRISMA en
-`docs/capitulos/03-trabajos-relacionados.tex` traducidos a inglés
-académico; caption F1 también; conteos 15/15/15/15/10, criterios,
-citas y metodología intactos; anchos ajustados 6.6→7.0cm /
-5.2→5.6cm contra solapes; 5/6 captions de figuras ya estaban en
-inglés; 9 figuras nuevas con texto en inglés); verificado con
-`scripts/verify-p8-p9-figures.py` (0 español en .svg versionados y en
-captions de figuras; tablas fuera de alcance); revisión visual humana
-post-compilación sigue pendiente (la compilación sí está verificada,
-ver P8)
+Parcial 70 % (verificado por `verify-p8-p9-figures.py`: 0 español en
+.svg versionados y en captions de figuras; tablas fuera de alcance).
+Pendiente (fase P9): `(Tabla 3.1)`/`Sección 3.3` dentro del PRISMA
+(babel) e identificadores técnicos; revisión visual humana
+post-compilación.
 
 ---
 
@@ -499,31 +466,31 @@ ver P8)
 ### Comando
 
 ```powershell
-cd backend-springboot; ./mvnw -B test -Dtest=DemoAccountAuthorizationIntegrationTest -DfailIfNoTests=false
+python scripts/verify-all.py  # paso P10: docker info + Testcontainers
 ```
 
-### Salida (2026-09-17, rama codex/asegurar-8-examen)
+### Salida (2026-09-17, rev d92ba03a)
 
 ```text
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 71.16 s -- in com.uteq.backend.integration.DemoAccountAuthorizationIntegrationTest
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
-BUILD SUCCESS
+>> P10: PENDIENTE — bloqueado por entorno (sin Docker; Testcontainers omitiria)
 ```
 
-Evidencia literal pedida por la guía, con cero mocks: login HTTP real
-con `u@uteq.edu.ec / usuario1`, JWT decodificado con rol `[LECTOR]`,
-403 real contra endpoint solo-ADMIN (`GET /api/v1/admin/usuarios`) y
-403 real contra multas de otro usuario
-(`GET /api/v1/multas/usuario/{ajenoId}`, sin fixture: el control
-compara IDs antes de consultar). Infraestructura real: PostgreSQL y
-Redis en Testcontainers, migraciones Flyway versionadas, cadena de
-seguridad completa (sin `addFilters = false`). Complemento previo:
-`DemoAccountMigrationIntegrationTest` (login + rol + cuenta
-activa/verificada) — ver `docs/mediciones/demo-account.md`.
+Registro histórico (no evidencia vigente): en otra rama se corrió
+`DemoAccountAuthorizationIntegrationTest` con `Tests run: 3, Failures: 0,
+Errors: 0, Skipped: 0` (login LECTOR, JWT `[LECTOR]`, doble 403, cero
+mocks, Testcontainers). No reproducible aquí sin Docker y fuera del
+árbol evaluado: no se reclama como cumplido.
+
+### Archivo que respalda
+
+- `backend-springboot/.../integration/DemoAccountAuthorizationIntegrationTest.java`
+- `docs/mediciones/demo-account.md`
 
 ### Resultado
 
-CUMPLE
+PENDIENTE-bloqueado (fix fase P10): login LECTOR + JWT + doble 403
+contra el despliegue en el expediente y retiro de la cuenta ADMIN
+pública del README.
 
 ---
 
@@ -532,37 +499,31 @@ CUMPLE
 ### Comando
 
 ```powershell
-git -c log.mailmap=true shortlog -sne --no-merges 840ba5c1
-git log --no-merges --author=<icajasi|mloorm14|mpanamam> --format=%h 840ba5c1 -- <área>  # listar SHAs, nunca solo agregados
+python scripts/verify-p11-counts.py
 ```
 
-### Salida (rev 840ba5c1 = commit 1 de evidencia en fix/examen-evidencia)
+### Salida (2026-09-17, rev d92ba03a, completa)
 
 ```text
-763 Irvin Cajas Ibarra / 343 Marlon Loor Medranda / 326 Moises Panama Murillo
-(+1 TeilorSuit no atribuible, +1 bot excluido; total no-merges 1434)
+verify-p11: rev citado 840ba5c1 es ancestro de HEAD (+11 commits propios declarados en prosa)
+verify-p11: OK (shortlog a 840ba5c1: 763/343/326, total 1434)
+verify-p11: OK (CONTRIBUCIONES.md coincide)
+verify-p11: OK (CONTRIBUTORS.md coincide)
+verify-p11: OK (cap. 13 coincide)
+verify-p11: OK (roles-commit-counts.txt exacto)
+verify-p11: OK (conteos verificables; ver seccion Firmas en CONTRIBUCIONES.md)
 ```
-
-Doble commit aplicado: conteos generados contra el SHA del commit de
-evidencia (`840ba5c1`, con listados explícitos de SHAs por área) y
-commiteados en el commit siguiente (que suma +1 a Panamá, declarado
-en `CONTRIBUCIONES.md`). `roles-commit-counts.txt` verificado byte a
-byte contra el shortlog en vivo (UTF-16 preservado). Lección
-registrada: los agregados se leen mal; solo valen listados explícitos.
 
 ### Archivo que respalda
 
-- `CONTRIBUCIONES.md` (14 roles: evidencia, autor/es, commits por
-  área y artefactos, totales por rol; "no aplica" vs "sin evidencia"
-  distinguidos; discrepancias `CONTRIBUTORS.md`/cap. 13 alineadas;
-  firmas pendientes fuera del repo)
-- Cap. 13: conteos con nota de rev + 2 figuras de autoría
-  (`fig-commits-mensuales`, `fig-commits-autores`)
+- `CONTRIBUCIONES.md` (sección A por punto + 14 roles; aceptaciones pendientes)
+- `docs/mediciones/roles-commit-counts.txt`
 
 ### Resultado
 
-CUMPLE en base verificable (conteos exactos al rev citado +
-artefactos; firmas de aceptación pendientes al cierre humano)
+Base verificable exacta al rev citado + artefactos. Pendiente (fase
+P11/EV-4): aceptaciones genuinas de los tres integrantes; los conteos
+miden commits por área, no autoría.
 
 ---
 
@@ -574,17 +535,18 @@ artefactos; firmas de aceptación pendientes al cierre humano)
 python scripts/verify-p12-secrets.py
 ```
 
-### Salida (2026-09-16)
+### Salida (2026-09-17, rev d92ba03a)
 
 ```text
-verify-p12: OK (árbol limpio, 1362 archivos revisados)
+verify-p12: OK (árbol limpio, 981 archivos revisados)
 ```
 
 ### Archivo que respalda
 
 - `scripts/verify-p12-secrets.py`
-- `docs/despliegue/NEON-ROTATION-ACTA.md` (rotación 2026-09-11/13)
+- `docs/despliegue/NEON-ROTATION-ACTA.md` (rotación declarada con fecha y responsable)
 
 ### Resultado
 
-CUMPLE (árbol limpio; rotación declarada con fecha)
+Cerrado 100 % (árbol limpio; rotación declarada; la credencial antigua
+solo vive en el historial).
