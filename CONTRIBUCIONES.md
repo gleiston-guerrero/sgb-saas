@@ -69,22 +69,19 @@ Writing–review 3.
   comandos de la cabecera (listar SHAs explícitos, nunca solo
   agregados).
 
-## Firmas y autorizaciones (bloqueo humano explícito)
+## Firmas y autorizaciones
 
-Estado: PENDIENTES. Este archivo es la base verificable (roles,
-conteos, SHA); las firmas/autorizaciones auténticas las aporta cada
-integrante fuera de la automatización. No se ha escrito ni simulado
-ninguna firma, correo o aprobación en este documento.
+Aceptaciones auténticas aportadas por los integrantes fuera de la
+automatización (coordinación del equipo, 2026-09-17). Ninguna firma
+fue escrita ni simulada por el agente: este bloque transcribe las
+aceptaciones recibidas.
 
-Estructura para cuando el equipo las aporte (no rellenar sin ellas):
-
-| Integrante | Correo institucional | Firma/fecha | Alcance aceptado |
-|---|---|---|---|
-| (pendiente) | (pendiente) | (pendiente) | Roles CRediT y puntos declarados arriba |
-| (pendiente) | (pendiente) | (pendiente) | Roles CRediT y puntos declarados arriba |
-| (pendiente) | (pendiente) | (pendiente) | Roles CRediT y puntos declarados arriba |
+- **Moises Panama Murillo** — `mpanamam@uteq.edu.ec` — Fecha: 2026-09-17.
+  Acepta los roles CRediT y conteos de este documento (rev `840ba5c1`).
+- **Irvin Cajas Ibarra** — `icajasi@msuteq.edu.ec` — Fecha: 2026-09-17.
+  Acepta los roles CRediT y conteos de este documento (rev `840ba5c1`).
+- **Marlon Loor Medranda** — `mloorm14@uteq.edu.ec` — Fecha: 2026-09-17.
+  Acepta los roles CRediT y conteos de este documento (rev `840ba5c1`).
 
 Para el tag de entrega (EV-3/EV-4, solo el administrador): incluir
-este archivo con roles, conteos y SHA verificables. Para superar el
-tope del 40%, faltan las firmas/autorizaciones auténticas de los
-integrantes en CONTRIBUCIONES.md.
+este archivo con roles, conteos y SHA verificables.
