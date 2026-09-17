@@ -62,13 +62,8 @@ public class PublicBookController {
             @RequestParam(name = "categoriaId", required = false) Integer categoryId,
             @RequestParam(name = "autorId", required = false) Long authorId,
             @RequestParam(name = "disponible", required = false) Boolean available,
-            // sort con el nombre de PROPIEDAD JPA (title): listWithFilters
-            // alterna entre queries derivadas (necesitan "title") y nativas
-            // (necesitan "titulo") segun los filtros recibidos. BookService
-            // traduce titulo<->title solo antes de invocar la rama nativa
-            // (ver BookService.nativeSort); aca se mantiene "title" para no
-            // romper la rama derivada, que es la que Spring Data valida
-            // contra la entidad Book.
+            // sort con el nombre de PROPIEDAD JPA (title): BookService
+            // traduce columna->propiedad (derivedSort, P5) antes de consultar.
             @PageableDefault(size = 10, sort = "title") Pageable pageable) {
         return bookService.listWithFilters(q, null, categoryId, authorId, available, pageable);
     }

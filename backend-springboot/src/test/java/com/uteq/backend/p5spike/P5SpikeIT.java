@@ -3,6 +3,7 @@ package com.uteq.backend.p5spike;
 import com.uteq.backend.entity.Book;
 import com.uteq.backend.entity.Loan;
 import com.uteq.backend.entity.Reservation;
+import com.uteq.backend.repository.BookRepository;
 import com.uteq.backend.repository.LoanRepository;
 import com.uteq.backend.repository.ReservationRepository;
 import com.uteq.backend.repository.StatusReservationRepository;
@@ -54,6 +55,9 @@ class P5SpikeIT {
 
     @Autowired
     private LoanRepository loans;
+
+    @Autowired
+    private BookRepository booksRepo;
 
     @Test
     void s1_procedurePosicionalCreaPrestamo() {
@@ -128,6 +132,41 @@ class P5SpikeIT {
                 .getSingleResult();
         assertThat(LoanService.diasRestantes(filas.get(0).getDateLoanReturnEstimada().toInstant()))
                 .isEqualTo(((Number) diasSql).intValue());
+    }
+
+    @Test
+    void s7_catalogoCriteriaEquivaleANativas() {
+        var sinPaginar = org.springframework.data.domain.Pageable.unpaged();
+
+        var soloTexto = booksRepo.searchText("clean", 1, null, null, null, sinPaginar);
+        assertThat(soloTexto.getContent()).hasSize(1);
+        assertThat(soloTexto.getContent().get(0).getTitle()).isEqualTo("Clean Code");
+        assertThat(soloTexto.getTotalElements()).isEqualTo(1);
+
+        var conCategoriaYStock = booksRepo.searchText("refactoring", 1, 2, null, true, sinPaginar);
+        assertThat(conCategoriaYStock.getContent()).hasSize(1);
+
+        var conAutor = booksRepo.searchText("cien", 1, null, 3L, null, sinPaginar);
+        assertThat(conAutor.getContent()).hasSize(1);
+        assertThat(conAutor.getContent().get(0).getTitle()).contains("Cien");
+
+        var agotados = booksRepo.searchText("a", 1, null, null, false, sinPaginar);
+        assertThat(agotados.getContent()).isEmpty();
+
+        // Join a categorias sin duplicar el total (countDistinct).
+        var porCategoria = booksRepo.searchText("a", 1, 1, null, null, sinPaginar);
+        assertThat(porCategoria.getContent()).hasSize(2);
+        assertThat(porCategoria.getTotalElements()).isEqualTo(2);
+
+        var bandeja = booksRepo.searchByStatusesCriteria(java.util.List.of(1), "sapiens", null, sinPaginar);
+        assertThat(bandeja.getContent()).hasSize(1);
+
+        var bandejaSinFiltros = booksRepo.searchByStatusesCriteria(java.util.List.of(1), null, null, sinPaginar);
+        assertThat(bandejaSinFiltros.getTotalElements()).isEqualTo(5);
+
+        var sugerencias = booksRepo.suggestByTitleCriteria("clean", 1);
+        assertThat(sugerencias).isNotEmpty();
+        assertThat(sugerencias.get(0).getTitle()).isEqualTo("Clean Code");
     }
 
     private void sembrarReserva(Long userId, Long bookId, Integer statusId, OffsetDateTime limite) {        Reservation r = new Reservation();

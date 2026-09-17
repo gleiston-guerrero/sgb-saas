@@ -34,7 +34,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 BASE_JAVA = ROOT / "backend-springboot" / "src" / "main" / "java"
 
-TOTAL_ESPERADO = 30
+TOTAL_ESPERADO = 24
 RUTINA_ESPERADA = 23
 
 # Rutinas pineadas por archivo (nombres distintos esperados).
@@ -67,17 +67,10 @@ ORDINARIAS: dict[str, list[tuple[int, str]]] = {
     "AuditLogAuditRepository.java": [
         (1, "SELECT con filtros nativos sobre bitacora_auditoria; sin rutinas"),
     ],
-    "BookRepository.java": [
-        (1, "SELECT planos sobre libros (listados/inventario); sin rutinas"),
-        (2, "SELECT planos sobre libros (listados/inventario); sin rutinas"),
-        (3, "SELECT planos sobre libros (listados/inventario); sin rutinas"),
-        (4, "SELECT plano con LIMIT 10 sobre libros; sin rutinas"),
-        (5, "SELECT planos sobre libros (listados/inventario); sin rutinas"),
-        (6, "SELECT planos sobre libros (listados/inventario); sin rutinas"),
-    ],
 }
-# (LoanRepository salio del pineado: findActivesByUserId migro a JPQL.
-# ReservationRepository salio antes: O-9/O-10 a JPQL. Ver MIGRADAS.)
+# (BookRepository salio del pineado: 6 metodos a Criteria. Ver MIGRADAS.
+# LoanRepository salio antes: findActivesByUserId a JPQL.
+# ReservationRepository salio antes: O-9/O-10 a JPQL.)
 # Migraciones cerradas con prueba de equivalencia (metodo, reemplazo, prueba).
 # Cada fila resta del inventario; prohibido borrar nativas sin fila aqui.
 MIGRADAS = [
@@ -90,6 +83,24 @@ MIGRADAS = [
     ("LoanRepository.findActivesByUserId",
      "JPQL cartesiana + diasRestantes en Java (zona sistema, igual que NOW()::date)",
      "P5SpikeIT.s6_activosPorUsuarioJpqlYDiasJava + LoanServiceTest 31/31"),
+    ("BookRepository.searchByTextOIsbn",
+     "Criteria searchText (sin categoria/autor, available tri-estado)",
+     "P5SpikeIT.s7 + BookServiceTest 21/21"),
+    ("BookRepository.searchByTextOIsbnYCategory",
+     "Criteria searchText con join categories + countDistinct",
+     "P5SpikeIT.s7 + BookServiceTest 21/21"),
+    ("BookRepository.searchByTextOrIsbnAndAuthor",
+     "Criteria searchText con join authors",
+     "P5SpikeIT.s7 + BookServiceTest 21/21"),
+    ("BookRepository.suggestByTitle",
+     "Criteria function(similarity) + maxResults 10",
+     "P5SpikeIT.s7 + BookServiceTest 21/21"),
+    ("BookRepository.searchPendientes",
+     "Eliminada: sin llamadores en src/main ni tests",
+     "compilacion + suite (sin referencias)"),
+    ("BookRepository.searchByStatuses",
+     "Criteria searchByStatusesCriteria (q/year opcionales)",
+     "P5SpikeIT.s7 + BookServiceTest 21/21"),
 ]
 
 # CALL nativos en *CustomImpl pineados por archivo (bajan solo con @Procedure real).
