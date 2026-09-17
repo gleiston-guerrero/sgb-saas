@@ -178,11 +178,12 @@ PARCIAL DELIBERADO (0-15%, no se cerrará con datos): el dataset fue
 retirado por el propio equipo (`docs/mediciones/sus/README.md`:
 patrones incompatibles con respuestas independientes, N=0 en todo el
 entregable). No se fabricará evidencia: sin instrumento real con
-consentimientos verificables no se puede cerrar. `sus.csv` se conserva
-solo como "dataset retirado" para trazabilidad histórica, nunca como
-evidencia válida; no se recalcula Brooke/SUS ni se presentan métricas.
-El informe (capítulos 01, 08-Bloque 5, 09-RQ3, 10, 11, 12, 13, 14)
-declara $N=0$ de forma consistente.
+consentimientos verificables no se puede cerrar. El dataset previo
+(`sus.csv`, 15 respuestas aparentes) se retiró del árbol evaluado en
+Fase 0.1 — solo permanece en el historial Git — junto con sus figuras
+derivadas; nunca fue ni es evidencia válida; no se recalcula Brooke/SUS
+ni se presentan métricas. El informe (capítulos 01, 08-Bloque 5, 09-RQ3,
+10, 11, 12, 13, 14) declara $N=0$ de forma consistente.
 
 ---
 
