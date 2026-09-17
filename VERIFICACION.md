@@ -531,24 +531,23 @@ CUMPLE
 ### Comando
 
 ```powershell
-git -c log.mailmap=true shortlog -sne --no-merges 9f370270
-git log --no-merges --author=<icajasi|mloorm14|mpanamam> --format=%h -- <área>
+git -c log.mailmap=true shortlog -sne --no-merges 840ba5c1
+git log --no-merges --author=<icajasi|mloorm14|mpanamam> --format=%h 840ba5c1 -- <área>  # listar SHAs, nunca solo agregados
 ```
 
-### Salida (rev 9f370270 = fix CRLF k6 en codex)
+### Salida (rev 840ba5c1 = commit 1 de evidencia en fix/examen-evidencia)
 
 ```text
-763 Irvin Cajas Ibarra / 343 Marlon Loor Medranda / 324 Moises Panama Murillo
-(+1 TeilorSuit no atribuible, +1 bot excluido; total no-merges 1432)
+763 Irvin Cajas Ibarra / 343 Marlon Loor Medranda / 326 Moises Panama Murillo
+(+1 TeilorSuit no atribuible, +1 bot excluido; total no-merges 1434)
 ```
 
 Doble commit aplicado: conteos generados contra el SHA del commit de
-evidencia (`9f370270`) y commiteados en el commit siguiente (que suma
-+1 a Panamá, declarado en `CONTRIBUCIONES.md`).
-`roles-commit-counts.txt` verificado byte a byte contra el shortlog
-en vivo (UTF-16 preservado). Nota: la cadena b82ae0e2→82fcfec1 queda
-en historial como re-sincronización previa al incidente CRLF; los
-conteos vigentes son los de este rev.
+evidencia (`840ba5c1`, con listados explícitos de SHAs por área) y
+commiteados en el commit siguiente (que suma +1 a Panamá, declarado
+en `CONTRIBUCIONES.md`). `roles-commit-counts.txt` verificado byte a
+byte contra el shortlog en vivo (UTF-16 preservado). Lección
+registrada: los agregados se leen mal; solo valen listados explícitos.
 
 ### Archivo que respalda
 

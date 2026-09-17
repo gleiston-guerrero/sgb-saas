@@ -113,16 +113,31 @@ def main() -> int:
             return falla(f"CONTRIBUTORS.md: {nombre} != {esperado}")
     print("verify-p11: OK (CONTRIBUTORS.md coincide)")
 
-    # 3. cap. 13: tres items en orden Cajas/Loor/Panamá.
+    # 3. cap. 13: tres items en orden Cajas/Loor/Panamá (\s+ porque el
+    # número puede quedar al final de línea y "commits" al inicio de la
+    # siguiente tras el ajuste de línea del editor).
     cap13 = leer("docs/capitulos/13-declaraciones.tex")
-    nums = [int(x) for x in re.findall(r"(\d+) commits humanos", cap13)]
+    nums = [int(x) for x in re.findall(r"(\d+)\s+commits humanos", cap13)]
     if nums != [cajas, loor, panama]:
         return falla(f"cap. 13: {nums} != [{cajas}, {loor}, {panama}]")
     print("verify-p11: OK (cap. 13 coincide)")
 
-    # 4. roles-commit-counts.txt: contenido exacto del shortlog.
-    txt = (ROOT / "docs" / "mediciones" / "roles-commit-counts.txt").read_text(
-        encoding="utf-8", errors="replace").splitlines()
+    # 4. roles-commit-counts.txt: contenido exacto del shortlog. El
+    # archivo se preserva en UTF-16: probar encodings en orden antes de
+    # comparar (leerlo como UTF-8 plano da mojibake y falso negativo).
+    txt = None
+    for enc in ("utf-16", "utf-8-sig", "utf-8"):
+        try:
+            candidato = (ROOT / "docs" / "mediciones" / "roles-commit-counts.txt").read_text(
+                encoding=enc)
+            if "Irvin Cajas Ibarra" in candidato:
+                txt = candidato
+                break
+        except (OSError, UnicodeError):
+            continue
+    if txt is None:
+        return falla("roles-commit-counts.txt ilegible en utf-16/utf-8")
+    txt = txt.splitlines()
     vivos = [l.strip() for l in ("\n".join(lineas)).splitlines() if l.strip()]
     propios = [l.strip() for l in txt if l.strip()]
     if propios != vivos:
