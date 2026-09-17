@@ -465,16 +465,22 @@ CUMPLE
 ### Comando
 
 ```powershell
-git -c log.mailmap=true shortlog -sne --no-merges fcda4808
+git -c log.mailmap=true shortlog -sne --no-merges b82ae0e2
 git log --no-merges --author=<icajasi|mloorm14|mpanamam> --format=%h -- <área>
 ```
 
-### Salida (rev fcda4808)
+### Salida (rev b82ae0e2 = commit 1 de evidencia)
 
 ```text
-763 Irvin Cajas Ibarra / 343 Marlon Loor Medranda / 317 Moises Panama Murillo
-(+1 TeilorSuit no atribuible, +1 bot excluido; total no-merges 1425)
+763 Irvin Cajas Ibarra / 343 Marlon Loor Medranda / 322 Moises Panama Murillo
+(+1 TeilorSuit no atribuible, +1 bot excluido; total no-merges 1430)
 ```
+
+Doble commit aplicado: conteos generados contra el SHA del commit 1
+(`b82ae0e2`) y commiteados en el commit 2 (que suma +1 a Panamá,
+declarado en `CONTRIBUCIONES.md`). `roles-commit-counts.txt`
+verificado byte a byte contra el shortlog en vivo (UTF-16
+preservado).
 
 ### Archivo que respalda
 
