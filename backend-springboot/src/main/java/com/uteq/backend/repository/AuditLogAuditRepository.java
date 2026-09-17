@@ -12,39 +12,12 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
- * CRUD de {@code bitacora_auditoria} más filtro paginado (query nativa con casts para parámetros NULL).
+ * CRUD de {@code bitacora_auditoria} más filtro paginado (Criteria API, P5).
  */
 @Repository
-public interface AuditLogAuditRepository extends JpaRepository<AuditLogAudit, Long> {
+public interface AuditLogAuditRepository
+        extends JpaRepository<AuditLogAudit, Long>, AuditLogAuditRepositoryCustom {
 
-    // Sin ORDER BY interno: el orden lo inyecta Spring Data desde el
-    // Pageable del controller (@PageableDefault sort="fecha_hora"), que en
-    // queries nativas pasa el nombre de columna TAL CUAL -- por eso el sort
-    // debe usar el nombre fisico (fecha_hora), no la propiedad (fechaHora).
-    // Se evaluo convertir a JPQL (P4/nativeQuery): AuditService.java linea
-    // ~113 construye el Pageable con Sort.by("fecha_hora") -- si esta query
-    // fuera JPQL, Spring Data validaria ese "fecha_hora" contra las
-    // propiedades de la entidad (dateTime, no fecha_hora) y fallaria en
-    // runtime. Se deja nativa para no arriesgar ese sort real; convertirla
-    // exigiria tambien cambiar el Sort del llamador, fuera del alcance de
-    // un cambio de bajo riesgo.
-    @Query(value = "SELECT * FROM bitacora_auditoria b WHERE "
-            + "(CAST(:userId AS bigint) IS NULL OR b.usuario_id = CAST(:userId AS bigint)) AND "
-            + "(CAST(:module AS text) IS NULL OR b.tabla_afectada = CAST(:module AS text)) AND "
-            + "(CAST(:from AS timestamptz) IS NULL OR b.fecha_hora >= CAST(:from AS timestamptz)) AND "
-            + "(CAST(:until AS timestamptz) IS NULL OR b.fecha_hora <= CAST(:until AS timestamptz))",
-           countQuery = "SELECT count(*) FROM bitacora_auditoria b WHERE "
-            + "(CAST(:userId AS bigint) IS NULL OR b.usuario_id = CAST(:userId AS bigint)) AND "
-            + "(CAST(:module AS text) IS NULL OR b.tabla_afectada = CAST(:module AS text)) AND "
-            + "(CAST(:from AS timestamptz) IS NULL OR b.fecha_hora >= CAST(:from AS timestamptz)) AND "
-            + "(CAST(:until AS timestamptz) IS NULL OR b.fecha_hora <= CAST(:until AS timestamptz))",
-           nativeQuery = true)
-    Page<AuditLogAudit> searchWithFilters(
-            @Param("userId") Long userId,
-            @Param("module") String module,
-            @Param("from") OffsetDateTime from,
-            @Param("until") OffsetDateTime until,
-            Pageable pageable);
 
     // Resumen por categoría: una sola query de agregación en vez de 8
     // llamadas al listado paginado. Devuelve Object[] porque la query

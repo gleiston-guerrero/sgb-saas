@@ -57,12 +57,10 @@ public class AuditController {
             @RequestParam(name = "modulo", required = false) String module,
             @RequestParam(name = "desde", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
             @RequestParam(name = "hasta", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime until,
-            // sort con el nombre FISICO de columna (fecha_hora): la query del
-            // repositorio es NATIVA (AuditLogAuditRepository.searchWithFilters,
-            // incondicional) y Spring Data inyecta el sort tal cual, sin
-            // traducir propiedad->columna. El valor "date_time" era el mismo
-            // bug de columna nativa desalineada por el renombrado a ingles.
-            @PageableDefault(size = 20, sort = "fecha_hora", direction = Sort.Direction.DESC) Pageable pageable) {
+            // sort con propiedad de entidad (dateTime): el repositorio es
+            // Criteria (P5) y traduce el histórico "fecha_hora" por
+            // compatibilidad, pero el default ya usa el nombre vigente.
+            @PageableDefault(size = 20, sort = "dateTime", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(
                 auditService.list(userId, module, from, until, pageable));
     }

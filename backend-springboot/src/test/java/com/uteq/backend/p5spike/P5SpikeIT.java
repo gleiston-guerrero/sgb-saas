@@ -3,6 +3,8 @@ package com.uteq.backend.p5spike;
 import com.uteq.backend.entity.Book;
 import com.uteq.backend.entity.Loan;
 import com.uteq.backend.entity.Reservation;
+import com.uteq.backend.entity.AuditLogAudit;
+import com.uteq.backend.repository.AuditLogAuditRepository;
 import com.uteq.backend.repository.BookRepository;
 import com.uteq.backend.repository.LoanRepository;
 import com.uteq.backend.repository.ReservationRepository;
@@ -58,6 +60,9 @@ class P5SpikeIT {
 
     @Autowired
     private BookRepository booksRepo;
+
+    @Autowired
+    private AuditLogAuditRepository auditoria;
 
     @Test
     void s1_procedurePosicionalCreaPrestamo() {
@@ -167,6 +172,47 @@ class P5SpikeIT {
         var sugerencias = booksRepo.suggestByTitleCriteria("clean", 1);
         assertThat(sugerencias).isNotEmpty();
         assertThat(sugerencias.get(0).getTitle()).isEqualTo("Clean Code");
+    }
+
+    @Test
+    void s8_bitacoraCriteriaFiltrosYOrden() {
+        OffsetDateTime ahora = OffsetDateTime.now(ZoneOffset.UTC);
+        sembrarBitacora(1L, "UPDATE", "s8usuarios", "x", ahora.minusDays(9));
+        sembrarBitacora(null, "LOGIN_FAIL", "s8sesiones", "y", ahora.minusHours(2));
+        sembrarBitacora(1L, "INSERT", "s8prestamos", "z", ahora.minusHours(1));
+        var orden = org.springframework.data.domain.Sort.by("fecha_hora").descending();
+        var paginado = org.springframework.data.domain.PageRequest.of(0, 20, orden);
+
+        var todo = auditoria.searchWithFiltersCriteria(null, null, null, null,
+                org.springframework.data.domain.Pageable.unpaged());
+        assertThat(todo.getTotalElements()).isGreaterThanOrEqualTo(3);
+        assertThat(todo.getContent().get(0).getDateTime())
+                .isAfterOrEqualTo(todo.getContent().get(1).getDateTime());
+
+        var porUsuarioYModulo = auditoria.searchWithFiltersCriteria(1L, "s8prestamos", null, null, paginado);
+        assertThat(porUsuarioYModulo.getContent()).hasSize(1);
+
+        var porModulo = auditoria.searchWithFiltersCriteria(null, "s8sesiones", null, null, paginado);
+        assertThat(porModulo.getContent()).hasSize(1);
+
+        OffsetDateTime desde = ahora.minusDays(9).minusHours(1);
+        OffsetDateTime hasta = ahora.minusDays(9).plusHours(1);
+        var ventana = auditoria.searchWithFiltersCriteria(null, null, desde, hasta, paginado);
+        assertThat(ventana.getContent())
+                .allMatch(e -> !e.getDateTime().isBefore(desde) && !e.getDateTime().isAfter(hasta));
+        assertThat(ventana.getContent().stream().map(AuditLogAudit::getDetalles)).contains("x");
+    }
+
+    private void sembrarBitacora(Long userId, String tipo, String modulo,
+            String detalles, OffsetDateTime cuando) {
+        AuditLogAudit e = AuditLogAudit.builder()
+                .userId(userId)
+                .typeOperacion(tipo)
+                .tableAfectada(modulo)
+                .detalles(detalles)
+                .dateTime(cuando)
+                .build();
+        auditoria.save(e);
     }
 
     private void sembrarReserva(Long userId, Long bookId, Integer statusId, OffsetDateTime limite) {        Reservation r = new Reservation();

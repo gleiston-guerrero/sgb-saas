@@ -78,7 +78,7 @@ class AuditServiceTest {
         AuditLogAudit evt = event(1L, 9L, "UPDATE", "usuarios", "Cambio de rol");
         Page<AuditLogAudit> page = new PageImpl<>(List.of(evt), pageable, 1);
 
-        given(auditLogAuditRepo.searchWithFilters(null, null, null, null, pageable))
+        given(auditLogAuditRepo.searchWithFiltersCriteria(null, null, null, null, pageable))
                 .willReturn(page);
         given(userRepo.findAllById(Set.of(9L))).willReturn(List.of(user(9L, "admin@correo.com")));
 
@@ -99,7 +99,7 @@ class AuditServiceTest {
         AuditLogAudit evt = event(2L, null, "LOGIN_FAIL", "usuarios", "Login fallido para correo: x@x.com");
         Page<AuditLogAudit> page = new PageImpl<>(List.of(evt), pageable, 1);
 
-        given(auditLogAuditRepo.searchWithFilters(null, null, null, null, pageable))
+        given(auditLogAuditRepo.searchWithFiltersCriteria(null, null, null, null, pageable))
                 .willReturn(page);
         given(userRepo.findAllById(Set.of())).willReturn(List.of());
 
@@ -115,19 +115,19 @@ class AuditServiceTest {
         OffsetDateTime from = OffsetDateTime.now().minusDays(7);
         OffsetDateTime until = OffsetDateTime.now();
 
-        given(auditLogAuditRepo.searchWithFilters(eq(9L), eq("usuarios"), eq(from), eq(until), eq(pageable)))
+        given(auditLogAuditRepo.searchWithFiltersCriteria(eq(9L), eq("usuarios"), eq(from), eq(until), eq(pageable)))
                 .willReturn(new PageImpl<>(List.of(), pageable, 0));
 
         service.list(9L, "usuarios", from, until, pageable);
 
         verify(auditLogAuditRepo, times(1))
-                .searchWithFilters(9L, "usuarios", from, until, pageable);
+                .searchWithFiltersCriteria(9L, "usuarios", from, until, pageable);
     }
 
     @Test
     void list_withoutResults_notConsultaUsersYRetornaPageVacia() {
         Pageable pageable = PageRequest.of(0, 20);
-        given(auditLogAuditRepo.searchWithFilters(any(), any(), any(), any(), eq(pageable)))
+        given(auditLogAuditRepo.searchWithFiltersCriteria(any(), any(), any(), any(), eq(pageable)))
                 .willReturn(new PageImpl<>(List.of(), pageable, 0));
 
         Page<EventAuditResponseDTO> result = service.list(null, null, null, null, pageable);

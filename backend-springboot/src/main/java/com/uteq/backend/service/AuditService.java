@@ -58,7 +58,7 @@ public class AuditService {
     public Page<EventAuditResponseDTO> list(Long userId, String module,
                                                      OffsetDateTime from, OffsetDateTime until,
                                                      Pageable pageable) {
-        Page<AuditLogAudit> page = auditLogAuditRepo.searchWithFilters(
+        Page<AuditLogAudit> page = auditLogAuditRepo.searchWithFiltersCriteria(
                 userId, module, from, until, pageable);
 
         // Resuelve correo por id con un solo IN (...) para evitar N+1.
@@ -116,8 +116,8 @@ public class AuditService {
      */
 
     public byte[] exportCsv(Long userId, String module, OffsetDateTime from, OffsetDateTime until) {
-        var pageable = org.springframework.data.domain.PageRequest.of(0, 10000, org.springframework.data.domain.Sort.by("fecha_hora").descending());
-        var page = auditLogAuditRepo.searchWithFilters(userId, module, from, until, pageable);
+        var pageable = org.springframework.data.domain.PageRequest.of(0, 10000, org.springframework.data.domain.Sort.by("dateTime").descending());
+        var page = auditLogAuditRepo.searchWithFiltersCriteria(userId, module, from, until, pageable);
         StringBuilder sb = new StringBuilder();
         sb.append("id,usuarioId,tipoOperacion,tablaAfectada,fechaHora,detalles\n");
         for (var e : page.getContent()) {

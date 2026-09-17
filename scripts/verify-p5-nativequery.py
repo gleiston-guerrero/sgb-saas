@@ -34,7 +34,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 BASE_JAVA = ROOT / "backend-springboot" / "src" / "main" / "java"
 
-TOTAL_ESPERADO = 24
+TOTAL_ESPERADO = 23
 RUTINA_ESPERADA = 23
 
 # Rutinas pineadas por archivo (nombres distintos esperados).
@@ -61,16 +61,10 @@ SITIOS_RUTINA_POR_ARCHIVO = {
 }
 
 # Consultas ordinarias pineadas: archivo -> [(ordinal, motivo tecnico)].
-# Son SELECT planos sin rutinas (la guia exige cero solo para
-# procedimientos); cada una lleva motivo individual.
+# Vacío: las 10 ordinarias migraron (ver MIGRADAS). El mapa se conserva
+# para que el chequeo de abajo siga exigiendo cero nativas ordinarias.
 ORDINARIAS: dict[str, list[tuple[int, str]]] = {
-    "AuditLogAuditRepository.java": [
-        (1, "SELECT con filtros nativos sobre bitacora_auditoria; sin rutinas"),
-    ],
 }
-# (BookRepository salio del pineado: 6 metodos a Criteria. Ver MIGRADAS.
-# LoanRepository salio antes: findActivesByUserId a JPQL.
-# ReservationRepository salio antes: O-9/O-10 a JPQL.)
 # Migraciones cerradas con prueba de equivalencia (metodo, reemplazo, prueba).
 # Cada fila resta del inventario; prohibido borrar nativas sin fila aqui.
 MIGRADAS = [
@@ -101,6 +95,9 @@ MIGRADAS = [
     ("BookRepository.searchByStatuses",
      "Criteria searchByStatusesCriteria (q/year opcionales)",
      "P5SpikeIT.s7 + BookServiceTest 21/21"),
+    ("AuditLogAuditRepository.searchWithFilters",
+     "Criteria dinamico + Sort fecha_hora->dateTime (controller y exportCsv a dateTime)",
+     "P5SpikeIT.s8 + AuditServiceTest 4/4"),
 ]
 
 # CALL nativos en *CustomImpl pineados por archivo (bajan solo con @Procedure real).
