@@ -130,20 +130,23 @@ def fig_k6_throughput(datos):
 
 
 def fig_jacoco_paquetes():
-    paquetes = defaultdict(lambda: [0, 0])  # pkg -> [missed, covered] instrucciones
+    # Top 12 por CLASE (solo hay 5 paquetes: por paquete el "top 12"
+    # mostraba 5 barras con título falso).
+    clases = {}
     with open(ROOT / "docs" / "mediciones" / "jacoco" / "report.csv", encoding="utf-8") as fh:
         for fila in csv.DictReader(fh):
-            pkg = fila["PACKAGE"].split(".")[-1]
-            paquetes[pkg][0] += int(fila["INSTRUCTION_MISSED"])
-            paquetes[pkg][1] += int(fila["INSTRUCTION_COVERED"])
-    items = sorted(((100 * c / (m + c), p, m + c) for p, (m, c) in paquetes.items() if m + c > 0),
+            clave = fila["PACKAGE"].split(".")[-1] + "." + fila["CLASS"]
+            m, c = int(fila["INSTRUCTION_MISSED"]), int(fila["INSTRUCTION_COVERED"])
+            anterior = clases.get(clave, [0, 0])
+            clases[clave] = [anterior[0] + m, anterior[1] + c]
+    items = sorted(((100 * c / (m + c), p, m + c) for p, (m, c) in clases.items() if m + c > 0),
                    reverse=True)[:12]
     nombres = [p for _, p, _ in reversed(items)]
     valores = [v for v, _, _ in reversed(items)]
     fig, ax = plt.subplots(figsize=(7.2, 4.6))
     barras = ax.barh(nombres, valores, color=CELESTE)
     ax.set_xlabel("instruction coverage (%)")
-    ax.set_title("JaCoCo instruction coverage by package (top 12)")
+    ax.set_title("JaCoCo instruction coverage by class (top 12)")
     ax.set_xlim(0, 100)
     for b, v in zip(barras, valores):
         ax.text(v + 1, b.get_y() + b.get_height() / 2, f"{v:.0f}%", va="center", fontsize=9)

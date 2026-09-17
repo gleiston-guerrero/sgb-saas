@@ -452,10 +452,12 @@ manifiesto 9 figuras × (svg+pdf) en `docs/mediciones/figuras/`. Total:
 
 ### Resultado
 
-Verificado en contenido (15/15) y compilación (109 páginas, exit 0).
-Pendiente visual/técnico (fase P8/P9): C4-N2 recortado, DER real con
-PK/FK/cardinalidades, JaCoCo "top 12", textos babel en PRISMA; revisión
-visual humana.
+Cerrado 100 %: 15/15 + compilación (109 páginas, exit 0) + C4-N2
+re-renderizado sin recorte (PostgreSQL y Redis visibles; comandos
+exactos en `workspace.dsl`) + DER rehecho con tablas/columnas/PK/FK y
+cardinalidades (`--check` contra `information_schema`: 86 columnas en
+30 tablas) + JaCoCo top-12 por clase. Revisión visual humana pendiente
+al cierre (compilación la verifica la fase PDF).
 
 ---
 
@@ -463,11 +465,11 @@ visual humana.
 
 ### Resultado
 
-Parcial 70 % (verificado por `verify-p8-p9-figures.py`: 0 español en
-.svg versionados y en captions de figuras; tablas fuera de alcance).
-Pendiente (fase P9): `(Tabla 3.1)`/`Sección 3.3` dentro del PRISMA
-(babel) e identificadores técnicos; revisión visual humana
-post-compilación.
+Cerrado 100 %: PRISMA sin `\autoref` (Table~/Section~\ref en inglés);
+verificado por `verify-p8-p9-figures.py` (0 español en .svg
+versionados y en captions de figuras; tablas fuera de alcance).
+Identificadores técnicos de código conservados a propósito. Revisión
+visual humana pendiente al cierre.
 
 ---
 

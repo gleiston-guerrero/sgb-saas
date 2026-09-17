@@ -20,9 +20,9 @@ English in-figure text).
   "Coverage summary derived from JaCoCo XML export (report.csv). Use `docs/mediciones/jacoco/report.xml` as the canonical source for line/branch coverage figures."
 
 - diagramas/er-english.pdf (ER diagram):
-  "Entity-relationship diagram (real schema reconstructed from database
-  migrations). Use this diagram to map tables and foreign key relations
-  mentioned in the evaluation."
+  "Entity-relationship diagram generated from the JPA entity model
+  (cross-checked against PostgreSQL information_schema); see
+  scripts/generate-english-er-figure.py."
 
 - figuras/fig-k6-distribucion-latencia (new, P8):
   "Latency distribution of http_req_duration per scenario, 5 runs pooled
@@ -33,7 +33,7 @@ English in-figure text).
   50 VUs (2026-09-17 series)."
 
 - figuras/fig-jacoco-paquetes (new, P8):
-  "JaCoCo instruction coverage by package (top 12), from the canonical
+  "JaCoCo instruction coverage by class (top 12), from the canonical
   docs/mediciones/jacoco/report.csv (54 instrumented classes)."
 
 - figuras/fig-lighthouse-puntajes (new, P8):
