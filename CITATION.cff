@@ -29,11 +29,10 @@ keywords:
   - Angular
   - PostgreSQL
   - RBAC
-# DOI del depósito real de v1.0.1 en Zenodo, generado el 2026-09-14 a
-# partir del Release de GitHub sobre el tag v1.0.1. Zenodo lo vinculó
-# automáticamente como nueva versión del mismo registro que v1.0.0
-# (10.5281/zenodo.22636466, DOI de la versión anterior, ver historial
-# de versiones en https://zenodo.org/records/22636466).
+# DOI del depósito vigente en Zenodo (v1.0.1, generado el 2026-09-14 a
+# partir del Release de GitHub sobre el tag v1.0.1). Es el identificador
+# que resuelve para citar este software; el historial de versiones vive
+# en Zenodo y en el historial Git.
 doi: 10.5281/zenodo.22741050
 # ---
 # Digests reales de las imágenes v1.0.0 (docker pull + docker inspect,

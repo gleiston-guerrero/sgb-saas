@@ -183,28 +183,30 @@ NDJSON se retiraron cuando están versionados. Fix en fase P1.
 python scripts/verify-p2-dois.py
 ```
 
-### Salida (2026-09-17, rev d92ba03a, completa)
+### Salida (2026-09-17, rama fix/fase01-sus-n0, completa)
 
 ```text
-[OK] 10.5281/zenodo.21712467 (published, 1 archivo(s)) <- VERIFICACION.md, docs\capitulos\00-portada.tex, docs\capitulos\02-introduccion.tex, docs\checklists\fair.md, docs\informe-entrega-3.tex
-[OK] 10.5281/zenodo.22636466 (published, 1 archivo(s)) <- CITATION.cff, VERIFICACION.md, docs\capitulos\00-portada.tex, docs\capitulos\02-introduccion.tex, docs\capitulos\13-declaraciones.tex
-[OK] 10.5281/zenodo.22715710 (published, 1 archivo(s)) <- README.md, VERIFICACION.md
-[OK] 10.5281/zenodo.22728199 (published, 1 archivo(s)) <- README.md, VERIFICACION.md
-[OK] 10.5281/zenodo.22741050 (published, 1 archivo(s)) <- CITATION.cff, VERIFICACION.md
-verify-p2: OK (5 DOI resuelven)
+[OK] 10.5281/zenodo.21712467 (doi.org: 200 -> https://zenodo.org/records/21712467; zenodo: published, 1 archivo(s)) <- VERIFICACION.md, docs\informe-entrega-3.tex
+[OK] 10.5281/zenodo.22715710 (doi.org: 200 -> https://zenodo.org/records/22715710; zenodo: published, 1 archivo(s)) <- README.md, VERIFICACION.md
+[OK] 10.5281/zenodo.22728199 (doi.org: 200 -> https://zenodo.org/records/22806568; zenodo: published, 1 archivo(s)) <- README.md, VERIFICACION.md
+[OK] 10.5281/zenodo.22741050 (doi.org: 200 -> https://zenodo.org/records/22741050; zenodo: published, 1 archivo(s)) <- CITATION.cff, VERIFICACION.md, docs\capitulos\00-portada.tex, docs\capitulos\02-introduccion.tex, docs\capitulos\13-declaraciones.tex
+verify-p2: OK (4 DOI resuelven)
 ```
 
 ### Archivo que respalda
 
-- `scripts/verify-p2-dois.py` (barre `*.cff/*.md/*.tex/*.txt`; API Zenodo para `10.5281`, `doi.org` para el resto; excluye el plan local no entregable)
+- `scripts/verify-p2-dois.py` (barre `*.cff/*.md/*.tex/*.txt`; primario
+  `doi.org` con redirects + API Zenodo adicional; excluye el plan local
+  no entregable y `docs/evidencia/` como registro histórico)
 - `CITATION.cff` (doi 10.5281/zenodo.22741050)
 
 ### Resultado
 
-Los 5 DOI resuelven vía API Zenodo. Pendiente de criterio estricto: el
-`22636466` sigue declarado en portada, introducción, declaraciones y
-FAIR y la guía exige resolución por `doi.org` (donde da 404). Fix en
-fase P2: eliminarlo de fuentes y derivados.
+Cerrado 100 %: el DOI roto `22636466` (doi.org 404, reproducido por el
+verificador endurecido) desapareció de portada, introducción,
+declaraciones, FAIR y `CITATION.cff`; los 4 DOI restantes resuelven
+`doi.org` 200 final. Derivados regenerables (`informe-final-text.txt`,
+extracción del PDF) se retiran del árbol y se regeneran en fase PDF.
 
 ---
 

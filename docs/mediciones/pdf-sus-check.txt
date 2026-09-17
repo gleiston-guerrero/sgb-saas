@@ -1,69 +1,0 @@
-﻿
-docs\mediciones\informe-final-text.txt:193:SUS
-docs\mediciones\informe-final-text.txt:244:JaCoCo, Lighthouse, y un protocolo SUS con consentimiento denido pero aún 
-no
-docs\mediciones\informe-final-text.txt:283:System Usability Scale (SUS) protocol with consent dened but not yet 
-executed. Both
-docs\mediciones\informe-final-text.txt:413:requisitos formal con trazabilidad vericable, y un protocolo de usabilidad 
-(SUS) con
-docs\mediciones\informe-final-text.txt:428:estandarizado System Usability Scale (SUS)?
-docs\mediciones\informe-final-text.txt:482:OE3 (trazado a RQ3). Aplicar el cuestionario System Usability Scale (SUS)
-docs\mediciones\informe-final-text.txt:615:Design Science Research adoptada, los instrumentos de medición usados (SUS, 
-k6,
-docs\mediciones\informe-final-text.txt:2331:una aplicación Angular responsiva  decisión cuya validación de usabilidad 
-real (SUS)
-docs\mediciones\informe-final-text.txt:2947:mismo capítulo (k6, JaCoCo, Lighthouse, auditoría OWASP, y SUS pendiente
-docs\mediciones\informe-final-text.txt:2975:System Usability Scale (SUS) (?): 10 ítems tipo Likert de 5 puntos,
-docs\mediciones\informe-final-text.txt:3220:Nota de honestidad  estado real de ejecución. La muestra SUS no se ha
-docs\mediciones\informe-final-text.txt:6619:8.5 Bloque 5  Usabilidad (SUS)
-docs\mediciones\informe-final-text.txt:6621:sistema, medida con el instrumento estandarizado System Usability Scale 
-(SUS)?
-docs\mediciones\informe-final-text.txt:6623:Métrica. Puntuación SUS agregada (0100), instrumento de 10 ítems (?) (??).
-docs\mediciones\informe-final-text.txt:6625:guía. La corrida SUS previa queda retirada como evidencia empírica por 
-falta de
-docs\mediciones\informe-final-text.txt:6629:de SUS; solo conserva el protocolo y el instrumento para una corrida 
-futura.
-docs\mediciones\informe-final-text.txt:6634:puntuación SUS agregada 0100 por participante con la fórmula de Brooke, 
-media,
-docs\mediciones\informe-final-text.txt:6668:usuarios y el protocolo SUS se dieren formalmente como trabajo futuro 
-para la
-docs\mediciones\informe-final-text.txt:6674:SUS evaluable: no hay consentimientos rmados versionados, no hay export 
-crudo del
-docs\mediciones\informe-final-text.txt:6720:(SUS)
-docs\mediciones\informe-final-text.txt:6746:momento de escribir este capítulo: la corrida SUS declarada anteriormente 
-se retiró
-docs\mediciones\informe-final-text.txt:6846:(SUS)?
-docs\mediciones\informe-final-text.txt:6848:no existe ninguna puntuación SUS que interpretar (??). Forzar una 
-respuesta aquí 
-docs\mediciones\informe-final-text.txt:7036:producción a que la pieza de usabilidad (SUS) se complete primero.
-docs\mediciones\informe-final-text.txt:7047:10.1 Completar la evidencia de usabilidad (SUS, N ≥
-docs\mediciones\informe-final-text.txt:7074:instrumento SUS de 10 ítems (?) con sus 2 ítems suplementarios, y el 
-pipeline de análisis
-docs\mediciones\informe-final-text.txt:7344:correcta (despliegue público → reclutamiento → aplicación del instrumento 
-SUS), no
-docs\mediciones\informe-final-text.txt:7572:de usabilidad (System Usability Scale, SUS): la guía de esta entrega exige 
-un mínimo
-docs\mediciones\informe-final-text.txt:7588:aleatorizadas  exactamente el perl previsto de este estudio SUS  
-limitan severamente
-docs\mediciones\informe-final-text.txt:7880:Protocolo de usabilidad SUS: plantilla de consentimiento informado en
-docs\mediciones\informe-final-text.txt:7882:docs/etica/consentimientos/plantilla.md (??). No hay respuestas SUS,
-docs\mediciones\informe-final-text.txt:7888:pruebas de usabilidad SUS están documentados en detalle en 
-docs/etica/ETHICS.md,
-docs\mediciones\informe-final-text.txt:7911:SUS
-docs\mediciones\informe-final-text.txt:7949:No existen formularios SUS rmados para esta entrega, porque la corrida 
-queda
-docs\mediciones\informe-final-text.txt:8040:con .mailmap. Asignado a la ejecución de las pruebas SUS pendientes 
-(OBS-08,
-docs\mediciones\informe-final-text.txt:8105:instrumento SUS (aún sin ejecutar), el placeholder del pipeline CI/CD 
-pendiente
-docs\mediciones\informe-final-text.txt:8142:14.2 Protocolo SUS (System Usability Scale)
-docs\mediciones\informe-final-text.txt:8210:14.2.2 Cuestionario SUS  10 ítems originales de Brooke (1996)
-docs\mediciones\informe-final-text.txt:9007:de las pruebas SUS se excluyen explícitamente del
-docs\mediciones\informe-final-text.txt:9069:un contexto de uso real. Coincide con N = 0 en SUS.
-docs\mediciones\informe-final-text.txt:9184:N = 0 en SUS  no hay ninguna opinión de usuario
-docs\mediciones\informe-final-text.txt:10664:del instrumento. No se conserva ningún archivo de respuestas, gura ni 
-cifra SUS como
-docs\mediciones\informe-final-text.txt:10667:el DER y el gráco de rendimiento p95 usan labels/captions en inglés; las 
-guras SUS
-
-
