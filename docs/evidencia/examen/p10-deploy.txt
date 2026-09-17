@@ -1,0 +1,14 @@
+Fecha ISO real: 2026-09-17T18:42:26.614808-05:00
+SHA: 179777f3
+URL: https://sgb-backend-b058.onrender.com
+Cuenta: u@uteq.edu.ec (demo LECTOR, password no registrada)
+
+[OK] health del despliegue HTTP 200
+[OK] login LECTOR HTTP 200
+[OK] JWT con 3 partes
+claims: rol=LECTOR roles=['LECTOR'] sub=2 correo=u@uteq.edu.ec
+[OK] rol LECTOR en claims
+[OK] recurso solo-ADMIN -> 403 HTTP 403
+cuerpo 403 ADMIN: {"detail":"No tiene permisos para realizar esta acción.","instance":"/api/v1/admin/usuarios","status":403,"title":"Forbidden"}
+[OK] recurso ajeno -> 403 HTTP 403
+cuerpo 403 ajeno: {"detail":"No tiene permisos para realizar esta acción.","instance":"/api/v1/multas/usuario/1","status":403,"title":"Forbidden"}

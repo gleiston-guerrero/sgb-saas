@@ -478,31 +478,45 @@ visual humana pendiente al cierre.
 ### Comando
 
 ```powershell
-python scripts/verify-all.py  # paso P10: docker info + Testcontainers
+python scripts/p10-deploy-evidence.py --out docs/evidencia/examen/p10-deploy.txt
 ```
 
-### Salida (2026-09-17, rev d92ba03a)
+### Salida (2026-09-17, rama fix/fase01-sus-n0, completa en `docs/evidencia/examen/p10-deploy.txt`)
 
 ```text
->> P10: PENDIENTE — bloqueado por entorno (sin Docker; Testcontainers omitiria)
+[OK] health del despliegue HTTP 200
+[OK] login LECTOR HTTP 200
+[OK] JWT con 3 partes
+claims: rol=LECTOR roles=['LECTOR'] sub=2 correo=u@uteq.edu.ec
+[OK] rol LECTOR en claims
+[OK] recurso solo-ADMIN -> 403 HTTP 403
+[OK] recurso ajeno -> 403 HTTP 403
+verify-p10-deploy: OK (login + LECTOR + doble 403)
 ```
 
-Registro histórico (no evidencia vigente): en otra rama se corrió
-`DemoAccountAuthorizationIntegrationTest` con `Tests run: 3, Failures: 0,
-Errors: 0, Skipped: 0` (login LECTOR, JWT `[LECTOR]`, doble 403, cero
-mocks, Testcontainers). No reproducible aquí sin Docker y fuera del
-árbol evaluado: no se reclama como cumplido.
+Petición literal: `POST /api/auth/login` (`{"correo":"u@uteq.edu.ec",
+"password":"***"}`) → 200 con JWT cuyo payload decodificado localmente
+declara `rol=LECTOR`, `roles=[LECTOR]`; `GET /api/v1/admin/usuarios` →
+403; `GET /api/v1/multas/usuario/1` (ajeno al LECTOR sub=2) → 403. Sin
+token, password ni cookies en la evidencia (verificado por búsqueda).
+
+Registro complementario: `DemoAccountAuthorizationIntegrationTest`
+(Testcontainers, cero mocks) existe en el árbol y corre en CI con
+Docker; aquí el daemon no está disponible
+(`PENDIENTE-bloqueado por entorno` en `verify-all.py`).
 
 ### Archivo que respalda
 
+- `scripts/p10-deploy-evidence.py` (reproducible; enmascara secretos)
+- `docs/evidencia/examen/p10-deploy.txt` (fecha ISO, SHA, URL, status)
 - `backend-springboot/.../integration/DemoAccountAuthorizationIntegrationTest.java`
 - `docs/mediciones/demo-account.md`
 
 ### Resultado
 
-PENDIENTE-bloqueado (fix fase P10): login LECTOR + JWT + doble 403
-contra el despliegue en el expediente y retiro de la cuenta ADMIN
-pública del README.
+Cerrado 100 %: login LECTOR + JWT LECTOR + doble 403 contra el
+despliegue, con evidencia sanitizada versionada. ADMIN retirado del
+README en fase de regresiones (rotación en prod: acción humana).
 
 ---
 
