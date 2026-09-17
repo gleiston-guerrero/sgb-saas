@@ -277,10 +277,13 @@ Wilcoxon p=0.0625, Cliff's delta=-1.00.
 
 ### Resultado
 
-Verificado contra crudos. Pendiente documental (fase P4): unificar
-cifras viejas en Resumen/Abstract/capítulos, declarar Wilcoxon no
-significativo con n=5 y el límite hot/cold (caliente más lento que frío:
-la caché no se presenta como mejora demostrada).
+Cerrado 100 %: serie única vigente (65,60/17,13) en REPORT.md, Resumen,
+Abstract y capítulos 05, 06, 08, 09, 11 y 12; Wilcoxon declarado no
+significativo por potencia (p=0,0625, n=5); caché no presentada como
+mejora demostrada (hot>cold + limitación frio-página-vacía en
+amenazas); notebooks perf ejecutados con la serie vigente
+(`scripts/perf-analysis.ipynb` y `docs/mediciones/perf-analysis.ipynb`,
+este último con fix de encoding cp1252 en su subprocess).
 
 Incidente 2026-09-16 (transparencia): los 5 JSON del worktree
 aparecieron volteados a CRLF a las 21:38 por un proceso local no
