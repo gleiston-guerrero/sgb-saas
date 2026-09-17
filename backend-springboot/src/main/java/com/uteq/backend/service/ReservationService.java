@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 
 // La auditoria de esta tabla ya no se hace aqui: trg_auditoria_reservaciones
@@ -216,7 +217,8 @@ public class ReservationService {
      */
     @Transactional(readOnly = true)
     public List<ReservationTodayResponseDTO> searchReservationsToday() {
-        return reservationRepo.searchReservationsToday().stream()
+        OffsetDateTime start = LocalDate.now(ZoneOffset.UTC).atStartOfDay().atOffset(ZoneOffset.UTC);
+        return reservationRepo.searchReservationsToday(start, start.plusDays(1)).stream()
                 .map(p -> new ReservationTodayResponseDTO(
                         p.getReservationId(),
                         p.getUserName(),
@@ -236,7 +238,8 @@ public class ReservationService {
      */
     @Transactional(readOnly = true)
     public List<ReservationTodayResponseDTO> searchReservationsNexts() {
-        return reservationRepo.searchReservationsNexts().stream()
+        OffsetDateTime start = LocalDate.now(ZoneOffset.UTC).atStartOfDay().atOffset(ZoneOffset.UTC).plusDays(1);
+        return reservationRepo.searchReservationsNexts(start).stream()
                 .map(p -> new ReservationTodayResponseDTO(
                         p.getReservationId(),
                         p.getUserName(),

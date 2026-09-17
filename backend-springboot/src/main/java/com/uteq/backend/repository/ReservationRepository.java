@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.OffsetDateTime;
@@ -44,44 +45,47 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     // retiro cae HOY, con libro/usuario ya resueltos (evita el N+1 que
     // tendría el frontend pidiendo cada libro/usuario por separado para
     // un widget que se carga en cada visita al dashboard).
-    // Revisadas para P4 (nativeQuery -> JPQL): searchReservationsToday y
-    // searchReservationsNexts se mantienen nativas por CURRENT_DATE +
-    // INTERVAL '1 day' (literal de intervalo especifico de PostgreSQL, sin
-    // equivalente portable en JPQL).
-    @Query(value = """
+    // Migradas a JPQL (P5): la ventana de fechas llega por parámetro desde
+    // el service (determinista y portable) en vez de CURRENT_DATE +
+    // INTERVAL de PostgreSQL. JOINs cartesianos porque Reservation expone
+    // FK planas sin relaciones JPA (decisión arquitectónica).
+    @Query("""
         SELECT r.id AS reservationId,
-               u.nombre || ' ' || u.apellido AS userName,
-               u.correo AS userEmail,
-               l.titulo AS bookTitle,
-               l.isbn AS bookIsbn,
-               er.nombre AS statusName,
-               r.fecha_limite_retiro AS dateLimitPickup
-        FROM reservaciones r
-        JOIN usuarios u ON u.id = r.usuario_id
-        JOIN libros l ON l.id = r.libro_id
-        JOIN estados_reservacion er ON er.id = r.estado_reservacion_id
-        WHERE r.fecha_limite_retiro >= CURRENT_DATE
-          AND r.fecha_limite_retiro < CURRENT_DATE + INTERVAL '1 day'
-          AND er.nombre IN ('PENDIENTE', 'LISTA_PARA_RETIRO')
-        ORDER BY r.fecha_limite_retiro ASC
-        """, nativeQuery = true)
-    List<ReservationTodayProjection> searchReservationsToday();
+               CONCAT(u.name, ' ', u.lastName) AS userName,
+               u.email AS userEmail,
+               b.title AS bookTitle,
+               b.isbn AS bookIsbn,
+               s.name AS statusName,
+               r.dateLimitPickup AS dateLimitPickup
+        FROM Reservation r, User u, Book b, StatusReservation s
+        WHERE u.id = r.userId
+          AND b.id = r.bookId
+          AND s.id = r.statusReservationId
+          AND r.dateLimitPickup >= :start
+          AND r.dateLimitPickup < :end
+          AND s.name IN ('PENDIENTE', 'LISTA_PARA_RETIRO')
+        ORDER BY r.dateLimitPickup ASC
+        """)
+    List<ReservationTodayProjection> searchReservationsToday(
+            @Param("start") OffsetDateTime start,
+            @Param("end") OffsetDateTime end);
 
-    @Query(value = """
+    @Query("""
         SELECT r.id AS reservationId,
-               u.nombre || ' ' || u.apellido AS userName,
-               u.correo AS userEmail,
-               l.titulo AS bookTitle,
-               l.isbn AS bookIsbn,
-               er.nombre AS statusName,
-               r.fecha_limite_retiro AS dateLimitPickup
-        FROM reservaciones r
-        JOIN usuarios u ON u.id = r.usuario_id
-        JOIN libros l ON l.id = r.libro_id
-        JOIN estados_reservacion er ON er.id = r.estado_reservacion_id
-        WHERE r.fecha_limite_retiro >= CURRENT_DATE + INTERVAL '1 day'
-          AND er.nombre IN ('PENDIENTE', 'LISTA_PARA_RETIRO')
-        ORDER BY r.fecha_limite_retiro ASC
-        """, nativeQuery = true)
-    List<ReservationTodayProjection> searchReservationsNexts();
+               CONCAT(u.name, ' ', u.lastName) AS userName,
+               u.email AS userEmail,
+               b.title AS bookTitle,
+               b.isbn AS bookIsbn,
+               s.name AS statusName,
+               r.dateLimitPickup AS dateLimitPickup
+        FROM Reservation r, User u, Book b, StatusReservation s
+        WHERE u.id = r.userId
+          AND b.id = r.bookId
+          AND s.id = r.statusReservationId
+          AND r.dateLimitPickup >= :start
+          AND s.name IN ('PENDIENTE', 'LISTA_PARA_RETIRO')
+        ORDER BY r.dateLimitPickup ASC
+        """)
+    List<ReservationTodayProjection> searchReservationsNexts(
+            @Param("start") OffsetDateTime start);
 }

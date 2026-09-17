@@ -2,6 +2,9 @@ package com.uteq.backend.p5spike;
 
 import com.uteq.backend.entity.Book;
 import com.uteq.backend.entity.Loan;
+import com.uteq.backend.entity.Reservation;
+import com.uteq.backend.repository.ReservationRepository;
+import com.uteq.backend.repository.StatusReservationRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.ParameterMode;
 import jakarta.persistence.PersistenceContext;
@@ -16,6 +19,9 @@ import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,6 +43,12 @@ class P5SpikeIT {
 
     @Autowired
     private SpikeBookRepo books;
+
+    @Autowired
+    private ReservationRepository reservations;
+
+    @Autowired
+    private StatusReservationRepository statuses;
 
     @Test
     void s1_procedurePosicionalCreaPrestamo() {
@@ -66,5 +78,33 @@ class P5SpikeIT {
         assertThat(top).isNotEmpty();
         assertThat(top.get(0).getTitle()).containsIgnoringCase("clean");
         assertThat(top.size()).isLessThanOrEqualTo(10);
+    }
+
+    @Test
+    void s5_ventanaHoyYProximas() {
+        Integer pend = statuses.findByName("PENDIENTE").orElseThrow().getId();
+        OffsetDateTime startToday = LocalDate.now(ZoneOffset.UTC)
+                .atStartOfDay().atOffset(ZoneOffset.UTC);
+        sembrarReserva(2L, 1L, pend, startToday.plusHours(10));
+        sembrarReserva(2L, 2L, pend, startToday.plusDays(2));
+        sembrarReserva(2L, 1L, pend, startToday.minusDays(1));
+
+        var hoy = reservations.searchReservationsToday(startToday, startToday.plusDays(1));
+        assertThat(hoy).hasSize(1);
+        assertThat(hoy.get(0).getBookTitle()).isEqualTo("Clean Code");
+        assertThat(hoy.get(0).getStatusName()).isEqualTo("PENDIENTE");
+
+        var proximas = reservations.searchReservationsNexts(startToday.plusDays(1));
+        assertThat(proximas).hasSize(1);
+    }
+
+    private void sembrarReserva(Long userId, Long bookId, Integer statusId, OffsetDateTime limite) {
+        Reservation r = new Reservation();
+        r.setUserId(userId);
+        r.setBookId(bookId);
+        r.setStatusReservationId(statusId);
+        r.setDateReservation(limite.minusDays(3));
+        r.setDateLimitPickup(limite);
+        reservations.save(r);
     }
 }
