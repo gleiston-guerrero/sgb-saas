@@ -65,6 +65,15 @@ def main() -> int:
             return falla(f"falta {path.relative_to(ROOT)}")
     print(f"verify-p4: OK (existen {len(CORRIDAS)} corridas)")
 
+    # Guardia CRLF (incidente 2026-09-16): con core.autocrlf=true y sin
+    # regla -text, un checkout voltea los NDJSON a CRLF y el SHA deja de
+    # coincidir sin que cambien los datos. Falla rapido con accion clara.
+    for path in CORRIDAS:
+        with open(path, "rb") as fh:
+            if b"\r" in fh.read(1 << 20):
+                return falla(f"{path.name} con CRLF: revisar .gitattributes (-text) o core.autocrlf")
+    print("verify-p4: OK (5 archivos en LF, sin CRLF)")
+
     # 2. NDJSON k6 legible con ambos escenarios.
     for path in CORRIDAS:
         vistos = set()
@@ -101,22 +110,36 @@ def main() -> int:
             return falla(f"{path.name}: SHA {real[:16]}... != REPORT.md {esperados[str(n)][:16]}...")
     print("verify-p4: OK (SHA-256 de las 5 coincide con REPORT.md)")
 
-    # 4. perf-analysis.py corre y el agregado coincide (p95 a 2 decimales).
+    # 4. perf-analysis.py corre y el agregado coincide por escenario
+    # (nombre, n_peticiones exacto, p95 a 2 decimales, tasa de error).
     proc = subprocess.run(
         [sys.executable, str(ANALISIS), *(str(p) for p in CORRIDAS)],
         cwd=ROOT, capture_output=True, text=True, timeout=600)
     if proc.returncode != 0:
         return falla(f"perf-analysis.py exit={proc.returncode}: {proc.stderr[-500:]}")
-    p95 = re.findall(r'"p95_ms":\s*([0-9.]+)', proc.stdout)
-    if len(p95) < 2:
-        return falla("perf-analysis.py no emitio p95_ms por escenario")
-    for (esc, esp), got in zip(ESPERADO.items(), p95):
-        if abs(float(got) - esp["p95_ms"]) > TOL_P95:
-            return falla(f"{esc}: p95={got} != REPORT.md {esp['p95_ms']}")
-    errores = re.findall(r'"tasa_error_5xx":\s*([0-9.]+)', proc.stdout)
-    if any(float(e) != 0.0 for e in errores):
-        return falla(f"tasa_error_5xx no es 0: {errores}")
-    print(f"verify-p4: OK (agregado coincide: p95 {[round(float(x), 2) for x in p95]}, error 0%)")
+    bloques = re.findall(
+        r'"escenario":\s*"(cache_caliente|cache_frio)"(.*?)(?="escenario"\s*:|$)',
+        proc.stdout, re.DOTALL)
+    vistos = {}
+    for esc, cuerpo in bloques:
+        p95 = re.search(r'"p95_ms":\s*([0-9.]+)', cuerpo)
+        n_pet = re.search(r'"n_peticiones":\s*([0-9]+)', cuerpo)
+        tasa = re.search(r'"tasa_error_5xx":\s*([0-9.]+)', cuerpo)
+        if not (p95 and n_pet and tasa):
+            return falla(f"{esc}: bloque sin p95/n_peticiones/tasa_error_5xx")
+        vistos[esc] = (float(p95.group(1)), int(n_pet.group(1)), float(tasa.group(1)))
+    if set(vistos) != set(ESPERADO):
+        return falla(f"escenarios incompletos: {sorted(vistos)} != {sorted(ESPERADO)}")
+    for esc, esp in ESPERADO.items():
+        p95, n_pet, tasa = vistos[esc]
+        if n_pet != esp["n"]:
+            return falla(f"{esc}: n={n_pet} != REPORT.md {esp['n']}")
+        if abs(p95 - esp["p95_ms"]) > TOL_P95:
+            return falla(f"{esc}: p95={p95:.2f} != REPORT.md {esp['p95_ms']}")
+        if tasa != esp["tasa_error_5xx"]:
+            return falla(f"{esc}: tasa_error_5xx={tasa} != 0.0")
+    print("verify-p4: OK (agregado coincide por escenario: n exacto,"
+          f" p95 {[round(vistos[e][0], 2) for e in ESPERADO]}, error 0%)")
 
     print("verify-p4: OK (5 corridas crudas versionables y fieles al reporte)")
     return 0

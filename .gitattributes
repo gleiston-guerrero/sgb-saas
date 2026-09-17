@@ -5,3 +5,11 @@
 # deteccion automatica de binarios de git puede fallar y tratarlos como
 # texto. Se fuerzan explicitamente como binarios para evitarlo.
 *.pdf -text -diff
+
+# Los NDJSON crudos de k6 llevan SHA-256 pinnado en REPORT.md y en
+# scripts/verify-p4-k6.py: una conversion LF->CRLF (autocrlf en Windows,
+# core.autocrlf=true) cambia su hash sin tocar los datos y rompe la
+# verificacion en clones Windows. Incidente real 2026-09-16 (5 archivos
+# volteados a CRLF en el worktree a las 21:38, blobs intactos). -text
+# fija bytes identicos en checkout/add en cualquier OS.
+docs/mediciones/perf/k6-run*.json -text -diff

@@ -37,8 +37,9 @@ db/init/
 # Artefactos temporales de notebooks Jupyter (los .ipynb con sus outputs si se versionan)
 .ipynb_checkpoints/
 
-# Salidas crudas pesadas de k6 (guardar resumen/reportes, no NDJSON completos)
-docs/mediciones/perf/k6-run*.json
+# NOTA P4: los NDJSON crudos de k6 (docs/mediciones/perf/k6-run*.json)
+# SÍ se versionan por exigencia literal de la guía (serie vigente con
+# SHA-256 en REPORT.md). No re-agregar regla de ignorado para ellos.
 
 # Scratch files de verificación de bundle (temporales, no versionar)
 live-bundle*.js

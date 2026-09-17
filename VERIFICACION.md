@@ -214,10 +214,25 @@ verify-p4: OK (5 corridas crudas versionables y fieles al reporte)
 ```
 
 Los 5 NDJSON (~74 MB) quedan versionados por exigencia literal de la
-guía (decisión documentada; antes gitignorados por higiene).
+guía (decisión documentada; antes gitignorados por higiene; regla
+retirada de `.gitignore` con nota).
 Efecto colateral conocido de `perf-analysis.py`: reescribe el SVG/PDF
 p95 con datos idénticos (solo fecha e IDs aleatorios); se restauraron
 con `git checkout` para no meter ruido — ver `verify-p4-k6.py`.
+
+Incidente 2026-09-16 (transparencia): los 5 JSON del worktree
+aparecieron volteados a CRLF a las 21:38 (mismo segundo, +1 byte por
+línea, datos intactos) por un proceso local no identificado, con
+`core.autocrlf=true` y sin regla en `.gitattributes`. Como `git status`
+normaliza CRLF contra el índice, no mostró ningún `AM` y el cambio era
+invisible para git pero rompía el SHA crudo. Los blobs commiteados se
+verificaron intactos por hash (`run1 = 72C782…` = REPORT.md). Fix
+sistémico: `docs/mediciones/perf/k6-run*.json -text -diff` en
+`.gitattributes` (bytes idénticos en checkout/add en cualquier OS,
+mismo precedente que los `*.pdf`), worktree restaurado por borrado +
+checkout forzado, y guardia CRLF con mensaje accionable dentro de
+`verify-p4-k6.py`. Lección: ningún hash crudo es estable en Windows
+sin regla `-text`.
 
 ---
 
