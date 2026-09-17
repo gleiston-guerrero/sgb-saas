@@ -19,6 +19,12 @@ from __future__ import annotations
 
 import re
 import sys
+
+# Salida UTF-8 en Windows sin exigir PYTHONUTF8=1: el locale cp1252
+# rompe print() con tildes o U+FFFD. Solo reconfigura, no imprime.
+if hasattr(__import__("sys").stdout, "reconfigure"):
+    __import__("sys").stdout.reconfigure(encoding="utf-8", errors="replace")
+    __import__("sys").stderr.reconfigure(encoding="utf-8", errors="replace")
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]

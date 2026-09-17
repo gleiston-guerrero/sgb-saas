@@ -15,6 +15,12 @@ from __future__ import annotations
 
 import re
 import sys
+
+# Salida UTF-8 en Windows sin exigir PYTHONUTF8=1: el locale cp1252
+# rompe print() con tildes o U+FFFD. Solo reconfigura, no imprime.
+if hasattr(__import__("sys").stdout, "reconfigure"):
+    __import__("sys").stdout.reconfigure(encoding="utf-8", errors="replace")
+    __import__("sys").stderr.reconfigure(encoding="utf-8", errors="replace")
 import time
 import urllib.request
 from pathlib import Path
@@ -24,12 +30,17 @@ PATRON_DOI = re.compile(r"10\.\d{4,}/[^\s)\"',;>\\]+")
 EXTENSIONES = {".cff", ".md", ".tex", ".txt"}
 EXCLUIR_DIRS = {".git", "node_modules", "target", "dist", ".opencode",
                 "graphify-out", ".venv", "venv", "__pycache__"}
+# Documento local de trabajo del equipo (gitignored, no entregable):
+# no forma parte del tag evaluado y no debe condicionar el resultado.
+EXCLUIR_ARCHIVOS = {"PLAN_RECUPERACION_NOTA_8_HONESTO.md"}
 
 
 def recolectar() -> dict[str, list[str]]:
     hallados: dict[str, list[str]] = {}
     for ruta in sorted(ROOT.rglob("*")):
         if not ruta.is_file() or ruta.suffix not in EXTENSIONES:
+            continue
+        if ruta.name in EXCLUIR_ARCHIVOS:
             continue
         if any(parte in EXCLUIR_DIRS for parte in ruta.parts):
             continue

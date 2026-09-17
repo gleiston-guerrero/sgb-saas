@@ -264,7 +264,10 @@ clean:
 # `python scripts/verify-all.py` donde no hay GNU Make). Clasifica cada
 # punto P1-P12 como "evidencia válida", "PENDIENTE" (visible, nunca
 # aprobado: P3, P5-parcial, firmas P11) o "FALLO", y sale 0 solo si no
-# hay ningun FALLO. Requiere: Python 3 + git + red (p2) + Maven/JDK 21
+# hay ningun FALLO. Solo lectura: ningun verificador modifica NDJSON,
+# figuras, PDFs ni evidencia (P4 genera su grafico en temporal).
+# UTF-8 interno: no requiere PYTHONUTF8=1 en Windows.
+# Requiere: Python 3 + git + red (p2) + Maven/JDK 21
 # (javadoc, P10) + Docker (P10 Testcontainers; sin Docker ese punto
 # queda PENDIENTE-bloqueado, nunca exito).
 verify:

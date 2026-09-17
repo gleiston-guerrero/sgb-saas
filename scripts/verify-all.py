@@ -21,6 +21,12 @@ import os
 import re
 import subprocess
 import sys
+
+# Salida UTF-8 en Windows sin exigir PYTHONUTF8=1: el locale cp1252
+# rompe print() con tildes o U+FFFD. Solo reconfigura, no imprime.
+if hasattr(__import__("sys").stdout, "reconfigure"):
+    __import__("sys").stdout.reconfigure(encoding="utf-8", errors="replace")
+    __import__("sys").stderr.reconfigure(encoding="utf-8", errors="replace")
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -39,9 +45,12 @@ def mvnw() -> list[str]:
 
 
 def corre(cmd: list[str], timeout: int, trabajo: Path = ROOT):
+    # encoding explicito: en Windows el locale por defecto (cp1252)
+    # rompe al decodificar salidas UTF-8; no se requiere PYTHONUTF8=1.
     try:
         return subprocess.run(cmd, cwd=trabajo, capture_output=True,
-                              text=True, timeout=timeout)
+                              text=True, timeout=timeout,
+                              encoding="utf-8", errors="replace")
     except FileNotFoundError as exc:
         return subprocess.CompletedProcess(cmd, 127, "", str(exc))
     except subprocess.TimeoutExpired:

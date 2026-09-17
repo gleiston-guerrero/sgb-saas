@@ -13,21 +13,27 @@ Verifica, sin re-correr k6:
 Uso: python scripts/verify-p4-k6.py
 Sale 0 si todo coincide, 1 con el primer incumplimiento (mensaje claro).
 
-Efecto colateral conocido: perf-analysis.py reescribe
-docs/mediciones/perf/p95-comparacion-escenarios.svg/.pdf con datos
-identicos (solo cambian fecha de generacion e IDs aleatorios del SVG).
-Si el arbol debe quedar intacto, restaurar con:
-  git checkout -- docs/mediciones/perf/p95-comparacion-escenarios.svg \
-    docs/mediciones/perf/p95-comparacion-escenarios.pdf
+Sin efectos colaterales: perf-analysis.py se ejecuta con SGB_PERF_GRAFICO
+apuntando a un directorio temporal, asi el arbol versionado queda intacto
+(el grafico versionado se verifica por existencia en P8/P9, no por bytes:
+contiene fecha de generacion e IDs aleatorios del SVG).
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
+
+# Salida UTF-8 en Windows sin exigir PYTHONUTF8=1: el locale cp1252
+# rompe print() con tildes o U+FFFD. Solo reconfigura, no imprime.
+if hasattr(__import__("sys").stdout, "reconfigure"):
+    __import__("sys").stdout.reconfigure(encoding="utf-8", errors="replace")
+    __import__("sys").stderr.reconfigure(encoding="utf-8", errors="replace")
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -112,9 +118,16 @@ def main() -> int:
 
     # 4. perf-analysis.py corre y el agregado coincide por escenario
     # (nombre, n_peticiones exacto, p95 a 2 decimales, tasa de error).
-    proc = subprocess.run(
-        [sys.executable, str(ANALISIS), *(str(p) for p in CORRIDAS)],
-        cwd=ROOT, capture_output=True, text=True, timeout=600)
+    # Solo lectura: el grafico se genera en un temporal (SGB_PERF_GRAFICO).
+    with tempfile.TemporaryDirectory(prefix="verify-p4-") as tmp:
+        entorno = dict(os.environ, SGB_PERF_GRAFICO=os.path.join(
+            tmp, "p95-comparacion-escenarios.svg"))
+        proc = subprocess.run(
+            [sys.executable, str(ANALISIS), *(str(p) for p in CORRIDAS)],
+            cwd=ROOT, capture_output=True, text=True, timeout=600,
+            encoding="utf-8", errors="replace", env=entorno)
+        if not os.path.isfile(entorno["SGB_PERF_GRAFICO"]):
+            return falla("perf-analysis.py no genero el grafico en temporal")
     if proc.returncode != 0:
         return falla(f"perf-analysis.py exit={proc.returncode}: {proc.stderr[-500:]}")
     bloques = re.findall(
