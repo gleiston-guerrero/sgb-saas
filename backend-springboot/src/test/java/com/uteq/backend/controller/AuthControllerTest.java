@@ -1,6 +1,7 @@
 package com.uteq.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.uteq.backend.config.RefreshCookieConfig;
 import com.uteq.backend.config.SecurityConfig;
 import com.uteq.backend.dto.LoginRequestDTO;
 import com.uteq.backend.dto.RegistrationRequestDTO;
@@ -50,7 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 // por GlobalExceptionHandler (antes solo se verificaba con assertThrows
 // a nivel de servicio, nunca se llegaba al @RestControllerAdvice real).
 @WebMvcTest(AuthController.class)
-@Import({SecurityConfig.class, JwtAuthFilter.class})
+@Import({SecurityConfig.class, JwtAuthFilter.class, RefreshCookieConfig.class})
 class AuthControllerTest {
 
     @Autowired
@@ -334,13 +335,35 @@ class AuthControllerTest {
                 .andExpect(status().isNoContent());
     }
 
-    // Dev local http://: con cookie-secure=false la cookie sale sin Secure
-    // y con SameSite=Lax (None exige Secure). Llamada directa al controller
-    // con mocks propios para no depender del contexto web.
+    // Política prod (bean por defecto): Secure + SameSite=None literales,
+    // sin propiedad capaz de degradarla. Llamada directa al controller.
     @Test
-    void login_conCookieSecureFalse_emiteLaxSinSecure() {
-        AuthController controller = new AuthController(authService, jwtService);
-        org.springframework.test.util.ReflectionTestUtils.setField(controller, "cookieSecure", false);
+    void login_conPoliticaProd_emiteSecureYSameSiteNone() {
+        RefreshCookieConfig.RefreshCookiePolicy policy =
+                new RefreshCookieConfig().refreshCookiePolicy();
+        AuthController controller = new AuthController(authService, jwtService, policy);
+        jakarta.servlet.http.HttpServletRequest request =
+                org.mockito.Mockito.mock(jakarta.servlet.http.HttpServletRequest.class);
+        org.mockito.Mockito.when(request.getRemoteAddr()).thenReturn("127.0.0.1");
+        when(authService.login(any(), anyString()))
+                .thenReturn(new TokenResponseDTO("access-token-x", "refresh-token-y", 3600));
+        when(jwtService.getRefreshExpirationMs()).thenReturn(604_800_000L);
+
+        var response = controller.login(new LoginRequestDTO("valido@correo.com", "password123"), request);
+        String setCookie = response.getHeaders().getFirst("Set-Cookie");
+
+        org.assertj.core.api.Assertions.assertThat(setCookie).contains("Secure");
+        org.assertj.core.api.Assertions.assertThat(setCookie).contains("SameSite=None");
+        org.assertj.core.api.Assertions.assertThat(setCookie).contains("HttpOnly");
+    }
+
+    // Excepción solo-dev-local-http: sin Secure + SameSite=Lax (None exige
+    // Secure). Solo existe bajo el perfil dev-local-http, nunca en prod.
+    @Test
+    void login_conPoliticaDevLocal_emiteLaxSinSecure() {
+        RefreshCookieConfig.RefreshCookiePolicy policy =
+                new RefreshCookieConfig().refreshCookiePolicyDevLocalHttp();
+        AuthController controller = new AuthController(authService, jwtService, policy);
         jakarta.servlet.http.HttpServletRequest request =
                 org.mockito.Mockito.mock(jakarta.servlet.http.HttpServletRequest.class);
         org.mockito.Mockito.when(request.getRemoteAddr()).thenReturn("127.0.0.1");

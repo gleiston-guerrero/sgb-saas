@@ -8,6 +8,7 @@ import com.uteq.backend.dto.ResetPasswordRequestDTO;
 import com.uteq.backend.dto.RequestResetRequestDTO;
 import com.uteq.backend.dto.TokenResponseDTO;
 import com.uteq.backend.dto.UserResponseDTO;
+import com.uteq.backend.config.RefreshCookieConfig;
 import com.uteq.backend.security.JwtService;
 import com.uteq.backend.service.AuthService;
 import com.uteq.backend.service.ServiceTemporarilyNotAvailableException;
@@ -18,7 +19,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,26 +41,22 @@ public class AuthController {
 
     private final AuthService authService;
     private final JwtService jwtService;
+    private final RefreshCookieConfig.RefreshCookiePolicy cookiePolicy;
 
     /**
      * Constructor con los servicios de autenticación y JWT.
      *
      * @param authService servicio de registro, login y tokens
      * @param jwtService servicio de emisión y validación de JWT
+     * @param cookiePolicy política de la cookie refreshToken (Secure en
+     *        prod; relajada solo bajo el perfil dev-local-http)
      */
-    public AuthController(AuthService authService, JwtService jwtService) {
+    public AuthController(AuthService authService, JwtService jwtService,
+            RefreshCookieConfig.RefreshCookiePolicy cookiePolicy) {
         this.authService = authService;
         this.jwtService = jwtService;
+        this.cookiePolicy = cookiePolicy;
     }
-
-    // Secure de la cookie refreshToken (app.auth.cookie-secure, default
-    // true). En dev local http:// sin TLS la cookie con Secure=true es
-    // descartada por el navegador: el login devuelve 200 pero sin cookie
-    // y el siguiente refresh falla con 400 "Falta la cookie refreshToken".
-    // Con AUTH_COOKIE_SECURE=false se emite sin Secure y con SameSite=Lax
-    // (SameSite=None exige Secure por especificacion).
-    @Value("${app.auth.cookie-secure:true}")
-    private boolean cookieSecure;
     /**
      * Procesa registration y devuelve el resultado calculado por el backend.
      *
@@ -197,13 +193,9 @@ public class AuthController {
     // autenticación (nunca viaja en llamadas a /api/v1/**). Ver
     // docs/adr/adr-007-cookies-jwt.md para el resto de decisiones de diseño
     // (por qué solo el refreshToken migra a cookie, no el accessToken).
+    // La dureza Secure+SameSite=None vive en RefreshCookieConfig (siempre
+    // en prod; excepción solo bajo el perfil dev-local-http).
     private ResponseCookie buildRefreshCookie(String value, long maxAgeMs) {
-        return ResponseCookie.from(REFRESH_COOKIE_NAME, value)
-                .httpOnly(true)
-                .secure(cookieSecure)
-                .sameSite(cookieSecure ? "None" : "Lax")
-                .path("/api/auth")
-                .maxAge(Duration.ofMillis(maxAgeMs))
-                .build();
+        return cookiePolicy.build(REFRESH_COOKIE_NAME, value, Duration.ofMillis(maxAgeMs));
     }
 }
