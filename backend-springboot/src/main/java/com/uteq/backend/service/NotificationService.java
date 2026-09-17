@@ -51,6 +51,15 @@ public class NotificationService {
     @Value("${notificaciones.email.habilitado:false}")
     private boolean emailEnabled;
 
+    /**
+     * Constructor con los repositorios de notificaciones, usuarios y libros más el envío de correo.
+     *
+     * @param notificationRepo repositorio de notificaciones in-app
+     * @param typeNotificationRepo repositorio de tipos de notificación del catálogo
+     * @param userRepo repositorio de usuarios para resolver receptores por identificador
+     * @param bookRepo repositorio de libros para los títulos incluidos en los mensajes
+     * @param emailService servicio de envío de correos para las vías que sí lo intentan
+     */
     public NotificationService(NotificationRepository notificationRepo,
                                 TypeNotificationRepository typeNotificationRepo,
                                 UserRepository userRepo,

@@ -18,6 +18,16 @@ import java.time.OffsetDateTime;
  */
 public interface AuditLogAuditRepositoryCustom {
 
+    /**
+     * Filtra la bitácora por usuario, módulo y rango de fechas, paginado.
+     *
+     * @param userId autor del evento, nulo = todos
+     * @param module tabla afectada, nulo = todas
+     * @param from inicio del rango, nulo = sin inicio
+     * @param until fin del rango, nulo = sin fin
+     * @param pageable paginación y orden con propiedades de entidad
+     * @return página de eventos coincidentes
+     */
     Page<AuditLogAudit> searchWithFiltersCriteria(Long userId, String module,
             OffsetDateTime from, OffsetDateTime until, Pageable pageable);
 }

@@ -10,10 +10,10 @@ import java.util.Objects;
 public record EvidenceDamageFileDTO( @JsonProperty("archivoTipo") String fileType, @JsonProperty("archivoBytes") byte[] fileBytes
 ) {
     /**
-     * Procesa equals y devuelve el resultado calculado por el backend.
+     * Compara por contenido del binario (no por referencia del arreglo).
      *
-     * @param o valor de entrada o usado por la operacion para completar su regla de negocio
-     * @return true cuando la comprobacion se cumple; false en caso contrario
+     * @param o otro objeto a comparar
+     * @return true si es la misma evidencia (tipo y bytes iguales)
      */
     @Override
     public boolean equals(Object o) {
@@ -22,18 +22,18 @@ public record EvidenceDamageFileDTO( @JsonProperty("archivoTipo") String fileTyp
         return Objects.equals(fileType, otro.fileType) && Arrays.equals(fileBytes, otro.fileBytes);
     }
     /**
-     * Checks whether hash code.
+     * Hash coherente con {@link #equals(Object)} (contenido del binario).
      *
-     * @return generated identifier of the affected record
+     * @return hash combinado de tipo y bytes
      */
     @Override
     public int hashCode() {
         return 31 * Objects.hashCode(fileType) + Arrays.hashCode(fileBytes);
     }
     /**
-     * Handles to string.
+     * Representación sin volcar el binario completo.
      *
-     * @return resulting text payload
+     * @return tipo y resumen de los bytes
      */
     @Override
     public String toString() {

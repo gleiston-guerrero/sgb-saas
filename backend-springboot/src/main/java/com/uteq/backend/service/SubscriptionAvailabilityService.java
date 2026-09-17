@@ -20,6 +20,14 @@ public class SubscriptionAvailabilityService {
     private final BookRepository bookRepo;
     private final NotificationService notificationService;
 
+    /**
+     * Constructor con los repositorios de suscripciones, usuarios y libros más las notificaciones.
+     *
+     * @param subscriptionRepo repositorio de suscripciones de disponibilidad por usuario y libro
+     * @param userRepo repositorio de usuarios para validar al suscriptor
+     * @param bookRepo repositorio de libros para validar el título y su stock actual
+     * @param notificationService servicio que avisa al suscriptor cuando el libro está disponible
+     */
     public SubscriptionAvailabilityService(SubscriptionAvailabilityRepository subscriptionRepo,
                                             UserRepository userRepo,
                                             BookRepository bookRepo,
@@ -30,10 +38,13 @@ public class SubscriptionAvailabilityService {
         this.notificationService = notificationService;
     }
     /**
-     * Ejecuta suscribir aplicando las validaciones necesarias del proceso.
+     * Suscribe a un lector para avisarle cuando un libro agotado vuelva a tener stock.
+     * Es idempotente: si ya existe la suscripción no hace nada. Cuando el libro ya tiene
+     * disponibles, avisa de inmediato en lugar de esperar la reposición.
      *
-     * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param bookId identificador del registro que se usa para ubicar el recurso en la base de datos
+     * @param userId identificador del lector suscriptor, debe existir
+     * @param bookId identificador del libro agotado o disponible a vigilar, debe existir
+     * @throws jakarta.persistence.EntityNotFoundException si el usuario o el libro no existen
      */
     @Transactional
     public void subscribe(Long userId, Long bookId) {
@@ -53,29 +64,32 @@ public class SubscriptionAvailabilityService {
         }
     }
     /**
-     * Ejecuta desuscribir aplicando las validaciones necesarias del proceso.
+     * Cancela la suscripción de un lector a la disponibilidad de un libro para dejar de avisarle.
+     * No falla si la suscripción ya no existe.
      *
-     * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param bookId identificador del registro que se usa para ubicar el recurso en la base de datos
+     * @param userId identificador del lector que deja de vigilar el libro
+     * @param bookId identificador del libro que deja de vigilarse
      */
     @Transactional
     public void unsubscribe(Long userId, Long bookId) {
         subscriptionRepo.deleteByUserIdAndBookId(userId, bookId);
     }
     /**
-     * Consulta list books ids usando los filtros recibidos y devuelve el resultado solicitado.
+     * Lista los libros que un lector vigila para mostrar su campana de disponibilidad.
      *
-     * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return lista de resultados que coincide con la consulta solicitada
+     * @param userId identificador del lector suscriptor cuyas vigilancias se consultan
+     * @return identificadores de los libros vigilados por ese lector
      */
     @Transactional(readOnly = true)
     public List<Long> listBooksIds(Long userId) {
         return subscriptionRepo.findByUserId(userId).stream().map(SubscriptionAvailability::getBookId).toList();
     }
     /**
-     * Envia notify disponibles usando los datos y destinatarios recibidos.
+     * Avisa a todos los suscriptores de un libro que volvió a tener stock y consume sus suscripciones.
+     * Se dispara al actualizar un libro de cero a disponible; no hace nada si el libro sigue agotado.
      *
-     * @param bookId identificador del registro que se usa para ubicar el recurso en la base de datos
+     * @param bookId identificador del libro repuesto cuyo stock volvió a ser mayor a cero
+     * @throws jakarta.persistence.EntityNotFoundException si el libro no existe
      */
     @Transactional
     public void notifyAvailable(Long bookId) {

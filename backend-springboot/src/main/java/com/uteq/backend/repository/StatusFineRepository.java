@@ -9,5 +9,6 @@ import java.util.Optional;
 @Repository
 public interface StatusFineRepository extends JpaRepository<StatusFine, Integer> {
 
+    /** Busca un estado de multa por su nombre exacto. */
     Optional<StatusFine> findByName(String name);
 }

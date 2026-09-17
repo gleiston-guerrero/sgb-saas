@@ -37,6 +37,15 @@ public class NotificationDueScheduler {
     private final NotificationService notificationService;
     private final ConfigurationSystemService configurationSystemService;
 
+    /**
+     * Crea el job con los repositorios de préstamos y estados, más los servicios
+     * de notificaciones y de configuración del sistema.
+     *
+     * @param loanRepo repositorio para buscar préstamos por vencer
+     * @param statusLoanRepo repositorio para resolver los estados vigentes
+     * @param notificationService servicio que genera la alerta de vencimiento
+     * @param configurationSystemService servicio que lee los días de anticipación
+     */
     public NotificationDueScheduler(LoanRepository loanRepo,
                                              StatusLoanRepository statusLoanRepo,
                                              NotificationService notificationService,
@@ -47,7 +56,10 @@ public class NotificationDueScheduler {
         this.configurationSystemService = configurationSystemService;
     }
     /**
-     * Notifies notification Vencimiento Scheduler.
+     * Job cada minuto que alerta los préstamos vigentes próximos a vencer.
+     * Lee la ventana en días desde la configuración, busca los préstamos con devolución
+     * estimada dentro de la ventana y genera una alerta por cada uno. Omite el ciclo
+     * con un aviso si falta la configuración o el catálogo de estados.
      */
     @Scheduled(fixedRate = 60 * 1000, initialDelay = 60 * 1000)
     public void notifyNextToExpire() {

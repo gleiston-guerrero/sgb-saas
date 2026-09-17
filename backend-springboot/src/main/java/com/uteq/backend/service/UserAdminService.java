@@ -46,6 +46,16 @@ public class UserAdminService {
     private final StatusFineRepository statusFineRepo;
     private final UserReasonChangeRepository userReasonChangeRepo;
 
+    /**
+     * Constructor con los repositorios de usuarios, roles, estados, multas y motivos de cambio.
+     *
+     * @param userRepo repositorio de usuarios del panel de administración
+     * @param roleRepo repositorio de roles del catálogo
+     * @param statusUserRepo repositorio de estados de usuario del catálogo
+     * @param fineRepo repositorio de multas para marcar filas con pendientes
+     * @param statusFineRepo repositorio de estados de multa para resolver el PENDIENTE
+     * @param userReasonChangeRepo repositorio del historial de motivos de cambio de estado
+     */
     public UserAdminService(UserRepository userRepo,
                                 RoleRepository roleRepo,
                                 StatusUserRepository statusUserRepo,

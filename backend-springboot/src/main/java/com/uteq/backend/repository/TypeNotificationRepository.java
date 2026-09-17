@@ -9,5 +9,6 @@ import java.util.Optional;
 @Repository
 public interface TypeNotificationRepository extends JpaRepository<TypeNotification, Integer> {
 
+    /** Busca un tipo de notificación por su nombre exacto. */
     Optional<TypeNotification> findByName(String name);
 }

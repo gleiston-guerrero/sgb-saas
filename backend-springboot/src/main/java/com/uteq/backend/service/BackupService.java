@@ -92,14 +92,18 @@ public class BackupService {
     }
 
     /**
-     * Genera o entrega generate backup a partir de los datos actuales del sistema.
+     * Genera un respaldo comprimido de las tablas pedidas en el rango dado y lo registra como completado.
+     * Valida que el rango no supere 30 días y que las tablas estén permitidas, vuelca cada tabla por JDBC
+     * en SQL o CSV dentro de un zip, lo sube al almacenamiento (cifrado si está habilitado) y persiste
+     * la fila con el usuario autenticado como creador.
      *
-     * @param from fecha limite usada para acotar el rango temporal de la consulta
-     * @param until fecha limite usada para acotar el rango temporal de la consulta
-     * @param tables coleccion de datos usada como entrada para filtrar o construir la respuesta
-     * @param format criterio de clasificacion usado para seleccionar la variante o filtro requerido
-     * @param type criterio de clasificacion usado para seleccionar la variante o filtro requerido
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param from inicio del rango temporal del volcado, inclusivo y anterior a {@code until}
+     * @param until fin del rango temporal del volcado, inclusivo
+     * @param tables tablas lógicas a respaldar; cada una debe figurar entre las permitidas
+     * @param format formato del volcado, {@code sql} o {@code csv}; nulo equivale a {@code sql}
+     * @param type origen del respaldo, por ejemplo manual o automático, guardado tal cual en la fila
+     * @return el respaldo persistido con ruta de almacenamiento, tamaño y estado COMPLETADO
+     * @throws org.springframework.web.server.ResponseStatusException con 400 si el rango, las tablas o el formato son inválidos
      */
     @Transactional
     public Backup generateBackup(OffsetDateTime from, OffsetDateTime until, Set<String> tables, String format, String type) {
@@ -210,11 +214,11 @@ public class BackupService {
 
     public List<Backup> listAll() { return backupRepository.findAllOrderByCreatedDesc(); }
     /**
-     * Consulta list by range usando los filtros recibidos y devuelve el resultado solicitado.
+     * Lista los respaldos cuyo rango cae dentro del intervalo dado, para ubicar copias por fecha.
      *
-     * @param from fecha limite usada para acotar el rango temporal de la consulta
-     * @param until fecha limite usada para acotar el rango temporal de la consulta
-     * @return lista de resultados que coincide con la consulta solicitada
+     * @param from inicio del intervalo de búsqueda de respaldos
+     * @param until fin del intervalo de búsqueda de respaldos
+     * @return respaldos generados dentro del intervalo solicitado
      */
     public List<Backup> listByRange(OffsetDateTime from, OffsetDateTime until) { return backupRepository.findByDateRange(from, until); }
     /**
@@ -237,9 +241,11 @@ public class BackupService {
         return text;
     }
     /**
-     * Elimina o anula delete despues de validar que la operacion sea permitida.
+     * Elimina un respaldo junto con su archivo en el almacenamiento.
+     * El borrado del archivo es best-effort: la fila se elimina aunque el almacenamiento falle.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
+     * @param id identificador del respaldo a eliminar
+     * @throws org.springframework.web.server.ResponseStatusException con 404 si el respaldo no existe
      */
     @Transactional
     public void delete(Long id) {        Backup b = getById(id);
@@ -250,10 +256,12 @@ public class BackupService {
     }
 
     /**
-     * Genera o entrega download a partir de los datos actuales del sistema.
+     * Descarga los bytes del zip de un respaldo desde el almacenamiento, descifrándolo si el cifrado
+     * está habilitado.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return contenido binario generado o recuperado por la operacion
+     * @param id identificador del respaldo cuyo archivo se quiere descargar
+     * @return bytes del archivo de respaldo listos para enviar al cliente
+     * @throws org.springframework.web.server.ResponseStatusException con 404 si el respaldo no existe
      */
 
     public byte[] download(Long id) {

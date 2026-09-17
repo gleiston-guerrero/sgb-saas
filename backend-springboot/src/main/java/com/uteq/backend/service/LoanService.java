@@ -75,6 +75,19 @@ public class LoanService {
     private final CredentialQrService credentialQrService;
     private final NotificationService notificationService;
 
+    /**
+     * Constructor con los repositorios de préstamos y reservaciones, la configuración y los servicios de apoyo.
+     *
+     * @param loanRepo repositorio de préstamos
+     * @param loanProcRepo repositorio de procedimientos y funciones de préstamos y reportes
+     * @param userRepo repositorio de usuarios para resolver al lector y al bibliotecario por correo
+     * @param statusLoanRepo repositorio de estados de préstamo
+     * @param reservationRepo repositorio de reservaciones para vincular el retiro en ventanilla
+     * @param statusReservationRepo repositorio de estados de reservación para validar vigencia
+     * @param configurationSystemService servicio de topes como días de préstamo y máximo de renovaciones
+     * @param credentialQrService servicio que resuelve al lector desde su QR de credencial
+     * @param notificationService servicio que avisa la multa generada al devolver con atraso
+     */
     public LoanService(LoanRepository loanRepo,
                            LoanProcedureRepository loanProcRepo,
                            UserRepository userRepo,

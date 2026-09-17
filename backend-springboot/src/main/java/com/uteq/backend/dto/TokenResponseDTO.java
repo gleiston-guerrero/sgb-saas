@@ -11,6 +11,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 // necesita el valor real para construir el Set-Cookie de la respuesta.
 public record TokenResponseDTO(String accessToken, @JsonIgnore String refreshToken, long expiresIn, String tokenType) {
 
+    /**
+     * Crea la respuesta de autenticación fijando el tipo de token en Bearer.
+     *
+     * @param accessToken JWT de acceso para el encabezado Authorization
+     * @param refreshToken token de renovación excluido del JSON y enviado solo como cookie HttpOnly
+     * @param expiresIn vigencia del token de acceso
+     */
     public TokenResponseDTO(String accessToken, String refreshToken, long expiresIn) {
         this(accessToken, refreshToken, expiresIn, "Bearer");
     }

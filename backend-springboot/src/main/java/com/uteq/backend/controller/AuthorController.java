@@ -31,9 +31,9 @@ public class AuthorController {
     }
 
     /**
-     * Lists author.
+     * Lista todos los autores del catálogo para cualquier usuario autenticado.
      *
-     * @return response entity{@code <list<autor response dto>>} with the resulting state after the operation
+     * @return lista completa de autores con id y nombre
      */
     @GetMapping
     public ResponseEntity<List<AuthorResponseDTO>> list() {
@@ -44,10 +44,10 @@ public class AuthorController {
     }
 
     /**
-     * Consulta search usando los filtros recibidos y devuelve el resultado solicitado.
+     * Busca hasta cinco autores cuyo nombre contenga el texto dado, sin distinguir mayúsculas.
      *
-     * @param q texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param q texto parcial del nombre del autor
+     * @return lista de hasta cinco autores coincidentes
      */
     @GetMapping("/buscar")
     public ResponseEntity<List<AuthorResponseDTO>> search(@RequestParam String q) {
@@ -58,10 +58,10 @@ public class AuthorController {
     }
 
     /**
-     * Registra create validando los datos de entrada antes de persistir cambios.
+     * Crea un autor nuevo en el catálogo. Solo GERENTE y ADMIN.
      *
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param dto nombre del autor a registrar
+     * @return autor creado con su id y cabecera de ubicación
      */
     @PostMapping
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")

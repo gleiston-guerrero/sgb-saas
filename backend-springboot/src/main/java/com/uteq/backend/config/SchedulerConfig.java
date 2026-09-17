@@ -7,12 +7,15 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
+/**
+ * Configuración del planificador de tareas periódicas de respaldos y jobs.
+ */
 @Configuration
 public class SchedulerConfig {
     /**
-     * Handles task scheduler.
+     * Crea el planificador con un pool de 4 hilos demonio para los jobs programados.
      *
-     * @return task scheduler with the resulting state after the operation
+     * @return planificador de tareas con prefijo {@code sgb-backup-scheduler-}
      */
     @Bean
     public TaskScheduler taskScheduler() {

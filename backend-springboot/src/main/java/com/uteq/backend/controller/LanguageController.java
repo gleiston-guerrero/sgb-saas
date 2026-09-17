@@ -21,13 +21,18 @@ public class LanguageController {
 
     private final LanguageRepository languageRepository;
 
+    /**
+     * Constructor con el repositorio de idiomas.
+     *
+     * @param languageRepository repositorio del catálogo de idiomas
+     */
     public LanguageController(LanguageRepository languageRepository) {
         this.languageRepository = languageRepository;
     }
     /**
-     * Lists language.
+     * Lista todos los idiomas del catálogo para alimentar los selectores del formulario de libros.
      *
-     * @return response entity{@code <list<idioma response dto>>} with the resulting state after the operation
+     * @return lista completa de idiomas con id y nombre
      */
     @GetMapping
     public ResponseEntity<List<LanguageResponseDTO>> list() {
@@ -37,10 +42,10 @@ public class LanguageController {
         return ResponseEntity.ok(languages);
     }
     /**
-     * Consulta search usando los filtros recibidos y devuelve el resultado solicitado.
+     * Busca hasta cinco idiomas cuyo nombre contenga el texto dado, sin distinguir mayúsculas.
      *
-     * @param q texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param q texto parcial del nombre del idioma
+     * @return lista de hasta cinco idiomas coincidentes
      */
     @GetMapping("/buscar")
     public ResponseEntity<List<LanguageResponseDTO>> search(@RequestParam String q) {
@@ -50,10 +55,10 @@ public class LanguageController {
                         .toList());
     }
     /**
-     * Registra create validando los datos de entrada antes de persistir cambios.
+     * Crea un idioma nuevo generando su código interno si el nombre no existe. Solo GERENTE y ADMIN.
      *
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param dto nombre del idioma a registrar
+     * @return idioma creado con su id y cabecera de ubicación
      */
     @PostMapping
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")

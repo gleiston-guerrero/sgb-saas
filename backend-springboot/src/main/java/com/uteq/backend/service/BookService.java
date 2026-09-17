@@ -67,6 +67,20 @@ public class BookService {
 
     // La auditoria de esta tabla ya no se hace aqui: trg_auditoria_libros
     // (V49__auditoria_triggers_negocio.sql) audita INSERT/UPDATE/DELETE a nivel de motor.
+    /**
+     * Constructor con los repositorios de catálogos, la configuración y los servicios opcionales de apoyo.
+     *
+     * @param bookRepo repositorio de libros
+     * @param publisherRepo repositorio de editoriales
+     * @param languageRepo repositorio de idiomas
+     * @param statusRepo repositorio de estados de libro
+     * @param categoryRepo repositorio de categorías
+     * @param authorRepo repositorio de autores
+     * @param supplierRepo repositorio de proveedores
+     * @param configurationSystemService servicio de parámetros como el tamaño máximo de portada
+     * @param subscriptionAvailabilityService avisos de disponibilidad, nulo si no está configurado
+     * @param suggestionAcquisitionService confirmación de sugerencias por ISBN, nulo si no está configurado
+     */
     public BookService(BookRepository bookRepo,
                         PublisherRepository publisherRepo,
                         LanguageRepository languageRepo,

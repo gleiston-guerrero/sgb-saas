@@ -30,9 +30,9 @@ public class CategoryDamageController {
         this.repo = repo;
     }
     /**
-     * Lists category damage report.
+     * Lista las categorías de daño registradas. Roles BIBLIOTECARIO, GERENTE y ADMIN.
      *
-     * @return response entity{@code <list<categoria damage report dto>>} with the resulting state after the operation
+     * @return lista de categorías de daño con id y nombre
      */
     @GetMapping
     @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
@@ -40,10 +40,10 @@ public class CategoryDamageController {
         return ResponseEntity.ok(repo.findAll().stream().map(c -> new CategoryDamageDTO(c.getId(), c.getName())).toList());
     }
     /**
-     * Registra create validando los datos de entrada antes de persistir cambios.
+     * Crea una categoría de daño si el nombre no existe. Solo ADMIN.
      *
-     * @param req datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param req nombre de la categoría de daño a registrar
+     * @return categoría creada con su id y cabecera de ubicación
      */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -56,11 +56,11 @@ public class CategoryDamageController {
         return ResponseEntity.created(URI.create("/api/v1/categorias-dano/" + g.getId())).body(new CategoryDamageDTO(g.getId(), g.getName()));
     }
     /**
-     * Actualiza update con las reglas de negocio requeridas por el flujo.
+     * Cambia el nombre de una categoría de daño existente. Solo ADMIN.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param req datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id de la categoría de daño a actualizar
+     * @param req nombre nuevo de la categoría de daño
+     * @return categoría actualizada, o 404 si no existe
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -72,10 +72,10 @@ public class CategoryDamageController {
         return ResponseEntity.ok(new CategoryDamageDTO(g.getId(), g.getName()));
     }
     /**
-     * Elimina o anula delete despues de validar que la operacion sea permitida.
+     * Desactiva una categoría de daño sin borrar su registro. Solo ADMIN.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id de la categoría de daño a desactivar
+     * @return respuesta vacía con estado 204, o 404 si no existe
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -87,9 +87,9 @@ public class CategoryDamageController {
         return ResponseEntity.noContent().build();
     }
     /**
-     * Procesa category request y devuelve el resultado calculado por el backend.
+     * Cuerpo de creación y edición de una categoría de daño.
      *
-     * @param name valor de entrada name usado por la operacion para completar su regla de negocio
+     * @param name nombre de la categoría de daño
      */
 
     public record CategoryRequest(@NotBlank @JsonProperty("nombre") String name) {}

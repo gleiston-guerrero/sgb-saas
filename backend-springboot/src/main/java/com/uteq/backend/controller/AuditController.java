@@ -42,14 +42,15 @@ public class AuditController {
 
     // ── GET /api/v1/auditoria?usuarioId=&modulo=&desde=&hasta= ──
     /**
-     * Consulta list usando los filtros recibidos y devuelve el resultado solicitado.
+     * Lista la bitácora de auditoría con filtros opcionales por usuario, módulo y rango de fechas.
+     * Solo GERENTE y ADMIN. Delega en AuditService y devuelve la página de eventos.
      *
-     * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param module criterio de clasificacion usado para seleccionar la variante o filtro requerido
-     * @param from fecha limite usada para acotar el rango temporal de la consulta
-     * @param until fecha limite usada para acotar el rango temporal de la consulta
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param userId id de usuario a filtrar, null para todos
+     * @param module nombre del módulo a filtrar, null para todos
+     * @param from fecha y hora inicial del rango, null sin límite inferior
+     * @param until fecha y hora final del rango, null sin límite superior
+     * @param pageable paginación y orden solicitados
+     * @return página de eventos de auditoría que cumplen los filtros
      */
     @GetMapping
     public ResponseEntity<Page<EventAuditResponseDTO>> list(
@@ -69,23 +70,25 @@ public class AuditController {
     // Agregación por tabla_afectada: total, hoy, último evento.
     // Misma restricción @PreAuthorize que el listado (GERENTE/ADMIN).
     /**
-     * Procesa summary y devuelve el resultado calculado por el backend.
+     * Devuelve el resumen de auditoría agrupado por tabla afectada con totales y último evento.
+     * Solo GERENTE y ADMIN. Delega en AuditService.
      *
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @return lista con el resumen por tabla afectada
      */
     @GetMapping("/resumen")
     public ResponseEntity<List<SummaryCategoryAuditDTO>> summary() {
         return ResponseEntity.ok(auditService.summary());
     }
     /**
-     * Genera o entrega export a partir de los datos actuales del sistema.
+     * Descarga la bitácora filtrada como archivo CSV adjunto.
+     * Solo GERENTE y ADMIN. Aplica los mismos filtros que el listado.
      *
-     * @param format criterio de clasificacion usado para seleccionar la variante o filtro requerido
-     * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param module criterio de clasificacion usado para seleccionar la variante o filtro requerido
-     * @param from fecha limite usada para acotar el rango temporal de la consulta
-     * @param until fecha limite usada para acotar el rango temporal de la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param format formato solicitado, actualmente solo se genera CSV
+     * @param userId id de usuario a filtrar, null para todos
+     * @param module nombre del módulo a filtrar, null para todos
+     * @param from fecha y hora inicial del rango, null sin límite inferior
+     * @param until fecha y hora final del rango, null sin límite superior
+     * @return bytes del CSV con la cabecera de descarga correspondiente
      */
 
     @GetMapping("/export")

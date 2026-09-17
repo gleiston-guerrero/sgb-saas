@@ -123,6 +123,10 @@ class FineProcedureRepositoryCustomImpl implements FineProcedureRepositoryCustom
      * Réplica de {@code fn_reporte_resumen_financiero_multas}: totales
      * recaudado (PAGADA) y pendiente (PENDIENTE) en el rango, siempre una
      * fila con ceros NUMERIC(12,2) cuando no hay multas.
+     *
+     * @param from inicio del rango, nulo = sin inicio
+     * @param until fin del rango, nulo = sin fin
+     * @return fila única con ambos totales
      */
     @Override
     public SummaryFinancialFinesProjection fnReportSummaryFinancial(
@@ -157,6 +161,9 @@ class FineProcedureRepositoryCustomImpl implements FineProcedureRepositoryCustom
     /**
      * Réplica de {@code fn_pagos_recientes}: últimas multas PAGADAs con
      * lector y libro, ordenadas por fecha de pago descendente.
+     *
+     * @param limit tope de filas, nulo = 5
+     * @return lista de pagos recientes
      */
     @Override
     public List<RecentPaymentProjection> fnPaymentsRecientes(Integer limit) {

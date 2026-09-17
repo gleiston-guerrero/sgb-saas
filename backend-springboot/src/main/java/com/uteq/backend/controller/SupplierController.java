@@ -22,16 +22,22 @@ public class SupplierController {
 
     private final SupplierRepository supplierRepository;
 
+    /**
+     * Constructor con el repositorio de proveedores.
+     *
+     * @param supplierRepository repositorio del catálogo de proveedores
+     */
     public SupplierController(SupplierRepository supplierRepository) {
         this.supplierRepository = supplierRepository;
     }
     /**
-     * Consulta list usando los filtros recibidos y devuelve el resultado solicitado.
+     * Lista en forma paginada los proveedores con filtros por nombre y estado activo.
+     * Solo GERENTE y ADMIN. Sin filtros usa el listado paginado directo.
      *
-     * @param q texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @param active criterio de clasificacion usado para seleccionar la variante o filtro requerido
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param q texto a buscar en el nombre, null para no filtrar
+     * @param active true solo activos, false solo inactivos, null todos
+     * @param pageable paginación y orden solicitados
+     * @return página de proveedores que cumplen los filtros
      */
 
     @GetMapping
@@ -52,9 +58,10 @@ public class SupplierController {
 
     // Compatibilidad: lista completa para casos antiguos (no usar con 50k)
     /**
-     * Lists todo.
+     * Lista todos los proveedores sin paginar para compatibilidad con clientes antiguos.
+     * Solo GERENTE y ADMIN.
      *
-     * @return response entity{@code <list<proveedor response dto>>} with the resulting state after the operation
+     * @return lista completa de proveedores
      */
     @GetMapping("/todo")
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
@@ -64,10 +71,11 @@ public class SupplierController {
         return ResponseEntity.ok(suppliers);
     }
     /**
-     * Consulta search usando los filtros recibidos y devuelve el resultado solicitado.
+     * Busca hasta cinco proveedores cuyo nombre contenga el texto dado, sin distinguir mayúsculas.
+     * Solo GERENTE y ADMIN.
      *
-     * @param q texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param q texto parcial del nombre del proveedor
+     * @return lista de hasta cinco proveedores coincidentes
      */
     @GetMapping("/buscar")
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
@@ -78,10 +86,10 @@ public class SupplierController {
                         .toList());
     }
     /**
-     * Registra create validando los datos de entrada antes de persistir cambios.
+     * Crea un proveedor nuevo si el nombre y el RUC no existen. Solo GERENTE y ADMIN.
      *
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param dto nombre, RUC, dirección y contacto del proveedor
+     * @return proveedor creado con su id y cabecera de ubicación
      */
     @PostMapping
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
@@ -105,11 +113,11 @@ public class SupplierController {
                 .body(toDTO(guardado));
     }
     /**
-     * Actualiza update con las reglas de negocio requeridas por el flujo.
+     * Actualiza los datos de un proveedor existente. Solo GERENTE y ADMIN.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id del proveedor a actualizar
+     * @param dto nombre, RUC, dirección y contacto nuevos del proveedor
+     * @return proveedor actualizado, o 404 si no existe
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")

@@ -55,11 +55,18 @@ public class ChatbotService {
     private final GeminiClient geminiClient;
     private final ChatbotRateLimiter chatbotRateLimiter;
     /**
-     * Envia send message usando los datos y destinatarios recibidos.
+     * Envía un mensaje del lector al asistente virtual y persiste toda la conversación en la sesión.
+     * Aplica el límite de mensajes por usuario, reutiliza o crea la sesión, guarda el mensaje entrante
+     * antes de llamar a Gemini, arma el prompt con la base de conocimiento y la disponibilidad real del
+     * catálogo, guarda la respuesta del modelo y actualiza la última actividad de la sesión.
+     * No ejecuta reservas desde el chat: solo indica cómo reservar.
      *
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param dto texto del mensaje y sesión destino; sesión nula crea una conversación nueva
+     * @param authentication identidad autenticada del lector que conversa, usada para resolver su usuario y su sesión
+     * @return identificador de la sesión, texto de respuesta del asistente y fecha de creación
+     * @throws ChatbotRateLimitExceededException si el usuario agotó su cuota de mensajes al asistente
+     * @throws SessionChatNotFoundException si la sesión no existe o pertenece a otro usuario
+     * @throws jakarta.persistence.EntityNotFoundException si el correo autenticado ya no existe en usuarios
      */
     @Transactional
     public MessageChatResponseDTO sendMessage(MessageChatRequestDTO dto, Authentication authentication) {
@@ -101,11 +108,14 @@ public class ChatbotService {
         return new MessageChatResponseDTO(session.getId(), response, msgAsistente.getCreated());
     }
     /**
-     * Consulta get history usando los filtros recibidos y devuelve el resultado solicitado.
+     * Recupera el historial ordenado de una sesión de chat propia para repintar la conversación.
+     * Verifica que la sesión pertenezca al lector autenticado antes de devolver sus mensajes.
      *
-     * @param sessionId valor de entrada sessionId usado por la operacion para completar su regla de negocio
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return lista de resultados que coincide con la consulta solicitada
+     * @param sessionId identificador de la sesión de chat a recuperar
+     * @param authentication identidad autenticada del lector dueño esperado de la sesión
+     * @return mensajes de la sesión en orden cronológico con rol, contenido y fecha
+     * @throws SessionChatNotFoundException si la sesión no existe o pertenece a otro usuario
+     * @throws jakarta.persistence.EntityNotFoundException si el correo autenticado ya no existe en usuarios
      */
     @Transactional(readOnly = true)
     public List<MessageChatHistoryDTO> getHistory(UUID sessionId, Authentication authentication) {

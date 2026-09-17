@@ -8,5 +8,6 @@ import java.util.UUID;
 
 public interface MessageChatRepository extends JpaRepository<MessageChat, Long> {
 
+    /** Lista los mensajes de la sesión dada del más antiguo al más reciente. */
     List<MessageChat> findBySessionIdOrderByCreatedAsc(UUID sessionId);
 }

@@ -21,18 +21,25 @@ public class EvidenceDamageController {
     private final LoanReturnService loanReturnService;
     private final UserRepository userRepo;
 
+    /**
+     * Constructor con el servicio de devoluciones y el repositorio de usuarios.
+     *
+     * @param loanReturnService servicio de devoluciones y evidencias de daño
+     * @param userRepo repositorio para resolver el id del bibliotecario por correo
+     */
     public EvidenceDamageController(LoanReturnService loanReturnService,
                                     UserRepository userRepo) {
         this.loanReturnService = loanReturnService;
         this.userRepo = userRepo;
     }
     /**
-     * Procesa upload evidence y devuelve el resultado calculado por el backend.
+     * Sube una foto de evidencia para un registro de daño de devolución.
+     * Roles BIBLIOTECARIO, GERENTE y ADMIN. Registra al bibliotecario autenticado como autor.
      *
-     * @param registrationDamageId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param file archivo recibido en la peticion y usado como contenido principal de la operacion
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param registrationDamageId id del registro de daño al que se anexa la foto
+     * @param file archivo de imagen de la evidencia
+     * @param authentication identidad del bibliotecario que sube la evidencia
+     * @return evidencia guardada con sus metadatos
      */
 
     @PostMapping(value = "/evidencia/{registroDanoId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -45,10 +52,11 @@ public class EvidenceDamageController {
         return ResponseEntity.ok(loanReturnService.uploadEvidence(registrationDamageId, file, librarianId));
     }
     /**
-     * Consulta list evidences usando los filtros recibidos y devuelve el resultado solicitado.
+     * Lista las evidencias fotográficas anexadas a un registro de daño.
+     * Roles BIBLIOTECARIO, GERENTE y ADMIN.
      *
-     * @param registrationDamageId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param registrationDamageId id del registro de daño cuyas evidencias se consultan
+     * @return lista de evidencias del registro indicado
      */
     @GetMapping("/evidencia/{registroDanoId}")
     @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
@@ -57,10 +65,11 @@ public class EvidenceDamageController {
         return ResponseEntity.ok(loanReturnService.listEvidences(registrationDamageId));
     }
     /**
-     * Consulta get file usando los filtros recibidos y devuelve el resultado solicitado.
+     * Descarga el binario de una evidencia de daño con su tipo de contenido original.
+     * Roles BIBLIOTECARIO, GERENTE y ADMIN.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id de la evidencia cuyo archivo se solicita
+     * @return bytes del archivo con su tipo de contenido
      */
     @GetMapping("/evidencia/{id}/archivo")
     @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")

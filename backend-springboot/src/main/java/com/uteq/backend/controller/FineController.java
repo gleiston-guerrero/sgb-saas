@@ -33,18 +33,26 @@ public class FineController {
     private final NotificationService notificationService;
     private final ReportPdfService reportPdfService;
 
+    /**
+     * Constructor con los servicios de multas, notificaciones y reportes PDF.
+     *
+     * @param fineService servicio de consulta, pago y anulación de multas
+     * @param notificationService servicio de avisos de comprobante de pago
+     * @param reportPdfService servicio de generación de reportes en PDF
+     */
     public FineController(FineService fineService, NotificationService notificationService, ReportPdfService reportPdfService) {
         this.fineService = fineService;
         this.notificationService = notificationService;
         this.reportPdfService = reportPdfService;
     }
     /**
-     * Consulta list by user usando los filtros recibidos y devuelve el resultado solicitado.
+     * Lista en forma paginada las multas de un usuario. Un LECTOR solo ve las suyas.
+     * Roles LECTOR, BIBLIOTECARIO, GERENTE y ADMIN.
      *
-     * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param userId id del usuario cuyas multas se consultan
+     * @param authentication identidad autenticada que pide la consulta
+     * @param pageable paginación y orden solicitados
+     * @return página de multas del usuario indicado
      */
 
     @GetMapping("/usuario/{usuarioId}")
@@ -57,12 +65,13 @@ public class FineController {
                 fineService.listByUser(userId, authentication, pageable));
     }
     /**
-     * Consulta list detail by user usando los filtros recibidos y devuelve el resultado solicitado.
+     * Lista en forma paginada el detalle de multas de un usuario con su estado y saldos.
+     * Un LECTOR solo ve el suyo. Roles LECTOR, BIBLIOTECARIO, GERENTE y ADMIN.
      *
-     * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param userId id del usuario cuyo detalle de multas se consulta
+     * @param authentication identidad autenticada que pide la consulta
+     * @param pageable paginación y orden solicitados
+     * @return página con el detalle de multas del usuario indicado
      */
 
     @GetMapping("/usuario/{usuarioId}/detalle")
@@ -77,11 +86,12 @@ public class FineController {
                 fineService.listDetailByUser(userId, authentication, pageable));
     }
     /**
-     * Procesa pay y devuelve el resultado calculado por el backend.
+     * Registra el pago total o parcial de una multa y notifica el comprobante al usuario.
+     * Roles BIBLIOTECARIO, GERENTE y ADMIN. Sin monto paga el total; con monto paga parcial.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param body datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param id id de la multa a pagar
+     * @param body monto pagado, null para pagar el total pendiente
+     * @return mapa con id de multa, estado resultante y saldo restante
      */
 
     @PostMapping("/{id}/pago")
@@ -109,12 +119,12 @@ public class FineController {
         return ResponseEntity.ok(result);
     }
     /**
-     * Elimina o anula annul despues de validar que la operacion sea permitida.
+     * Anula una multa registrando el motivo y el gerente que la anula. Solo GERENTE y ADMIN.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id de la multa a anular
+     * @param dto motivo de la anulación
+     * @param authentication identidad del gerente que autoriza la anulación
+     * @return resultado de la anulación con el estado aplicado
      */
     @PostMapping("/{id}/anulacion")
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
@@ -125,11 +135,11 @@ public class FineController {
         return ResponseEntity.ok(fineService.annul(id, dto.reason(), authentication));
     }
     /**
-     * Procesa report summary financial y devuelve el resultado calculado por el backend.
+     * Devuelve el resumen financiero de multas en el rango de fechas indicado. Solo GERENTE y ADMIN.
      *
-     * @param from fecha limite usada para acotar el rango temporal de la consulta
-     * @param until fecha limite usada para acotar el rango temporal de la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param from fecha inicial del rango, null sin límite inferior
+     * @param until fecha final del rango, null sin límite superior
+     * @return resumen financiero con totales cobrados y pendientes
      */
 
     @GetMapping("/reportes/resumen-financiero")
@@ -140,11 +150,11 @@ public class FineController {
         return ResponseEntity.ok(fineService.reportSummaryFinancial(from, until));
     }
     /**
-     * Procesa report summary financial pdf y devuelve el resultado calculado por el backend.
+     * Descarga el resumen financiero de multas como archivo PDF. Solo GERENTE y ADMIN.
      *
-     * @param from fecha limite usada para acotar el rango temporal de la consulta
-     * @param until fecha limite usada para acotar el rango temporal de la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param from fecha inicial del rango, null sin límite inferior
+     * @param until fecha final del rango, null sin límite superior
+     * @return bytes del PDF con cabecera de descarga
      */
 
     @GetMapping(value = "/reportes/resumen-financiero/pdf", produces = MediaType.APPLICATION_PDF_VALUE)

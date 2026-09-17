@@ -17,10 +17,10 @@ public record CoverImageDTO(
         String contentType
 ) {
     /**
-     * Procesa equals y devuelve el resultado calculado por el backend.
+     * Compara por contenido del binario (no por referencia del arreglo).
      *
-     * @param o valor de entrada o usado por la operacion para completar su regla de negocio
-     * @return true cuando la comprobacion se cumple; false en caso contrario
+     * @param o otro objeto a comparar
+     * @return true si es la misma portada (bytes y contentType iguales)
      */
     @Override
     public boolean equals(Object o) {

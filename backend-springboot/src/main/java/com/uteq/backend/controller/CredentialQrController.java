@@ -20,14 +20,20 @@ public class CredentialQrController {
 
     private final CredentialQrService service;
 
+    /**
+     * Constructor con el servicio de credenciales QR.
+     *
+     * @param service servicio de generación de la imagen QR de credencial
+     */
     public CredentialQrController(CredentialQrService service) {
         this.service = service;
     }
     /**
-     * Procesa mi credential y devuelve el resultado calculado por el backend.
+     * Genera la imagen QR de la credencial del propio LECTOR autenticado.
+     * Solo LECTOR. El usuario se resuelve del Authentication, sin id en la URL.
      *
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param authentication identidad del LECTOR que pide su credencial
+     * @return bytes de la imagen PNG de la credencial para mostrar en línea
      */
     @GetMapping(value = "/mi-credencial", produces = MediaType.IMAGE_PNG_VALUE)
     @PreAuthorize("hasRole('LECTOR')")

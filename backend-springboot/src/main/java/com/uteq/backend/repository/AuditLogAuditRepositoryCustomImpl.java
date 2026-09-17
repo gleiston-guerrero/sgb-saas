@@ -26,6 +26,16 @@ class AuditLogAuditRepositoryCustomImpl implements AuditLogAuditRepositoryCustom
     /** Nombres físicos históricos aceptados y su propiedad de entidad. */
     private static final Map<String, String> SORT_LEGACY = Map.of("fecha_hora", "dateTime");
 
+    /**
+     * Filtra la bitácora por usuario, módulo y rango de fechas, paginado.
+     *
+     * @param userId autor del evento, nulo = todos
+     * @param module tabla afectada, nulo = todas
+     * @param from inicio del rango, nulo = sin inicio
+     * @param until fin del rango, nulo = sin fin
+     * @param pageable paginación y orden con propiedades de entidad
+     * @return página de eventos coincidentes
+     */
     @Override
     public Page<AuditLogAudit> searchWithFiltersCriteria(Long userId, String module,
             OffsetDateTime from, OffsetDateTime until, Pageable pageable) {

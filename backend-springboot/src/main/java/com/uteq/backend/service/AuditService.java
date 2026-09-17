@@ -45,14 +45,16 @@ public class AuditService {
     }
 
     /**
-     * Consulta list usando los filtros recibidos y devuelve el resultado solicitado.
+     * Devuelve la página de eventos de {@code bitacora_auditoria} que cumplen los filtros dados.
+     * Resuelve el correo de cada evento con una sola consulta por lote para evitar N+1 y lo expone
+     * en el DTO junto al tipo de operación, la tabla afectada y la fecha.
      *
-     * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param module criterio de clasificacion usado para seleccionar la variante o filtro requerido
-     * @param from fecha limite usada para acotar el rango temporal de la consulta
-     * @param until fecha limite usada para acotar el rango temporal de la consulta
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @return pagina de resultados que coincide con los filtros y la paginacion solicitada
+     * @param userId identificador del autor del evento; nulo incluye eventos de todos los usuarios
+     * @param module nombre de la tabla afectada por la que se filtra; nulo desactiva ese filtro
+     * @param from inicio del rango temporal de la consulta; nulo deja el rango sin cota inferior
+     * @param until fin del rango temporal de la consulta; nulo deja el rango sin cota superior
+     * @param pageable paginación, tamaño y orden solicitados por el panel de auditoría
+     * @return página de eventos que coinciden con los filtros y la paginación solicitada
      */
     @Transactional(readOnly = true)
     public Page<EventAuditResponseDTO> list(Long userId, String module,
@@ -73,9 +75,10 @@ public class AuditService {
     }
 
     /**
-     * Procesa summary y devuelve el resultado calculado por el backend.
+     * Resume la bitácora por tabla afectada con totales históricos, eventos de hoy y última fecha.
+     * Marca la categoría de sesiones para revisión cuando hay 3 o más inicios fallidos en 24 horas.
      *
-     * @return lista de resultados que coincide con la consulta solicitada
+     * @return resumen por categoría con totales, eventos de hoy, último evento y marca de revisión
      */
     @Transactional(readOnly = true)
     public List<SummaryCategoryAuditDTO> summary() {
@@ -106,13 +109,15 @@ public class AuditService {
     }
 
     /**
-     * Genera o entrega exportar csv a partir de los datos actuales del sistema.
+     * Genera el contenido CSV (UTF-8) de los eventos que cumplen los filtros, con cabecera
+     * {@code id,usuarioId,tipoOperacion,tablaAfectada,fechaHora,detalles} y hasta 10000 filas
+     * ordenadas por fecha descendente, escapando comas, saltos y comillas de cada celda.
      *
-     * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param module criterio de clasificacion usado para seleccionar la variante o filtro requerido
-     * @param from fecha limite usada para acotar el rango temporal de la consulta
-     * @param until fecha limite usada para acotar el rango temporal de la consulta
-     * @return contenido binario generado o recuperado por la operacion
+     * @param userId identificador del autor del evento; nulo incluye eventos de todos los usuarios
+     * @param module nombre de la tabla afectada por la que se filtra; nulo desactiva ese filtro
+     * @param from inicio del rango temporal incluido en la exportación; nulo deja sin cota inferior
+     * @param until fin del rango temporal incluido en la exportación; nulo deja sin cota superior
+     * @return bytes del CSV generado en UTF-8 listos para descargar
      */
 
     public byte[] exportCsv(Long userId, String module, OffsetDateTime from, OffsetDateTime until) {

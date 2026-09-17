@@ -25,13 +25,18 @@ public class UserScheduler {
 
     private final UserRepository userRepo;
 
+    /**
+     * Crea el job con el repositorio de usuarios.
+     *
+     * @param userRepo repositorio para eliminar cuentas no verificadas
+     */
     public UserScheduler(UserRepository userRepo) {
         this.userRepo = userRepo;
     }
     /**
-     * Deletes no verificados overdue loans.
+     * Job cada hora que elimina las cuentas no verificadas con más de 24 horas de antigüedad
+     * (cada 1 hora, con 1 minuto de retardo inicial).
      */
-    // cada 1 hora, con 1 minuto de retardo inicial
     @Scheduled(fixedRate = 60 * 60 * 1000, initialDelay = 60 * 1000)
     @Transactional
     public void deleteNotVerifiedsOverdues() {

@@ -12,10 +12,21 @@ import java.util.List;
 
 @Repository
 public interface SupplierRepository extends JpaRepository<Supplier, Integer> {
+    /** Busca hasta 5 proveedores cuyo nombre contenga el texto, sin importar mayúsculas. */
     List<Supplier> findTop5ByNameContainingIgnoreCase(String name);
+    /** Indica si ya existe un proveedor con el nombre dado, sin importar mayúsculas. */
     boolean existsByNameIgnoreCase(String name);
+    /** Indica si ya existe un proveedor con el RUC dado, sin importar mayúsculas. */
     boolean existsByRucIgnoreCase(String ruc);
 
+    /**
+     * Pagina los proveedores cuyo nombre o RUC contenga el texto dado y con el estado indicado.
+     *
+     * @param q texto en nombre o RUC, nulo sin filtro
+     * @param active estado exigido, nulo todos
+     * @param pageable paginación solicitada
+     * @return página de proveedores coincidentes
+     */
     @Query("SELECT p FROM Supplier p WHERE (:q IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :q, '%')) OR LOWER(p.ruc) LIKE LOWER(CONCAT('%', :q, '%'))) AND (:active IS NULL OR p.active = :active)")
     Page<Supplier> searchWithFilters(@Param("q") String q, @Param("active") Boolean active, Pageable pageable);
 }

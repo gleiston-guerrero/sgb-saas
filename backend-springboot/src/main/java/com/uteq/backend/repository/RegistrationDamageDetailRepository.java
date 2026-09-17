@@ -9,5 +9,6 @@ import java.util.List;
 @Repository
 public interface RegistrationDamageDetailRepository extends JpaRepository<RegistrationDamageDetail, Long> {
 
+    /** Lista los detalles del registro de daño dado. */
     List<RegistrationDamageDetail> findByRegistrationDamageId(Long registrationDamageId);
 }

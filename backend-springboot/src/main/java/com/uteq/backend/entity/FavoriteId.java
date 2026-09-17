@@ -25,6 +25,12 @@ public class FavoriteId implements Serializable {
     @JsonProperty("libroId")
     private Long bookId;
 
+    /**
+     * Crea la clave compuesta del favorito con el usuario y el libro indicados.
+     *
+     * @param userId identificador del usuario
+     * @param bookId identificador del libro
+     */
     public FavoriteId(Long userId, Long bookId) {
         this.userId = userId;
         this.bookId = bookId;

@@ -20,24 +20,29 @@ import java.util.Optional;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
+    /** Pagina las reservaciones del usuario dado. */
     Page<Reservation> findByUserId(Long userId, Pageable pageable);
 
     // Usado por PrestamoService.renovar(): una renovación se bloquea si OTRO
     // usuario (usuarioId <> el dueño del préstamo) tiene una reserva vigente
     // sobre el mismo libro. "Vigente" = no RETIRADA/EXPIRADA/CANCELADA, ver
     // los ids que arma PrestamoService a partir de EstadoReservacionRepository.
+    /** Indica si otro usuario tiene reserva del libro dado en los estados dados. */
     boolean existsByBookIdAndStatusReservationIdInAndUserIdNot(
             Long bookId, List<Integer> statusesReservationIds, Long userId);
 
     // Reservaciones a expirar en la corrida actual (mismo filtro que la función masiva, para notificar antes del UPDATE).
+    /** Lista las reservaciones en los estados dados cuya fecha límite ya pasó. */
     List<Reservation> findByStatusReservationIdInAndDateLimitPickupBefore(
             List<Integer> statusesReservationIds, OffsetDateTime ahora);
 
     // Reserva vigente más reciente del usuario (la que se convierte en préstamo).
+    /** Busca la reserva más reciente del usuario en los estados dados. */
     Optional<Reservation> findFirstByUserIdAndStatusReservationIdInOrderByDateReservationDesc(
             Long userId, List<Integer> statusesReservationIds);
 
     // Conteo de reservas vigentes del usuario (badge de activas).
+    /** Cuenta las reservaciones del usuario en los estados dados. */
     long countByUserIdAndStatusReservationIdIn(
             Long userId, List<Integer> statusesReservationIds);
 
@@ -49,6 +54,13 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     // el service (determinista y portable) en vez de CURRENT_DATE +
     // INTERVAL de PostgreSQL. JOINs cartesianos porque Reservation expone
     // FK planas sin relaciones JPA (decisión arquitectónica).
+    /**
+     * Reservaciones PENDIENTE/LISTA_PARA_RETIRO con vencimiento en [start, end).
+     *
+     * @param start inicio de la ventana (inclusive)
+     * @param end fin de la ventana (exclusive)
+     * @return reservaciones ordenadas por fecha límite ascendente
+     */
     @Query("""
         SELECT r.id AS reservationId,
                CONCAT(u.name, ' ', u.lastName) AS userName,
@@ -86,6 +98,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
           AND s.name IN ('PENDIENTE', 'LISTA_PARA_RETIRO')
         ORDER BY r.dateLimitPickup ASC
         """)
+    /**
+     * Reservaciones PENDIENTE/LISTA_PARA_RETIRO con vencimiento desde start.
+     *
+     * @param start inicio de la ventana (inclusive)
+     * @return reservaciones ordenadas por fecha límite ascendente
+     */
     List<ReservationTodayProjection> searchReservationsNexts(
             @Param("start") OffsetDateTime start);
 }

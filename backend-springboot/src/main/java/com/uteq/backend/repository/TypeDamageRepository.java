@@ -10,9 +10,12 @@ import java.util.Optional;
 @Repository
 public interface TypeDamageRepository extends JpaRepository<TypeDamage, Integer> {
 
+    /** Lista los tipos de daño activos. */
     List<TypeDamage> findByActiveTrue();
 
+    /** Busca un tipo de daño por su nombre exacto. */
     Optional<TypeDamage> findByName(String name);
 
+    /** Lista los tipos de daño activos de la categoría dada. */
     List<TypeDamage> findByActiveTrueAndCategoryId(Integer categoryId);
 }

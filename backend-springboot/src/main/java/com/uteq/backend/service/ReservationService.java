@@ -42,6 +42,14 @@ public class ReservationService {
     private final UserRepository userRepo;
     private final ConfigurationSystemService configurationSystemService;
 
+    /**
+     * Constructor con los repositorios de reservaciones y usuarios más la configuración de topes.
+     *
+     * @param reservationRepo repositorio de reservaciones
+     * @param statusReservationRepo repositorio de estados de reservación del catálogo
+     * @param userRepo repositorio de usuarios para validar bloqueo por multas
+     * @param configurationSystemService servicio del máximo de reservas y la hora límite de retiro
+     */
     public ReservationService(ReservationRepository reservationRepo,
                               StatusReservationRepository statusReservationRepo,
                               UserRepository userRepo,

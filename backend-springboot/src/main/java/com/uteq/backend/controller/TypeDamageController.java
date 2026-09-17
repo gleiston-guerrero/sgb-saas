@@ -22,13 +22,18 @@ public class TypeDamageController {
 
     private final TypeDamageService typeDamageService;
 
+    /**
+     * Constructor con el servicio de tipos de daño.
+     *
+     * @param typeDamageService servicio del catálogo de tipos de daño
+     */
     public TypeDamageController(TypeDamageService typeDamageService) {
         this.typeDamageService = typeDamageService;
     }
     /**
-     * Lists tipo damage report.
+     * Lista los tipos de daño con su categoría y costo. Lectura para BIBLIOTECARIO, GERENTE y ADMIN.
      *
-     * @return response entity{@code <list<tipo damage report dto>>} with the resulting state after the operation
+     * @return lista de tipos de daño registrados
      */
     @GetMapping
     @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
@@ -36,10 +41,10 @@ public class TypeDamageController {
         return ResponseEntity.ok(typeDamageService.listAll());
     }
     /**
-     * Registra create validando los datos de entrada antes de persistir cambios.
+     * Crea un tipo de daño con su categoría y regla de costo. Solo ADMIN.
      *
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param dto nombre, categoría, tipo de costo y valor del daño
+     * @return tipo de daño creado con su id y cabecera de ubicación
      */
     @PostMapping
     public ResponseEntity<TypeDamageDTO> create(@Valid @RequestBody TypeDamageRequestDTO dto) {
@@ -47,21 +52,21 @@ public class TypeDamageController {
         return ResponseEntity.created(URI.create("/api/v1/tipos-dano/" + created.id())).body(created);
     }
     /**
-     * Actualiza update con las reglas de negocio requeridas por el flujo.
+     * Actualiza el nombre, categoría y costo de un tipo de daño existente. Solo ADMIN.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id del tipo de daño a actualizar
+     * @param dto nombre, categoría, tipo de costo y valor nuevos
+     * @return tipo de daño actualizado
      */
     @PutMapping("/{id}")
     public ResponseEntity<TypeDamageDTO> update(@PathVariable Integer id, @Valid @RequestBody TypeDamageRequestDTO dto) {
         return ResponseEntity.ok(typeDamageService.update(id, dto.name(), dto.categoryId(), dto.typeCost(), dto.value()));
     }
     /**
-     * Elimina o anula delete despues de validar que la operacion sea permitida.
+     * Elimina un tipo de daño por su id. Solo ADMIN.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id del tipo de daño a eliminar
+     * @return respuesta vacía con estado 204 si se eliminó
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
@@ -69,12 +74,12 @@ public class TypeDamageController {
         return ResponseEntity.noContent().build();
     }
     /**
-     * Procesa type damage request dto y devuelve el resultado calculado por el backend.
+     * Cuerpo de creación y edición de un tipo de daño con su regla de costo.
      *
-     * @param name valor de entrada name usado por la operacion para completar su regla de negocio
-     * @param categoryId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param typeCost valor de entrada typeCost usado por la operacion para completar su regla de negocio
-     * @param value clave o valor de configuracion que se valida antes de guardarse
+     * @param name nombre del tipo de daño
+     * @param categoryId id de la categoría de daño a la que pertenece
+     * @param typeCost tipo de costo aplicado al daño
+     * @param value valor del costo del daño
      */
 
     public record TypeDamageRequestDTO(

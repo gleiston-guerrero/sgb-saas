@@ -17,11 +17,15 @@ import java.util.List;
 @Repository
 public interface FavoriteRepository extends JpaRepository<Favorite, FavoriteId> {
 
+    /** Lista los favoritos del usuario dado. */
     List<Favorite> findByUserId(Long userId);
 
+    /** Pagina los favoritos del usuario dado. */
     Page<Favorite> findByUserId(Long userId, Pageable pageable);
 
+    /** Indica si el libro dado está en los favoritos del usuario dado. */
     boolean existsByUserIdAndBookId(Long userId, Long bookId);
 
+    /** Elimina el favorito del usuario y libro dados. */
     void deleteByUserIdAndBookId(Long userId, Long bookId);
 }

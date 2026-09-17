@@ -34,20 +34,25 @@ public class BackupStorageService {
      */
     public BackupStorageService(@org.springframework.beans.factory.annotation.Autowired(required = false) S3Client s3Client) { this.s3Client = s3Client; }
     /**
-         * isR2Configured.
-     * @return resultado de la operacion
+     * Indica si el almacenamiento remoto está disponible, es decir si hay cliente S3 y bucket configurado.
+     * Cuando es falso los respaldos se guardan en el directorio local de respaldo.
+     *
+     * @return verdadero si los respaldos se suben al bucket remoto; falso si se usa disco local
      */
     public boolean isR2Configured() { return s3Client != null && bucket != null && !bucket.isBlank(); }
     /**
-         * isEncryptionEnabled.
-     * @return resultado de la operacion
+     * Indica si el cifrado AES-GCM de respaldos está habilitado por tener clave configurada.
+     *
+     * @return verdadero si los bytes se cifran antes de guardarse y se descifran al leerse
      */
     public boolean isEncryptionEnabled() { return encryptionKey != null && !encryptionKey.isBlank(); }
     /**
-     * Ejecuta upload aplicando las validaciones necesarias del proceso.
+     * Guarda los bytes de un respaldo cifrándolos con AES-GCM cuando el cifrado está habilitado.
+     * Sube el objeto al bucket remoto si está configurado; si no, lo escribe en el directorio local.
      *
-     * @param key clave o valor de configuracion que se valida antes de guardarse
-     * @param data valor de entrada data usado por la operacion para completar su regla de negocio
+     * @param key clave del objeto dentro del almacenamiento de respaldos
+     * @param data bytes del respaldo a guardar, previos al cifrado
+     * @throws RuntimeException si el guardado local en disco falla
      */
     public void upload(String key, byte[] data) {
         byte[] toStore = isEncryptionEnabled() ? encrypt(data) : data;
@@ -60,10 +65,12 @@ public class BackupStorageService {
         }
     }
     /**
-     * Genera o entrega download a partir de los datos actuales del sistema.
+     * Lee los bytes de un respaldo desde el bucket remoto o el directorio local y los descifra
+     * con AES-GCM cuando el cifrado está habilitado.
      *
-     * @param key clave o valor de configuracion que se valida antes de guardarse
-     * @return contenido binario generado o recuperado por la operacion
+     * @param key clave del objeto dentro del almacenamiento de respaldos
+     * @return bytes originales del respaldo listos para descargar
+     * @throws RuntimeException si el archivo local no puede leerse o el descifrado falla
      */
     public byte[] download(String key) {
         byte[] stored;
@@ -72,9 +79,11 @@ public class BackupStorageService {
         return isEncryptionEnabled() ? decrypt(stored) : stored;
     }
     /**
-     * Elimina o anula delete despues de validar que la operacion sea permitida.
+     * Elimina el objeto de un respaldo del bucket remoto o del directorio local, según qué
+     * almacenamiento esté configurado.
      *
-     * @param key clave o valor de configuracion que se valida antes de guardarse
+     * @param key clave del objeto dentro del almacenamiento de respaldos
+     * @throws RuntimeException si la eliminación local en disco falla
      */
     public void delete(String key) {
         if (isR2Configured()) s3Client.deleteObject(DeleteObjectRequest.builder().bucket(bucket).key(key).build());

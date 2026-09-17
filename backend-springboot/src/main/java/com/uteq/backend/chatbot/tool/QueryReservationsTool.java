@@ -28,6 +28,13 @@ public class QueryReservationsTool extends AbstractUserAwareTool {
     private final StatusReservationRepository statusReservationRepo;
     private final BookRepository bookRepo;
 
+    /**
+     * Crea la tool con los repositorios de reservaciones, estados y libros.
+     *
+     * @param reservationRepo repositorio para paginar reservaciones por usuario
+     * @param statusReservationRepo repositorio para resolver los estados vigentes y sus nombres
+     * @param bookRepo repositorio para enriquecer cada reserva con título e ISBN
+     */
     public QueryReservationsTool(ReservationRepository reservationRepo,
                                       StatusReservationRepository statusReservationRepo,
                                       BookRepository bookRepo) {
@@ -36,18 +43,20 @@ public class QueryReservationsTool extends AbstractUserAwareTool {
         this.bookRepo = bookRepo;
     }
     /**
-     * Retrieves name.
+     * Devuelve el nombre único que Gemini usa para invocar esta tool.
      *
-     * @return resulting text payload
+     * @return nombre {@code consultar_reservaciones}
      */
     @Override
     public String getName() {
         return "consultar_reservaciones";
     }
     /**
-     * Retrieves scription.
+     * Describe que esta tool expone las reservas vigentes ({@code PENDIENTE} o
+     * {@code LISTA_PARA_RETIRO}) de un usuario. Recibe {@code usuario_id} y devuelve
+     * un JSON con el arreglo {@code reservas_vigentes} (libro, fechas y estado) y su {@code total}.
      *
-     * @return resulting text payload
+     * @return descripción legible por Gemini para decidir cuándo invocar la tool
      */
     @Override
     public String getDescription() {
@@ -55,10 +64,11 @@ public class QueryReservationsTool extends AbstractUserAwareTool {
                 + "Devuelve el listado con libro, fechas y estado.";
     }
     /**
-     * Procesa execute y devuelve el resultado calculado por el backend.
+     * Consulta la primera página de reservaciones del usuario, filtra las vigentes por estado
+     * y las enriquece con los datos del libro y el nombre del estado.
      *
-     * @param args argumento recibido por la herramienta del chatbot para decidir y ejecutar la accion
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param args nodo JSON con {@code usuario_id} inyectado desde la sesión autenticada
+     * @return nodo JSON con el arreglo de reservas vigentes, el total y el usuario, o error si faltan datos
      */
     @Override
     public JsonNode execute(JsonNode args) {

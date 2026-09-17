@@ -25,6 +25,19 @@ class BookRepositoryCustomImpl implements BookRepositoryCustom {
     @PersistenceContext
     private EntityManager em;
 
+    /**
+     * Búsqueda por título o ISBN con estado, categoría/autor y
+     * disponibilidad opcionales.
+     *
+     * @param q texto no vacío para título o ISBN
+     * @param statusId estado exigido
+     * @param categoryId categoría exigida, nulo = todas
+     * @param authorId autor exigido, nulo = todos
+     * @param available true = con stock, false = agotados, nulo = ambos
+     * @param pageable paginación con propiedades de entidad (ver
+     *        BookService: SORT_TO_PROPERTY)
+     * @return página de libros (contenido distinto, total exacto)
+     */
     @Override
     public Page<Book> searchText(String q, Integer statusId, Integer categoryId,
             Long authorId, Boolean available, Pageable pageable) {
@@ -76,6 +89,15 @@ class BookRepositoryCustomImpl implements BookRepositoryCustom {
         return new PageImpl<>(filas, pageable, total);
     }
 
+    /**
+     * Bandeja de gestión: estados dados con texto y año opcionales.
+     *
+     * @param statusIds estados a incluir (no vacío)
+     * @param q texto para título o ISBN, nulo o vacío = sin filtro
+     * @param year año de publicación, nulo = todos
+     * @param pageable paginación con propiedades de entidad
+     * @return página de libros
+     */
     @Override
     public Page<Book> searchByStatusesCriteria(List<Integer> statusIds, String q,
             Short year, Pageable pageable) {
@@ -115,6 +137,14 @@ class BookRepositoryCustomImpl implements BookRepositoryCustom {
         return new PageImpl<>(filas, pageable, total);
     }
 
+    /**
+     * Autocompletado por similitud de título (pg_trgm vía
+     * {@code function('similarity', ...)}).
+     *
+     * @param text texto escrito por quien busca
+     * @param statusId estado exigido
+     * @return hasta 10 libros ordenados por similitud descendente
+     */
     @Override
     public List<Book> suggestByTitleCriteria(String text, Integer statusId) {
         CriteriaBuilder cb = em.getCriteriaBuilder();

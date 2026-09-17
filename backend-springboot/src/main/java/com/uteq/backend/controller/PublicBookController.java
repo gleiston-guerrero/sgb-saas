@@ -20,7 +20,7 @@ import java.util.List;
  * Fachada pública de SOLO LECTURA del catálogo (portal público sin cuenta,
  * regla de negocio de la Rama C: cualquier persona puede buscar/ver el
  * catálogo en tiempo real; reservar, favoritos y cuenta requieren login).
- * <p>
+ * <p></p>
  * El acceso lo habilita {@code SecurityConfig} con {@code permitAll()} sobre
  * {@code /api/publico/**}: este controller NO lleva {@code @PreAuthorize} en
  * ningún método (el filtro de seguridad ya los deja pasar). Es una fachada
@@ -29,7 +29,7 @@ import java.util.List;
  * ese método ya no exponga. No existe ningún POST/PUT/DELETE acá a propósito:
  * la superficie pública es angosta y de solo lectura (ver
  * {@code PublicoLibroControllerTest}).
- * <p>
+ * <p></p>
  * El endpoint {@code /sugerencias} reusa el autocompletado del catálogo
  * autenticado: el buscador del portal necesita búsqueda por título, y el DTO
  * {@link BookSuggestionDTO} solo expone id/titulo/disponible.
@@ -47,13 +47,14 @@ public class PublicBookController {
     // categoriaId/autorId filtran (mutuamente excluyentes), paginado
     // por defecto size=10 sort=titulo.
     /**
-     * Consulta list usando los filtros recibidos y devuelve el resultado solicitado.
+     * Consulta paginada pública y de solo lectura del catálogo con filtros por texto y facetas.
+     * Sin autenticación. Fija el filtro de estado en ACTIVO y delega en el servicio de libros.
      *
-     * @param q texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @param categoryId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param authorId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param available criterio de clasificacion usado para seleccionar la variante o filtro requerido
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
+     * @param q texto a buscar en título o ISBN, null para no filtrar
+     * @param categoryId id de categoría, null para todas
+     * @param authorId id de autor, null para todos
+     * @param available true solo disponibles, false solo no disponibles, null todos
+     * @param pageable paginación y orden solicitados
      * @return pagina de resultados que coincide con los filtros y la paginacion solicitada
      */
     @GetMapping
@@ -72,9 +73,9 @@ public class PublicBookController {
     // Autocompletado del buscador público. Misma validación que el endpoint
     // autenticado (mínimo 2 caracteres).
     /**
-     * Procesa suggestions y devuelve el resultado calculado por el backend.
+     * Devuelve sugerencias públicas de autocompletado para el buscador del portal sin cuenta.
      *
-     * @param text texto de busqueda o filtro usado para reducir los resultados devueltos
+     * @param text texto parcial del título con entre 2 y 60 caracteres
      * @return lista de resultados que coincide con la consulta solicitada
      */
     @GetMapping("/sugerencias")
@@ -85,9 +86,9 @@ public class PublicBookController {
 
     // ── GET /api/publico/libros/{id} ─────────────────────────────────
     /**
-     * Consulta get usando los filtros recibidos y devuelve el resultado solicitado.
+     * Devuelve el detalle público de un libro activo por su id, sin autenticación.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
+     * @param id id del libro a consultar
      * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
      */
     @GetMapping("/{id}")
@@ -103,10 +104,11 @@ public class PublicBookController {
     // autenticado de LibroController: Content-Type dinámico según
     // portada_tipo, 404 si el libro no existe o no tiene portada.
     /**
-     * Procesa cover y devuelve el resultado calculado por el backend.
+     * Sirve la portada de un libro sin autenticación para su uso directo en etiquetas de imagen.
+     * Responde 404 si el libro no existe o no tiene portada.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id del libro cuya portada se solicita
+     * @return bytes de la imagen con su tipo de contenido
      */
     @GetMapping("/{id}/portada")
     public ResponseEntity<byte[]> cover(@PathVariable Long id) {

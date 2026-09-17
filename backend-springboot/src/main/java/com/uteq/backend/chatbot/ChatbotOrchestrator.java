@@ -60,6 +60,17 @@ public class ChatbotOrchestrator {
     private final ChatbotRateLimiter chatbotRateLimiter;
     private final ObjectMapper mapper = new ObjectMapper();
 
+    /**
+     * Crea el orquestador con los repositorios, el cliente Gemini, el registro de tools y el limitador.
+     *
+     * @param sessionChatRepo repositorio de sesiones de chat
+     * @param messageChatRepo repositorio de mensajes de chat
+     * @param baseKnowledgeRepo repositorio de la base de conocimiento
+     * @param userRepo repositorio de usuarios para resolver el id por correo
+     * @param geminiClient cliente HTTP de Gemini con function calling
+     * @param toolRegistry registro de tools disponibles para Gemini
+     * @param chatbotRateLimiter limitador de mensajes por usuario en Redis
+     */
     public ChatbotOrchestrator(
             SessionChatRepository sessionChatRepo,
             MessageChatRepository messageChatRepo,
@@ -77,11 +88,12 @@ public class ChatbotOrchestrator {
         this.chatbotRateLimiter = chatbotRateLimiter;
     }
     /**
-     * Envia send message usando los datos y destinatarios recibidos.
+     * Envía un mensaje al asistente: valida el límite, persiste el mensaje del usuario,
+     * ejecuta el loop de function calling con Gemini y persiste la respuesta final.
      *
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param dto datos de la petición con el identificador de sesión y el texto del usuario
+     * @param authentication identidad autenticada usada para resolver el usuario y validar la sesión
+     * @return respuesta con el identificador de sesión, el texto del asistente y su fecha de creación
      */
     @Transactional
     public MessageChatResponseDTO sendMessage(MessageChatRequestDTO dto, Authentication authentication) {
@@ -127,11 +139,12 @@ public class ChatbotOrchestrator {
         return new MessageChatResponseDTO(session.getId(), responseFinal, msgAsistente.getCreated());
     }
     /**
-     * Consulta get history usando los filtros recibidos y devuelve el resultado solicitado.
+     * Obtiene el historial de mensajes de una sesión en orden cronológico.
+     * Valida que la sesión pertenezca al usuario autenticado.
      *
-     * @param sessionId valor de entrada sessionId usado por la operacion para completar su regla de negocio
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return lista de resultados que coincide con la consulta solicitada
+     * @param sessionId identificador de la sesión de chat
+     * @param authentication identidad autenticada dueña de la sesión
+     * @return lista de mensajes con rol, contenido y fecha de creación
      */
     @Transactional(readOnly = true)
     public List<MessageChatHistoryDTO> getHistory(UUID sessionId, Authentication authentication) {

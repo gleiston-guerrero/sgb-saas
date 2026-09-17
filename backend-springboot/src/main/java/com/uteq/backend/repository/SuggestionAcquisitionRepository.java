@@ -13,10 +13,13 @@ import java.util.List;
 @Repository
 public interface SuggestionAcquisitionRepository extends JpaRepository<SuggestionAcquisition, Long> {
 
+    /** Pagina las sugerencias de adquisición del usuario dado. */
     Page<SuggestionAcquisition> findByUserId(Long userId, Pageable pageable);
 
+    /** Pagina las sugerencias de adquisición en el estado dado. */
     Page<SuggestionAcquisition> findByStatus(String status, Pageable pageable);
 
+    /** Lista las sugerencias con el ISBN y estado dados. */
     List<SuggestionAcquisition> findByIsbnAndStatus(String isbn, String status);
 
     // Gestión por demanda: agrupa PENDIENTE con ISBN por libro. Sin ISBN
@@ -26,6 +29,12 @@ public interface SuggestionAcquisitionRepository extends JpaRepository<Suggestio
     // calificaría "cantidad" contra la entidad y rompe con
     // UnknownPathException); el segundo término da orden estable para
     // que la paginación no duplique ni salte filas.
+    /**
+     * Pagina los ISBN pendientes más solicitados agrupados por ISBN, excluyendo los sin ISBN.
+     *
+     * @param pageable paginación solicitada
+     * @return página de grupos con ISBN, título, autor y cantidad de solicitudes
+     */
     @Query(value = "SELECT new com.uteq.backend.dto.SuggestionGroupedDTO("
             + "s.isbn, MAX(s.title), MAX(s.author), COUNT(s)) "
             + "FROM SuggestionAcquisition s "

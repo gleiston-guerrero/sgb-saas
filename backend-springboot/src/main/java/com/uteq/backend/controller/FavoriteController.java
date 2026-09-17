@@ -22,17 +22,22 @@ public class FavoriteController {
 
     private final FavoriteService favoriteService;
 
+    /**
+     * Constructor con el servicio de favoritos.
+     *
+     * @param favoriteService servicio de favoritos del lector
+     */
     public FavoriteController(FavoriteService favoriteService) {
         this.favoriteService = favoriteService;
     }
 
     // ── POST /api/v1/favoritos/{libroId} ──────────────────
     /**
-     * Procesa agregar y devuelve el resultado calculado por el backend.
+     * Agrega un libro a los favoritos del propio LECTOR autenticado. Solo LECTOR.
      *
-     * @param bookId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param bookId id del libro a marcar como favorito
+     * @param authentication identidad del LECTOR dueño de los favoritos
+     * @return favorito creado con estado 201
      */
     @PostMapping("/{libroId}")
     @PreAuthorize("hasRole('LECTOR')")
@@ -44,11 +49,11 @@ public class FavoriteController {
 
     // ── DELETE /api/v1/favoritos/{libroId} ────────────────
     /**
-     * Procesa quitar y devuelve el resultado calculado por el backend.
+     * Quita un libro de los favoritos del propio LECTOR autenticado. Solo LECTOR.
      *
-     * @param bookId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param bookId id del libro a quitar de favoritos
+     * @param authentication identidad del LECTOR dueño de los favoritos
+     * @return respuesta vacía con estado 204 si se quitó
      */
     @DeleteMapping("/{libroId}")
     @PreAuthorize("hasRole('LECTOR')")
@@ -67,11 +72,11 @@ public class FavoriteController {
     // Se deja sin path param a propósito: "mis favoritos", no "favoritos
     // de tal usuarioId".
     /**
-     * Consulta list owns usando los filtros recibidos y devuelve el resultado solicitado.
+     * Lista en forma paginada los favoritos del propio LECTOR autenticado. Solo LECTOR.
      *
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param authentication identidad del LECTOR cuyos favoritos se consultan
+     * @param pageable paginación y orden solicitados
+     * @return página con los favoritos del lector
      */
     @GetMapping
     @PreAuthorize("hasRole('LECTOR')")
@@ -81,10 +86,10 @@ public class FavoriteController {
         return ResponseEntity.ok(favoriteService.listOwnsPaginated(authentication, pageable));
     }
     /**
-     * Consulta list owns todo usando los filtros recibidos y devuelve el resultado solicitado.
+     * Lista todos los favoritos del propio LECTOR autenticado sin paginar. Solo LECTOR.
      *
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param authentication identidad del LECTOR cuyos favoritos se consultan
+     * @return lista completa de favoritos del lector
      */
     @GetMapping("/todo")
     @PreAuthorize("hasRole('LECTOR')")

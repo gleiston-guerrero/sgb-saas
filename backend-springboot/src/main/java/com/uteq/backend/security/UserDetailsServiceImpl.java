@@ -11,6 +11,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
+/**
+ * Servicio de usuarios para Spring Security: carga por correo, mapea los roles de la
+ * base sin prefijo y traduce el estado a cuenta bloqueada o deshabilitada.
+ */
 @Service
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -27,11 +31,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
     /**
-     * Procesa load user by username y devuelve el resultado calculado por el backend.
+     * Carga el usuario por correo con sus roles y su estado.
+     * Marca la cuenta como bloqueada si está {@code BLOQUEADO_POR_MULTA} y como
+     * deshabilitada si está {@code INACTIVO} o {@code PENDIENTE_VERIFICACION}.
      *
-     * @param email texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
-     * @throws UsernameNotFoundException si la operacion no puede completarse por validacion, permisos o fallo del recurso asociado
+     * @param email correo del usuario a cargar
+     * @return datos del usuario con roles y flags de estado para Spring Security
+     * @throws UsernameNotFoundException si no existe un usuario con ese correo
      */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {

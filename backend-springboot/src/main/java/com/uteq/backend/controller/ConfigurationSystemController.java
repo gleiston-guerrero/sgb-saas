@@ -19,24 +19,29 @@ public class ConfigurationSystemController {
 
     private final ConfigurationSystemService service;
 
+    /**
+     * Constructor con el servicio de parámetros del sistema.
+     *
+     * @param service servicio de lectura y actualización de la configuración
+     */
     public ConfigurationSystemController(ConfigurationSystemService service) {
         this.service = service;
     }
     /**
-     * Lists configuration sistema.
+     * Lista todos los parámetros de configuración del sistema. Solo ADMIN.
      *
-     * @return response entity{@code <list<configuracion sistema response dto>>} with the resulting state after the operation
+     * @return lista de parámetros con clave y valor actual
      */
     @GetMapping
     public ResponseEntity<List<ConfigurationSystemResponseDTO>> list() {
         return ResponseEntity.ok(service.list());
     }
     /**
-     * Actualiza update con las reglas de negocio requeridas por el flujo.
+     * Actualiza el valor del parámetro de configuración indicado por su clave. Solo ADMIN.
      *
-     * @param key clave o valor de configuracion que se valida antes de guardarse
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param key clave del parámetro a modificar
+     * @param dto valor nuevo del parámetro
+     * @return parámetro actualizado con su clave y valor
      */
     @PutMapping("/{clave}")
     public ResponseEntity<ConfigurationSystemResponseDTO> update(

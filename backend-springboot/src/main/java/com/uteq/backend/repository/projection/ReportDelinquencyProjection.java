@@ -10,17 +10,24 @@ import java.math.BigDecimal;
  */
 public interface ReportDelinquencyProjection {
 
+    /** Identificador del lector moroso. */
     Long getUserId();
 
+    /** Nombre del lector. */
     String getName();
 
+    /** Apellido del lector. */
     String getLastName();
 
+    /** Correo del lector. */
     String getEmail();
 
+    /** Deuda total pendiente del lector. */
     BigDecimal getAmountTotalAdeudado();
 
+    /** Cantidad de multas pendientes del lector. */
     Long getQuantityFinesPendientes();
 
+    /** Promedio de días de atraso del lector con 1 decimal. */
     BigDecimal getDaysAtrasoPromedio();
 }

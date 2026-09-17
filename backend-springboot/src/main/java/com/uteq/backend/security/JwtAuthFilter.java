@@ -20,6 +20,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/**
+ * Filtro JWT que se ejecuta una vez por petición: valida el encabezado Bearer,
+ * revisa la revocación en la blacklist de Redis, carga los datos del usuario y fija
+ * la autenticación. Deja pasar sin autenticar si no hay token o es inválido, y
+ * rechaza con 401 si Redis no permite confirmar la revocación.
+ */
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -32,6 +38,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final RedisTemplate<String, String> redisTemplate;
     private final UserDetailsServiceImpl userDetailsServiceImpl;
 
+    /**
+     * Filtra cada petición HTTP con el token Bearer: lo valida, verifica que no esté
+     * revocado y autentica al usuario en el contexto de seguridad.
+     *
+     * @param request petición HTTP entrante
+     * @param response respuesta HTTP saliente
+     * @param filterChain cadena de filtros para continuar el procesamiento
+     * @throws ServletException si falla el filtrado de la petición
+     * @throws IOException si falla la lectura o escritura del mensaje de error
+     */
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,

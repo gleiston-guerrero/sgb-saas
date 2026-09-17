@@ -435,13 +435,8 @@ public class GlobalExceptionHandler {
     /**
      * Reenvía el status HTTP indicado por un ResponseStatusException del servicio.
      *
-     * @param ex excepicon con el estado HTTP y razon del error
-     * @return ProblemDetail con el cdigo de estado y razon indicados por la excepcin
-    /**
-     * Maneja handle response status y construye una respuesta consistente para el cliente.
-     *
-     * @param ex excepcion capturada que se transforma en una respuesta HTTP controlada
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param ex excepción con el estado HTTP y la razón del error
+     * @return ProblemDetail con el código de estado y la razón indicados por la excepción
      */
     @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
     public ProblemDetail handleResponseStatus(org.springframework.web.server.ResponseStatusException ex) {
@@ -453,15 +448,11 @@ public class GlobalExceptionHandler {
 
     // ── Fallback ──────────────────────────────────────────────
     /**
-     * Fallback para cualquier excepcin no controlada.
+     * Fallback para cualquier excepción no controlada.
      * Devuelve 500 con detalle del error (limitado a 300 caracteres).
-     * @param ex excepicon no controlada
-     * @return ProblemDetail con estado 500 y detalle del error interno
-    /**
-     * Maneja handle generica y construye una respuesta consistente para el cliente.
      *
-     * @param ex excepcion capturada que se transforma en una respuesta HTTP controlada
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param ex excepción no controlada
+     * @return ProblemDetail con estado 500 y detalle del error interno
      */
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleGeneric(Exception ex) {

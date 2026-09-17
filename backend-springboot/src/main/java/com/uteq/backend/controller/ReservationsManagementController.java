@@ -31,6 +31,11 @@ public class ReservationsManagementController {
 
     private final ReservationsManagementService reservationsManagementService;
 
+    /**
+     * Constructor con el servicio de lecturas de la ventanilla de reservaciones.
+     *
+     * @param reservationsManagementService servicio de búsqueda de usuarios e historial de reservas
+     */
     public ReservationsManagementController(
             ReservationsManagementService reservationsManagementService) {
         this.reservationsManagementService = reservationsManagementService;
@@ -40,10 +45,11 @@ public class ReservationsManagementController {
     // Busca el usuario por correo completo y retorna su tarjeta de
     // identificación + cantidad de reservas activas.
     /**
-     * Consulta search user usando los filtros recibidos y devuelve el resultado solicitado.
+     * Busca al usuario por su correo exacto para armar la tarjeta de la ventanilla de reservaciones.
+     * Roles BIBLIOTECARIO, GERENTE y ADMIN.
      *
-     * @param email texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param email correo completo del usuario a buscar
+     * @return tarjeta del usuario con su conteo de reservas activas
      */
     @GetMapping("/buscar-usuario")
     @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
@@ -57,10 +63,11 @@ public class ReservationsManagementController {
     // ── GET /api/v1/reservaciones/gestion/historial-reservaciones?usuarioId= ──
     // Historial de reservaciones del usuario con título del libro resuelto.
     /**
-     * Procesa history reservations y devuelve el resultado calculado por el backend.
+     * Devuelve el historial de reservaciones de un usuario con el título del libro resuelto.
+     * Roles BIBLIOTECARIO, GERENTE y ADMIN.
      *
-     * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param userId id del usuario cuyo historial de reservas se consulta
+     * @return lista de reservaciones del usuario con datos del libro
      */
     @GetMapping("/historial-reservaciones")
     @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")

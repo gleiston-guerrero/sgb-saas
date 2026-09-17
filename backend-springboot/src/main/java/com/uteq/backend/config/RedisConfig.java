@@ -18,6 +18,11 @@ import org.springframework.cache.interceptor.CacheErrorHandler;
 import java.time.Duration;
 import java.util.Map;
 
+/**
+ * Configuración de caché Redis y de la plantilla de cadenas.
+ * Define TTL externos para el catálogo y las sugerencias, y degrada a
+ * fail-open ante fallos de Redis para no romper las peticiones.
+ */
 @Configuration
 @EnableCaching
 public class RedisConfig {
@@ -25,12 +30,14 @@ public class RedisConfig {
     // Caches con serialización JDK estándar (PageImpl no deserializa en JSON).
     // "libros": paginado del catálogo. "sugerencias-libros": autocompletado con TTL corto.
     /**
-     * Procesa cache manager y devuelve el resultado calculado por el backend.
+     * Crea el gestor de caché Redis con TTL externos: uno para el paginado del
+     * catálogo {@code libros} y otro más corto para {@code sugerencias-libros}.
+     * Deshabilita valores nulos y propaga la caché en transacciones.
      *
-     * @param connectionFactory valor de entrada connectionFactory usado por la operacion para completar su regla de negocio
-     * @param booksTtlSeconds valor de entrada booksTtlSeconds usado por la operacion para completar su regla de negocio
-     * @param suggestionsTtlSeconds valor de entrada suggestionsTtlSeconds usado por la operacion para completar su regla de negocio
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param connectionFactory fábrica de conexiones Redis
+     * @param booksTtlSeconds TTL en segundos del caché del catálogo
+     * @param suggestionsTtlSeconds TTL en segundos del caché de autocompletado
+     * @return gestor de caché Redis configurado
      */
     @Bean
     public CacheManager cacheManager(
@@ -55,9 +62,10 @@ public class RedisConfig {
                 .build();
     }
     /**
-     * Handles cache error handler.
+     * Crea el manejador de errores de caché que solo registra avisos y deja continuar
+     * la petición sin caché: Redis funciona como capa opcional degradada, nunca fatal.
      *
-     * @return cache error handler with the resulting state after the operation
+     * @return manejador de errores de caché tolerante a fallos
      */
     @Bean
     public CacheErrorHandler cacheErrorHandler() {
@@ -110,10 +118,11 @@ public class RedisConfig {
         };
     }
     /**
-     * Procesa redis template y devuelve el resultado calculado por el backend.
+     * Crea la plantilla Redis de cadenas con serialización de texto para claves,
+     * valores y hashes.
      *
-     * @param connectionFactory valor de entrada connectionFactory usado por la operacion para completar su regla de negocio
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param connectionFactory fábrica de conexiones Redis
+     * @return plantilla Redis de cadena a cadena configurada
      */
     @Bean
     public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory connectionFactory) {

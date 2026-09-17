@@ -26,6 +26,11 @@ public class UserAdminController {
 
     private final UserAdminService userAdminService;
 
+    /**
+     * Constructor con el servicio de administración de usuarios.
+     *
+     * @param userAdminService servicio de listado, creación, roles y estados de usuarios
+     */
     public UserAdminController(UserAdminService userAdminService) {
         this.userAdminService = userAdminService;
     }
@@ -34,13 +39,14 @@ public class UserAdminController {
     // F8-gerente: ?mios=true filtra por creado_por propio (el service además
     // fuerza ese filtro para GERENTE aunque no mande el flag).
     /**
-     * Consulta list usando los filtros recibidos y devuelve el resultado solicitado.
+     * Lista en forma paginada los usuarios con filtro por texto y alcance propio para GERENTE.
+     * Roles ADMIN y GERENTE. El GERENTE solo ve los usuarios que él creó.
      *
-     * @param filter texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @param mios valor de entrada mios usado por la operacion para completar su regla de negocio
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param filter texto a buscar en nombre o correo, null para no filtrar
+     * @param mios true para ver solo los creados por el solicitante
+     * @param pageable paginación y orden solicitados
+     * @param authentication identidad del administrador que pide el listado
+     * @return página de usuarios según el alcance permitido
      */
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
@@ -55,12 +61,13 @@ public class UserAdminController {
     // ── PATCH /api/v1/admin/usuarios/{id}/rol ─────────────
     // F8-gerente: GERENTE limitado en service a sus creados + LECTOR/BIBLIOTECARIO.
     /**
-     * Actualiza change role con las reglas de negocio requeridas por el flujo.
+     * Cambia el rol de un usuario. El GERENTE solo actúa sobre sus creados y a LECTOR o BIBLIOTECARIO.
+     * Roles ADMIN y GERENTE.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id del usuario cuyo rol se cambia
+     * @param dto rol nuevo solicitado
+     * @param authentication identidad del administrador que autoriza el cambio
+     * @return respuesta vacía con estado 204 si se aplicó
      */
     @PatchMapping("/{id}/rol")
     @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
@@ -75,12 +82,13 @@ public class UserAdminController {
     // ── PATCH /api/v1/admin/usuarios/{id}/estado ──────────
     // F8-gerente: GERENTE limitado en service a sus creados + ACTIVO/INACTIVO.
     /**
-     * Actualiza change status con las reglas de negocio requeridas por el flujo.
+     * Cambia el estado de un usuario registrando el motivo. El GERENTE solo usa ACTIVO o INACTIVO.
+     * Roles ADMIN y GERENTE.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id del usuario cuyo estado se cambia
+     * @param dto estado nuevo y motivo del cambio
+     * @param authentication identidad del administrador que autoriza el cambio
+     * @return respuesta vacía con estado 204 si se aplicó
      */
     @PatchMapping("/{id}/estado")
     @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
@@ -95,11 +103,12 @@ public class UserAdminController {
     // ── POST /api/v1/admin/usuarios ──────────
     // F8-gerente: GERENTE crea solo LECTOR/BIBLIOTECARIO (service lo verifica).
     /**
-     * Registra create validando los datos de entrada antes de persistir cambios.
+     * Crea un usuario desde el panel. El GERENTE solo crea LECTOR o BIBLIOTECARIO.
+     * Roles ADMIN y GERENTE.
      *
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param dto datos del usuario nuevo con rol y datos personales
+     * @param authentication identidad del administrador que crea al usuario
+     * @return usuario creado con estado 201
      */
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
@@ -110,12 +119,12 @@ public class UserAdminController {
 
     // ── DELETE /api/v1/admin/usuarios/{id} soft INACTIVO ──────────
     /**
-     * Elimina o anula delete despues de validar que la operacion sea permitida.
+     * Desactiva un usuario con borrado lógico a estado INACTIVO registrando el motivo. Solo ADMIN.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param reason valor de entrada reason usado por la operacion para completar su regla de negocio
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id del usuario a desactivar
+     * @param reason motivo de la baja, null si no se indica
+     * @param authentication identidad del administrador que ejecuta la baja
+     * @return respuesta vacía con estado 204 si se aplicó
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -128,10 +137,11 @@ public class UserAdminController {
     // V50/OBS-28: historial de motivos de cambio de estado/eliminación,
     // más reciente primero.
     /**
-     * Procesa history reasons y devuelve el resultado calculado por el backend.
+     * Devuelve el historial de motivos de cambios de estado y bajas de un usuario, el más reciente primero.
+     * Roles ADMIN y GERENTE.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id del usuario cuyo historial de motivos se consulta
+     * @return lista de cambios de estado con su motivo y fecha
      */
     @GetMapping("/{id}/historial-motivos")
     @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")

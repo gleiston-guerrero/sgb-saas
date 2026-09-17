@@ -38,6 +38,15 @@ public class ReservationScheduler {
     private final StatusReservationRepository statusReservationRepository;
     private final NotificationService notificationService;
 
+    /**
+     * Crea el job con el repositorio de procedimientos, los repositorios de reservas
+     * y estados, y el servicio de notificaciones.
+     *
+     * @param reservationProcedureRepository repositorio que ejecuta el procedimiento de expiración
+     * @param reservationRepository repositorio para buscar reservas por vencer
+     * @param statusReservationRepository repositorio para resolver los estados por expirar
+     * @param notificationService servicio que notifica cada reserva vencida
+     */
     public ReservationScheduler(ReservationProcedureRepository reservationProcedureRepository,
                                 ReservationRepository reservationRepository,
                                 StatusReservationRepository statusReservationRepository,
@@ -53,7 +62,9 @@ public class ReservationScheduler {
     // (antes el primer disparo era inmediato y fallaba en contexto de test
     // con H2 vacío o en Postgres antes de terminar el seed).
     /**
-     * Handles expirar reservations Vencidas.
+     * Job cada 15 minutos que expira en lote las reservas vencidas no retiradas.
+     * Notifica cada reserva vencida y luego ejecuta el procedimiento almacenado de
+     * expiración. Omite el ciclo con un aviso si falta el catálogo o falla el procedimiento.
      */
     @Scheduled(fixedRate = 15 * 60 * 1000, initialDelay = 60 * 1000)
     public void expireOverdueReservations() {

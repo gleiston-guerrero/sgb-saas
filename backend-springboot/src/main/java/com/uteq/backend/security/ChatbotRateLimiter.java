@@ -31,10 +31,11 @@ public class ChatbotRateLimiter {
     private long rateLimitWindowSeconds;
 
     /**
-     * Procesa esta blocked y devuelve el resultado calculado por el backend.
+     * Indica si el usuario alcanzó el máximo de mensajes del chatbot en la ventana vigente.
+     * Lee el contador {@code chatbot-mensajes:id} en Redis y degrada a sin bloqueo si Redis cae.
      *
-     * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return true cuando la comprobacion se cumple; false en caso contrario
+     * @param userId identificador del usuario a evaluar
+     * @return true si alcanzó el límite; false en caso contrario o si Redis no responde
      */
 
     public boolean isBlocked(Long userId) {
@@ -48,9 +49,10 @@ public class ChatbotRateLimiter {
     }
 
     /**
-     * Registra register message validando los datos de entrada antes de persistir cambios.
+     * Registra un mensaje del usuario: incrementa su contador y fija la expiración
+     * de la ventana solo en el primer mensaje. Ignora el fallo si Redis no responde.
      *
-     * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
+     * @param userId identificador del usuario que envió el mensaje
      */
     public void registerMessage(Long userId) {
         try {

@@ -54,10 +54,11 @@ public class BackupController {
     }
 
     /**
-     * Genera o entrega generate a partir de los datos actuales del sistema.
+     * Genera un respaldo manual o automático con el rango de fechas, tablas y formato indicados.
+     * Solo ADMIN. Devuelve el respaldo creado con su URL de descarga.
      *
-     * @param req datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param req rango desde-hasta, tablas, formato y tipo de respaldo
+     * @return respaldo creado con estado 201 y URL de descarga
      */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -68,11 +69,12 @@ public class BackupController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new BackupResponseDTO(b.getId(), b.getCreated(), b.getFrom(), b.getUntil(), b.getTables(), b.getFormat(), b.getPath(), b.getSizeBytes(), b.getStatus(), b.getType(), url));
     }
     /**
-     * Consulta list usando los filtros recibidos y devuelve el resultado solicitado.
+     * Lista los respaldos generados, opcionalmente acotados por rango de fechas.
+     * Solo ADMIN. Sin fechas lista todo; con fechas lista el rango indicado.
      *
-     * @param from fecha limite usada para acotar el rango temporal de la consulta
-     * @param until fecha limite usada para acotar el rango temporal de la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param from fecha inicial flexible del rango, null para listar todo
+     * @param until fecha final flexible del rango, null para listar todo
+     * @return lista resumida de respaldos del rango solicitado
      */
 
     @GetMapping
@@ -93,9 +95,9 @@ public class BackupController {
     }
 
     /**
-     * Lists programaciones.
+     * Lista las programaciones de respaldo activas. Solo ADMIN.
      *
-     * @return response entity{@code <list<backup programacion>>} with the resulting state after the operation
+     * @return lista de programaciones activas de respaldo
      */
     @GetMapping("/programacion")
     @PreAuthorize("hasRole('ADMIN')")
@@ -103,10 +105,11 @@ public class BackupController {
         return ResponseEntity.ok(progService.listActives());
     }
     /**
-     * Registra create schedule validando los datos de entrada antes de persistir cambios.
+     * Crea una programación de respaldo y la agenda de inmediato si queda activa.
+     * Solo ADMIN.
      *
-     * @param req datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param req programación con frecuencia, tablas, formato y bandera de activa
+     * @return programación creada con estado 201
      */
     @PostMapping("/programacion")
     @PreAuthorize("hasRole('ADMIN')")
@@ -120,10 +123,10 @@ public class BackupController {
     }
 
     /**
-     * Procesa schedule y devuelve el resultado calculado por el backend.
+     * Activa la ejecución programada de una programación de respaldo existente. Solo ADMIN.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param id id de la programación a agendar
+     * @return mapa con id, bandera de activo y mensaje de confirmación
      */
     @PostMapping("/{id}/programar")
     @PreAuthorize("hasRole('ADMIN')")
@@ -136,10 +139,10 @@ public class BackupController {
                 "mensaje", "Programación de respaldo activada exitosamente"));
     }
     /**
-     * Procesa deleteBackup y devuelve el resultado calculado por el backend.
+     * Elimina el registro de un respaldo generado, sin tocar las programaciones. Solo ADMIN.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id del respaldo a eliminar
+     * @return respuesta vacía con estado 204 si se eliminó
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -150,10 +153,10 @@ public class BackupController {
         return ResponseEntity.noContent().build();
     }
     /**
-     * Procesa deleteBackup schedule y devuelve el resultado calculado por el backend.
+     * Elimina una programación de respaldo por su id, sin tocar los respaldos generados. Solo ADMIN.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id de la programación a eliminar
+     * @return respuesta vacía con estado 204 si se eliminó
      */
     @DeleteMapping("/programacion/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -162,10 +165,10 @@ public class BackupController {
         return ResponseEntity.noContent().build();
     }
     /**
-     * Genera o entrega download a partir de los datos actuales del sistema.
+     * Descarga el archivo ZIP de un respaldo generado. Solo ADMIN.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id del respaldo a descargar
+     * @return bytes del ZIP con cabecera de descarga backup-id.zip
      */
     @GetMapping("/{id}/download")
     @PreAuthorize("hasRole('ADMIN')")
@@ -178,10 +181,11 @@ public class BackupController {
                 .body(content);
     }
     /**
-     * Procesa execute ahora y devuelve el resultado calculado por el backend.
+     * Ejecuta de inmediato la programación indicada y guarda el respaldo automático resultante.
+     * Solo ADMIN. Actualiza además la fecha de última ejecución de la programación.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param id id de la programación a ejecutar ahora
+     * @return mapa con id del respaldo, id de programación y mensaje de confirmación
      */
     @PostMapping("/{id}/ejecutar-ahora")
     @PreAuthorize("hasRole('ADMIN')")

@@ -23,6 +23,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+/**
+ * Configuración de seguridad stateless con JWT: define el codificador, el proveedor
+ * de autenticación, la cadena de filtros y las reglas de acceso, CORS y cabeceras CSP.
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -32,29 +36,29 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
     private final UserDetailsServiceImpl userDetailsServiceImpl;
     /**
-     * Handles password encoder.
+     * Crea el codificador de contraseñas BCrypt con fuerza 12.
      *
-     * @return password encoder with the resulting state after the operation
+     * @return codificador de contraseñas para usuarios
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
     }
     /**
-     * Procesa authentication manager y devuelve el resultado calculado por el backend.
+     * Expone el gestor de autenticación construido por Spring Security.
      *
-     * @param config objeto del framework usado para integrar esta operacion con Spring o Jackson
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
-     * @throws Exception si la operacion no puede completarse por validacion, permisos o fallo del recurso asociado
+     * @param config configuración de autenticación de Spring
+     * @return gestor de autenticación del contexto
+     * @throws Exception si no se puede construir el gestor
      */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
     /**
-     * Handles authentication provider.
+     * Crea el proveedor de autenticación DAO con el servicio de usuarios y BCrypt.
      *
-     * @return authentication provider with the resulting state after the operation
+     * @return proveedor de autenticación por correo y contraseña
      */
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -63,11 +67,13 @@ public class SecurityConfig {
         return provider;
     }
     /**
-     * Procesa filter chain y devuelve el resultado calculado por el backend.
+     * Construye la cadena de filtros stateless sin CSRF: deja públicas las rutas de
+     * autenticación, catálogo público, docs y salud, exige autenticación en el resto,
+     * aplica CORS y cabeceras CSP, e inserta el filtro JWT antes del filtro de usuario.
      *
-     * @param http objeto del framework usado para integrar esta operacion con Spring o Jackson
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
-     * @throws Exception si la operacion no puede completarse por validacion, permisos o fallo del recurso asociado
+     * @param http configuración HTTP de Spring Security
+     * @return cadena de filtros de seguridad construida
+     * @throws Exception si no se puede construir la cadena
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

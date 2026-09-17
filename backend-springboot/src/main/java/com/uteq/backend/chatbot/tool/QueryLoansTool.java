@@ -18,22 +18,29 @@ public class QueryLoansTool extends AbstractUserAwareTool {
 
     private final LoanRepository loanRepo;
 
+    /**
+     * Crea la tool con el repositorio de préstamos.
+     *
+     * @param loanRepo repositorio para buscar préstamos activos por usuario
+     */
     public QueryLoansTool(LoanRepository loanRepo) {
         this.loanRepo = loanRepo;
     }
     /**
-     * Retrieves name.
+     * Devuelve el nombre único que Gemini usa para invocar esta tool.
      *
-     * @return resulting text payload
+     * @return nombre {@code consultar_prestamos}
      */
     @Override
     public String getName() {
         return "consultar_prestamos";
     }
     /**
-     * Retrieves scription.
+     * Describe que esta tool expone los préstamos activos (no devueltos) de un usuario.
+     * Recibe {@code usuario_id} y devuelve un JSON con el arreglo {@code prestamos_activos}
+     * (título, ISBN, fechas, días restantes y estado) y su {@code total}.
      *
-     * @return resulting text payload
+     * @return descripción legible por Gemini para decidir cuándo invocar la tool
      */
     @Override
     public String getDescription() {
@@ -41,10 +48,11 @@ public class QueryLoansTool extends AbstractUserAwareTool {
                 + "Devuelve títulos, ISBNs, fechas de préstamo y devolución estimada.";
     }
     /**
-     * Procesa execute y devuelve el resultado calculado por el backend.
+     * Consulta los préstamos activos del usuario y calcula los días restantes
+     * con la fecha de devolución estimada de cada préstamo.
      *
-     * @param args argumento recibido por la herramienta del chatbot para decidir y ejecutar la accion
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param args nodo JSON con {@code usuario_id} inyectado desde la sesión autenticada
+     * @return nodo JSON con el arreglo de préstamos, el total y el usuario, o error si falta el usuario
      */
     @Override
     public JsonNode execute(JsonNode args) {

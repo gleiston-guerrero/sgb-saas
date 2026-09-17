@@ -9,5 +9,6 @@ import java.util.Optional;
 @Repository
 public interface StatusLoanRepository extends JpaRepository<StatusLoan, Integer> {
 
+    /** Busca un estado de préstamo por su nombre exacto. */
     Optional<StatusLoan> findByName(String name);
 }

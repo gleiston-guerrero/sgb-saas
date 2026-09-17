@@ -37,17 +37,24 @@ public class EmailService {
     @Value("${brevo.api-url:https://api.brevo.com/v3/smtp/email}")
     private String brevoApiUrl;
 
+    /**
+     * Constructor con el remitente SMTP para el envío de alertas y verificación.
+     *
+     * @param mailSender remitente Jakarta Mail con la cuenta configurada
+     */
     public EmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
 
     /**
-     * Envia send email usando los datos y destinatarios recibidos.
+     * Envía un correo HTML intentando primero el SMTP clásico y, si falla, la API HTTP de Brevo
+     * cuando hay clave configurada. Nunca interrumpe el flujo que lo origina: informa el resultado
+     * para que el llamador decida (por ejemplo persistirlo en {@code enviado_ok}).
      *
-     * @param destinatario valor de entrada destinatario usado por la operacion para completar su regla de negocio
-     * @param asunto valor de entrada asunto usado por la operacion para completar su regla de negocio
-     * @param bodyHtml valor de entrada bodyHtml usado por la operacion para completar su regla de negocio
-     * @return true cuando la comprobacion se cumple; false en caso contrario
+     * @param destinatario dirección de correo del receptor
+     * @param asunto asunto del mensaje a enviar
+     * @param bodyHtml cuerpo HTML del mensaje ya maquetado por el llamador
+     * @return verdadero si el correo se aceptó por SMTP o por Brevo; falso si ambos fallaron
      */
     public boolean sendEmail(String destinatario, String asunto, String bodyHtml) {
         // 1) Intento SMTP clásico

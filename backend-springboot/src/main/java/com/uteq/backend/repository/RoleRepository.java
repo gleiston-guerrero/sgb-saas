@@ -9,5 +9,6 @@ import java.util.Optional;
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Integer> {
 
+    /** Busca un rol por su nombre exacto. */
     Optional<Role> findByName(String name);
 }

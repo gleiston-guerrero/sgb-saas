@@ -352,17 +352,17 @@ cd backend-springboot; ./mvnw -B javadoc:javadoc
 ```text
 Javadoc audit
 source=backend-springboot\src\main\java
-java_files=273
-public_methods=405
-documented_methods=405
+java_files=278
+public_methods=435
+documented_methods=435
 documented_pct=100.00
-javadoc_param_tags=727
-javadoc_return_tags=375
-javadoc_throws_tags=80
+javadoc_param_tags=987
+javadoc_return_tags=402
+javadoc_throws_tags=142
 files_with_missing_javadocs=0
 verify-p6: OK (100.00% >= 90.00%)
 [INFO] BUILD SUCCESS
-[INFO] Total time:  4.514 s
+[INFO] Total time:  15.389 s
 >> Javadoc: evidencia válida (BUILD SUCCESS)
 ```
 
@@ -373,9 +373,10 @@ verify-p6: OK (100.00% >= 90.00%)
 ### Resultado
 
 100 % con el conteo del auditor (métodos públicos explícitos) y
-`mvn javadoc:javadoc` BUILD SUCCESS. Pendiente de criterio amplio
-(fase P6): constructores, interfaces y proyecciones (64,1 % según el
-evaluador) y reescritura de 231 plantillas genéricas.
+`mvn javadoc:javadoc` BUILD SUCCESS sin warnings. Conteo amplio
+(métodos + constructores + interfaces/proyecciones): 99,6 % con
+ Javadoc real; ~500 Javadocs añadidos/reescritos eliminando plantillas
+genéricas (`mvn clean verify`: 655 tests, 0 fallos).
 
 ---
 

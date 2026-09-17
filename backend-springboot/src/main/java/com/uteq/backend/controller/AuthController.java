@@ -58,10 +58,11 @@ public class AuthController {
         this.cookiePolicy = cookiePolicy;
     }
     /**
-     * Procesa registration y devuelve el resultado calculado por el backend.
+     * Registra un usuario nuevo en estado pendiente de verificación y envía el código al correo.
+     * Endpoint público POST /registro.
      *
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param dto datos de registro con correo, clave y datos personales
+     * @return usuario creado con estado pendiente de verificación
      */
     @PostMapping("/registro")
     public ResponseEntity<UserResponseDTO> registration(@Valid @RequestBody RegistrationRequestDTO dto) {
@@ -98,10 +99,11 @@ public class AuthController {
     }
 
     /**
-     * Procesa reset y devuelve el resultado calculado por el backend.
+     * Restablece la contraseña validando el código de recuperación enviado al correo.
+     * Endpoint público POST /reset.
      *
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param dto correo, código de recuperación y contraseña nueva
+     * @return respuesta vacía con estado 204 si el cambio se aplicó
      */
     @PostMapping("/reset")
     public ResponseEntity<Void> reset(@Valid @RequestBody ResetPasswordRequestDTO dto) {
@@ -125,11 +127,12 @@ public class AuthController {
         return ResponseEntity.ok(user);
     }
     /**
-     * Procesa login y devuelve el resultado calculado por el backend.
+     * Autentica al usuario con correo y contraseña y emite el par de tokens de acceso y refresco.
+     * Endpoint público POST /login. El token de refresco viaja además en cookie HttpOnly.
      *
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @param request datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param dto correo y contraseña del usuario
+     * @param request petición HTTP usada para registrar la IP de origen
+     * @return tokens de acceso y refresco del usuario autenticado
      */
     @PostMapping("/login")
     public ResponseEntity<TokenResponseDTO> login(@Valid @RequestBody LoginRequestDTO dto, HttpServletRequest request) {
@@ -140,11 +143,12 @@ public class AuthController {
                 .body(tokens);
     }
     /**
-     * Procesa logout y devuelve el resultado calculado por el backend.
+     * Cierra la sesión invalidando el token de acceso y limpiando la cookie de refresco.
+     * Endpoint POST /logout con cabecera Authorization Bearer.
      *
-     * @param authHeader token de seguridad recibido para validar o renovar la sesion del usuario
-     * @param request datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param authHeader cabecera Authorization con el token de acceso a invalidar
+     * @param request petición HTTP usada para registrar la IP de origen
+     * @return respuesta vacía con estado 204 y cookie de refresco limpia
      */
 
     @PostMapping("/logout")
@@ -170,10 +174,12 @@ public class AuthController {
     // handler ya existente de IllegalArgumentException (400, RFC 7807) en
     // vez de en el mecanismo de error por defecto de Spring MVC.
     /**
-     * Procesa refresh y devuelve el resultado calculado por el backend.
+     * Renueva el par de tokens a partir de la cookie HttpOnly de refresco y la rota.
+     * Endpoint público POST /refresh.
      *
-     * @param refreshTokenCookie token de seguridad recibido para validar o renovar la sesion del usuario
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param refreshTokenCookie valor de la cookie refreshToken, obligatorio
+     * @return tokens nuevos de acceso y refresco
+     * @throws IllegalArgumentException si la cookie falta o está vacía
      */
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponseDTO> refresh(

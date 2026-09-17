@@ -74,6 +74,21 @@ public class LoanReturnService {
     // El resumen humano de la devolucion completa (estado + multa atraso + multa
     // dano + cantidad de danos en una sola linea) desaparece como vista consolidada:
     // ver detalle en OBS-28.
+    /**
+     * Constructor con los repositorios de préstamos, multas, daños, evidencias y configuración.
+     *
+     * @param loanRepo repositorio de préstamos para validar y leer el préstamo devuelto
+     * @param loanProcRepo repositorio del procedimiento que registra la devolución y la multa por atraso
+     * @param userRepo repositorio de usuarios para enriquecer el historial de devoluciones
+     * @param bookRepo repositorio de libros para el precio base del cálculo por daño y los títulos
+     * @param statusFineRepo repositorio de estados de multa para resolver el PENDIENTE del daño
+     * @param fineRepo repositorio de multas para persistir la multa por daño o pérdida
+     * @param typeDamageRepo repositorio de tipos de daño con su costo fijo o porcentaje
+     * @param registrationDamageRepo repositorio de registros de daño por devolución
+     * @param registrationDamageDetailRepo repositorio del detalle cobrado por cada daño
+     * @param evidenceDamageRepo repositorio de evidencias fotográficas de cada registro
+     * @param configurationSystemService servicio del tamaño máximo de evidencia en MB
+     */
     public LoanReturnService(LoanRepository loanRepo,
                              LoanProcedureRepository loanProcRepo,
                              UserRepository userRepo,
@@ -98,12 +113,17 @@ public class LoanReturnService {
         this.configurationSystemService = configurationSystemService;
     }
     /**
-     * Registra register loan return validando los datos de entrada antes de persistir cambios.
+     * Registra la devolución completa de un préstamo con su revisión física en ventanilla.
+     * Llama al procedimiento que cierra el préstamo y genera la multa por atraso, y si la revisión
+     * reporta daño o pérdida crea el registro de daño con su detalle cobrado (fijo o porcentaje del
+     * precio base) más una multa PENDIENTE adicional; la pérdida total cobra el precio base del libro.
      *
-     * @param loanId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @param librarianId valor de entrada librarianId usado por la operacion para completar su regla de negocio
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param loanId identificador del préstamo a devolver, aún sin fecha de devolución real
+     * @param dto estado de la revisión con daños reportados y descripción del bibliotecario
+     * @param librarianId identificador del bibliotecario que recibe y registra la devolución
+     * @return consolidado con el préstamo, ambas multas (atraso y daño), el total y los daños cobrados
+     * @throws jakarta.persistence.EntityNotFoundException si el préstamo no existe
+     * @throws IllegalStateException si el préstamo ya fue devuelto o falta el estado PENDIENTE de multa
      */
     @Transactional
     public LoanReturnFullResponseDTO registerLoanReturn(
@@ -235,8 +255,9 @@ public class LoanReturnService {
                 damagesRegistrados);
     }
     /**
-         * Busca/lista recursos.
-     * @return lista o pagina de resultados
+     * Lista los tipos de daño activos con su categoría y costo para el formulario de revisión en ventanilla.
+     *
+     * @return tipos de daño vigentes con nombre, categoría, tipo de costo y valor
      */
     @Transactional(readOnly = true)
     public List<TypeDamageDTO> listTypesDamage() {
@@ -248,10 +269,12 @@ public class LoanReturnService {
                 .toList();
     }
     /**
-     * Procesa history loan returns y devuelve el resultado calculado por el backend.
+     * Recupera las últimas 10 devoluciones con daño o pérdida registradas por un bibliotecario.
+     * Enriquece cada registro con su préstamo, título e ISBN del libro y nombre del lector en una
+     * sola pasada por lote para la línea de tiempo de ventanilla.
      *
-     * @param librarianId valor de entrada librarianId usado por la operacion para completar su regla de negocio
-     * @return lista de resultados que coincide con la consulta solicitada
+     * @param librarianId identificador del bibliotecario cuyas devoluciones recientes se consultan
+     * @return historial reciente con libro, lector, fechas, estado de revisión y bibliotecario
      */
     @Transactional(readOnly = true)
     public List<LoanReturnHistoryDTO> historyLoanReturns(Long librarianId) {
@@ -316,12 +339,16 @@ public class LoanReturnService {
 
     // ── Evidencia fotográfica ──────────────────────────────
     /**
-     * Procesa upload evidence y devuelve el resultado calculado por el backend.
+     * Guarda una foto de evidencia (JPG, PNG, WebP o AVIF dentro del tope configurado en MB) asociada
+     * a un registro de daño, persistiendo sus bytes en la base para respaldar el cobro al lector.
      *
-     * @param registrationDamageId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param file archivo recibido en la peticion y usado como contenido principal de la operacion
-     * @param librarianId valor de entrada librarianId usado por la operacion para completar su regla de negocio
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param registrationDamageId identificador del registro de daño al que se anexa la foto
+     * @param file imagen recibida por multipart con nombre, tipo y bytes del archivo
+     * @param librarianId identificador del bibliotecario que sube la evidencia, solo informativo
+     * @return la evidencia guardada con su nombre, tipo y fecha de subida
+     * @throws jakarta.persistence.EntityNotFoundException si el registro de daño no existe
+     * @throws IllegalArgumentException si no hay archivo, el tipo no está permitido o excede el tamaño máximo
+     * @throws IllegalStateException si los bytes del archivo no pueden leerse
      */
     @Transactional
     public EvidenceDamageResponseDTO uploadEvidence(Long registrationDamageId, MultipartFile file, Long librarianId) {
@@ -366,10 +393,10 @@ public class LoanReturnService {
                 evidence.getSubido());
     }
     /**
-     * Consulta list evidences usando los filtros recibidos y devuelve el resultado solicitado.
+     * Lista los metadatos de las fotos de evidencia anexadas a un registro de daño, sin sus bytes.
      *
-     * @param registrationDamageId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return lista de resultados que coincide con la consulta solicitada
+     * @param registrationDamageId identificador del registro de daño cuyas evidencias se consultan
+     * @return evidencias del registro con nombre de archivo, tipo y fecha de subida
      */
     @Transactional(readOnly = true)
     public List<EvidenceDamageResponseDTO> listEvidences(Long registrationDamageId) {
@@ -380,10 +407,11 @@ public class LoanReturnService {
                 .toList();
     }
     /**
-     * Consulta get file evidence usando los filtros recibidos y devuelve el resultado solicitado.
+     * Recupera los metadatos de una evidencia fotográfica por su identificador, sin sus bytes.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param id identificador de la evidencia a recuperar
+     * @return metadatos de la evidencia con registro, nombre de archivo, tipo y fecha de subida
+     * @throws jakarta.persistence.EntityNotFoundException si la evidencia no existe
      */
     @Transactional(readOnly = true)
     public EvidenceDamageResponseDTO getFileEvidence(Long id) {
@@ -394,10 +422,11 @@ public class LoanReturnService {
                 evidence.getFileName(), evidence.getFileType(), evidence.getSubido());
     }
     /**
-     * Consulta get file binario usando los filtros recibidos y devuelve el resultado solicitado.
+     * Recupera los bytes de la foto de una evidencia para servir la descarga de la imagen.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param id identificador de la evidencia cuya imagen se quiere descargar
+     * @return tipo de contenido y bytes de la imagen guardada
+     * @throws jakarta.persistence.EntityNotFoundException si la evidencia no existe
      */
     @Transactional(readOnly = true)
     public EvidenceDamageFileDTO getFileBinary(Long id) {

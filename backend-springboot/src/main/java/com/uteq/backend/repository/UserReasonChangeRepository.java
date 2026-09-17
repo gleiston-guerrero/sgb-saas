@@ -10,5 +10,6 @@ import java.util.List;
 public interface UserReasonChangeRepository extends JpaRepository<UserReasonChange, Long> {
 
     // Historial de motivos del usuario: más recientes primero.
+    /** Lista los motivos de cambio del usuario dado del más reciente al más antiguo. */
     List<UserReasonChange> findByUserIdOrderByCreatedDesc(Long userId);
 }

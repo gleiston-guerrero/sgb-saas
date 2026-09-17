@@ -17,9 +17,9 @@ public record TypeDamageDTO(
         Integer id, @JsonProperty("nombre") String name, @JsonProperty("categoriaId") Integer categoryId, @JsonProperty("categoriaNombre") String categoryName, @JsonProperty("tipoCosto") String typeCost, @JsonProperty("valor") BigDecimal value
 ) {
     /**
-     * Handles precio.
+     * Precio del tipo de daño (alias de {@code value} para el reporte).
      *
-     * @return big decimal with the resulting state after the operation
+     * @return valor monetario del daño
      */
     public BigDecimal price() { return value; }
 }

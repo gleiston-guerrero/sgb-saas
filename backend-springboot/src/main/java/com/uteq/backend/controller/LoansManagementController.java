@@ -33,6 +33,11 @@ public class LoansManagementController {
 
     private final LoansManagementService loansManagementService;
 
+    /**
+     * Constructor con el servicio de lecturas de la ventanilla de préstamos.
+     *
+     * @param loansManagementService servicio de búsqueda de usuarios y reservas para ventanilla
+     */
     public LoansManagementController(LoansManagementService loansManagementService) {
         this.loansManagementService = loansManagementService;
     }
@@ -43,10 +48,11 @@ public class LoansManagementController {
     // ProblemDetail si no hay coincidencia; el mensaje es el que muestra
     // la pantalla.
     /**
-     * Consulta search user usando los filtros recibidos y devuelve el resultado solicitado.
+     * Busca al usuario por su correo exacto para armar la tarjeta de la ventanilla de préstamos.
+     * Roles BIBLIOTECARIO, GERENTE y ADMIN. Responde 404 si no hay coincidencia.
      *
-     * @param email texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param email correo completo del usuario a buscar
+     * @return tarjeta del usuario con su identificación y estado
      */
     @GetMapping("/buscar-usuario")
     @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
@@ -62,10 +68,11 @@ public class LoansManagementController {
     // contenga el texto ingresado (case-insensitive). El frontend lo usa
     // para el dropdown y el placeholder dinámico.
     /**
-     * Procesa suggestions users y devuelve el resultado calculado por el backend.
+     * Sugiere hasta tres usuarios cuyo correo contenga el texto para el autocompletado de ventanilla.
+     * Roles BIBLIOTECARIO, GERENTE y ADMIN.
      *
-     * @param email texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param email texto parcial del correo para el autocompletado
+     * @return lista de hasta tres usuarios coincidentes
      */
     @GetMapping("/sugerencias-usuarios")
     @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
@@ -78,10 +85,11 @@ public class LoansManagementController {
     // 404 cuando el usuario NO tiene reserva vigente -> el frontend cae al
     // Caso B (préstamo directo). No es un error para el usuario final.
     /**
-     * Procesa reservation active y devuelve el resultado calculado por el backend.
+     * Devuelve la reserva vigente de un usuario para convertirla en préstamo en ventanilla.
+     * Roles BIBLIOTECARIO, GERENTE y ADMIN. Responde 404 si no tiene reserva vigente.
      *
-     * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param userId id del usuario cuya reserva vigente se consulta
+     * @return reserva activa con el libro reservado
      */
     @GetMapping("/reserva-activa")
     @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
@@ -93,10 +101,11 @@ public class LoansManagementController {
     // Historial reciente (tope interno en el service) para la línea de
     // tiempo; lista vacía si el usuario no tiene préstamos.
     /**
-     * Procesa history y devuelve el resultado calculado por el backend.
+     * Devuelve el historial reciente de préstamos de un usuario para la línea de tiempo de ventanilla.
+     * Roles BIBLIOTECARIO, GERENTE y ADMIN. Lista vacía si no tiene préstamos.
      *
-     * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param userId id del usuario cuyo historial se consulta
+     * @return lista reciente de préstamos del usuario
      */
     @GetMapping("/historial")
     @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")

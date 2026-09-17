@@ -24,11 +24,25 @@ public interface FineRepository extends JpaRepository<Fine, Long> {
     // de joins). Se resuelve acá con un "ad hoc join" JPQL (JOIN ... ON,
     // soportado por Hibernate 6) contra Prestamo, ya que sí hace falta
     // filtrar por usuario para el endpoint GET /multas/usuario/{id}.
+    /**
+     * Pagina las multas de los préstamos del usuario indicado.
+     *
+     * @param userId identificador del usuario dueño de los préstamos
+     * @param pageable paginación solicitada
+     * @return página de multas del usuario
+     */
     @Query("SELECT m FROM Fine m JOIN Loan p ON p.id = m.loanId WHERE p.userId = :userId")
     Page<Fine> findByUserId(@Param("userId") Long userId, Pageable pageable);
 
     // Saldo total pendiente (monto - monto_pagado) por usuario:
     // alimenta la tarjeta "Total Pendiente" del módulo de gestión de multas.
+    /**
+     * Calcula el saldo pendiente (monto menos monto pagado) de las multas del usuario en el estado dado.
+     *
+     * @param userId identificador del usuario dueño de los préstamos
+     * @param statusFineId identificador del estado de multa exigido
+     * @return suma del saldo, cero si no hay multas coincidentes
+     */
     @Query("SELECT COALESCE(SUM(m.amount - m.amountPaid), 0) FROM Fine m JOIN Loan p ON p.id = m.loanId "
             + "WHERE p.userId = :userId AND m.statusFineId = :statusFineId")
     BigDecimal sumBalanceByUserIdAndStatusFineId(@Param("userId") Long userId,
@@ -39,6 +53,13 @@ public interface FineRepository extends JpaRepository<Fine, Long> {
     // Monto total adeudado por el usuario: alimenta la tarjeta "Usuario
     // Bloqueado" del Caso C ("...multas pendientes de pago ($X.XX)") y la
     // condición de bloqueo (monto > 0).
+    /**
+     * Calcula el monto total de las multas del usuario en el estado dado.
+     *
+     * @param userId identificador del usuario dueño de los préstamos
+     * @param statusFineId identificador del estado de multa exigido
+     * @return suma de los montos, cero si no hay multas coincidentes
+     */
     @Query("SELECT COALESCE(SUM(m.amount), 0) FROM Fine m JOIN Loan p ON p.id = m.loanId "
             + "WHERE p.userId = :userId AND m.statusFineId = :statusFineId")
     BigDecimal sumAmountByUserIdAndStatusFineId(@Param("userId") Long userId,
@@ -46,6 +67,13 @@ public interface FineRepository extends JpaRepository<Fine, Long> {
 
     // Cantidad de multas en un estado dado (para el texto explicativo del
     // Caso C y el badge de la tarjeta de usuario).
+    /**
+     * Cuenta las multas del usuario en el estado dado.
+     *
+     * @param userId identificador del usuario dueño de los préstamos
+     * @param statusFineId identificador del estado de multa exigido
+     * @return cantidad de multas coincidentes
+     */
     @Query("SELECT COUNT(m) FROM Fine m JOIN Loan p ON p.id = m.loanId "
             + "WHERE p.userId = :userId AND m.statusFineId = :statusFineId")
     long countByUserIdAndStatusFineId(@Param("userId") Long userId,
@@ -54,6 +82,13 @@ public interface FineRepository extends JpaRepository<Fine, Long> {
     // Multas pendientes agrupadas por préstamo: permite marcar en el
     // historial qué préstamos devueltos tarde arrastran multa sin pagar,
     // con una sola consulta para toda la lista (sin N+1).
+    /**
+     * Agrupa por préstamo el monto de las multas del usuario en el estado dado.
+     *
+     * @param userId identificador del usuario dueño de los préstamos
+     * @param statusFineId identificador del estado de multa exigido
+     * @return lista con el total pendiente de cada préstamo
+     */
     @Query("SELECT m.loanId AS loanId, SUM(m.amount) AS totalPending "
             + "FROM Fine m JOIN Loan p ON p.id = m.loanId "
             + "WHERE p.userId = :userId AND m.statusFineId = :statusFineId "
@@ -64,6 +99,13 @@ public interface FineRepository extends JpaRepository<Fine, Long> {
     // Usuarios con al menos una multa pendiente (batch): evita N+1 en
     // UsuarioAdminService.toListadoDTO() al consultar una sola vez para
     // todos los usuarios de la página.
+    /**
+     * Localiza los usuarios de la lista dada con al menos una multa en el estado indicado.
+     *
+     * @param userIds identificadores de usuarios a revisar
+     * @param statusFineId identificador del estado de multa exigido
+     * @return identificadores con multas en ese estado
+     */
     @Query("SELECT DISTINCT p.userId FROM Fine m JOIN Loan p ON p.id = m.loanId "
             + "WHERE p.userId IN :userIds AND m.statusFineId = :statusFineId")
     List<Long> findUserIdsWithFinesPendientes(@Param("userIds") List<Long> userIds,

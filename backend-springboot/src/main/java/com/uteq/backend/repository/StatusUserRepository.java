@@ -9,5 +9,6 @@ import java.util.Optional;
 @Repository
 public interface StatusUserRepository extends JpaRepository<StatusUser, Integer> {
 
+    /** Busca un estado de usuario por su nombre exacto. */
     Optional<StatusUser> findByName(String name);
 }

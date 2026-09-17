@@ -31,6 +31,12 @@ public class Favorite {
     @JsonProperty("agregadoEn")
     @Column(name = "agregado_en", updatable = false)  private OffsetDateTime agregado;
 
+    /**
+     * Crea un favorito que vincula al usuario con el libro indicados.
+     *
+     * @param userId identificador del usuario que marca el favorito
+     * @param bookId identificador del libro marcado como favorito
+     */
     public Favorite(Long userId, Long bookId) {
         this.userId = userId;
         this.bookId = bookId;

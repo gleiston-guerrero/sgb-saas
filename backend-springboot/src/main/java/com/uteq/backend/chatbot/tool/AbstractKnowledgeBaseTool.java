@@ -28,9 +28,9 @@ public abstract class AbstractKnowledgeBaseTool extends AbstractChatbotTool {
         this.baseKnowledgeRepo = baseKnowledgeRepo;
     }
     /**
-     * Retrieves input schema.
+     * Devuelve el schema de entrada: objeto vacío porque estas tools no reciben parámetros.
      *
-     * @return json node with the resulting state after the operation
+     * @return schema JSON de tipo objeto sin propiedades
      */
     @Override
     public JsonNode getInputSchema() {
@@ -61,10 +61,11 @@ public abstract class AbstractKnowledgeBaseTool extends AbstractChatbotTool {
      */
     protected abstract ObjectNode mapInput(KnowledgeBase bc);
     /**
-     * Procesa execute y devuelve el resultado calculado por el backend.
+     * Ejecuta la consulta sobre la base de conocimiento: filtra las entradas activas
+     * por las categorías de la tool y las devuelve bajo la clave de respuesta con su total.
      *
-     * @param args argumento recibido por la herramienta del chatbot para decidir y ejecutar la accion
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param args argumentos recibidos de Gemini, se ignoran porque no hay parámetros
+     * @return nodo JSON con el arreglo de entradas y el total encontrado
      */
     @Override
     public JsonNode execute(JsonNode args) {

@@ -30,9 +30,9 @@ public class CategoryController {
         this.categoryRepository = categoryRepository;
     }
     /**
-     * Lists category.
+     * Lista todas las categorías del catálogo para cualquier usuario autenticado.
      *
-     * @return response entity{@code <list<categoria response dto>>} with the resulting state after the operation
+     * @return lista completa de categorías con id y nombre
      */
     @GetMapping
     public ResponseEntity<List<CategoryResponseDTO>> list() {
@@ -42,10 +42,10 @@ public class CategoryController {
         return ResponseEntity.ok(categories);
     }
     /**
-     * Consulta search usando los filtros recibidos y devuelve el resultado solicitado.
+     * Busca hasta cinco categorías cuyo nombre contenga el texto dado, sin distinguir mayúsculas.
      *
-     * @param q texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param q texto parcial del nombre de la categoría
+     * @return lista de hasta cinco categorías coincidentes
      */
     @GetMapping("/buscar")
     public ResponseEntity<List<CategoryResponseDTO>> search(@RequestParam String q) {
@@ -55,10 +55,10 @@ public class CategoryController {
                         .toList());
     }
     /**
-     * Registra create validando los datos de entrada antes de persistir cambios.
+     * Crea una categoría nueva si el nombre no existe. Solo GERENTE y ADMIN.
      *
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param dto nombre de la categoría a registrar
+     * @return categoría creada con su id y cabecera de ubicación
      */
     @PostMapping
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")

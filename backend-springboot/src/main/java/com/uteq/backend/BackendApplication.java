@@ -23,9 +23,9 @@ public class BackendApplication {
     }
 
 	/**
-     * Handles main.
+     * Punto de entrada de la aplicación Spring Boot.
      *
-     * @param args string[] supplied by the caller for this invocation
+     * @param args argumentos de línea de comandos
      */
 
 	public static void main(String[] args) {
