@@ -253,7 +253,7 @@ def main() -> int:
         if vistos != n:
             return falla(f"{arch}: {vistos} createNativeQuery != {n} pineados")
     print("verify-p5: OK (CALL nativos en CustomImpl pineados)")
-    print("verify-p5: pendiente documentado (excepcion tecnica ADR-006; sin migraciones a ciegas)")
+    print("verify-p5: OK (0 nativeQuery + 0 CALL nativos: P5 migrado)")
     return 0
 
 

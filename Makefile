@@ -268,7 +268,7 @@ clean:
 # scripts/verify-all.py (unica fuente de verdad; mismo script corre con
 # `python scripts/verify-all.py` donde no hay GNU Make). Clasifica cada
 # punto P1-P12 como "evidencia válida", "PENDIENTE" (visible, nunca
-# aprobado: P3, P5-parcial, firmas P11) o "FALLO", y sale 0 solo si no
+# aprobado: P3, P10-bloqueado, firmas P11) o "FALLO", y sale 0 solo si no
 # hay ningun FALLO. Solo lectura: ningun verificador modifica NDJSON,
 # figuras, PDFs ni evidencia (P4 genera su grafico en temporal).
 # UTF-8 interno: no requiere PYTHONUTF8=1 en Windows.

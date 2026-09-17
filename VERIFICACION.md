@@ -78,7 +78,7 @@ UTF-8 interno: no requiere `PYTHONUTF8=1` en Windows.
 python scripts/verify-all.py
 ```
 
-### Salida (2026-09-17, rev d92ba03a, salida completa en `docs/evidencia/examen/d92ba03a/verify-all.txt`)
+### Salida (2026-09-17, rev b500878d, salida completa en `docs/evidencia/examen/b500878d/verify-all.txt`)
 
 ```text
 ===== verify-all: resumen P1-P12 =====
@@ -86,7 +86,7 @@ P1: evidencia válida
 P2: evidencia válida
 P3: PENDIENTE — no puntuable
 P4: evidencia válida
-P5: pendiente documentado (excepcion tecnica)
+P5: migrado (0 nativeQuery + 0 CALL nativos)
 P6: evidencia válida
 P7: evidencia válida
 P8/P9: evidencia válida
@@ -98,6 +98,9 @@ verify-all: exit 0 = coherencia/reproducibilidad de la evidencia disponible, NO 
 ```
 
 Código de salida: 0.
+
+P10 local queda PENDIENTE-bloqueado sin Docker; la evidencia contra el
+despliegue (login LECTOR + JWT + doble 403) vive en la sección P10.
 
 ### Archivo que respalda
 
@@ -302,39 +305,36 @@ guardia CRLF dentro de `verify-p4-k6.py`.
 python scripts/verify-p5-nativequery.py
 ```
 
-### Salida (2026-09-17, rev d92ba03a)
+### Salida (2026-09-17, rev b500878d)
 
 ```text
-verify-p5: OK (inventario 33=23+10 coincide)
+verify-p5: OK (inventario 0=0+0 coincide)
+(... 22 líneas "migrada <método> -> <reemplazo> [<prueba>]" ...)
+verify-p5: OK (CALL nativos en CustomImpl pineados)
+verify-p5: OK (0 nativeQuery + 0 CALL nativos: P5 migrado)
 ```
 
-Detalle: 33 `nativeQuery = true` en total (AuditLogAuditRepository:1,
-BookRepository:6, FineProcedureRepository:3, LoanProcedureRepository:20,
-LoanRepository:1, ReservationRepository:2); 23 invocan rutinas
-(`fn_*`/`sp_pago_parcial_multa`), 10 son SELECT sin rutinas.
+(Salida íntegra en `docs/evidencia/examen/b500878d/verify-all.txt`.)
 
-### Clasificación
+### Migración ejecutada (era: 33 nativas = 23 rutinas + 10 ordinarias)
 
-- **22 `fn_* RETURNS TABLE`** (reportes e inventarios): sin
-  equivalente JPA/`@Procedure` — JPA 2.1/`CallableStatement` solo
-  expone escalar/OUT o `REF_CURSOR`, no `SETOF/TABLE` vía
-  `SELECT * FROM fn_()`; reescribir a cursor rompería el contrato SQL
-  público e impediría `psql` directo. Limitación pgjdbc documentada —
-  ver `docs/adr/adr-006-acceso-datos-orm-sp.md` y
-  `docs/capitulos/14-anexos.tex` ("Alcance de corrección").
-- **`sp_pago_parcial_multa`** (`FUNCTION ... RETURNS record` con 4
-  OUT, `V16__multas_pago_parcial.sql`): 0 tests ejercitan su SQL
-  real (solo mocks en `FineControllerTest`), así que la equivalencia
-  `@Procedure` no queda demostrada; migrar sin prueba violaría la
-  regla del plan. Se mantiene con justificación técnica.
+- **10 ordinarias** → JPQL/Criteria (`ReservationRepository`,
+  `LoanRepository`, `BookRepositoryCustom`, `AuditLogAuditRepositoryCustom`).
+- **6 side-effects** → `StoredProcedureQuery` posicional (incluye
+  wrapper V54 `proc_pago_parcial_multa`).
+- **17 tabulares** → Criteria/JPQL con cómputo Java idéntico
+  (ROUND, porcentajes, `string_agg`, FULL OUTER, `date_trunc`).
+- Pruebas: equivalencia fila a fila en PG real (`P5SpikeIT` 12/12,
+  `P5TabularSpikeIT` 8/8), H2 (`ReportRepositoriesH2Test` 11/11),
+  suite completa 655/0/0. Matriz: `docs/basedatos/P5-MATRIZ-33.md`.
 
 ### Resultado
 
-PARCIAL documentado, 0 % a criterio estricto (la guía exige cero
-`nativeQuery=true` para rutinas): inventario verificable completo;
-migración real pendiente en fase P5 (camino crítico a 8,0). Nota: una
-sonda desechable no versionada citada antes en este expediente se
-retiró del mismo; su conclusión técnica vive en ADR-006.
+Cerrado 100 %: 0 apariciones de `nativeQuery = true` y 0 `CALL` nativos
+en `*CustomImpl` (verificador pineado con 22 migraciones auditadas);
+side-effects por `StoredProcedureQuery` posicional (V54 incluida);
+tabulares en Criteria/JPQL con equivalencia fila a fila probada en PG
+real; ordinarias en JPQL/Criteria. Funciones SQL intactas en BD.
 
 ---
 
@@ -528,11 +528,11 @@ README en fase de regresiones (rotación en prod: acción humana).
 python scripts/verify-p11-counts.py
 ```
 
-### Salida (2026-09-17, rev d92ba03a, completa)
+### Salida (2026-09-17, rama fix/fase01-sus-n0, completa)
 
 ```text
-verify-p11: rev citado 840ba5c1 es ancestro de HEAD (+11 commits propios declarados en prosa)
-verify-p11: OK (shortlog a 840ba5c1: 763/343/326, total 1434)
+verify-p11: rev citado b500878d es ancestro de HEAD (+0 commits propios declarados en prosa)
+verify-p11: OK (shortlog a b500878d: 763/343/356, total 1464)
 verify-p11: OK (CONTRIBUCIONES.md coincide)
 verify-p11: OK (CONTRIBUTORS.md coincide)
 verify-p11: OK (cap. 13 coincide)

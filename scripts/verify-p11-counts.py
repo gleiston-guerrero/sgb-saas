@@ -109,12 +109,13 @@ def main() -> int:
         return falla("totales de CONTRIBUCIONES.md difieren del shortlog")
     print("verify-p11: OK (CONTRIBUCIONES.md coincide)")
 
-    # 2. CONTRIBUTORS.md: tabla por autor.
-    tabla = leer("CONTRIBUTORS.md")
+    # 2. CONTRIBUTORS.md: tabla por autor (filas que envuelven línea
+    # se normalizan a espacios antes de buscar).
+    tabla = re.sub(r"\s+", " ", leer("CONTRIBUTORS.md"))
     for nombre, esperado in (("Irvin Cajas Ibarra", cajas),
                              ("Marlon Loor Medranda", loor),
                              ("Moises Panama Murillo", panama)):
-        mm = re.search(rf"\|\s*{re.escape(nombre)}\s*\|.*\|\s*\*\*(\d+)\*\*", tabla)
+        mm = re.search(rf"\|\s*{re.escape(nombre)}\s*\|.*?\|\s*\*\*(\d+)\*\*", tabla)
         if not mm or int(mm.group(1)) != esperado:
             return falla(f"CONTRIBUTORS.md: {nombre} != {esperado}")
     print("verify-p11: OK (CONTRIBUTORS.md coincide)")

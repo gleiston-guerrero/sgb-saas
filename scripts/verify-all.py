@@ -120,7 +120,7 @@ def main() -> int:
         ("P2", [PY, "scripts/verify-p2-dois.py"], 600, VALIDA),
         ("P4", [PY, "scripts/verify-p4-k6.py"], 900, VALIDA),
         ("P5", [PY, "scripts/verify-p5-nativequery.py"], 300,
-         "pendiente documentado (excepcion tecnica)"),
+         "migrado (0 nativeQuery + 0 CALL nativos)"),
         ("P6", [PY, "scripts/verify-p6-javadoc.py"], 300, VALIDA),
         ("P7", [PY, "scripts/verify-p7-names.py"], 300, VALIDA),
         ("P8/P9", [PY, "scripts/verify-p8-p9-figures.py"], 300, VALIDA),
