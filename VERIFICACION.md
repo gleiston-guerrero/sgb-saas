@@ -480,22 +480,24 @@ CUMPLE
 ### Comando
 
 ```powershell
-git -c log.mailmap=true shortlog -sne --no-merges b82ae0e2
+git -c log.mailmap=true shortlog -sne --no-merges 9f370270
 git log --no-merges --author=<icajasi|mloorm14|mpanamam> --format=%h -- <área>
 ```
 
-### Salida (rev b82ae0e2 = commit 1 de evidencia)
+### Salida (rev 9f370270 = fix CRLF k6 en codex)
 
 ```text
-763 Irvin Cajas Ibarra / 343 Marlon Loor Medranda / 322 Moises Panama Murillo
-(+1 TeilorSuit no atribuible, +1 bot excluido; total no-merges 1430)
+763 Irvin Cajas Ibarra / 343 Marlon Loor Medranda / 324 Moises Panama Murillo
+(+1 TeilorSuit no atribuible, +1 bot excluido; total no-merges 1432)
 ```
 
-Doble commit aplicado: conteos generados contra el SHA del commit 1
-(`b82ae0e2`) y commiteados en el commit 2 (que suma +1 a Panamá,
-declarado en `CONTRIBUCIONES.md`). `roles-commit-counts.txt`
-verificado byte a byte contra el shortlog en vivo (UTF-16
-preservado).
+Doble commit aplicado: conteos generados contra el SHA del commit de
+evidencia (`9f370270`) y commiteados en el commit siguiente (que suma
++1 a Panamá, declarado en `CONTRIBUCIONES.md`).
+`roles-commit-counts.txt` verificado byte a byte contra el shortlog
+en vivo (UTF-16 preservado). Nota: la cadena b82ae0e2→82fcfec1 queda
+en historial como re-sincronización previa al incidente CRLF; los
+conteos vigentes son los de este rev.
 
 ### Archivo que respalda
 
