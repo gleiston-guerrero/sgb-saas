@@ -332,6 +332,25 @@ public class LoanService {
                 .toList();
     }
 
+    /**
+     * Días restantes con la semántica de la fórmula nativa original
+     * {@code (fecha_devolucion_estimada::date - NOW()::date)}: diferencia
+     * en días calendario entre hoy y la fecha estimada; nulo si no hay
+     * fecha estimada (igual que la resta SQL con NULL). Usa la zona del
+     * sistema — igual que CURRENT_DATE/NOW() del lado BD cuando JVM y BD
+     * comparten zona (prod: UTC/UTC) — no UTC fijo, que desplaza el corte
+     * de día cuando la BD corre en otra zona.
+     */
+    public static Integer diasRestantes(java.time.Instant estimada) {
+        if (estimada == null) {
+            return null;
+        }
+        java.time.ZoneId zona = java.time.ZoneId.systemDefault();
+        return (int) java.time.temporal.ChronoUnit.DAYS.between(
+                java.time.LocalDate.now(zona),
+                estimada.atZone(zona).toLocalDate());
+    }
+
     private static final int LIMITE_REPORTE_DEFAULT = 10;
 
     /**
@@ -488,6 +507,19 @@ public class LoanService {
                 p.getDateLoan() != null ? p.getDateLoan().atOffset(ZoneOffset.UTC) : null,
                 p.getDateLoanReturnEstimada() != null ? p.getDateLoanReturnEstimada().atOffset(ZoneOffset.UTC) : null,
                 p.getDaysRemaining(),
+                p.getStatusName());
+    }
+
+    private LoanActiveResponseDTO toDTO(
+            com.uteq.backend.repository.projection.LoanActiveBaseProjection p) {
+        return new LoanActiveResponseDTO(
+                p.getLoanId(),
+                p.getBookTitle(),
+                p.getBookIsbn(),
+                p.getDateLoan() != null ? p.getDateLoan().toInstant().atOffset(ZoneOffset.UTC) : null,
+                p.getDateLoanReturnEstimada() != null ? p.getDateLoanReturnEstimada().toInstant().atOffset(ZoneOffset.UTC) : null,
+                diasRestantes(p.getDateLoanReturnEstimada() != null
+                        ? p.getDateLoanReturnEstimada().toInstant() : null),
                 p.getStatusName());
     }
 

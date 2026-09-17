@@ -15,5 +15,7 @@ public interface ReservationTodayProjection {
     String getBookTitle();
     String getBookIsbn();
     String getStatusName();
-    java.time.Instant getDateLimitPickup();
+    // OffsetDateTime (tipo del atributo): Spring no convierte
+    // OffsetDateTime->Instant en proyecciones; el service normaliza a UTC.
+    java.time.OffsetDateTime getDateLimitPickup();
 }

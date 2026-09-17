@@ -217,7 +217,10 @@ public class ReservationService {
      */
     @Transactional(readOnly = true)
     public List<ReservationTodayResponseDTO> searchReservationsToday() {
-        OffsetDateTime start = LocalDate.now(ZoneOffset.UTC).atStartOfDay().atOffset(ZoneOffset.UTC);
+        // Zona del sistema, igual que CURRENT_DATE del SQL original (ver
+        // LoanService.diasRestantes): JVM y BD comparten zona en prod.
+        OffsetDateTime start = LocalDate.now(ZoneId.systemDefault()).atStartOfDay()
+                .atZone(ZoneId.systemDefault()).toOffsetDateTime();
         return reservationRepo.searchReservationsToday(start, start.plusDays(1)).stream()
                 .map(p -> new ReservationTodayResponseDTO(
                         p.getReservationId(),
@@ -226,7 +229,7 @@ public class ReservationService {
                         p.getBookTitle(),
                         p.getBookIsbn(),
                         p.getStatusName(),
-                        p.getDateLimitPickup() != null ? p.getDateLimitPickup().atOffset(java.time.ZoneOffset.UTC) : null))
+                        p.getDateLimitPickup() != null ? p.getDateLimitPickup().toInstant().atOffset(java.time.ZoneOffset.UTC) : null))
                 .toList();
     }
 
@@ -238,7 +241,8 @@ public class ReservationService {
      */
     @Transactional(readOnly = true)
     public List<ReservationTodayResponseDTO> searchReservationsNexts() {
-        OffsetDateTime start = LocalDate.now(ZoneOffset.UTC).atStartOfDay().atOffset(ZoneOffset.UTC).plusDays(1);
+        OffsetDateTime start = LocalDate.now(ZoneId.systemDefault()).atStartOfDay()
+                .atZone(ZoneId.systemDefault()).toOffsetDateTime().plusDays(1);
         return reservationRepo.searchReservationsNexts(start).stream()
                 .map(p -> new ReservationTodayResponseDTO(
                         p.getReservationId(),
@@ -247,7 +251,7 @@ public class ReservationService {
                         p.getBookTitle(),
                         p.getBookIsbn(),
                         p.getStatusName(),
-                        p.getDateLimitPickup() != null ? p.getDateLimitPickup().atOffset(java.time.ZoneOffset.UTC) : null))
+                        p.getDateLimitPickup() != null ? p.getDateLimitPickup().toInstant().atOffset(java.time.ZoneOffset.UTC) : null))
                 .toList();
     }
 

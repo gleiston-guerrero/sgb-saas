@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.uteq.backend.repository.LoanRepository;
-import com.uteq.backend.repository.projection.LoanActiveProjection;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -54,17 +53,24 @@ public class QueryLoansTool extends AbstractUserAwareTool {
             return errorNode("Se requiere usuario_id");
         }
 
-        List<LoanActiveProjection> loans = loanRepo.findActivesByUserId(userId);
+        List<com.uteq.backend.repository.projection.LoanActiveBaseProjection> loans =
+                loanRepo.findActivesByUserId(userId);
 
         ArrayNode loansArray = mapper.createArrayNode();
-        for (LoanActiveProjection p : loans) {
+        for (com.uteq.backend.repository.projection.LoanActiveBaseProjection p : loans) {
             ObjectNode node = mapper.createObjectNode();
             node.put("prestamo_id", p.getLoanId());
             node.put("titulo", p.getBookTitle());
             node.put("isbn", p.getBookIsbn());
-            node.put("fecha_prestamo", p.getDateLoan() != null ? p.getDateLoan().toString() : null);
-            node.put("fecha_devolucion_estimada", p.getDateLoanReturnEstimada() != null ? p.getDateLoanReturnEstimada().toString() : null);
-            node.put("dias_restantes", p.getDaysRemaining());
+            node.put("fecha_prestamo", p.getDateLoan() != null ? p.getDateLoan().toInstant().toString() : null);
+            node.put("fecha_devolucion_estimada", p.getDateLoanReturnEstimada() != null ? p.getDateLoanReturnEstimada().toInstant().toString() : null);
+            Integer dias = com.uteq.backend.service.LoanService.diasRestantes(p.getDateLoanReturnEstimada() != null
+                    ? p.getDateLoanReturnEstimada().toInstant() : null);
+            if (dias != null) {
+                node.put("dias_restantes", dias.intValue());
+            } else {
+                node.putNull("dias_restantes");
+            }
             node.put("estado", p.getStatusName());
             loansArray.add(node);
         }

@@ -1,7 +1,7 @@
 package com.uteq.backend.repository;
 
 import com.uteq.backend.entity.Loan;
-import com.uteq.backend.repository.projection.LoanActiveProjection;
+import com.uteq.backend.repository.projection.LoanActiveBaseProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -36,21 +36,22 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
     List<Loan> findByUserIdOrderByIdDesc(Long userId);
 
     // Préstamos activos del LECTOR: misma lógica que
-    // fn_listar_prestamos_activos_por_usuario pero como query nativa JPA
-    // para evitar dependencia del stored procedure en producción.
-    // Revisada para P4 (nativeQuery -> JPQL): se mantiene nativa porque usa
-    // (fecha::date - NOW()::date)::INTEGER, cast/aritmetica de fechas
-    // especifica de PostgreSQL sin equivalente portable en JPQL para
-    // calcular dias_restantes como columna proyectada.
-    @Query(value = "SELECT p.id AS loanId, l.titulo AS bookTitle, l.isbn AS bookIsbn, "
-            + "p.fecha_prestamo AS dateLoan, p.fecha_devolucion_estimada AS dateLoanReturnEstimada, "
-            + "(p.fecha_devolucion_estimada::date - NOW()::date)::INTEGER AS daysRemaining, "
-            + "ep.nombre AS statusName "
-            + "FROM prestamos p "
-            + "JOIN libros l ON l.id = p.libro_id "
-            + "JOIN estados_prestamo ep ON ep.id = p.estado_prestamo_id "
-            + "WHERE p.usuario_id = :userId "
-            + "AND ep.nombre <> 'DEVUELTO' "
-            + "ORDER BY p.fecha_devolucion_estimada ASC", nativeQuery = true)
-    List<LoanActiveProjection> findActivesByUserId(@Param("userId") Long userId);
+    // fn_listar_prestamos_activos_por_usuario pero en JPQL para no
+    // depender del stored procedure en producción (P5).
+    // JOINs cartesianos porque Loan expone FK planas sin relaciones JPA.
+    // Los días restantes se calculan en Java (ver LoanService y
+    // QueryLoansTool) con la semántica de la fórmula original
+    // (fecha_devolucion_estimada::date - NOW()::date).
+    @Query("""
+        SELECT p.id AS loanId, b.title AS bookTitle, b.isbn AS bookIsbn,
+               p.dateLoan AS dateLoan,
+               p.dateLoanReturnEstimada AS dateLoanReturnEstimada,
+               s.name AS statusName
+        FROM Loan p, Book b, StatusLoan s
+        WHERE b.id = p.bookId
+          AND s.id = p.statusLoanId
+          AND p.userId = :userId
+          AND s.name <> 'DEVUELTO'
+        ORDER BY p.dateLoanReturnEstimada ASC""")
+    List<LoanActiveBaseProjection> findActivesByUserId(@Param("userId") Long userId);
 }

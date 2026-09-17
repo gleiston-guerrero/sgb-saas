@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
-"""P5: inventario pineado de `nativeQuery = true` (33 = 23 rutinas + 10 ordinarias).
+"""P5: inventario pineado de `nativeQuery = true` en descenso hacia 0.
 
 Clasifica cada ocurrencia por bloque @Query (scanner con estado de
 strings Java, no regex ingenuo): es "rutina" si el bloque invoca
-FROM fn_*/sp_*; el resto es consulta ordinaria. Compara contra lo
-pineado abajo y falla ante CUALQUIER alta, baja o reclasificacion:
-todo cambio del inventario exige actualizar justificacion y pruebas
-en el mismo commit.
+FROM fn_*/sp_*; el resto es consulta ordinaria. Falla ante CUALQUIER
+alta, baja o reclasificacion no declarada: cada migracion actualiza los
+pineados + MIGRADAS en el mismo commit, con prueba de equivalencia.
+
+Segunda dimension: los `createNativeQuery("CALL ...")` en *CustomImpl
+(tambien pineados por archivo) deben bajar solo via @Procedure real.
 
 Este verificador NO aprueba P5: exit 0 significa "inventario fiel a
-lo documentado (excepcion tecnica ADR-006 vigente)", no punto cerrado.
+lo documentado", no punto cerrado. P5 cierra en 0 nativas + 0 CALL
+nativos en CustomImpl.
 
 Uso: python scripts/verify-p5-nativequery.py
 Sale 0 si el inventario coincide, 1 ante cualquier diferencia.
@@ -31,7 +34,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 BASE_JAVA = ROOT / "backend-springboot" / "src" / "main" / "java"
 
-TOTAL_ESPERADO = 33
+TOTAL_ESPERADO = 30
 RUTINA_ESPERADA = 23
 
 # Rutinas pineadas por archivo (nombres distintos esperados).
@@ -72,13 +75,28 @@ ORDINARIAS: dict[str, list[tuple[int, str]]] = {
         (5, "SELECT planos sobre libros (listados/inventario); sin rutinas"),
         (6, "SELECT planos sobre libros (listados/inventario); sin rutinas"),
     ],
-    "LoanRepository.java": [
-        (1, "SELECT prestamos+libros con ORDER BY; sin rutinas"),
-    ],
-    "ReservationRepository.java": [
-        (1, "SELECT con filtros sobre reservaciones; sin rutinas"),
-        (2, "SELECT con filtros sobre reservaciones; sin rutinas"),
-    ],
+}
+# (LoanRepository salio del pineado: findActivesByUserId migro a JPQL.
+# ReservationRepository salio antes: O-9/O-10 a JPQL. Ver MIGRADAS.)
+# Migraciones cerradas con prueba de equivalencia (metodo, reemplazo, prueba).
+# Cada fila resta del inventario; prohibido borrar nativas sin fila aqui.
+MIGRADAS = [
+    ("ReservationRepository.searchReservationsToday",
+     "JPQL cartesiana + ventana :start/:end desde el service (zona sistema)",
+     "P5SpikeIT.s5_ventanaHoyYProximas + ReservationServiceTest 21/21"),
+    ("ReservationRepository.searchReservationsNexts",
+     "JPQL cartesiana + :start desde el service (zona sistema)",
+     "P5SpikeIT.s5_ventanaHoyYProximas + ReservationServiceTest 21/21"),
+    ("LoanRepository.findActivesByUserId",
+     "JPQL cartesiana + diasRestantes en Java (zona sistema, igual que NOW()::date)",
+     "P5SpikeIT.s6_activosPorUsuarioJpqlYDiasJava + LoanServiceTest 31/31"),
+]
+
+# CALL nativos en *CustomImpl pineados por archivo (bajan solo con @Procedure real).
+CALL_NATIVOS_POR_ARCHIVO = {
+    "LoanProcedureRepositoryCustomImpl.java": 2,
+    "FineProcedureRepositoryCustomImpl.java": 2,
+    "ReservationProcedureRepositoryCustomImpl.java": 1,
 }
 
 PATRON_RUTINA = re.compile(r"FROM\s+(fn_\w+|sp_\w+)", re.IGNORECASE)
@@ -186,6 +204,19 @@ def main() -> int:
     print(f"verify-p5: OK (inventario {total}={sitios_rutina}+{total - sitios_rutina} coincide)")
     for d in detalle:
         print(f"verify-p5: {d}")
+    for metodo, reemplazo, prueba in MIGRADAS:
+        print(f"verify-p5: migrada {metodo} -> {reemplazo} [{prueba}]")
+    # Segunda dimension: CALL nativos ocultos en CustomImpl.
+    for arch, n in CALL_NATIVOS_POR_ARCHIVO.items():
+        proc2 = subprocess.run(
+            ["git", "grep", "-c", "createNativeQuery", "--",
+             f"backend-springboot/src/main/java/com/uteq/backend/repository/{arch}"],
+            cwd=ROOT, capture_output=True, text=True,
+            encoding="utf-8", errors="replace")
+        vistos = int(proc2.stdout.strip().split(":")[-1]) if proc2.returncode == 0 else 0
+        if vistos != n:
+            return falla(f"{arch}: {vistos} createNativeQuery != {n} pineados")
+    print("verify-p5: OK (CALL nativos en CustomImpl pineados)")
     print("verify-p5: pendiente documentado (excepcion tecnica ADR-006; sin migraciones a ciegas)")
     return 0
 

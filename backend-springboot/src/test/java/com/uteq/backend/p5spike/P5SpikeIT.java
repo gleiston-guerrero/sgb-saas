@@ -3,8 +3,10 @@ package com.uteq.backend.p5spike;
 import com.uteq.backend.entity.Book;
 import com.uteq.backend.entity.Loan;
 import com.uteq.backend.entity.Reservation;
+import com.uteq.backend.repository.LoanRepository;
 import com.uteq.backend.repository.ReservationRepository;
 import com.uteq.backend.repository.StatusReservationRepository;
+import com.uteq.backend.service.LoanService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.ParameterMode;
 import jakarta.persistence.PersistenceContext;
@@ -50,6 +52,9 @@ class P5SpikeIT {
     @Autowired
     private StatusReservationRepository statuses;
 
+    @Autowired
+    private LoanRepository loans;
+
     @Test
     void s1_procedurePosicionalCreaPrestamo() {
         StoredProcedureQuery sp = em.createStoredProcedureQuery("proc_crear_prestamo");
@@ -83,8 +88,8 @@ class P5SpikeIT {
     @Test
     void s5_ventanaHoyYProximas() {
         Integer pend = statuses.findByName("PENDIENTE").orElseThrow().getId();
-        OffsetDateTime startToday = LocalDate.now(ZoneOffset.UTC)
-                .atStartOfDay().atOffset(ZoneOffset.UTC);
+        OffsetDateTime startToday = LocalDate.now(java.time.ZoneId.systemDefault())
+                .atStartOfDay(java.time.ZoneId.systemDefault()).toOffsetDateTime();
         sembrarReserva(2L, 1L, pend, startToday.plusHours(10));
         sembrarReserva(2L, 2L, pend, startToday.plusDays(2));
         sembrarReserva(2L, 1L, pend, startToday.minusDays(1));
@@ -93,13 +98,39 @@ class P5SpikeIT {
         assertThat(hoy).hasSize(1);
         assertThat(hoy.get(0).getBookTitle()).isEqualTo("Clean Code");
         assertThat(hoy.get(0).getStatusName()).isEqualTo("PENDIENTE");
+        assertThat(hoy.get(0).getDateLimitPickup()).isNotNull();
 
         var proximas = reservations.searchReservationsNexts(startToday.plusDays(1));
         assertThat(proximas).hasSize(1);
     }
 
-    private void sembrarReserva(Long userId, Long bookId, Integer statusId, OffsetDateTime limite) {
-        Reservation r = new Reservation();
+    @Test
+    void s6_activosPorUsuarioJpqlYDiasJava() {
+        OffsetDateTime estimada = LocalDate.now(ZoneOffset.UTC)
+                .plusDays(5).atStartOfDay().atOffset(ZoneOffset.UTC);
+        Loan prestamo = new Loan();
+        prestamo.setUserId(2L);
+        prestamo.setBookId(1L);
+        prestamo.setLibrarianId(1L);
+        prestamo.setDateLoan(OffsetDateTime.now(ZoneOffset.UTC).minusDays(2));
+        prestamo.setDateLoanReturnEstimada(estimada);
+        prestamo.setStatusLoanId(1);
+        prestamo = loans.saveAndFlush(prestamo);
+
+        var filas = loans.findActivesByUserId(2L);
+        assertThat(filas).hasSize(1);
+        assertThat(filas.get(0).getBookTitle()).isEqualTo("Clean Code");
+        assertThat(filas.get(0).getStatusName()).isEqualTo("ACTIVO");
+
+        Object diasSql = em.createNativeQuery(
+                "SELECT (fecha_devolucion_estimada::date - NOW()::date) FROM prestamos WHERE id = ?")
+                .setParameter(1, filas.get(0).getLoanId())
+                .getSingleResult();
+        assertThat(LoanService.diasRestantes(filas.get(0).getDateLoanReturnEstimada().toInstant()))
+                .isEqualTo(((Number) diasSql).intValue());
+    }
+
+    private void sembrarReserva(Long userId, Long bookId, Integer statusId, OffsetDateTime limite) {        Reservation r = new Reservation();
         r.setUserId(userId);
         r.setBookId(bookId);
         r.setStatusReservationId(statusId);
