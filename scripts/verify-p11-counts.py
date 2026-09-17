@@ -144,7 +144,7 @@ def main() -> int:
         return falla("roles-commit-counts.txt difiere del shortlog en vivo")
     print("verify-p11: OK (roles-commit-counts.txt exacto)")
 
-    print("verify-p11: OK (conteos verificables; firmas externas pendientes)")
+    print("verify-p11: OK (conteos verificables; ver seccion Firmas en CONTRIBUCIONES.md)")
     return 0
 
 
