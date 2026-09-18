@@ -311,7 +311,7 @@ make verify   # = scripts/verify-all.py: P1-P12 + javadoc en un solo comando
 ```
 
 - Clasifica cada punto como `evidencia válida`, `PENDIENTE` (visible,
-  nunca aprobado: P3, P5-parcial, firmas P11) o `FALLO`; sale 0 solo
+  nunca aprobado: P3, P10-bloqueado, firmas P11) o `FALLO`; sale 0 solo
   si no hay ningún `FALLO`. Un exit 0 con pendientes significa
   coherencia/reproducibilidad de la evidencia disponible, no
   cumplimiento académico total.
@@ -364,5 +364,5 @@ make verify   # = scripts/verify-all.py: P1-P12 + javadoc en un solo comando
 Digest SHA256 de `docs/informe-final.pdf` (regenerado 2026-09-17, 109 páginas):
 
 ```
-FC22AB0C0628C41AED8AA4108462B99AF49AFA0798F8BBBECA7DB6A36012055C
+FD541B819F3DDC9C488B36739F29AD53F0E76F0AD01630745772B8CC4C134560
 ```

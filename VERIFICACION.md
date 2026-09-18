@@ -431,7 +431,7 @@ xelatex -interaction=nonstopmode -halt-on-error informe-final.tex
 xelatex -interaction=nonstopmode -halt-on-error informe-final.tex
 ```
 
-### Salida (2026-09-17, rev 31f4b30e; logs en `docs/evidencia/examen/d92ba03a/xelatex-{1,2,3}.txt`, `bibtex.txt`)
+### Salida (2026-09-17, rev 31f4b30e; logs en `docs/evidencia/examen/xelatex-c2-*.txt`, `bibtex-c2.txt`; los de `d92ba03a/` quedan como históricos)
 
 ```text
 verify-p8-p9: OK (15 entornos figure)
@@ -461,7 +461,7 @@ manifiesto 9 figuras × (svg+pdf) en `docs/mediciones/figuras/`. Total:
 
 - `scripts/generar-figuras-evaluacion.py` (fuentes solo versionadas)
 - `docs/mediciones/figures-captions-en.md`
-- `docs/evidencia/examen/d92ba03a/xelatex-3.txt` (109 páginas, exit 0)
+- `docs/evidencia/examen/xelatex-c2-3.txt` (109 páginas, exit 0; los de `d92ba03a/` quedan como históricos)
 
 ### Resultado
 

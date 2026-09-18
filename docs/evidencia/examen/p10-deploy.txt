@@ -1,5 +1,5 @@
-Fecha ISO real: 2026-09-17T19:42:01.406864-05:00
-SHA: 31f4b30e
+Fecha ISO real: 2026-09-17T20:03:14.872083-05:00
+SHA: e55f43b0
 URL: https://sgb-backend-b058.onrender.com
 Cuenta: u@uteq.edu.ec (demo LECTOR, password no registrada)
 

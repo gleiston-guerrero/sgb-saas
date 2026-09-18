@@ -46,7 +46,7 @@ doi: 10.5281/zenodo.22741050
 # paginas -- P4 unificado, serie k6 vigente, DOI vigente, figuras
 # C4/DER/JaCoCo corregidas, P11 re-sincronizado; mismo valor que README.md
 # "Integridad del entregable"):
-# FC22AB0C0628C41AED8AA4108462B99AF49AFA0798F8BBBECA7DB6A36012055C
+# FD541B819F3DDC9C488B36739F29AD53F0E76F0AD01630745772B8CC4C134560
 # NOTA: si el PDF se recompila al cierre, re-sincronizar este digest y
 # el del README con el nuevo `Get-FileHash docs/informe-final.pdf
 # -Algorithm SHA256` (docs/capitulos/00-portada.tex no fija un valor

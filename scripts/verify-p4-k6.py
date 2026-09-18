@@ -121,15 +121,27 @@ def main() -> int:
     # (nombre, n_peticiones exacto, p95 a 2 decimales, tasa de error).
     # Solo lectura: el grafico se genera en un temporal (SGB_PERF_GRAFICO).
     # Orden: primero el exit code con stderr (causa real), despues el
-    # archivo. Limpieza tolerante: en Windows los handles (matplotlib,
+    # archivo. Pre-flight de escritura (falla rapido antes del analisis
+    # largo) y limpieza tolerante: en Windows los handles (matplotlib,
     # antivirus) pueden bloquear el borrado del temporal.
-    tmp = tempfile.mkdtemp(prefix="verify-p4-")
-    entorno = dict(os.environ, SGB_PERF_GRAFICO=os.path.join(
-        tmp, "p95-comparacion-escenarios.svg"))
-    proc = subprocess.run(
-        [sys.executable, str(ANALISIS), *(str(p) for p in CORRIDAS)],
-        cwd=ROOT, capture_output=True, text=True, timeout=600,
-        encoding="utf-8", errors="replace", env=entorno)
+    try:
+        tmp = tempfile.mkdtemp(prefix="verify-p4-")
+        prueba = os.path.join(tmp, ".wtest")
+        with open(prueba, "w", encoding="utf-8") as fh:
+            fh.write("ok")
+        os.remove(prueba)
+    except OSError as exc:
+        return falla(f"temporal no escribible ({tempfile.gettempdir()}): {exc}")
+    try:
+        entorno = dict(os.environ, SGB_PERF_GRAFICO=os.path.join(
+            tmp, "p95-comparacion-escenarios.svg"))
+        proc = subprocess.run(
+            [sys.executable, str(ANALISIS), *(str(p) for p in CORRIDAS)],
+            cwd=ROOT, capture_output=True, text=True, timeout=600,
+            encoding="utf-8", errors="replace", env=entorno)
+    except OSError as exc:
+        shutil.rmtree(tmp, ignore_errors=True)
+        return falla(f"no se pudo lanzar perf-analysis.py: {exc}")
     if proc.returncode != 0:
         shutil.rmtree(tmp, ignore_errors=True)
         return falla(f"perf-analysis.py exit={proc.returncode}: {proc.stderr[-800:]}")
