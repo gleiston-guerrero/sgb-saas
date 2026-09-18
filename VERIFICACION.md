@@ -37,8 +37,7 @@ git status --short
 * d65b8ade docs(blindaje-final): P11 a e55f43b0, PDF FD54, P4 unificado, verificadores
 * e55f43b0 docs(cierre): evidencia verify-all final, exit 0
 * f590bb6b docs(cierre): PDF final 109pp + SHA real + derivados
-v1.1.0 -> 6803730704269737bce4e4c17b7b61bb89702380 (tag anotado)
-v1.1.0^{} -> bec80ecbd8973d93b45894155981ad4409a405c8 (commit, anterior al cierre; lo mueve el admin al SHA final)
+v1.1.0 -> 080450c22e02551c6dfe1248060e243298aae43c (commit, etiqueta ligera)
 M VERIFICACION.md
 ?? docs/evidencia/examen/24885d18/
 ```
@@ -133,14 +132,13 @@ PENDIENTEs visibles: P3 N=0, P10 sin Docker, firmas P11).
 python scripts/verify-p1-hashes.py
 ```
 
-### Salida (2026-09-17, rama fix/fase01-sus-n0, completa)
+### Salida reproducida el 2026-09-18 sobre `080450c2` (completa)
 
 ```text
 [OK] 00b2630 (commit)
 [OK] 00b26306 (commit)
 [OK] 1028ad02 (commit)
 [OK] 437ebe5 (commit)
-[OK] 437ebe5b (commit)
 [OK] 454be77 (commit)
 [OK] 4d69f24 (commit)
 [OK] 4d69f244 (commit)
@@ -159,7 +157,6 @@ python scripts/verify-p1-hashes.py
 [OK] 9a467125 (commit)
 [OK] 9f370270 (commit)
 [OK] bca23c2 (commit)
-[OK] bca23c2c (commit)
 [OK] d8443e6 (commit)
 [OK] d8443e66 (commit)
 [OK] df09f0d (commit)
