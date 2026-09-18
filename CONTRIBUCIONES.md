@@ -128,15 +128,23 @@ transcribe firmas por otros integrantes.
   Filas aceptadas: P1, P2, P3 retiro/N=0, P4, P5, P6, P8/P9, P10,
   P11, P12, EV-1/EV-2 y sección B CRediT de Panamá.
   Firma: Panamá Murillo Moisés Antonio.
-- **Loor Medranda Marlon Taylor** — `mloorm14@uteq.edu.ec` — Fecha: 2026-09-17.
-  Declaración: Yo, Loor Medranda Marlon Taylor, declaro que revisé
-  la atribución EV-4 y acepto como reales y verificables las
-  contribuciones asignadas a mi nombre en este documento. Acepto mi
-  titularidad en P2, P4, P5 como trabajo previo parcial, P7, P8/P9 y
-  sección B CRediT de Loor, según los archivos, commits y comandos
-  indicados. No reclamo autoría sobre filas no asignadas a mi nombre.
-  Filas aceptadas: P2, P4, P5 trabajo previo parcial, P7, P8/P9 y
-  sección B CRediT de Loor.
+- **Loor Medranda Marlon Taylor** — `mloorm14@uteq.edu.ec` — Fecha: 2026-09-18.
+  Declaración de aceptación personal: Yo, Loor Medranda Marlon Taylor,
+  revisé personalmente la evidencia y los commits indicados en este
+  documento. Acepto únicamente las atribuciones que reconozco como
+  propias: P2; P4; P5 como trabajo previo parcial; P7; y P8/P9,
+  conforme a los archivos, commits y comandos de verificación
+  identificados en cada fila.
+
+  Esta aceptación distingue mis aportes históricos de cualquier cierre
+  posterior del examen suspenso. No declaro como trabajo nuevo posterior
+  a `8d1b7999` ningún cambio que no haya realizado personalmente.
+
+  No reclamo autoría sobre filas no asignadas a mi nombre, no reclamo
+  puntaje para P3 SUS y dejo la sección B de conteos CRediT pendiente de
+  recálculo contra el HEAD final.
+
+  Filas aceptadas: P2, P4, P5 como trabajo previo parcial, P7 y P8/P9.
   Firma: Loor Medranda Marlon Taylor.
 - **Cajas Ibarra Irvin Marcelo** — `icajasi@msuteq.edu.ec` — Fecha: 2026-09-18.
   Declaración de aceptación personal: Yo, Cajas Ibarra Irvin Marcelo,
