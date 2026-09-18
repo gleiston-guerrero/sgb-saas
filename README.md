@@ -191,21 +191,17 @@ sgb-saas/
 
 Convención de commits: [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `refactor:`, `test:`, `docs:`).
 
-## 🔑 Credenciales de desarrollo (local)
+## 🔑 Bootstrap local (desarrollo, no credencial de tribunal)
 
 Al inicializar la base de datos con `db/schema.sql` + `db/seed.sql` (montados
-en `docker-entrypoint-initdb.d/`), se crea el usuario administrador de
-desarrollo (`admin@sgb-saas.local`, rol `ADMIN`). La contraseña inicial
-vive únicamente en `db/seed.sql` (entorno local): no se publica en este
-archivo.
-
-| Campo      | Valor                  |
-|------------|------------------------|
-| Correo     | `admin@sgb-saas.local` |
-| Rol        | `ADMIN`                |
+en `docker-entrypoint-initdb.d/`), el seed crea un usuario administrador
+para desarrollo local. No es una cuenta de evaluación: el tribunal usa
+exclusivamente las cuentas demo por rol de la sección “Acceso para el
+tribunal evaluador”. La contraseña inicial del seed vive únicamente en
+`db/seed.sql` y no se publica en este archivo.
 
 ⚠️ Solo para entornos locales de desarrollo / demo académica. Nunca usar
-esas credenciales en un entorno con datos personales reales. En cualquier
+ese bootstrap en un entorno con datos personales reales. En cualquier
 despliegue real la contraseña del seed debe rotarse en el primer arranque
 (acción humana pendiente para producción: ver P10).
 

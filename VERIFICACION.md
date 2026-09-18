@@ -1,15 +1,15 @@
 # Expediente de verificación — examen suspenso SGB-SaaS (EV-1)
 
-Rama de trabajo: `fix/fase01-sus-n0` (rev `d92ba03a`, 2026-09-17).
+Rama de trabajo: `fix/fase01-sus-n0` (rev `31f4b30e`, 2026-09-17).
 Cierre: viernes 18-sep-2026 23:55. Etiqueta `v1.1.0`: la mueve el admin al final (ver EV-3).
 
 > Regla: ninguna salida está escrita a mano. Todo bloque `Salida` viene de
 > ejecutar el `Comando` tal cual sobre el SHA y fecha indicados. Los puntos
 > con `Estado: PENDIENTE` indican qué falta y quién lo cierra; nunca cuentan
 > como éxito.
-> Evidencia completa de la corrida: `docs/evidencia/examen/d92ba03a/`
-> (`verify-all.txt` con cabecera SHA/fecha/comando/salida/código,
-> `xelatex-1/2/3.txt`, `bibtex.txt`).
+> Evidencia completa de la corrida: `docs/evidencia/examen/31f4b30e/`
+> (`verify-all-pts.txt` con cabecera SHA/fecha/comando/salida/código).
+> Corridas anteriores (`d92ba03a/`, `b500878d/`) quedan como histórico.
 
 ## Pisos 1–4
 
@@ -22,17 +22,20 @@ git rev-parse "v1.1.0^{}"
 git status --short
 ```
 
-### Salida (2026-09-17, rev d92ba03a)
+### Salida (2026-09-17, rev 31f4b30e)
 
 ```text
-* d92ba03a fix(examen): verificadores de solo lectura y UTF-8 sin PYTHONUTF8
-* 50f517d8 docs(examen): plantilla EV-4 con titularidad por punto, sin firmas simuladas
-* 902e5133 test(examen): endurece verify-p3 y notebook SUS en modo N=0 ejecutado
-* c52fc402 docs(examen): actualiza referencias al retiro SUS del arbol
-* 1c28085f docs(examen): retira dataset SUS mock del arbol, N=0 consistente
+* 31f4b30e docs(cierre): evidencia verify-all final sobre b500878d (exit 0)
+* 42914710 docs(p11): re-sincroniza conteos a HEAD final (763/343/358)
+* 0ca73a0f docs(cierre): nota de reproduccion PDF desde clon limpio
+* e23b64fd docs(p11): re-sincroniza conteos a b500878d (763/343/356) + P5 migrado
+* b500878d docs(cierre): PDF final 109pp + SHA + derivados regenerados
 v1.1.0 -> 6803730704269737bce4e4c17b7b61bb89702380 (tag anotado)
-v1.1.0^{} -> bec80ecbd8973d93b45894155981ad4409a405c8 (commit, anterior al cierre)
-?? docs/evidencia/
+v1.1.0^{} -> bec80ecbd8973d93b45894155981ad4409a405c8 (commit, anterior al cierre; lo mueve el admin al SHA final)
+M CONTRIBUCIONES.md, README.md, VERIFICACION.md, docs/arquitectura/ISO25010.md,
+  docs/mediciones/perf/REPORT.md, docs/requisitos/CHANGELOG-REQ.md,
+  docs/requisitos/SRS.md, scripts/verify-p4-k6.py, scripts/verify-p5-nativequery.py
+?? docs/evidencia/examen/31f4b30e/
 ```
 
 ### Archivo que respalda
@@ -66,8 +69,8 @@ modificar el historial.
 El target delega en `scripts/verify-all.py` (única fuente de verdad;
 `python scripts/verify-all.py` es el equivalente exacto donde no hay
 GNU Make — sin `make` en este Windows). Clasifica cada punto como
-`evidencia válida`, `PENDIENTE` (visible, nunca aprobado: P3, P5-parcial,
-P10-bloqueado, firmas P11) o `FALLO`; sale 0 solo si no hay ningún
+`evidencia válida`, `PENDIENTE` (visible, nunca aprobado: P3, P10-bloqueado,
+firmas P11) o `FALLO`; sale 0 solo si no hay ningún
 `FALLO`. Solo lectura: ningún verificador modifica NDJSON, figuras, PDF
 ni evidencia (P4 genera su gráfico en temporal vía `SGB_PERF_GRAFICO`).
 UTF-8 interno: no requiere `PYTHONUTF8=1` en Windows.
@@ -78,7 +81,7 @@ UTF-8 interno: no requiere `PYTHONUTF8=1` en Windows.
 python scripts/verify-all.py
 ```
 
-### Salida (2026-09-17, rev b500878d, salida completa en `docs/evidencia/examen/b500878d/verify-all.txt`)
+### Salida (2026-09-17, rev 31f4b30e, salida completa en `docs/evidencia/examen/31f4b30e/verify-all-pts.txt`)
 
 ```text
 ===== verify-all: resumen P1-P12 =====
@@ -107,12 +110,13 @@ despliegue (login LECTOR + JWT + doble 403) vive en la sección P10.
 - `Makefile` (target `verify` → `python scripts/verify-all.py`)
 - `scripts/verify-all.py` + `verify-p{1,2,3,4,5,6,7,8-p9,11,12}.py`
 - `.github/workflows/verify.yml` (job CI)
-- `docs/evidencia/examen/d92ba03a/verify-all.txt` (343 líneas: cabecera + salida + código)
+- `docs/evidencia/examen/31f4b30e/verify-all-pts.txt` (cabecera SHA/fecha + salidas + códigos)
+- `docs/evidencia/examen/b500878d/verify-all.txt` y `docs/evidencia/examen/d92ba03a/verify-all.txt` (históricos)
 
 ### Resultado
 
 Operativo (orquestador completo, solo lectura, UTF-8, exit 0 sin FALLO;
-PENDIENTEs visibles: P3 N=0, P5 parcial, P10 sin Docker, firmas P11).
+PENDIENTEs visibles: P3 N=0, P10 sin Docker, firmas P11).
 
 ---
 
@@ -225,7 +229,7 @@ extracción del PDF) se retiran del árbol y se regeneran en fase PDF.
 python scripts/verify-p3-sus.py
 ```
 
-### Salida (2026-09-17, rev d92ba03a, completa)
+### Salida (2026-09-17, rev 31f4b30e, completa)
 
 ```text
 verify-p3: OK (sin sus.csv ni derivados en el arbol evaluado)
@@ -255,7 +259,7 @@ evidencia.
 python scripts/verify-p4-k6.py
 ```
 
-### Salida (2026-09-17, rev d92ba03a, completa)
+### Salida (2026-09-17, rev 31f4b30e, completa)
 
 ```text
 verify-p4: OK (existen 5 corridas)
@@ -305,16 +309,24 @@ guardia CRLF dentro de `verify-p4-k6.py`.
 python scripts/verify-p5-nativequery.py
 ```
 
-### Salida (2026-09-17, rev b500878d)
+### Salida (2026-09-17, rev 31f4b30e)
 
 ```text
 verify-p5: OK (inventario 0=0+0 coincide)
 (... 22 líneas "migrada <método> -> <reemplazo> [<prueba>]" ...)
 verify-p5: OK (CALL nativos en CustomImpl pineados)
+verify-p5: OK (unico createNativeQuery fuera de repositorios: AuditAspect set_config, justificado)
 verify-p5: OK (0 nativeQuery + 0 CALL nativos: P5 migrado)
 ```
 
-(Salida íntegra en `docs/evidencia/examen/b500878d/verify-all.txt`.)
+(Salida íntegra en `docs/evidencia/examen/31f4b30e/verify-all-pts.txt`.)
+
+Nota `AuditAspect.java:59`: único `createNativeQuery` fuera de
+repositorios, pineado por archivo:línea en el verificador. Invoca la
+función built-in `SELECT set_config(...)` para el trigger de auditoría
+— no es un stored procedure del dominio ni acceso a datos; parámetro
+bindeado, sin concatenación. La guía exige cero `nativeQuery=true`
+para invocar procedimientos almacenados; aquí no hay SP.
 
 ### Migración ejecutada (era: 33 nativas = 23 rutinas + 10 ordinarias)
 
@@ -347,7 +359,7 @@ python scripts/verify-p6-javadoc.py
 cd backend-springboot; ./mvnw -B javadoc:javadoc
 ```
 
-### Salida (2026-09-17, rev d92ba03a)
+### Salida (2026-09-17, rev 31f4b30e)
 
 ```text
 Javadoc audit
@@ -388,7 +400,7 @@ genéricas (`mvn clean verify`: 655 tests, 0 fallos).
 python scripts/verify-p7-names.py
 ```
 
-### Salida (2026-09-17, rev d92ba03a, completa)
+### Salida (2026-09-17, rev 31f4b30e, completa)
 
 ```text
 Types: 0/286 flagged (0.00%)
@@ -419,7 +431,7 @@ xelatex -interaction=nonstopmode -halt-on-error informe-final.tex
 xelatex -interaction=nonstopmode -halt-on-error informe-final.tex
 ```
 
-### Salida (2026-09-17, rev d92ba03a; logs en `docs/evidencia/examen/d92ba03a/xelatex-{1,2,3}.txt`, `bibtex.txt`)
+### Salida (2026-09-17, rev 31f4b30e; logs en `docs/evidencia/examen/d92ba03a/xelatex-{1,2,3}.txt`, `bibtex.txt`)
 
 ```text
 verify-p8-p9: OK (15 entornos figure)
@@ -482,7 +494,7 @@ visual humana pendiente al cierre.
 python scripts/p10-deploy-evidence.py --out docs/evidencia/examen/p10-deploy.txt
 ```
 
-### Salida (2026-09-17, rama fix/fase01-sus-n0, completa en `docs/evidencia/examen/p10-deploy.txt`)
+### Salida (2026-09-17, rev 31f4b30e; re-verificado el mismo día — completa en `docs/evidencia/examen/p10-deploy.txt`)
 
 ```text
 [OK] health del despliegue HTTP 200
@@ -529,10 +541,10 @@ README en fase de regresiones (rotación en prod: acción humana).
 python scripts/verify-p11-counts.py
 ```
 
-### Salida (2026-09-17, rama fix/fase01-sus-n0, completa)
+### Salida (2026-09-17, rev 31f4b30e — corrida sobre ese SHA; el delta posterior lo imprime el propio verificador)
 
 ```text
-verify-p11: rev citado 0ca73a0f es ancestro de HEAD (+0 commits propios declarados en prosa)
+verify-p11: rev citado 0ca73a0f es ancestro de HEAD (+2 commits propios declarados en prosa)
 verify-p11: OK (shortlog a 0ca73a0f: 763/343/358, total 1466)
 verify-p11: OK (CONTRIBUCIONES.md coincide)
 verify-p11: OK (CONTRIBUTORS.md coincide)
@@ -562,10 +574,10 @@ miden commits por área, no autoría.
 python scripts/verify-p12-secrets.py
 ```
 
-### Salida (2026-09-17, rev d92ba03a)
+### Salida (2026-09-17, rev 31f4b30e)
 
 ```text
-verify-p12: OK (árbol limpio, 981 archivos revisados)
+verify-p12: OK (árbol limpio, 1007 archivos revisados)
 ```
 
 ### Archivo que respalda

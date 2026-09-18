@@ -135,6 +135,15 @@ CALL_NATIVOS_POR_ARCHIVO = {
     "ReservationProcedureRepositoryCustomImpl.java": 0,
 }
 
+# Tercera dimension: createNativeQuery FUERA de repositorios. Pin exacto
+# (archivo:linea): hoy solo AuditAspect.java:59, que invoca la funcion
+# built-in SELECT set_config(...) para el trigger de auditoria (no es un
+# stored procedure del dominio ni acceso a datos; parametro bindeado, sin
+# concatenacion). Si aparece otro sitio o este se mueve, falla.
+CREATE_NATIVE_FUERA_PIN = {
+    "backend-springboot/src/main/java/com/uteq/backend/config/AuditAspect.java": [59],
+}
+
 PATRON_RUTINA = re.compile(r"FROM\s+(fn_\w+|sp_\w+)", re.IGNORECASE)
 
 
@@ -253,6 +262,30 @@ def main() -> int:
         if vistos != n:
             return falla(f"{arch}: {vistos} createNativeQuery != {n} pineados")
     print("verify-p5: OK (CALL nativos en CustomImpl pineados)")
+    proc3 = subprocess.run(
+        ["git", "grep", "-n", "createNativeQuery", "--",
+         "backend-springboot/src/main/java"],
+        cwd=ROOT, capture_output=True, text=True,
+        encoding="utf-8", errors="replace")
+    vistos_fuera: dict[str, list[int]] = {}
+    if proc3.returncode == 0:
+        for linea in proc3.stdout.splitlines():
+            if not linea.strip():
+                continue
+            partes = linea.split(":", 2)
+            if len(partes) < 3:
+                continue
+            rel = partes[0]
+            if Path(rel).name in CALL_NATIVOS_POR_ARCHIVO:
+                continue
+            try:
+                num = int(partes[1])
+            except ValueError:
+                return falla(f"linea no parseable: {linea[:120]}")
+            vistos_fuera.setdefault(rel, []).append(num)
+    if vistos_fuera != CREATE_NATIVE_FUERA_PIN:
+        return falla(f"createNativeQuery fuera de repositorios difiere del pin: {vistos_fuera}")
+    print("verify-p5: OK (unico createNativeQuery fuera de repositorios: AuditAspect set_config, justificado)")
     print("verify-p5: OK (0 nativeQuery + 0 CALL nativos: P5 migrado)")
     return 0
 

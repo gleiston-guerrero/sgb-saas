@@ -1,14 +1,14 @@
 # Evidencia — Bloque C.1: prueba de carga real sobre GET /api/v1/libros (cache Redis)
 
-> **Serie vigente al cierre: 2026-09-17** (5 corridas nuevas, sección
-> dedicada al final de este archivo). La serie julio/agosto 2026 que
-> describía este reporte queda como historia metodológica: sus NDJSON
-> ya no están en el árbol y sus cifras fueron reemplazadas en el
-> capítulo de resultados por la re-medición. Los nombres de archivo
-> (`k6-run1.json` … `k6-run5.json`) se reutilizan para la serie
-> vigente; no coexisten dos series en el árbol.
+> **SERIE VIGENTE AL CIERRE: 2026-09-17** (5 corridas nuevas, sección
+> dedicada al final de este archivo: "Serie vigente al cierre"). Todo lo
+> anterior a esa sección es la **SERIE HISTÓRICA de julio/agosto 2026 —
+> NO VIGENTE**: se conserva como historia metodológica (sus NDJSON ya no
+> están en el árbol). Los nombres de archivo (`k6-run1.json` …
+> `k6-run5.json`) se reutilizan para la serie vigente; no coexisten dos
+> series en el árbol.
 
-## Cabecera de medición
+## Cabecera de medición (SERIE HISTÓRICA — NO VIGENTE)
 
 - **Fecha (ISO 8601 UTC)**: 2026-07-31T02:54:00Z a 2026-07-31T03:00:00Z
   (corridas 1-3) · 2026-08-05 (corrida 4, `d6ae7c9`, regenerada tras el
@@ -86,7 +86,7 @@ SVG — ver sección dedicada más abajo):
 python scripts/perf-analysis.py docs/mediciones/perf/k6-run*.json
 ```
 
-## Resultados crudos
+## Resultados crudos (SERIE HISTÓRICA — NO VIGENTE)
 
 ### Resumen por corrida (consola de k6, thresholds evaluados por k6 mismo)
 
@@ -140,7 +140,7 @@ Salida JSON completa del script (reproducible con el comando de arriba):
 ]
 ```
 
-## Umbrales exigidos por la guía — resultado real
+## Umbrales exigidos por la guía — resultado real (SERIE HISTÓRICA — NO VIGENTE)
 
 | Umbral | Exigido | Obtenido (agregado 5 corridas) | Cumple |
 |---|---|---|---|
@@ -151,7 +151,7 @@ Salida JSON completa del script (reproducible con el comando de arriba):
 Ambos umbrales se cumplen con margen amplio en las 5 corridas individuales y
 en el agregado. No se ajustó ningún dato para lograr este resultado.
 
-## Comparación estadística cache_caliente vs cache_frio (Bloque D4/B.10)
+## Comparación estadística cache_caliente vs cache_frio (Bloque D4/B.10, SERIE HISTÓRICA — NO VIGENTE)
 
 Test pareado (Wilcoxon de rangos con signo, no Mann-Whitney: ambos
 escenarios corren en las mismas 5 sesiones de carga, no son muestras
@@ -202,7 +202,7 @@ paleta accesible a daltonismo (Okabe-Ito, naranja `#E69F00` / celeste
 
 Caption (English): p95 latency comparison between cache_hot and cache_cold across 5 runs. Error bars show 95% confidence intervals estimated by bootstrap (2000 replicates, seed=42). Color palette: Okabe-Ito (accessible to common forms of color blindness).
 
-## Análisis breve
+## Análisis breve (SERIE HISTÓRICA — NO VIGENTE; el análisis vigente está en la serie al cierre)
 
 1. **Ambos umbrales se cumplen con margen amplio** (p95 caliente 19.49ms
    contra el límite de 200ms; p95 frío 7.50ms contra el límite de 500ms), sin
@@ -291,11 +291,11 @@ Caption (English): p95 latency comparison between cache_hot and cache_cold acros
 
 ## Custodia de los NDJSON crudos
 
-Los 5 NDJSON (~15 MB cada uno) **no se versionan en git** por higiene
-de repositorio (regla `.gitignore`: `docs/mediciones/perf/k6-run*.json`,
-decisión vigente del equipo). En su lugar se versiona aquí el
-SHA-256 de cada archivo, el resumen por corrida y el agregado
-completo, más el comando exacto para repetir la medición:
+Los 5 NDJSON (~15 MB cada uno) están versionados en este mismo
+directorio por exigencia literal de la guía (la regla de higiene que
+los excluía se retiró de `.gitattributes`/`.gitignore`). Aquí se
+versiona además el SHA-256 de cada archivo, el resumen por corrida y
+el agregado completo, más el comando exacto para repetir la medición:
 
 | Corrida | SHA-256 (`k6-runN.json`) |
 |---|---|
