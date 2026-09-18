@@ -1,8 +1,8 @@
 # Declaración de aportes por punto — SGB-SaaS (EV-4)
 
-Rev de referencia: `b500878d2f905cfbaf8f1a50b85f62c982a01ead`
+Rev de referencia: `0ca73a0f584f4e7df1322cca973949dc0bb54b91`
 (rama `fix/fase01-sus-n0`).
-Base de conteos CRediT verificada: `b500878d2f905cfbaf8f1a50b85f62c982a01ead`
+Base de conteos CRediT verificada: `0ca73a0f584f4e7df1322cca973949dc0bb54b91`
 (re-sincronizar al cierre con los comandos de abajo).
 
 Regla de este documento: la columna **Responsable propuesto** se infiere
@@ -43,10 +43,10 @@ la tabla de pendientes): `3d6d53382550a2c0e6526a3b99bfd63a61e431ad`
 el literal `.secure(true)`; la restauración literal a producción queda
 como fix pendiente y la titulará quien la ejecute.
 
-## B. Roles CRediT (base verificada a `b500878d`)
+## B. Roles CRediT (base verificada a `0ca73a0f`)
 
-Totales globales a `b500878d`: **Cajas 763, Loor 343, Panamá 356**
-(763+343+356+1+1 = 1464 = `rev-list`; +1 TeilorSuit esqueleto Angular
+Totales globales a `0ca73a0f`: **Cajas 763, Loor 343, Panamá 358**
+(763+343+358+1+1 = 1466 = `rev-list`; +1 TeilorSuit esqueleto Angular
 no atribuible, +1 bot excluido — ver `CONTRIBUTORS.md`). Los conteos
 por área cuentan commits que tocan el área de evidencia, no autoría
 exclusiva. Re-sincronizar al cierre listando SHAs explícitos, nunca
@@ -58,7 +58,7 @@ individualizado"** (el cap. 13 lo asigna pero no se encontró
 artefacto propio), **"—"** (sin asignación ni evidencia),
 **"no aplica"** (rol imposible en este proyecto).
 
-| Rol CRediT | Cajas (763) | Loor (343) | Panamá (356) |
+| Rol CRediT | Cajas (763) | Loor (343) | Panamá (358) |
 |---|---|---|---|
 | Conceptualization | Declarado sin artefacto individualizado (cap. 13 lo asigna; el alcance de módulos se infiere del volumen backend, sin ADR propio) | **22** `docs/adr` (ADR-001/007/013, estrategia ramas y versionado) + **10** `docs/arquitectura` (`workspace.dsl`, C4) | Declarado sin artefacto individualizado (cap. 13 lo asigna; sin ADR/arquitectura propios) |
 | Data curation | **10** `mediciones/sec` (índice, commit `4b7f50a75f7e0236573721168e8bee61e1e52c5b`) + retiro SUS (`e6df3ff6ad3796f7ea4d41b97674d0741862043d`) | **21** `mediciones/sec` + **8** `mediciones/perf` + `DATA-DICTIONARY.md`, `DATA-PROVENANCE.md` | Retiro SUS del árbol Fase 0.1 (`1c28085ffcc66098e558b49634397d6984f4df4b`) + **3** `mediciones/perf` (`9f3702705eab68971b9d275b59da36da57a0ce06` REPORT policy, `b82ae0e231c7ddd5db4074126c62f40f0301c26a` JSONs, `6549becb6cb5e32a0efdd99fdc691d7a47ada311` REPORT+p95) + `ETHICS.md`, `DATA-DICTIONARY.md` (sección SUS, 22 campos) |
@@ -96,7 +96,7 @@ Writing–review 3.
 - Conteos globales: `CONTRIBUTORS.md` y
   `docs/mediciones/roles-commit-counts.txt` (este último, antes con
   `--all`) citaban revs distintos; los vigentes a `b500878d` son
-  **763/343/356** (este archivo, verificados por
+  **763/343/358** (este archivo, verificados por
   `verify-p11-counts.py`).
 
 ## Firmas y aceptaciones (PENDIENTES — las llena cada integrante)

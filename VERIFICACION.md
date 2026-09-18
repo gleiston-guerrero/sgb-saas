@@ -532,8 +532,8 @@ python scripts/verify-p11-counts.py
 ### Salida (2026-09-17, rama fix/fase01-sus-n0, completa)
 
 ```text
-verify-p11: rev citado b500878d es ancestro de HEAD (+0 commits propios declarados en prosa)
-verify-p11: OK (shortlog a b500878d: 763/343/356, total 1464)
+verify-p11: rev citado 0ca73a0f es ancestro de HEAD (+0 commits propios declarados en prosa)
+verify-p11: OK (shortlog a 0ca73a0f: 763/343/358, total 1466)
 verify-p11: OK (CONTRIBUCIONES.md coincide)
 verify-p11: OK (CONTRIBUTORS.md coincide)
 verify-p11: OK (cap. 13 coincide)
