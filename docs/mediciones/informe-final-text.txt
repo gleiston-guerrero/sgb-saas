@@ -4151,7 +4151,7 @@ taxonomía CRediT.
 Justiﬁcación de la propuesta, con evidencia concreta veriﬁcada para este capítulo:
       Cajas: autor del mayor volumen de commits del proyecto (763 commits huma-
       nos sin merges según git -c log.mailmap=true shortlog -sne –no-merges
-      HEAD al rev 840ba5c1; conteos vigentes por rol en CONTRIBUCIONES.md), concen-
+      HEAD al rev 0ca73a0f; conteos vigentes por rol en CONTRIBUCIONES.md), concen-
       trados en el backend Spring Boot – servicios, controladores, la validación estricta
 
 
@@ -4167,11 +4167,11 @@ Justiﬁcación de la propuesta, con evidencia concreta veriﬁcada para este ca
        tura C4, ADRs, bibliografía veriﬁcada contra Crossref), de los scripts de medi-
        ción (k6/, scripts/perf-analysis.py) y del análisis estadístico del Capítulo 8.
        343 commits humanos sin merges según la misma consulta con .mailmap (rev
-       840ba5c1; conteos vigentes por rol en CONTRIBUCIONES.md).
+       0ca73a0f; conteos vigentes por rol en CONTRIBUCIONES.md).
        Panamá: autor de los componentes de frontend de Préstamos, Reserva-
        ciones y Multas (frontend-angular/) y de varias historias de usuario en
-       docs/requisitos/. 326 commits humanos sin merges según la misma consulta
-       con .mailmap (rev 840ba5c1; conteos vigentes por rol en CONTRIBUCIONES.md).
+       docs/requisitos/. 358 commits humanos sin merges según la misma consulta
+       con .mailmap (rev 0ca73a0f; conteos vigentes por rol en CONTRIBUCIONES.md).
        Asignado a la ejecución de las pruebas SUS pendientes (OBS-08, Sección 10.1).
 La actividad temporal y el reparto por autor se visualizan en las Figura 13.1 y Fi-
 gura 13.2, generadas desde git log con scripts/generar-figuras-evaluacion.py

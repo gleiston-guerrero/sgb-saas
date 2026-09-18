@@ -43,10 +43,10 @@ doi: 10.5281/zenodo.22741050
 # como comentario para no inventar un campo no contemplado por el esquema.
 # ---
 # Digest SHA256 de docs/informe-final.pdf (regenerado 2026-09-17, 109
-# paginas -- P5 sin SQL nativo, serie k6 vigente, DOI vigente, figuras
-# C4/DER/JaCoCo corregidas; mismo valor que README.md
+# paginas -- P4 unificado, serie k6 vigente, DOI vigente, figuras
+# C4/DER/JaCoCo corregidas, P11 re-sincronizado; mismo valor que README.md
 # "Integridad del entregable"):
-# 5DF4C78FFCBD335E9D256ACCD78B4AE89A2F97766F50E1EDC85D85B84B1D022C
+# FC22AB0C0628C41AED8AA4108462B99AF49AFA0798F8BBBECA7DB6A36012055C
 # NOTA: si el PDF se recompila al cierre, re-sincronizar este digest y
 # el del README con el nuevo `Get-FileHash docs/informe-final.pdf
 # -Algorithm SHA256` (docs/capitulos/00-portada.tex no fija un valor
