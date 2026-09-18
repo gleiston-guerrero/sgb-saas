@@ -1,16 +1,16 @@
 # Expediente de verificación — examen suspenso SGB-SaaS (EV-1)
 
-Rama de trabajo: `fix/fase01-sus-n0` (rev `d65b8ade`, 2026-09-17).
+Rama de trabajo: `fix/fase01-sus-n0` (código evaluado/verificado: rev `24885d18`, 2026-09-17).
 Cierre: viernes 18-sep-2026 23:55. Etiqueta `v1.1.0`: la mueve el admin al final (ver EV-3).
 
 > Regla: ninguna salida está escrita a mano. Todo bloque `Salida` viene de
 > ejecutar el `Comando` tal cual sobre el SHA y fecha indicados. Los puntos
 > con `Estado: PENDIENTE` indican qué falta y quién lo cierra; nunca cuentan
 > como éxito.
-> Evidencia completa de la corrida: `docs/evidencia/examen/d65b8ade/`
-> (corrida anterior `31f4b30e/` queda como histórico).
-> (`verify-all-pts.txt` con cabecera SHA/fecha/comando/salida/código).
-> Corridas anteriores (`d92ba03a/`, `b500878d/`) quedan como histórico.
+> Evidencia completa de la corrida: `docs/evidencia/examen/24885d18/`
+> (`verify-all.txt` con cabecera SHA/fecha/comando/salida/código).
+> Corridas anteriores (`d65b8ade/`, `31f4b30e/`, `b500878d/`, `d92ba03a/`)
+> quedan como histórico.
 
 ## Pisos 1–4
 
@@ -23,20 +23,18 @@ git rev-parse "v1.1.0^{}"
 git status --short
 ```
 
-### Salida (2026-09-17, rev d65b8ade)
+### Salida (2026-09-17, rev 24885d18)
 
 ```text
+* 24885d18 fix(p4): staging fijo ignorado en vez de mkdtemp inaccesible
+* ae57fb53 docs(cierre): expediente sobre H1 + evidencia final
 * d65b8ade docs(blindaje-final): P11 a e55f43b0, PDF FD54, P4 unificado, verificadores
 * e55f43b0 docs(cierre): evidencia verify-all final, exit 0
 * f590bb6b docs(cierre): PDF final 109pp + SHA real + derivados
-* 917c4e73 docs(blindaje): EV-4 sin contradicciones + P4 unificado + verificadores endurecidos
-* 31f4b30e docs(cierre): evidencia verify-all final sobre b500878d (exit 0)
 v1.1.0 -> 6803730704269737bce4e4c17b7b61bb89702380 (tag anotado)
 v1.1.0^{} -> bec80ecbd8973d93b45894155981ad4409a405c8 (commit, anterior al cierre; lo mueve el admin al SHA final)
-M CONTRIBUCIONES.md, README.md, VERIFICACION.md, docs/arquitectura/ISO25010.md,
-  docs/mediciones/perf/REPORT.md, docs/requisitos/CHANGELOG-REQ.md,
-  docs/requisitos/SRS.md, scripts/verify-p4-k6.py, scripts/verify-p5-nativequery.py
-?? docs/evidencia/examen/d65b8ade/
+M VERIFICACION.md
+?? docs/evidencia/examen/24885d18/
 ```
 
 ### Archivo que respalda
@@ -82,7 +80,7 @@ UTF-8 interno: no requiere `PYTHONUTF8=1` en Windows.
 python scripts/verify-all.py
 ```
 
-### Salida (2026-09-17, rev d65b8ade, salida completa en `docs/evidencia/examen/d65b8ade/verify-all.txt`)
+### Salida (2026-09-17, rev 24885d18, salida completa en `docs/evidencia/examen/24885d18/verify-all.txt`)
 
 ```text
 ===== verify-all: resumen P1-P12 =====
@@ -111,7 +109,7 @@ despliegue (login LECTOR + JWT + doble 403) vive en la sección P10.
 - `Makefile` (target `verify` → `python scripts/verify-all.py`)
 - `scripts/verify-all.py` + `verify-p{1,2,3,4,5,6,7,8-p9,11,12}.py`
 - `.github/workflows/verify.yml` (job CI)
-- `docs/evidencia/examen/d65b8ade/verify-all.txt` (cabecera SHA/fecha + salidas + códigos)
+- `docs/evidencia/examen/24885d18/verify-all.txt` (cabecera SHA/fecha + salidas + códigos)
 - `docs/evidencia/examen/b500878d/verify-all.txt` y `docs/evidencia/examen/d92ba03a/verify-all.txt` (históricos)
 
 ### Resultado
@@ -230,7 +228,7 @@ extracción del PDF) se retiran del árbol y se regeneran en fase PDF.
 python scripts/verify-p3-sus.py
 ```
 
-### Salida (2026-09-17, rev d65b8ade, completa)
+### Salida (2026-09-17, rev 24885d18, completa)
 
 ```text
 verify-p3: OK (sin sus.csv ni derivados en el arbol evaluado)
@@ -260,7 +258,7 @@ evidencia.
 python scripts/verify-p4-k6.py
 ```
 
-### Salida (2026-09-17, rev d65b8ade, completa)
+### Salida (2026-09-17, rev 24885d18, completa)
 
 ```text
 verify-p4: OK (existen 5 corridas)
@@ -310,7 +308,7 @@ guardia CRLF dentro de `verify-p4-k6.py`.
 python scripts/verify-p5-nativequery.py
 ```
 
-### Salida (2026-09-17, rev d65b8ade)
+### Salida (2026-09-17, rev 24885d18)
 
 ```text
 verify-p5: OK (inventario 0=0+0 coincide)
@@ -320,7 +318,7 @@ verify-p5: OK (unico createNativeQuery fuera de repositorios: AuditAspect set_co
 verify-p5: OK (0 nativeQuery + 0 CALL nativos: P5 migrado)
 ```
 
-(Salida íntegra en `docs/evidencia/examen/d65b8ade/verify-all.txt`.)
+(Salida íntegra en `docs/evidencia/examen/24885d18/verify-all.txt`.)
 
 Nota `AuditAspect.java:59`: único `createNativeQuery` fuera de
 repositorios, pineado por archivo:línea en el verificador. Invoca la
@@ -360,7 +358,7 @@ python scripts/verify-p6-javadoc.py
 cd backend-springboot; ./mvnw -B javadoc:javadoc
 ```
 
-### Salida (2026-09-17, rev d65b8ade)
+### Salida (2026-09-17, rev 24885d18)
 
 ```text
 Javadoc audit
@@ -401,7 +399,7 @@ genéricas (`mvn clean verify`: 655 tests, 0 fallos).
 python scripts/verify-p7-names.py
 ```
 
-### Salida (2026-09-17, rev d65b8ade, completa)
+### Salida (2026-09-17, rev 24885d18, completa)
 
 ```text
 Types: 0/286 flagged (0.00%)
@@ -432,7 +430,7 @@ xelatex -interaction=nonstopmode -halt-on-error informe-final.tex
 xelatex -interaction=nonstopmode -halt-on-error informe-final.tex
 ```
 
-### Salida (2026-09-17, rev d65b8ade; logs en `docs/evidencia/examen/xelatex-c2-*.txt`, `bibtex-c2.txt`; los de `d92ba03a/` quedan como históricos)
+### Salida (2026-09-17, rev 24885d18; logs en `docs/evidencia/examen/xelatex-c2-*.txt`, `bibtex-c2.txt`; los de `d92ba03a/` quedan como históricos)
 
 ```text
 verify-p8-p9: OK (15 entornos figure)
@@ -495,7 +493,7 @@ visual humana pendiente al cierre.
 python scripts/p10-deploy-evidence.py --out docs/evidencia/examen/p10-deploy.txt
 ```
 
-### Salida (2026-09-17, rev d65b8ade; re-verificado el mismo día — completa en `docs/evidencia/examen/p10-deploy.txt`)
+### Salida (2026-09-17, rev 24885d18; re-verificado el mismo día — completa en `docs/evidencia/examen/p10-deploy.txt`)
 
 ```text
 [OK] health del despliegue HTTP 200
@@ -542,10 +540,10 @@ README en fase de regresiones (rotación en prod: acción humana).
 python scripts/verify-p11-counts.py
 ```
 
-### Salida (2026-09-17, rev d65b8ade — corrida sobre ese SHA; el delta posterior lo imprime el propio verificador)
+### Salida (2026-09-17, rev 24885d18 — corrida sobre ese SHA; el delta posterior lo imprime el propio verificador)
 
 ```text
-verify-p11: rev citado e55f43b0 es ancestro de HEAD (+1 commits propios declarados en prosa)
+verify-p11: rev citado e55f43b0 es ancestro de HEAD (+3 commits propios declarados en prosa)
 verify-p11: OK (shortlog a e55f43b0: 763/343/363, total 1471)
 verify-p11: OK (CONTRIBUCIONES.md coincide)
 verify-p11: OK (CONTRIBUTORS.md coincide)
@@ -575,10 +573,10 @@ miden commits por área, no autoría.
 python scripts/verify-p12-secrets.py
 ```
 
-### Salida (2026-09-17, rev d65b8ade)
+### Salida (2026-09-17, rev 24885d18)
 
 ```text
-verify-p12: OK (árbol limpio, 1007 archivos revisados)
+verify-p12: OK (árbol limpio, 1010 archivos revisados)
 ```
 
 ### Archivo que respalda
