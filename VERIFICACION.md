@@ -435,9 +435,10 @@ Output written on informe-final.pdf (109 pages).
 
 Sin errores (`^!`), sin referencias indefinidas en la pasada final; solo
 avisos benignos (inputenc ignorado con motor utf8, tokens hyperref en
-strings PDF, `h`→`ht` en floats). El PDF recompilado no se versiona en
-esta fase (fix Piso 2 pendiente con SHA): se restauró con
-`git checkout -- docs/informe-final.pdf`.
+strings PDF, `h`→`ht` en floats). Compilación reproducida desde clon
+limpio (109 páginas, exit 0; el SHA varía entre builds por metadatos de
+xelatex, esperado). El PDF versionado es el de la fase PDF con SHA en
+README/`CITATION.cff`.
 
 Generador de las 9 figuras nuevas (`scripts/generar-figuras-evaluacion.py`,
 corrida 2026-09-17): k6 caliente n=9821/frío n=10006; 79 `@PreAuthorize`;
