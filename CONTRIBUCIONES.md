@@ -7,10 +7,11 @@ Base de conteos CRediT verificada: `e55f43b0782166b4d0586ccd34eb2d30e3e14c59`
 
 Regla de este documento: la columna **Responsable propuesto** se infiere
 del historial (`git log -- <ruta>`) y está **pendiente de aceptación
-genuina**. La columna **Aceptación** solo la llena cada integrante con
-nombre, correo institucional y fecha reales, fuera de la automatización.
-El agente no firma ni transcribe firmas: toda aceptación vacía significa
-punto sin titular confirmado.
+genuina** hasta que el integrante figure en la sección **Firmas y
+aceptaciones** con nombre, correo institucional, fecha real y filas
+aceptadas. El agente no firma ni transcribe firmas por otros integrantes:
+una fila solo queda confirmada para los responsables que la aceptan
+explícitamente al final del documento.
 
 Comandos reproducibles (verificar cada fila):
 
@@ -36,6 +37,15 @@ git log --format='%H %ae %s' -- <ruta-especifica>
 | P11 CRediT (0,5) | Parcial 70 % (conteos por área, no autoría; ver sección B) | Panamá Murillo | 14 roles con conteos y artefacto por celda; verificador de conteos | `CONTRIBUCIONES.md`, `scripts/verify-p11-counts.py` | `f23598724c86c946625e709b313d4f956d4aeaeb` | `python scripts/verify-p11-counts.py` | *(vacía)* |
 | P12 Credencial (0,4) | Cerrado 100 % (rotación declarada 13-sep; árbol limpio) | Cajas Ibarra (acta) + Panamá Murillo (verificador) | Acta de rotación Neon; verificador de secretos | `docs/despliegue/NEON-ROTATION-ACTA.md`, `scripts/verify-p12-secrets.py` | `f0e22b474c3e9dbdc9b16a5fbefc1f5d6c37844e` (Cajas), `ca5bee901197c0c28c6932694b45f323f2c75448` (Panamá) | `python scripts/verify-p12-secrets.py` | *(vacía)* |
 | EV-1/EV-2 Expediente+verify | Operativo (solo-lectura, UTF-8 sin PYTHONUTF8, exit 0 sin FALLO; PENDIENTEs visibles P3/P10/firmas) | Panamá Murillo | Expediente sin fechas futuras ni elipsis; orquestador `verify-all.py`; verifiers P1-P12; evidencia por SHA; job CI | `VERIFICACION.md`, `Makefile`, `scripts/verify-all.py`, `scripts/verify-*.py`, `docs/evidencia/examen/` | `ca5bee901197c0c28c6932694b45f323f2c75448`, `6549becb6cb5e32a0efdd99fdc691d7a47ada311`, `840ba5c17d22e4b60bbafa1232243bf44ef002c6`, `4a4a26cb8fa1e592f64468bc8449ffde9948a6bf` (PLAN ignorado Fase 0.1), `1c28085ffcc66098e558b49634397d6984f4df4b`, `902e5133e929b6c03a7790baf136bf5d7767fa8b`, `d92ba03a28cebd970a15b841dfbbaf9ac1ab534d` (solo-lectura+UTF-8), `059b46b974b4b180264de2519cb56c7d51a2e2e5` + siguientes (expediente por SHA) | `python scripts/verify-all.py` | *(vacía)* |
+
+Lectura de la columna **Aceptación**: las celdas de la tabla quedan como
+marcador histórico, pero la aceptación institucional válida está en la
+sección **Firmas y aceptaciones** al final de este documento. Cruce por
+fila: P1 Panamá+Cajas; P2 Loor+Panamá; P3 Cajas+Panamá solo como
+retiro/N=0 sin puntaje; P4 Panamá+Loor; P5 Panamá como migración final
+y Loor+Cajas como trabajo previo parcial; P6 Cajas+Panamá; P7
+Cajas+Loor; P8/P9 Panamá+Loor; P10 Panamá+Cajas; P11 Panamá; P12
+Cajas+Panamá; EV-1/EV-2 Panamá.
 
 Nota cookie/regresión §1 (punto ya resuelto, restaurado): `3d6d53382550a2c0e6526a3b99bfd63a61e431ad`
 (Panamá, degradación a variable) → restaurado a literal en prod por
@@ -99,19 +109,47 @@ Writing–review 3.
   **763/343/363** (este archivo, verificados por
   `verify-p11-counts.py`).
 
-## Firmas y aceptaciones (PENDIENTES — las llena cada integrante)
+## Firmas y aceptaciones
 
-Ninguna aceptación registrada. El agente no firma ni transcribe firmas.
 Cada integrante acepta las filas de la sección A que reconoce como
 suyas y sus celdas de la sección B, con nombre, correo institucional y
-fecha reales.
+fecha reales. Las aceptaciones de terceros solo se registran cuando el
+integrante las confirma de forma expresa; el agente no firma ni
+transcribe firmas por otros integrantes.
 
-- **Panamá Murillo Moisés Antonio** — `mpanamam@uteq.edu.ec` — Fecha: *(pendiente)*.
-  Filas aceptadas: *(pendiente)*.
-- **Loor Medranda Marlon Taylor** — `mloorm14@uteq.edu.ec` — Fecha: *(pendiente)*.
-  Filas aceptadas: *(pendiente)*.
-- **Cajas Ibarra Irvin Marcelo** — `icajasi@msuteq.edu.ec` — Fecha: *(pendiente)*.
-  Filas aceptadas: *(pendiente)*.
+- **Panamá Murillo Moisés Antonio** — `mpanamam@uteq.edu.ec` — Fecha: 2026-09-17.
+  Declaración: Yo, Panamá Murillo Moisés Antonio, declaro que revisé
+  la atribución EV-4 y acepto como reales y verificables las
+  contribuciones asignadas a mi nombre en este documento. Acepto mi
+  titularidad en P1, P2, P3 únicamente como retiro honesto de evidencia
+  mock y N=0, P4, P5, P6, P8/P9, P10, P11, P12 y EV-1/EV-2, según los
+  archivos, commits y comandos indicados. No reclamo puntaje para P3
+  SUS ni autoría sobre filas no asignadas a mi nombre.
+  Filas aceptadas: P1, P2, P3 retiro/N=0, P4, P5, P6, P8/P9, P10,
+  P11, P12, EV-1/EV-2 y sección B CRediT de Panamá.
+  Firma: Panamá Murillo Moisés Antonio.
+- **Loor Medranda Marlon Taylor** — `mloorm14@uteq.edu.ec` — Fecha: 2026-09-17.
+  Declaración: Yo, Loor Medranda Marlon Taylor, declaro que revisé
+  la atribución EV-4 y acepto como reales y verificables las
+  contribuciones asignadas a mi nombre en este documento. Acepto mi
+  titularidad en P2, P4, P5 como trabajo previo parcial, P7, P8/P9 y
+  sección B CRediT de Loor, según los archivos, commits y comandos
+  indicados. No reclamo autoría sobre filas no asignadas a mi nombre.
+  Filas aceptadas: P2, P4, P5 trabajo previo parcial, P7, P8/P9 y
+  sección B CRediT de Loor.
+  Firma: Loor Medranda Marlon Taylor.
+- **Cajas Ibarra Irvin Marcelo** — `icajasi@msuteq.edu.ec` — Fecha: 2026-09-17.
+  Declaración: Yo, Cajas Ibarra Irvin Marcelo, declaro que revisé
+  la atribución EV-4 y acepto como reales y verificables las
+  contribuciones asignadas a mi nombre en este documento. Acepto mi
+  titularidad en P1, P3 únicamente como retiro honesto de evidencia
+  mock y N=0, P5 como trabajo previo parcial, P6, P7, P10, P12 y
+  sección B CRediT de Cajas, según los archivos, commits y comandos
+  indicados. No reclamo puntaje para P3 SUS ni autoría sobre filas no
+  asignadas a mi nombre.
+  Filas aceptadas: P1, P3 retiro/N=0, P5 trabajo previo parcial, P6,
+  P7, P10, P12 y sección B CRediT de Cajas.
+  Firma: Cajas Ibarra Irvin Marcelo.
 
 Para el tag de entrega (EV-3/EV-4, solo el administrador): incluir
 este archivo únicamente cuando las tres aceptaciones estén completas.

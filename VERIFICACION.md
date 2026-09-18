@@ -3,6 +3,12 @@
 Rama de trabajo: `fix/fase01-sus-n0` (código evaluado/verificado: rev `24885d18`, 2026-09-17).
 Cierre: viernes 18-sep-2026 23:55. Etiqueta `v1.1.0`: la mueve el admin al final (ver EV-3).
 
+> Nota de cierre EV-4:
+> La verificación técnica integral fue ejecutada sobre el cierre técnico previo documentado.
+> El commit final posterior incorpora únicamente el cierre documental de EV-4 en `CONTRIBUCIONES.md`
+> (firmas/aceptaciones institucionales y trazabilidad de autoría), sin cambios funcionales.
+> El tag `v1.1.0` debe apuntar al SHA final que incluye esta aceptación EV-4.
+
 > Regla: ninguna salida está escrita a mano. Todo bloque `Salida` viene de
 > ejecutar el `Comando` tal cual sobre el SHA y fecha indicados. Los puntos
 > con `Estado: PENDIENTE` indican qué falta y quién lo cierra; nunca cuentan
