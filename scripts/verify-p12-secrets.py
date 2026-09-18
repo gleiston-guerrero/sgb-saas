@@ -30,7 +30,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 EXCLUIR_DIRS = {".git", "node_modules", "target", "dist", ".opencode",
                 "graphify-out", ".venv", "venv", "__pycache__", ".idea",
-                ".vscode", "jacoco", "surefire-reports"}
+                ".vscode", "jacoco", "surefire-reports", ".tmp-verify-p4"}
 
 PATRONES = [
     # postgres://usuario:password@host (password no vacía ni placeholder)

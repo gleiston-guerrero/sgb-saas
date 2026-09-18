@@ -68,4 +68,7 @@ docs/mediciones/jacoco/*/html/
 # conservan resúmenes/documentos livianos en Markdown cuando aplique)
 docs/mediciones/sec/zap/*.html
 docs/mediciones/sec/static-analysis/*.html
+# Staging fijo de verify-p4 (SVG/PDF temporales del analisis; ver
+# scripts/verify-p4-k6.py). Nunca versionar ni evidenciar.
+docs/evidencia/.tmp-verify-p4/
 tmp/

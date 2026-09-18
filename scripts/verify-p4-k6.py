@@ -14,9 +14,11 @@ Uso: python scripts/verify-p4-k6.py
 Sale 0 si todo coincide, 1 con el primer incumplimiento (mensaje claro).
 
 Sin efectos colaterales: perf-analysis.py se ejecuta con SGB_PERF_GRAFICO
-apuntando a un directorio temporal, asi el arbol versionado queda intacto
-(el grafico versionado se verifica por existencia en P8/P9, no por bytes:
-contiene fecha de generacion e IDs aleatorios del SVG).
+apuntando al staging fijo docs/evidencia/.tmp-verify-p4 (ignorado en
+.gitignore, excluido en verify-p12); pre/post limpieza solo de los 3
+nombres esperados. El grafico versionado se verifica por existencia en
+P8/P9, no por bytes: contiene fecha de generacion e IDs aleatorios
+del SVG).
 """
 
 from __future__ import annotations
@@ -25,7 +27,6 @@ import hashlib
 import json
 import os
 import re
-import shutil
 import subprocess
 import sys
 
@@ -34,7 +35,6 @@ import sys
 if hasattr(__import__("sys").stdout, "reconfigure"):
     __import__("sys").stdout.reconfigure(encoding="utf-8", errors="replace")
     __import__("sys").stderr.reconfigure(encoding="utf-8", errors="replace")
-import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -119,37 +119,48 @@ def main() -> int:
 
     # 4. perf-analysis.py corre y el agregado coincide por escenario
     # (nombre, n_peticiones exacto, p95 a 2 decimales, tasa de error).
-    # Solo lectura: el grafico se genera en un temporal (SGB_PERF_GRAFICO).
-    # Orden: primero el exit code con stderr (causa real), despues el
-    # archivo. Pre-flight de escritura (falla rapido antes del analisis
-    # largo) y limpieza tolerante: en Windows los handles (matplotlib,
-    # antivirus) pueden bloquear el borrado del temporal.
+    # Staging fijo del repo (mkdtemp crea subdirs inaccesibles en
+    # sandboxes Codex): docs/evidencia/.tmp-verify-p4 (ignorado en
+    # .gitignore y excluido en verify-p12). Pre-flight de escritura
+    # (falla rapido antes del analisis largo); limpieza selectiva de los
+    # 3 nombres exactos, nunca rmtree amplio ni globs. Orden: primero el
+    # exit code con stderr (causa real), despues el archivo.
+    staging = ROOT / "docs" / "evidencia" / ".tmp-verify-p4"
+    esperados_tmp = ("p95-comparacion-escenarios.svg",
+                     "p95-comparacion-escenarios.pdf", ".wtest")
     try:
-        tmp = tempfile.mkdtemp(prefix="verify-p4-")
-        prueba = os.path.join(tmp, ".wtest")
+        os.makedirs(staging, exist_ok=True)
+        for resto in esperados_tmp:
+            objetivo = staging / resto
+            if objetivo.is_file() or objetivo.is_symlink():
+                objetivo.unlink()
+        prueba = staging / ".wtest"
         with open(prueba, "w", encoding="utf-8") as fh:
             fh.write("ok")
         os.remove(prueba)
     except OSError as exc:
-        return falla(f"temporal no escribible ({tempfile.gettempdir()}): {exc}")
+        return falla(f"staging no escribible ({staging}): {exc}")
     try:
         entorno = dict(os.environ, SGB_PERF_GRAFICO=os.path.join(
-            tmp, "p95-comparacion-escenarios.svg"))
+            str(staging), "p95-comparacion-escenarios.svg"))
         proc = subprocess.run(
             [sys.executable, str(ANALISIS), *(str(p) for p in CORRIDAS)],
             cwd=ROOT, capture_output=True, text=True, timeout=600,
             encoding="utf-8", errors="replace", env=entorno)
     except OSError as exc:
-        shutil.rmtree(tmp, ignore_errors=True)
         return falla(f"no se pudo lanzar perf-analysis.py: {exc}")
     if proc.returncode != 0:
-        shutil.rmtree(tmp, ignore_errors=True)
         return falla(f"perf-analysis.py exit={proc.returncode}: {proc.stderr[-800:]}")
     if not os.path.isfile(entorno["SGB_PERF_GRAFICO"]):
-        shutil.rmtree(tmp, ignore_errors=True)
-        return falla("perf-analysis.py no genero el grafico en temporal "
+        return falla("perf-analysis.py no genero el grafico en staging "
                      f"(stdout {len(proc.stdout)} chars; stderr: {proc.stderr[-300:]})")
-    shutil.rmtree(tmp, ignore_errors=True)
+    for resto in esperados_tmp:
+        try:
+            objetivo = staging / resto
+            if objetivo.is_file() or objetivo.is_symlink():
+                objetivo.unlink()
+        except OSError as exc:
+            print(f"verify-p4: aviso: no se pudo limpiar {resto}: {exc}")
     bloques = re.findall(
         r'"escenario":\s*"(cache_caliente|cache_frio)"(.*?)(?="escenario"\s*:|$)',
         proc.stdout, re.DOTALL)
