@@ -38,5 +38,12 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Instalar deps Python para P4 (gráfico)
+        # P4 exige que scripts/perf-analysis.py genere el SVG en staging.
+        # Sin matplotlib el script sale 0 con AVISO pero no genera el
+        # archivo y verify-p4-k6.py falla solo en CI (local sí lo tiene).
+        # scipy da paridad con docs/entorno/versions.txt (método exacto).
+        run: python -m pip install matplotlib scipy
+
       - name: make verify (orquestador P1-P12)
         run: make verify

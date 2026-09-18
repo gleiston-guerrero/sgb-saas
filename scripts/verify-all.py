@@ -62,6 +62,10 @@ def paso_simple(nombre: str, cmd: list[str], timeout: int,
     proc = corre(cmd, timeout)
     print(proc.stdout[-2000:])
     if proc.returncode != 0:
+        # Diagnóstico CI: el stderr trae la causa real (verify-p4-k6.py
+        # reporta vía falla() a stderr). Solo se imprime en fallo, sin
+        # cambiar criterios de aprobación.
+        print(proc.stderr[-2000:])
         return FALLO, f"{nombre} exit={proc.returncode}"
     print(f">> {nombre}: {etiqueta_ok}")
     return etiqueta_ok, ""
