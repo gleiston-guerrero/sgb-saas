@@ -84,6 +84,19 @@ public class LoansManagementService {
     private final StatusFineRepository statusFineRepo;
     private final ConfigurationSystemService configurationSystemService;
 
+    /**
+     * Constructor con los repositorios de la ventanilla y el servicio de configuración.
+     *
+     * @param userRepo repositorio de usuarios para buscar por correo
+     * @param reservationRepo repositorio de reservaciones para la reserva vigente
+     * @param statusReservationRepo repositorio de estados de reservación para resolver vigencia
+     * @param bookRepo repositorio de libros para enriquecer reserva e historial
+     * @param loanRepo repositorio de préstamos para el historial reciente
+     * @param statusLoanRepo repositorio de estados de préstamo para los nombres del historial
+     * @param fineRepo repositorio de multas para el agregado de pendientes por usuario y préstamo
+     * @param statusFineRepo repositorio de estados de multa para resolver el PENDIENTE
+     * @param configurationSystemService servicio de los días de préstamo sugeridos por defecto
+     */
     public LoansManagementService(UserRepository userRepo,
                                    ReservationRepository reservationRepo,
                                    StatusReservationRepository statusReservationRepo,
@@ -106,10 +119,14 @@ public class LoansManagementService {
 
     // ── GET /gestion/buscar-usuario?correo= ──────────────────
     /**
-     * Consulta search by email usando los filtros recibidos y devuelve el resultado solicitado.
+     * Busca al lector por su correo para la tarjeta de identificación de la ventanilla de préstamos.
+     * Agrega el monto y la cantidad de multas pendientes más los días de préstamo sugeridos, para que
+     * el bibliotecario vea de un vistazo si el bloqueo por multas impedirá crear el préstamo.
      *
-     * @param email texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param email correo exacto del lector a buscar en ventanilla
+     * @return tarjeta con identificación, roles, estado de cuenta, pendiente de multas y días sugeridos
+     * @throws jakarta.persistence.EntityNotFoundException si ningún usuario tiene ese correo
+     * @throws IllegalStateException si falta la fila PENDIENTE del catálogo de estados de multa
      */
     @Transactional(readOnly = true)
     public UserLoansManagementDTO searchByEmail(String email) {
@@ -141,10 +158,11 @@ public class LoansManagementService {
     // Autocompletado predictivo: retorna hasta 3 usuarios cuyo correo
     // contenga el texto ingresado (case-insensitive).
     /**
-     * Procesa suggestions users y devuelve el resultado calculado por el backend.
+     * Sugiere hasta 3 usuarios cuyo correo contiene el texto escrito para el autocompletado de ventanilla.
+     * Pide al menos 2 caracteres para no barrer toda la tabla en cada tecla.
      *
-     * @param email texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @return lista de resultados que coincide con la consulta solicitada
+     * @param email fragmento del correo escrito por el bibliotecario en el buscador
+     * @return hasta 3 candidatos con nombre, correo y estado, vacía si el texto es muy corto
      */
     @Transactional(readOnly = true)
     public List<UserSuggestionDTO> suggestionsUsers(String email) {
@@ -165,10 +183,13 @@ public class LoansManagementService {
     // 404 (EntityNotFoundException) si no hay reserva vigente: el frontend
     // interpreta ese 404 como "Caso B: préstamo directo".
     /**
-     * Procesa reservation active y devuelve el resultado calculado por el backend.
+     * Recupera la reserva vigente más reciente del usuario con los datos del libro para convertirla
+     * en préstamo en ventanilla. El frontend interpreta la ausencia de reserva como préstamo directo.
      *
-     * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param userId identificador del lector cuya reserva vigente se busca
+     * @return la reserva vigente con libro, autores, stock, ubicación y días sugeridos
+     * @throws jakarta.persistence.EntityNotFoundException si el usuario no tiene reservas vigentes o el libro ya no existe
+     * @throws IllegalStateException si falta alguna fila PENDIENTE o LISTA_PARA_RETIRO del catálogo
      */
     @Transactional(readOnly = true)
     public ReservationActiveDTO reservationActive(Long userId) {
@@ -213,10 +234,12 @@ public class LoansManagementService {
     // préstamos: el frontend muestra "Este usuario no tiene préstamos
     // registrados".
     /**
-     * Procesa history y devuelve el resultado calculado por el backend.
+     * Recupera los últimos 20 préstamos del usuario para la línea de tiempo de la ventanilla.
+     * Resuelve títulos, autores, categorías, nombres de estado y multas pendientes agrupadas en tres
+     * consultas por lote en lugar de una por fila; vacía si el usuario nunca pidió prestado.
      *
-     * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return lista de resultados que coincide con la consulta solicitada
+     * @param userId identificador del lector cuyo historial reciente se consulta
+     * @return últimos préstamos con libro, fechas, estado y marca de multa pendiente
      */
     @Transactional(readOnly = true)
     public List<HistoryLoanDTO> history(Long userId) {

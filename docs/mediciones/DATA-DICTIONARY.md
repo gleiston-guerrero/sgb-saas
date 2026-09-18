@@ -203,7 +203,7 @@ ejecutada con consentimiento informado.
 | `Q10` | entero | Likert 1–5 | 1, 2, 3, 4, 5 | "Necesité aprender muchas cosas antes de poder usar este sistema." (Ítem negativo, contribución: `5 - Q10`) |
 | `I1` | entero | Likert 1–5 | 1, 2, 3, 4, 5 | Pregunta de interfaz adicional: facilidad de aprendizaje percibida. No forma parte del cálculo SUS estándar. |
 | `I2` | entero | Likert 1–5 | 1, 2, 3, 4, 5 | Pregunta de interfaz adicional: confianza para uso independiente. No forma parte del cálculo SUS estándar. |
-| `score` | decimal | puntos (0–100) | 0.0–100.0 | Puntuación SUS calculada con la fórmula de Brooke: `((Q1-1)+(5-Q2)+(Q3-1)+(5-Q4)+(Q5-1)+(5-Q6)+(Q7-1)+(5-Q8)+(Q9-1)+(5-Q10)) * 2.5`. Verificado contra el cálculo reproducido por `scripts/sus-analysis.ipynb`. |
+| `score` | decimal | puntos (0–100) | 0.0–100.0 | Puntuación SUS calculada con la fórmula de Brooke: `((Q1-1)+(5-Q2)+(Q3-1)+(5-Q4)+(Q5-1)+(5-Q6)+(Q7-1)+(5-Q8)+(Q9-1)+(5-Q10)) * 2.5`. Especificación del protocolo (Brooke 1996); implementación de referencia en `scripts/sus-analysis.ipynb`, sin corrida en este entregable (N=0). |
 | `comentarios` | string | — | texto libre (1 línea) | Comentario cualitativo breve del participante en español. No contiene datos personales identificables. |
 
 **Fórmula de verificación del score:**

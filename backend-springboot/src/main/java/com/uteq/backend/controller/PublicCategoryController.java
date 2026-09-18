@@ -15,13 +15,18 @@ public class PublicCategoryController {
 
     private final CategoryRepository categoryRepository;
 
+    /**
+     * Constructor con el repositorio de categorías.
+     *
+     * @param categoryRepository repositorio del catálogo de categorías
+     */
     public PublicCategoryController(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
     /**
-     * Lists publico category.
+     * Lista todas las categorías para el portal público sin autenticación.
      *
-     * @return response entity{@code <list<categoria response dto>>} with the resulting state after the operation
+     * @return lista completa de categorías con id y nombre
      */
     @GetMapping
     public ResponseEntity<List<CategoryResponseDTO>> list() {

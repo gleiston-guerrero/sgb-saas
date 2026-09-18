@@ -25,8 +25,16 @@ import { check, sleep } from 'k6';
 import { options as baseOptions } from './opts.js';
 
 const BASE_URL = __ENV.BASE_URL || 'http://backend:8080';
-const ADMIN_CORREO = __ENV.ADMIN_CORREO || 'admin@sgb-saas.local';
-const ADMIN_PASSWORD = __ENV.ADMIN_PASSWORD || 'Admin123!';
+// Sin defaults: las credenciales con privilegio de lectura del catálogo
+// se inyectan por entorno (nunca versionadas). Las corridas P4 usaron la
+// cuenta de carga documentada en docs/mediciones/perf/REPORT.md.
+const ADMIN_CORREO = __ENV.ADMIN_CORREO;
+const ADMIN_PASSWORD = __ENV.ADMIN_PASSWORD;
+if (!ADMIN_CORREO || !ADMIN_PASSWORD) {
+    throw new Error(
+        'Faltan ADMIN_CORREO / ADMIN_PASSWORD en el entorno (ver REPORT.md).'
+    );
+}
 
 // PRNG determinista (mulberry32, semilla fija 42) para elegir la página en
 // el escenario cache_frio — ver k6/opts.js: "si un script concreto

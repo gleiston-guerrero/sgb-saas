@@ -40,6 +40,14 @@ public class ReservationsManagementService {
     private final StatusReservationRepository statusReservationRepo;
     private final BookRepository bookRepo;
 
+    /**
+     * Constructor con los repositorios de la ventanilla de reservaciones.
+     *
+     * @param userRepo repositorio de usuarios para buscar por correo
+     * @param reservationRepo repositorio de reservaciones para conteo e historial
+     * @param statusReservationRepo repositorio de estados de reservación para resolver vigencia
+     * @param bookRepo repositorio de libros para los títulos del historial
+     */
     public ReservationsManagementService(UserRepository userRepo,
                                        ReservationRepository reservationRepo,
                                        StatusReservationRepository statusReservationRepo,
@@ -52,10 +60,14 @@ public class ReservationsManagementService {
 
     // ── GET /gestion/buscar-usuario?correo= ──────────────────
     /**
-     * Consulta search by email usando los filtros recibidos y devuelve el resultado solicitado.
+     * Busca al lector por su correo para la tarjeta de identificación de la ventanilla de reservaciones.
+     * Cuenta sus reservas en estado PENDIENTE o LISTA_PARA_RETIRO frente al tope de 3 activas, para que
+     * el bibliotecario sepa si aún puede registrar otra.
      *
-     * @param email texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param email correo exacto del lector a buscar en ventanilla
+     * @return tarjeta con identificación, estado de cuenta y conteo de activas frente al tope
+     * @throws jakarta.persistence.EntityNotFoundException si ningún usuario tiene ese correo
+     * @throws IllegalStateException si falta alguna fila vigente del catálogo de estados
      */
     @Transactional(readOnly = true)
     public UserReservationsManagementDTO searchByEmail(String email) {
@@ -82,10 +94,12 @@ public class ReservationsManagementService {
     // Retorna las reservaciones del usuario con el título del libro
     // resuelto en batch (3 queries: reservaciones, libros, estados).
     /**
-     * Procesa history reservations y devuelve el resultado calculado por el backend.
+     * Recupera las últimas 50 reservaciones del usuario con título del libro y nombre de estado.
+     * Resuelve libros y estados por lote en tres consultas y devuelve lista vacía si nunca reservó.
      *
-     * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return lista de resultados que coincide con la consulta solicitada
+     * @param userId identificador del lector cuyo historial de reservaciones se consulta
+     * @return reservaciones recientes con libro, estado y fechas de reserva y límite de retiro
+     * @throws jakarta.persistence.EntityNotFoundException si no existe ningún usuario con ese identificador
      */
     @Transactional(readOnly = true)
     public List<HistoryReservationDTO> historyReservations(Long userId) {

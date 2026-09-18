@@ -44,9 +44,9 @@ public class ConfigurationBackup {
     private OffsetDateTime updated;
 
     /**
-     * Checks whether is habilitado.
+     * Indica si la configuración está habilitada (nulo equivale a no).
      *
-     * @return true when the operation succeeds
+     * @return true cuando habilitado
      */
 
     public boolean isEnabled() {

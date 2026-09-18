@@ -12,6 +12,7 @@ import java.util.Optional;
 @Repository
 public interface RegistrationDamageRepository extends JpaRepository<RegistrationDamage, Long> {
 
+    /** Busca el registro de daño del préstamo dado, si existe. */
     Optional<RegistrationDamage> findByLoanId(Long loanId);
 
     // Historial de devoluciones del bibliotecario: más recientes primero.
@@ -19,6 +20,7 @@ public interface RegistrationDamageRepository extends JpaRepository<Registration
     @Query("SELECT rd FROM RegistrationDamage rd "
             + "WHERE rd.librarianId = :librarianId "
             + "ORDER BY rd.dateRegistration DESC")
+    /** Lista los registros más recientes del bibliotecario dado, hasta 10 por página. */
     List<RegistrationDamage> findTop10ByLibrarianIdOrderByDateRegistrationDesc(
             @Param("librarianId") Long librarianId,
             org.springframework.data.domain.Pageable pageable);

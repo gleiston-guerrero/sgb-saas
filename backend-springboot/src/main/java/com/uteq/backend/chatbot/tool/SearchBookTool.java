@@ -21,22 +21,29 @@ public class SearchBookTool extends AbstractChatbotTool {
 
     private final BookService bookService;
 
+    /**
+     * Crea la tool con el servicio de libros para sugerencias del catálogo.
+     *
+     * @param bookService servicio que busca por similitud de texto en el catálogo
+     */
     public SearchBookTool(BookService bookService) {
         this.bookService = bookService;
     }
     /**
-     * Retrieves name.
+     * Devuelve el nombre único que Gemini usa para invocar esta tool.
      *
-     * @return resulting text payload
+     * @return nombre {@code buscar_libro}
      */
     @Override
     public String getName() {
         return "buscar_libro";
     }
     /**
-     * Retrieves scription.
+     * Describe que esta tool busca libros del catálogo por título, autor o tema.
+     * Recibe {@code query} y devuelve un JSON con el arreglo {@code resultados}
+     * (id, título y disponibilidad), su {@code total} y el {@code query} usado.
      *
-     * @return resulting text payload
+     * @return descripción legible por Gemini para decidir cuándo invocar la tool
      */
     @Override
     public String getDescription() {
@@ -44,9 +51,9 @@ public class SearchBookTool extends AbstractChatbotTool {
                 + "Devuelve los resultados más relevantes con su disponibilidad actual.";
     }
     /**
-     * Retrieves input schema.
+     * Devuelve el schema de entrada: objeto que exige {@code query} con el título, autor o tema a buscar.
      *
-     * @return json node with the resulting state after the operation
+     * @return schema JSON con la propiedad {@code query} requerida
      */
     @Override
     public JsonNode getInputSchema() {
@@ -68,10 +75,10 @@ public class SearchBookTool extends AbstractChatbotTool {
         return schema;
     }
     /**
-     * Procesa execute y devuelve el resultado calculado por el backend.
+     * Busca en el catálogo con el texto recibido y mapea las sugerencias a id, título y disponibilidad.
      *
-     * @param args argumento recibido por la herramienta del chatbot para decidir y ejecutar la accion
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param args nodo JSON con {@code query} (título, autor o tema a buscar)
+     * @return nodo JSON con los resultados, el total y el query usado
      */
     @Override
     public JsonNode execute(JsonNode args) {

@@ -14,22 +14,29 @@ import java.util.List;
 @Component
 public class QuerySchedulesTool extends AbstractKnowledgeBaseTool {
 
+    /**
+     * Crea la tool con el repositorio de la base de conocimiento.
+     *
+     * @param baseKnowledgeRepo repositorio de entradas de conocimiento activas
+     */
     public QuerySchedulesTool(BaseKnowledgeRepository baseKnowledgeRepo) {
         super(baseKnowledgeRepo);
     }
     /**
-     * Retrieves name.
+     * Devuelve el nombre único que Gemini usa para invocar esta tool.
      *
-     * @return resulting text payload
+     * @return nombre {@code consultar_horarios}
      */
     @Override
     public String getName() {
         return "consultar_horarios";
     }
     /**
-     * Retrieves scription.
+     * Describe que esta tool expone los horarios de apertura (lunes a viernes, sábados y
+     * días especiales). No recibe argumentos y devuelve un JSON con el arreglo
+     * {@code horarios} y su {@code total}.
      *
-     * @return resulting text payload
+     * @return descripción legible por Gemini para decidir cuándo invocar la tool
      */
     @Override
     public String getDescription() {

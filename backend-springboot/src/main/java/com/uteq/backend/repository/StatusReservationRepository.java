@@ -9,5 +9,6 @@ import java.util.Optional;
 @Repository
 public interface StatusReservationRepository extends JpaRepository<StatusReservation, Integer> {
 
+    /** Busca un estado de reservación por su nombre exacto. */
     Optional<StatusReservation> findByName(String name);
 }

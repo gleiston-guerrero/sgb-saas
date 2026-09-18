@@ -10,7 +10,9 @@ import java.math.BigDecimal;
  */
 public interface SummaryFinancialFinesProjection {
 
+    /** Total recaudado de multas PAGADAs en el rango. */
     BigDecimal getTotalRecaudado();
 
+    /** Total pendiente de multas PENDIENTEs en el rango. */
     BigDecimal getTotalPending();
 }

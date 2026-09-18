@@ -35,6 +35,11 @@ public class ChatbotController {
 
     private final ChatbotOrchestrator chatbotOrchestrator;
 
+    /**
+     * Constructor con el orquestador del asistente virtual.
+     *
+     * @param chatbotOrchestrator orquestador del ciclo herramienta-respuesta con Gemini
+     */
     public ChatbotController(ChatbotOrchestrator chatbotOrchestrator) {
         this.chatbotOrchestrator = chatbotOrchestrator;
     }
@@ -54,11 +59,12 @@ public class ChatbotController {
             @ApiResponse(responseCode = "429", description = "Límite de mensajes por minuto excedido")
     })
     /**
-     * Envia send message usando los datos y destinatarios recibidos.
+     * Envía un mensaje del LECTOR al asistente y devuelve la respuesta generada con Gemini.
+     * Solo LECTOR. Crea una sesión nueva si sesionId es nulo, o continúa la sesión propia indicada.
      *
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param dto mensaje y sesión destino del chat
+     * @param authentication identidad del LECTOR que envía el mensaje
+     * @return respuesta del asistente con su sesión y contenido
      */
     public ResponseEntity<MessageChatResponseDTO> sendMessage(
             @Valid @RequestBody MessageChatRequestDTO dto, Authentication authentication) {
@@ -77,11 +83,12 @@ public class ChatbotController {
             @ApiResponse(responseCode = "404", description = "Sesión no encontrada o de otro usuario")
     })
     /**
-     * Procesa history y devuelve el resultado calculado por el backend.
+     * Devuelve el historial cronológico de mensajes de una sesión de chat del propio LECTOR.
+     * Solo LECTOR y solo el dueño de la sesión puede leerlo.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id de la sesión de chat a consultar
+     * @param authentication identidad del LECTOR dueño de la sesión
+     * @return lista de mensajes con rol, contenido y fecha ordenados por tiempo
      */
     public ResponseEntity<List<MessageChatHistoryDTO>> history(
             @PathVariable UUID id, Authentication authentication) {

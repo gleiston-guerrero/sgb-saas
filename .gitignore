@@ -44,6 +44,10 @@ db/init/
 # Scratch files de verificación de bundle (temporales, no versionar)
 live-bundle*.js
 
+# Plan local de recuperacion de nota (documento de trabajo del equipo,
+# NO entregable: no incluir en commits, evidencia, ni tag evaluado)
+PLAN_RECUPERACION_NOTA_8_HONESTO.md
+
 # Graphify MCP Local Artefacts
 graphify-out/
 graph.json
@@ -64,4 +68,7 @@ docs/mediciones/jacoco/*/html/
 # conservan resúmenes/documentos livianos en Markdown cuando aplique)
 docs/mediciones/sec/zap/*.html
 docs/mediciones/sec/static-analysis/*.html
+# Staging fijo de verify-p4 (SVG/PDF temporales del analisis; ver
+# scripts/verify-p4-k6.py). Nunca versionar ni evidenciar.
+docs/evidencia/.tmp-verify-p4/
 tmp/

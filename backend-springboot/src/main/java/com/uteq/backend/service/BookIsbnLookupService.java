@@ -72,10 +72,14 @@ public class BookIsbnLookupService {
     }
 
     /**
-     * Consulta search by isbn usando los filtros recibidos y devuelve el resultado solicitado.
+     * Busca la ficha de un libro por ISBN para autocompletar el inventario sin cargarla a mano.
+     * Consulta Google Books y mapea su primer volumen (título, primer autor, descripción, año,
+     * editorial, páginas y marca de portada); si Google no responde o limita la cuota usa Open Library
+     * como respaldo, y si falta el resumen lo completa con Gemini cuando está configurado.
      *
-     * @param isbn valor de entrada isbn usado por la operacion para completar su regla de negocio
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param isbn ISBN a buscar; se acepta con guiones porque se limpian antes de consultar
+     * @return ficha con título, autor, resumen, año, disponibilidad de portada, editorial y páginas
+     * @throws jakarta.persistence.EntityNotFoundException si ningún proveedor trae información del libro
      */
 
     public BookIsbnLookupDTO searchByIsbn(String isbn) {
@@ -176,10 +180,13 @@ public class BookIsbnLookupService {
     }
 
     /**
-     * Consulta get cover usando los filtros recibidos y devuelve el resultado solicitado.
+     * Descarga la imagen de portada de un libro por ISBN para previsualizarla antes de darlo de alta.
+     * Intenta primero el thumbnail de Google Books y, si no hay resultado, la portada mediana de
+     * Open Library.
      *
-     * @param isbn valor de entrada isbn usado por la operacion para completar su regla de negocio
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param isbn ISBN cuya portada se quiere descargar; se acepta con guiones o espacios
+     * @return bytes de la imagen en JPEG con su tipo de contenido para la respuesta HTTP
+     * @throws jakarta.persistence.EntityNotFoundException si ningún proveedor trae portada del libro
      */
 
     public CoverImageDTO getCover(String isbn) {

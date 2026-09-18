@@ -28,14 +28,21 @@ public class ConfigurationSystemService {
     private final AuditLogAuditRepository auditLogAuditRepo;
     private final ConcurrentHashMap<String, String> cache = new ConcurrentHashMap<>();
 
+    /**
+     * Constructor con el repositorio de parámetros y el de bitácora para auditar cambios.
+     *
+     * @param repo repositorio de {@code configuracion_sistema}
+     * @param auditLogAuditRepo repositorio de {@code bitacora_auditoria} para registrar actualizaciones
+     */
     public ConfigurationSystemService(ConfigurationSystemRepository repo,
                                         AuditLogAuditRepository auditLogAuditRepo) {
         this.repo = repo;
         this.auditLogAuditRepo = auditLogAuditRepo;
     }
     /**
-         * Busca/lista recursos.
-     * @return lista o pagina de resultados
+     * Lista todos los parámetros del sistema como pares clave-valor para el panel de administración.
+     *
+     * @return parámetros registrados con su clave y valor actuales
      */
     @Transactional(readOnly = true)
     public List<ConfigurationSystemResponseDTO> list() {
@@ -45,11 +52,13 @@ public class ConfigurationSystemService {
     }
 
     /**
-     * Actualiza update con las reglas de negocio requeridas por el flujo.
+     * Actualiza el valor de un parámetro existente, invalida su entrada en la caché en memoria
+     * y deja constancia del cambio en la bitácora de auditoría sobre {@code configuracion_sistema}.
      *
-     * @param key clave o valor de configuracion que se valida antes de guardarse
-     * @param freshValue clave o valor de configuracion que se valida antes de guardarse
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param key clave del parámetro a actualizar, debe existir en el catálogo
+     * @param freshValue valor nuevo que reemplaza al anterior
+     * @return el parámetro con su clave y valor actualizados
+     * @throws jakarta.persistence.EntityNotFoundException si no existe ningún parámetro con esa clave
      */
     @Transactional
     public ConfigurationSystemResponseDTO update(String key, String freshValue) {
@@ -74,10 +83,12 @@ public class ConfigurationSystemService {
         auditLogAuditRepo.save(event);
     }
     /**
-     * Consulta get value usando los filtros recibidos y devuelve el resultado solicitado.
+     * Recupera el valor en texto de un parámetro usando la caché en memoria antes de ir a la base.
+     * La entrada se guarda en caché tras la primera lectura hasta que {@link #update} la invalide.
      *
-     * @param key clave o valor de configuracion que se valida antes de guardarse
-     * @return texto generado o recuperado por la operacion
+     * @param key clave del parámetro a recuperar
+     * @return valor en texto guardado para esa clave
+     * @throws jakarta.persistence.EntityNotFoundException si no existe ningún parámetro con esa clave
      */
     @Transactional(readOnly = true)
     public String getValue(String key) {
@@ -93,10 +104,13 @@ public class ConfigurationSystemService {
     }
 
     /**
-     * Consulta get value entero usando los filtros recibidos y devuelve el resultado solicitado.
+     * Recupera un parámetro como entero para los topes numéricos del negocio (préstamos, renovaciones,
+     * tamaños de archivo). Delegada en {@link #getValue} con conversión estricta a entero.
      *
-     * @param key clave o valor de configuracion que se valida antes de guardarse
-     * @return valor numerico calculado o recuperado por la operacion
+     * @param key clave del parámetro numérico a recuperar
+     * @return valor del parámetro convertido a entero
+     * @throws jakarta.persistence.EntityNotFoundException si no existe ningún parámetro con esa clave
+     * @throws IllegalStateException si el valor guardado no es numérico entero
      */
 
     public Integer getIntegerValue(String key) {
@@ -110,10 +124,13 @@ public class ConfigurationSystemService {
     }
 
     /**
-     * Consulta get value decimal usando los filtros recibidos y devuelve el resultado solicitado.
+     * Recupera un parámetro como decimal para los montos configurables del negocio.
+     * Delegada en {@link #getValue} con conversión estricta a decimal.
      *
-     * @param key clave o valor de configuracion que se valida antes de guardarse
-     * @return valor numerico calculado o recuperado por la operacion
+     * @param key clave del parámetro decimal a recuperar
+     * @return valor del parámetro convertido a decimal
+     * @throws jakarta.persistence.EntityNotFoundException si no existe ningún parámetro con esa clave
+     * @throws IllegalStateException si el valor guardado no es un decimal válido
      */
 
     public BigDecimal getValueDecimal(String key) {

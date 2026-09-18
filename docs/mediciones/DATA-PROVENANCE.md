@@ -8,7 +8,9 @@ por última vez. Requisito R2 de la guía. Complementa a
 crudo) sin repetirlo -- este archivo responde "de dónde viene", no "qué
 forma tiene".
 
-**Fecha**: 2026-09-16 (reescritura P1 examen suspenso). **Método**: el
+**Fecha**: 2026-09-16 (reescritura P1 examen suspenso), corregida
+2026-09-17 (filas 1, 2 y 4: NDJSON versionados, commits reales por
+archivo). **Método**: el
 commit de cada archivo crudo se obtuvo con `git log -1 -- <archivo>`
 sobre el historial vigente, y cada hash citado se verificó con
 `git cat-file -t` (todos devuelven `commit`; ver sección "Verificación
@@ -25,10 +27,10 @@ reproducible con un nombre de archivo cuando en realidad no lo hay.
 
 | # | Tabla / Figura | Capítulo | Archivo(s) crudo(s) de origen | Script | Commit |
 |---|---|---|---|---|---|
-| 1 | `tab:res-perf-descriptivo` (estadística descriptiva de rendimiento) | 08-resultados.tex, §Rendimiento | `docs/mediciones/perf/REPORT.md` y artefactos derivados; los NDJSON `k6-run1.json` … `k6-run5.json` fueron la fuente histórica y se retiraron del árbol final por higiene. | `scripts/perf-analysis.py` (bootstrap 2000 réplicas, semilla `BOOTSTRAP_SEED = 42`) | `REPORT.md`: `bca23c2c`. Tabla en el capítulo: `00b26306`. |
-| 2 | `fig:res-perf-comparacion` (`p95-comparacion-escenarios.pdf`) | 08-resultados.tex, §Rendimiento | `docs/mediciones/perf/REPORT.md`, `p95-comparacion-escenarios.svg` y `p95-comparacion-escenarios.pdf`; los NDJSON crudos fueron retirados del árbol final por higiene. | `scripts/perf-analysis.py` genera el `.svg`; conversión a `.pdf` con `svglib`/`reportlab` fue un paso manual de esta redacción, **no** un script versionado en `scripts/`. | `.svg` y `.pdf`: `437ebe5b`. Inclusión en el capítulo: `00b26306`. |
+| 1 | `tab:res-perf-descriptivo` (estadística descriptiva de rendimiento) | 08-resultados.tex, §Rendimiento | `docs/mediciones/perf/REPORT.md` y artefactos derivados; los NDJSON `k6-run1.json` … `k6-run5.json` están versionados (serie vigente 2026-09-17, SHA-256 por corrida en REPORT.md). | `scripts/perf-analysis.py` (bootstrap 2000 réplicas, semilla `BOOTSTRAP_SEED = 42`) | `REPORT.md`: `9f370270`. Tabla en el capítulo: `e8477021`. |
+| 2 | `fig:res-perf-comparacion` (`p95-comparacion-escenarios.pdf`) | 08-resultados.tex, §Rendimiento | `docs/mediciones/perf/REPORT.md`, `p95-comparacion-escenarios.svg` y `p95-comparacion-escenarios.pdf` versionados; los NDJSON crudos que los originan también están versionados (ver fila 1). | `scripts/perf-analysis.py` genera el `.svg`; conversión a `.pdf` con `svglib`/`reportlab` fue un paso manual de esta redacción, **no** un script versionado en `scripts/`. | `.svg` y `.pdf`: `6549becb`. Inclusión en el capítulo: `e8477021`. |
 | 3 | `tab:res-owasp` (6 controles OWASP auditados) | 08-resultados.tex, §Seguridad | Los 16 archivos de `docs/mediciones/sec/*.md` (evidencia manual vía `curl` contra el stack Docker real) | Sin script de agregación automática de los 16 en una tabla -- `scripts/owasp-audit.sh` (`make audit`) solo re-verifica 4 de los 6 controles (A01/A03/A07/A09), no agrega la tabla del informe. | Evidencia manual original: rango entre `75d635b1` y `e6909a5d` (2026-07-21). Re-verificación automatizada más reciente: `4d69f244`. Tabla en el capítulo: `00b26306`. |
-| 4 | `tab:res-jacoco` (cobertura JaCoCo vigente) | 08-resultados.tex, §Cobertura | `docs/mediciones/jacoco/report.xml`, `report.csv` y `docs/mediciones/jacoco/README.md`; las carpetas fechadas permanecen como historial y no sustituyen la medición raíz | `jacoco-maven-plugin` vía `./mvnw clean verify` (Maven, no un script propio del repositorio). La cifra defendida se recalcula desde `report.csv`: 1805 líneas cubiertas de 2065 (87,41 %) y 448 ramas cubiertas de 588 (76,19 %), con servicios en 87,38 %/77,70 % y controladores en 97,03 %/75,51 % (corrida `mvnw clean verify` con 620 tests, 0 fallos, sobre `main` tras V51 -- procedures nativos P4 -- y la migración de 3 `nativeQuery` a JPQL). | Reporte raíz vigente: re-generado 2026-09-13 sobre `main` (commit `1028ad02` y posteriores). Tabla en el capítulo: actualizada en `00b26306`. Canonicidad documentada en `docs/mediciones/jacoco/README.md`. |
+| 4 | `tab:res-jacoco` (cobertura JaCoCo vigente) | 08-resultados.tex, §Cobertura | `docs/mediciones/jacoco/report.xml`, `report.csv` y `docs/mediciones/jacoco/README.md`; las carpetas fechadas permanecen como historial y no sustituyen la medición raíz | `jacoco-maven-plugin` vía `./mvnw clean verify` (Maven, no un script propio del repositorio). La cifra defendida se recalcula desde `report.csv`: 2337 líneas cubiertas de 2708 (86,30 %) y 594 ramas cubiertas de 797 (74,53 %), con servicios en 87,55 %/77,31 % y controladores en 96,54 %/75,51 % (corrida `mvnw clean verify` con 655 tests, 0 fallos, tras la migración P5 a mecanismos JPA sin SQL nativo). | Reporte raíz vigente: re-generado 2026-09-17 (commit `e8477021`). Tabla en el capítulo: actualizada en `e8477021`. Canonicidad documentada en `docs/mediciones/jacoco/README.md`. |
 | 5 | `tab:res-lighthouse` (2 corridas móvil) | 08-resultados.tex, §Calidad web | `docs/mediciones/lighthouse/lhci-20260731-0300.json` (corrida 1), `lhci-20260731-0330.json` (corrida 2) | `@lhci/cli` vía `frontend-angular/lighthouserc.js` (herramienta de terceros, no script propio) | Corrida 1: `df11c6ed`. Corrida 2 (post-fix SEO): `ed42c421`. Tabla en el capítulo: `00b26306`. |
 | 6 | `tab:res-resumen` (resumen de los 5 bloques) | 08-resultados.tex, §Resumen | Deriva de las filas 1, 3, 4 y 5 de esta tabla (sin archivo crudo propio -- es una síntesis, no una nueva medición) | N/A | Síntesis redactada en `00b26306` (mismo commit que fijó las cifras de las filas fuente). |
 | 7 | `tab:trabajos-comparativa` (10 trabajos primarios) | 03-trabajos-relacionados.tex | `docs/bibliografia.bib` (34 referencias, verificadas contra Crossref) + resúmenes indexados de cada trabajo consultados directamente (no descargados como archivo al repositorio) | Sin script -- síntesis narrativa manual, declarada así en el propio capítulo (§Estrategia de búsqueda). | `docs/bibliografia.bib`: `862672b2`. |
@@ -72,10 +74,50 @@ reproducible con un nombre de archivo cuando en realidad no lo hay.
 ## Verificación de hashes citados
 
 Todos los hashes citados en la columna "Commit" existen en el árbol
-vigente (reescritura P1 del examen suspenso, 2026-09-16). Comprobación:
+vigente (reescritura P1 del examen suspenso, 2026-09-16; corrección de
+filas 1, 2 y 4 el 2026-09-17). Comprobación (2026-09-17):
 
 ```powershell
-foreach ($h in @('bca23c2','437ebe5','75d635b','e6909a5','4d69f24','1028ad02','df11c6e','ed42c42','00b2630','862672b','9a46712','6bce625','5f3e5e5','7debd0b','e3f3f7f','df09f0d','d8443e6','454be77')) { $r = git cat-file -t $h 2>$null; if ($?) { echo "$h EXISTE ($r)" } else { echo "$h FALTA" } }
+python scripts/verify-p1-hashes.py
+```
+
+```text
+[OK] 00b2630 (commit)
+[OK] 00b26306 (commit)
+[OK] 1028ad02 (commit)
+[OK] 437ebe5 (commit)
+[OK] 454be77 (commit)
+[OK] 4d69f24 (commit)
+[OK] 4d69f244 (commit)
+[OK] 5f3e5e5 (commit)
+[OK] 5f3e5e5b (commit)
+[OK] 6549becb (commit)
+[OK] 6bce625 (commit)
+[OK] 6bce6257 (commit)
+[OK] 75d635b (commit)
+[OK] 75d635b1 (commit)
+[OK] 7debd0b (commit)
+[OK] 7debd0b1 (commit)
+[OK] 862672b (commit)
+[OK] 862672b2 (commit)
+[OK] 9a46712 (commit)
+[OK] 9a467125 (commit)
+[OK] 9f370270 (commit)
+[OK] bca23c2 (commit)
+[OK] d8443e6 (commit)
+[OK] d8443e66 (commit)
+[OK] df09f0d (commit)
+[OK] df09f0db (commit)
+[OK] df11c6e (commit)
+[OK] df11c6ed (commit)
+[OK] e3f3f7f (commit)
+[OK] e3f3f7fa (commit)
+[OK] e6909a5 (commit)
+[OK] e6909a5d (commit)
+[OK] e8477021 (commit)
+[OK] ed42c42 (commit)
+[OK] ed42c421 (commit)
+verify-p1: OK (35 hashes existen)
 ```
 
 Salida (2026-09-16, rama `fix/rescate-produccion-examen`):

@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 
 // La auditoria de esta tabla ya no se hace aqui: trg_auditoria_reservaciones
@@ -41,6 +42,14 @@ public class ReservationService {
     private final UserRepository userRepo;
     private final ConfigurationSystemService configurationSystemService;
 
+    /**
+     * Constructor con los repositorios de reservaciones y usuarios más la configuración de topes.
+     *
+     * @param reservationRepo repositorio de reservaciones
+     * @param statusReservationRepo repositorio de estados de reservación del catálogo
+     * @param userRepo repositorio de usuarios para validar bloqueo por multas
+     * @param configurationSystemService servicio del máximo de reservas y la hora límite de retiro
+     */
     public ReservationService(ReservationRepository reservationRepo,
                               StatusReservationRepository statusReservationRepo,
                               UserRepository userRepo,
@@ -216,7 +225,11 @@ public class ReservationService {
      */
     @Transactional(readOnly = true)
     public List<ReservationTodayResponseDTO> searchReservationsToday() {
-        return reservationRepo.searchReservationsToday().stream()
+        // Zona del sistema, igual que CURRENT_DATE del SQL original (ver
+        // LoanService.diasRestantes): JVM y BD comparten zona en prod.
+        OffsetDateTime start = LocalDate.now(ZoneId.systemDefault()).atStartOfDay()
+                .atZone(ZoneId.systemDefault()).toOffsetDateTime();
+        return reservationRepo.searchReservationsToday(start, start.plusDays(1)).stream()
                 .map(p -> new ReservationTodayResponseDTO(
                         p.getReservationId(),
                         p.getUserName(),
@@ -224,7 +237,7 @@ public class ReservationService {
                         p.getBookTitle(),
                         p.getBookIsbn(),
                         p.getStatusName(),
-                        p.getDateLimitPickup() != null ? p.getDateLimitPickup().atOffset(java.time.ZoneOffset.UTC) : null))
+                        p.getDateLimitPickup() != null ? p.getDateLimitPickup().toInstant().atOffset(java.time.ZoneOffset.UTC) : null))
                 .toList();
     }
 
@@ -236,7 +249,9 @@ public class ReservationService {
      */
     @Transactional(readOnly = true)
     public List<ReservationTodayResponseDTO> searchReservationsNexts() {
-        return reservationRepo.searchReservationsNexts().stream()
+        OffsetDateTime start = LocalDate.now(ZoneId.systemDefault()).atStartOfDay()
+                .atZone(ZoneId.systemDefault()).toOffsetDateTime().plusDays(1);
+        return reservationRepo.searchReservationsNexts(start).stream()
                 .map(p -> new ReservationTodayResponseDTO(
                         p.getReservationId(),
                         p.getUserName(),
@@ -244,7 +259,7 @@ public class ReservationService {
                         p.getBookTitle(),
                         p.getBookIsbn(),
                         p.getStatusName(),
-                        p.getDateLimitPickup() != null ? p.getDateLimitPickup().atOffset(java.time.ZoneOffset.UTC) : null))
+                        p.getDateLimitPickup() != null ? p.getDateLimitPickup().toInstant().atOffset(java.time.ZoneOffset.UTC) : null))
                 .toList();
     }
 

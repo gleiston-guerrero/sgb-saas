@@ -33,12 +33,14 @@ public class AuditAspect {
     }
 
     /**
-     * Procesa set current user y devuelve el resultado calculado por el backend.
+     * Intercepta cada método transaccional de escritura y fija {@code app.current_user_id}
+     * con el id del usuario autenticado, para que el trigger de auditoría no grabe NULL.
+     * Si no hay sesión o falla {@code set_config}, deja continuar al método original.
      *
-     * @param pjp objeto del framework usado para integrar esta operacion con Spring o Jackson
-     * @param tx objeto del framework usado para integrar esta operacion con Spring o Jackson
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
-     * @throws Throwable si la operacion no puede completarse por validacion, permisos o fallo del recurso asociado
+     * @param pjp punto de corte del método interceptado
+     * @param tx anotación transaccional que marca al método como escritura cuando no es de solo lectura
+     * @return resultado del método original interceptado
+     * @throws Throwable si el método interceptado falla
      */
     @Around("@annotation(tx)")
     public Object setCurrentUser(ProceedingJoinPoint pjp, org.springframework.transaction.annotation.Transactional tx) throws Throwable {

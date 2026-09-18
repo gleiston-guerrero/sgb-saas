@@ -1,0 +1,797 @@
+This is XeTeX, Version 3.141592653-2.6-0.999997 (MiKTeX 25.12) (preloaded format=xelatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+(informe-final.tex
+LaTeX2e <2025-11-01>
+L3 programming layer <2025-12-24>
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/base\report.cls
+Document Class: report 2025/01/22 v1.4n Standard LaTeX document class
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/base\size12.clo))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/base\inputenc.sty
+
+Package inputenc Warning: inputenc package ignored with utf8 based engines.
+
+) (C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/base\fontenc.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmr.fd))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/babel\babel.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/babel\xebabel.def)
+*************************************
+* Local config file bblopts.cfg used
+*
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/arabi\bblopts.cfg)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/babel/locale/es\babel
+-spanish.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/babel-spanish\spanish.l
+df))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/iftex\ifvtex.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.sty))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.cfg))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graphics.c
+fg)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\xetex.def)
+)) (C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/xcolor\xcolor.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\color.cfg)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/graphics\mathcolor.ltx)
+) (C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperref.sty
+
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/kvsetkeys\kvsetkeys.sty
+)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/kvdefinekeys\kvdefine
+keys.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pdfescape\pdfescape.s
+ty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/ltxcmds\ltxcmds.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pdftexcmds\pdftexcmds
+.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/infwarerr\infwarerr.s
+ty)))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/hycolor\hycolor.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcount.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/gettitlestring\gettit
+lestring.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/kvoptions\kvoptions.sty
+)))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/stringenc\stringenc.s
+ty) (C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.def
+) (C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/intcalc\intcalc.sty
+) (C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\puenc.def)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/bitset\bitset.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/bigintcalc\bigintcalc
+.sty)))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hxetex.def
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/rerunfilecheck\rerunfil
+echeck.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/uniquecounter\uniquec
+ounter.sty)))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/booktabs\booktabs.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/tools\longtable.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/tools\array.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/enumitem\enumitem.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/fancyhdr\fancyhdr.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/titlesec\titlesec.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/colortbl\colortbl.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/tools\tabularx.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/parskip\parskip.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/multirow\multirow.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/listings\listings.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstpatch.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstmisc.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/listings\listings.cfg))
+==> First Aid for listings.sty no longer applied!
+    Expected:
+        2024/09/23 1.10c (Carsten Heinz)
+    but found:
+        2025/11/14 1.11b (Carsten Heinz)
+    so I'm assuming it got fixed.
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/natbib\natbib.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/microtype\microtype.sty
+
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/microtype\microtype-xet
+ex.def)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/microtype\microtype.cfg
+))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pgf/frontendlayer\tikz.
+sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pgf/basiclayer\pgf.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgfrcs.st
+y
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfutil
+-common.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfutil
+-latex.def)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfrcs.
+code.tex
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf\pgf.revision.tex)
+))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pgf/basiclayer\pgfcore.
+sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pgf/systemlayer\pgfsys.
+sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsy
+s.code.tex
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfkeys
+.code.tex
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfkeys
+libraryfiltered.code.tex))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgf.c
+fg)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsy
+s-xetex.def
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsy
+s-dvipdfmx.def
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsy
+s-common-pdf.def))))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsy
+ssoftpath.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsy
+sprotocol.code.tex))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+e.code.tex
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmath.code
+.tex
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathutil.
+code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathparse
+r.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.basic.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.trigonometric.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.random.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.comparison.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.base.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.round.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.misc.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.integerarithmetics.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathcalc.
+code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfloat
+.code.tex))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfint.code.
+tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+epoints.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+epathconstruct.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+epathusage.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+escopes.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+egraphicstate.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+etransformations.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+equick.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+eobjects.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+epathprocessing.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+earrows.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+eshade.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+eimage.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+eexternal.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+elayers.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+etransparency.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+epatterns.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+erdf.code.tex)))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodule
+shapes.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodule
+plot.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibility\pgfco
+mp-version-0-65.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibility\pgfco
+mp-version-1-18.sty))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgffor.st
+y
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgfkeys.s
+ty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfkeys
+.code.tex))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pgf/math\pgfmath.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmath.code
+.tex))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgffor.
+code.tex))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z\tikz.code.tex
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pgflibr
+aryplothandlers.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodule
+matrix.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z/libraries\tikzlibrarytopaths.code.tex)))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pgflibr
+aryarrows.meta.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z/libraries\tikzlibrarypositioning.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pdflscape\pdflscape.sty
+
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pdflscape\pdflscape-nom
+etadata.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/graphics\lscape.sty)))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\amssymb.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\amsfonts.sty))
+
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-xet
+ex.def) (informe-final.aux)
+*geometry* driver: auto-detecting
+*geometry* detected driver: xetex
+(informe-final.out) (informe-final.out)
+Couldn't patch \ttl@straight@ii
+Couldn't patch \ttl@straight@ii
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/microtype\mt-cmr.cfg)
+(capitulos/00-portada.tex
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/microtype\mt-msa.cfg)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/microtype\mt-msb.cfg)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmtt.fd) [1]
+[2]) (informe-final.toc [1] [2]) [3] (informe-final.lof [4]) [5]
+(informe-final.lot) [6] (informe-final.lol) [7]
+ignored error: Infinite glue shrinkage found in box being split [8] [9]
+(capitulos/01-resumen.tex [10]) (capitulos/02-introduccion.tex [11]
+Cap├¡tulo 1.
+[12] [13]) (capitulos/04-marco-teorico.tex [14] [15]
+Cap├¡tulo 2.
+
+Package natbib Warning: Citation `bano2019elicitation' on page 16 undefined on 
+input line 28.
+
+
+Package natbib Warning: Citation `palomares2021elicitation' on page 16 undefine
+d on input line 32.
+
+[16]
+
+Package natbib Warning: Citation `brown2023c4model' on page 17 undefined on inp
+ut line 60.
+
+
+Package natbib Warning: Citation `walls2022springinaction' on page 17 undefined
+ on input line 93.
+
+[17]
+
+Package natbib Warning: Citation `bucko2023jwtbehavior' on page 18 undefined on
+ input line 114.
+
+
+Package natbib Warning: Citation `shatnawi2024pythonjwt' on page 18 undefined o
+n input line 116.
+
+
+Package natbib Warning: Citation `ahmed2019jwtscheme' on page 18 undefined on i
+nput line 120.
+
+
+Package natbib Warning: Citation `mckay2019tls' on page 18 undefined on input l
+ine 133.
+
+
+Package natbib Warning: Citation `walls2022springinaction' on page 18 undefined
+ on input line 158.
+
+
+Package natbib Warning: Citation `colley2018ormperformance' on page 18 undefine
+d on input line 162.
+
+[18]
+
+Package natbib Warning: Citation `kusuma2017rediscaching' on page 19 undefined 
+on input line 178.
+
+) (capitulos/03-trabajos-relacionados.tex [19]
+Cap├¡tulo 3.
+
+Package natbib Warning: Citation `colley2018ormperformance' on page 20 undefine
+d on input line 25.
+
+
+Package natbib Warning: Citation `kusuma2017rediscaching' on page 20 undefined 
+on input line 26.
+
+[20]
+
+Package natbib Warning: Citation `kusuma2017rediscaching' on page 21 undefined 
+on input line 54.
+
+
+Package natbib Warning: Citation `ayinde2026ai' on page 21 undefined on input l
+ine 55.
+
+
+Package natbib Warning: Citation `brown2023c4model' on page 21 undefined on inp
+ut line 68.
+
+
+Package natbib Warning: Citation `ayinde2026ai' on page 21 undefined on input l
+ine 88.
+
+
+Package natbib Warning: Citation `liabor2023cataloging' on page 21 undefined on
+ input line 88.
+
+
+Package natbib Warning: Citation `shivaji2024intelligentlms' on page 21 undefin
+ed on input line 88.
+
+
+Package natbib Warning: Citation `rajacic2025gdpr' on page 21 undefined on inpu
+t line 88.
+
+
+Package natbib Warning: Citation `supriyono2018qr' on page 21 undefined on inpu
+t line 88.
+
+
+Package natbib Warning: Citation `ng2024libbot' on page 21 undefined on input l
+ine 88.
+
+
+Package natbib Warning: Citation `mukund2021rfid' on page 21 undefined on input
+ line 88.
+
+
+Package natbib Warning: Citation `adetayo2023chatgpt' on page 21 undefined on i
+nput line 88.
+
+
+Package natbib Warning: Citation `yan2023chatbotsslr' on page 21 undefined on i
+nput line 88.
+
+
+Package natbib Warning: Citation `ehrenpreis2022chatbot' on page 21 undefined o
+n input line 88.
+
+
+Package natbib Warning: Citation `wayesa2023recsys' on page 21 undefined on inp
+ut line 88.
+
+
+Package natbib Warning: Citation `hu2025bigdata' on page 21 undefined on input 
+line 88.
+
+
+Package natbib Warning: Citation `ayemowa2024genai' on page 21 undefined on inp
+ut line 88.
+
+
+Package natbib Warning: Citation `colley2018ormperformance' on page 21 undefine
+d on input line 88.
+
+
+Package natbib Warning: Citation `kusuma2017rediscaching' on page 21 undefined 
+on input line 88.
+
+
+Package natbib Warning: Citation `bano2019elicitation' on page 21 undefined on 
+input line 95.
+
+
+Package natbib Warning: Citation `palomares2021elicitation' on page 21 undefine
+d on input line 95.
+
+
+Package natbib Warning: Citation `yu1997istar' on page 21 undefined on input li
+ne 95.
+
+
+Package natbib Warning: Citation `kurtanovic2017classifying' on page 21 undefin
+ed on input line 95.
+
+
+Package natbib Warning: Citation `truong2025personality' on page 21 undefined o
+n input line 96.
+
+
+Package natbib Warning: Citation `rahman2024agile' on page 21 undefined on inpu
+t line 96.
+
+
+Package natbib Warning: Citation `parlakkilic2022responsive' on page 21 undefin
+ed on input line 98.
+
+
+Package natbib Warning: Citation `aienobe2025responsive' on page 21 undefined o
+n input line 98.
+
+
+Package natbib Warning: Citation `mckay2019tls' on page 21 undefined on input l
+ine 99.
+
+
+Package natbib Warning: Citation `sommerville2011se' on page 21 undefined on in
+put line 101.
+
+
+Package natbib Warning: Citation `fowler2002poeaa' on page 21 undefined on inpu
+t line 101.
+
+
+Package natbib Warning: Citation `walls2022springinaction' on page 21 undefined
+ on input line 101.
+
+
+Package natbib Warning: Citation `bass2021softwarearch' on page 21 undefined on
+ input line 101.
+
+
+Package natbib Warning: Citation `brown2023c4model' on page 21 undefined on inp
+ut line 101.
+
+
+Package natbib Warning: Citation `baltes2022sampling' on page 21 undefined on i
+nput line 102.
+
+
+Package natbib Warning: Citation `bucko2023jwtbehavior' on page 21 undefined on
+ input line 111.
+
+
+Package natbib Warning: Citation `shatnawi2024pythonjwt' on page 21 undefined o
+n input line 111.
+
+
+Package natbib Warning: Citation `ahmed2019jwtscheme' on page 21 undefined on i
+nput line 111.
+
+[21]
+
+Package natbib Warning: Citation `ayinde2026ai' on page 22 undefined on input l
+ine 156.
+
+
+Package natbib Warning: Citation `liabor2023cataloging' on page 22 undefined on
+ input line 156.
+
+
+Package natbib Warning: Citation `adetayo2023chatgpt' on page 22 undefined on i
+nput line 156.
+
+
+Package natbib Warning: Citation `yan2023chatbotsslr' on page 22 undefined on i
+nput line 156.
+
+
+Package natbib Warning: Citation `ayemowa2024genai' on page 22 undefined on inp
+ut line 156.
+
+
+Package natbib Warning: Citation `ayinde2026ai' on page 22 undefined on input l
+ine 184.
+
+
+Package natbib Warning: Citation `yan2023chatbotsslr' on page 22 undefined on i
+nput line 185.
+
+
+Package natbib Warning: Citation `ayemowa2024genai' on page 22 undefined on inp
+ut line 185.
+
+
+Package natbib Warning: Citation `adetayo2023chatgpt' on page 22 undefined on i
+nput line 187.
+
+
+Package natbib Warning: Citation `liabor2023cataloging' on page 22 undefined on
+ input line 189.
+
+[22] [23]
+
+Package natbib Warning: Citation `supriyono2018qr' on page 24 undefined on inpu
+t line 237.
+
+
+Package natbib Warning: Citation `mukund2021rfid' on page 24 undefined on input
+ line 251.
+
+
+Package natbib Warning: Citation `ng2024libbot' on page 24 undefined on input l
+ine 264.
+
+
+Package natbib Warning: Citation `rajacic2025gdpr' on page 24 undefined on inpu
+t line 275.
+
+
+Package natbib Warning: Citation `wayesa2023recsys' on page 24 undefined on inp
+ut line 290.
+
+
+Package natbib Warning: Citation `hu2025bigdata' on page 24 undefined on input 
+line 304.
+
+
+Package natbib Warning: Citation `ehrenpreis2022chatbot' on page 24 undefined o
+n input line 319.
+
+
+Package natbib Warning: Citation `shivaji2024intelligentlms' on page 24 undefin
+ed on input line 336.
+
+
+Package natbib Warning: Citation `colley2018ormperformance' on page 24 undefine
+d on input line 351.
+
+
+Package natbib Warning: Citation `kusuma2017rediscaching' on page 24 undefined 
+on input line 367.
+
+[24] [25] [26]
+
+Package natbib Warning: Citation `bano2019elicitation' on page 27 undefined on 
+input line 388.
+
+
+Package natbib Warning: Citation `palomares2021elicitation' on page 27 undefine
+d on input line 390.
+
+
+Package natbib Warning: Citation `yu1997istar' on page 27 undefined on input li
+ne 392.
+
+
+Package natbib Warning: Citation `kurtanovic2017classifying' on page 27 undefin
+ed on input line 394.
+
+
+Package natbib Warning: Citation `truong2025personality' on page 27 undefined o
+n input line 404.
+
+
+Package natbib Warning: Citation `rahman2024agile' on page 27 undefined on inpu
+t line 406.
+
+
+Package natbib Warning: Citation `parlakkilic2022responsive' on page 27 undefin
+ed on input line 416.
+
+
+Package natbib Warning: Citation `aienobe2025responsive' on page 27 undefined o
+n input line 418.
+
+
+Package natbib Warning: Citation `mckay2019tls' on page 27 undefined on input l
+ine 427.
+
+
+Package natbib Warning: Citation `sommerville2011se' on page 27 undefined on in
+put line 436.
+
+
+Package natbib Warning: Citation `fowler2002poeaa' on page 27 undefined on inpu
+t line 437.
+
+
+Package natbib Warning: Citation `walls2022springinaction' on page 27 undefined
+ on input line 440.
+
+
+Package natbib Warning: Citation `bass2021softwarearch' on page 27 undefined on
+ input line 441.
+
+
+Package natbib Warning: Citation `brown2023c4model' on page 27 undefined on inp
+ut line 443.
+
+[27]
+
+Package natbib Warning: Citation `ng2024libbot' on page 28 undefined on input l
+ine 462.
+
+
+Package natbib Warning: Citation `ehrenpreis2022chatbot' on page 28 undefined o
+n input line 463.
+
+
+Package natbib Warning: Citation `colley2018ormperformance' on page 28 undefine
+d on input line 466.
+
+
+Package natbib Warning: Citation `kusuma2017rediscaching' on page 28 undefined 
+on input line 469.
+
+) (capitulos/09-ingenieria-requisitos.tex [28]
+Cap├¡tulo 4.
+[29]
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\leavevmode@ifvmode' on input line 107.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                \kern 1.95836pt
+(hyperref)                removed on input line 107.
+
+[30] [31]) (capitulos/05-materiales-metodos.tex [32] [33]
+Cap├¡tulo 5.
+
+Package natbib Warning: Citation `peffers2007dsrm' on page 34 undefined on inpu
+t line 12.
+
+
+Package natbib Warning: Citation `hevner2004design' on page 34 undefined on inp
+ut line 16.
+
+[34]
+
+Package natbib Warning: Citation `brooke1996sus' on page 35 undefined on input 
+line 56.
+
+Missing character: There is no ÔÇö in font ec-lmr12!
+Missing character: There is no ÔÇö in font ec-lmr12!
+[35]
+
+Package natbib Warning: Citation `baltes2022sampling' on page 36 undefined on i
+nput line 142.
+
+[36]
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty)
+[37]) (capitulos/06-diseno-arquitectura.tex [38]
+Cap├¡tulo 6.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[39] [40]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[41] [42] [43] [44]
+ignored error: Infinite glue shrinkage found in box being split [45] [46]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[47]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+) (capitulos/07-implementacion.tex [48] [49]
+Cap├¡tulo 7.
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty)
+[50] [51]
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty)
+[52] [53] [54] [55]) (capitulos/08-resultados.tex [56]
+Cap├¡tulo 8.
+[57]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[58]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[59] [60]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[61] [62]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[63] [64] [65]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[66]
+
+Package natbib Warning: Citation `brooke1996sus' on page 67 undefined on input 
+line 588.
+
+[67]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+) (capitulos/09-discusion.tex [68] [69]
+Cap├¡tulo 9.
+[70] [71]
+
+Package natbib Warning: Citation `colley2018ormperformance' on page 72 undefine
+d on input line 131.
+
+
+Package natbib Warning: Citation `kusuma2017rediscaching' on page 72 undefined 
+on input line 136.
+
+[72]) (capitulos/10-trabajo-futuro.tex [73]
+Cap├¡tulo 10.
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 13.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\geq' on input line 13.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 13.
+
+
+Package natbib Warning: Citation `brooke1996sus' on page 74 undefined on input 
+line 27.
+
+[74] [75] [76]) (capitulos/11-conclusiones.tex [77]
+Cap├¡tulo 11.
+[78]) (capitulos/12-amenazas-validez.tex [79]
+Cap├¡tulo 12.
+[80]
+
+Package natbib Warning: Citation `baltes2022sampling' on page 81 undefined on i
+nput line 86.
+
+[81]) (capitulos/13-declaraciones.tex [82] [83]
+Cap├¡tulo 13.
+[84] [85] [86]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[87] [88]) (capitulos/14-anexos.tex [89]
+Cap├¡tulo 14.
+
+Package natbib Warning: Citation `brooke1996sus' on page 90 undefined on input 
+line 44.
+
+[90] [91]
+
+Package natbib Warning: Citation `brooke1996sus' on page 92 undefined on input 
+line 127.
+
+
+Package natbib Warning: Citation `ralph2021empiricalstandards' on page 92 undef
+ined on input line 161.
+
+[92]
+ignored error: Infinite glue shrinkage found in box being split [93] [94]
+[95] [96] [97] [98] [99] [100] [101] [102] [103]) (informe-final.bbl [104]
+[105] [106])
+
+Package natbib Warning: There were undefined citations.
+
+[107] (informe-final.aux
+
+Package natbib Warning: Citation(s) may have changed.
+(natbib)                Rerun to get citations correct.
+
+)
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+ )
+Output written on informe-final.pdf (109 pages).
+Transcript written on informe-final.log.

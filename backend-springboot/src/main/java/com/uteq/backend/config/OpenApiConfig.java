@@ -16,9 +16,10 @@ public class OpenApiConfig {
 
     private static final String ESQUEMA_BEARER_JWT = "bearer-jwt";
     /**
-     * Handles sgb open api.
+     * Crea el bean OpenAPI con el título, la versión y la descripción de SGB-SaaS,
+     * más el esquema bearer-jwt para el botón Authorize de Swagger UI.
      *
-     * @return open api with the resulting state after the operation
+     * @return definición OpenAPI de la API
      */
     @Bean
     public OpenAPI sgbOpenAPI() {

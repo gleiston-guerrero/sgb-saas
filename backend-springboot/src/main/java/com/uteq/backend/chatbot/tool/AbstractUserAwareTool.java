@@ -20,9 +20,10 @@ public abstract class AbstractUserAwareTool extends AbstractChatbotTool {
     protected AbstractUserAwareTool() {
     }
     /**
-     * Retrieves input schema.
+     * Devuelve el schema de entrada: objeto que exige {@code usuario_id} entero,
+     * resuelto automáticamente desde la sesión autenticada por el orquestador.
      *
-     * @return json node with the resulting state after the operation
+     * @return schema JSON con la propiedad {@code usuario_id} requerida
      */
     @Override
     public JsonNode getInputSchema() {

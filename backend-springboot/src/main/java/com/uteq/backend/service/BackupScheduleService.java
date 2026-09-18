@@ -79,10 +79,11 @@ public class BackupScheduleService {
     }
 
     /**
-     * Consulta get usando los filtros recibidos y devuelve el resultado solicitado.
+     * Recupera una programación de respaldo activa por su identificador.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param id identificador de la programación a recuperar
+     * @return la programación activa encontrada
+     * @throws org.springframework.web.server.ResponseStatusException con 404 si no existe o está inactiva
      */
 
     public BackupSchedule get(Long id) {
@@ -92,10 +93,13 @@ public class BackupScheduleService {
     }
 
     /**
-     * Registra create validando los datos de entrada antes de persistir cambios.
+     * Persiste una programación de respaldo activa registrando al usuario autenticado como creador.
+     * Valida que se defina exactamente una frecuencia (cada horas o cada días) dentro de rango.
+     * Solo guarda la fila; la ejecución periódica empieza al programarla (ver {@link #scheduleExecution}).
      *
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param dto programación con frecuencia, tablas, formato y frecuencia solicitadas
+     * @return la programación persistida con creador, fecha de creación y estado activo
+     * @throws org.springframework.web.server.ResponseStatusException con 400 si la frecuencia es ambigua o fuera de rango
      */
 
     public BackupSchedule create(BackupSchedule dto) {
@@ -108,10 +112,11 @@ public class BackupScheduleService {
     }
 
     /**
-     * Actualiza update last execution con las reglas de negocio requeridas por el flujo.
+     * Actualiza la marca de última ejecución de una programación activa sin alterar su frecuencia.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param date fecha limite usada para acotar el rango temporal de la consulta
+     * @param id identificador de la programación activa a actualizar
+     * @param date fecha con la que se marca la última ejecución
+     * @throws org.springframework.web.server.ResponseStatusException con 404 si no existe o está inactiva
      */
 
     public void updateLastExecution(Long id, OffsetDateTime date) {
@@ -123,9 +128,11 @@ public class BackupScheduleService {
     }
 
     /**
-     * Elimina o anula delete despues de validar que la operacion sea permitida.
+     * Desactiva una programación (baja lógica) y cancela su tarea en memoria de inmediato.
+     * La fila se conserva con estado inactivo para mantener el historial de programaciones.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
+     * @param id identificador de la programación activa a desactivar
+     * @throws org.springframework.web.server.ResponseStatusException con 404 si no existe o ya está inactiva
      */
 
     public void delete(Long id) {
@@ -170,10 +177,14 @@ public class BackupScheduleService {
     // ---------- Programación automática ----------
 
     /**
-     * Procesa schedule execution y devuelve el resultado calculado por el backend.
+     * Programa la ejecución periódica de un respaldo activo en el planificador en memoria.
+     * Calcula el intervalo desde cada horas o cada días, espera hasta la próxima hora en punto
+     * o medianoche según el caso, cancela la tarea previa del mismo identificador y registra
+     * la programación como última ejecución al momento de agendarla.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param id identificador de la programación activa a poner en marcha
+     * @return el futuro de la tarea periódica agendada en el planificador
+     * @throws org.springframework.web.server.ResponseStatusException con 404 si no existe o está inactiva
      */
     public ScheduledFuture<?> scheduleExecution(Long id) {
         BackupSchedule p = progRepo.findById(id)

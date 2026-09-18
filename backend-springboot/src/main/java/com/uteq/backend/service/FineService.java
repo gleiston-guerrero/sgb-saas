@@ -72,6 +72,15 @@ public class FineService {
     // manual interno -- eso es SQL dentro del procedimiento, no Java, y ya
     // estaba documentado como duplicacion aceptada en db/auditoria-triggers.sql
     // seccion 3; no se toca aqui.
+    /**
+     * Constructor con los repositorios de multas, préstamos, libros y usuarios más el acceso a procedimientos.
+     *
+     * @param fineRepo repositorio de multas
+     * @param fineProcRepo repositorio de procedimientos de pago, anulación y reportes de multas
+     * @param userRepo repositorio de usuarios para resolver el dueño desde su correo
+     * @param bookRepo repositorio de libros para enriquecer el detalle de cada multa
+     * @param loanRepo repositorio de préstamos para navegar de la multa a su préstamo y libro
+     */
     public FineService(FineRepository fineRepo,
                         FineProcedureRepository fineProcRepo,
                         UserRepository userRepo,

@@ -23,17 +23,23 @@ public class ReservationController {
 
     private final ReservationService reservationService;
 
+    /**
+     * Constructor con el servicio de reservaciones.
+     *
+     * @param reservationService servicio de creación, consulta y cambio de estado de reservas
+     */
     public ReservationController(ReservationService reservationService) {
         this.reservationService = reservationService;
     }
 
     // ── POST /api/v1/reservaciones ────────────────────────
     /**
-     * Registra create validando los datos de entrada antes de persistir cambios.
+     * Crea una reservación de un libro para el usuario autenticado o el indicado por el personal.
+     * Roles LECTOR, BIBLIOTECARIO y GERENTE.
      *
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param dto libro, usuario y fecha de retiro de la reserva
+     * @param authentication identidad que solicita la reserva
+     * @return reservación creada con estado 201
      */
     @PostMapping
     @PreAuthorize("hasAnyRole('LECTOR','BIBLIOTECARIO','GERENTE')")
@@ -48,9 +54,10 @@ public class ReservationController {
     // Dashboard del bibliotecario: reservaciones que vencen hoy, sin
     // paginar (volumen bajo por diseño -- es "las de hoy", no el histórico).
     /**
-     * Handles reservations de hoy.
+     * Lista las reservaciones que vencen hoy para el tablero del bibliotecario, sin paginar.
+     * Roles BIBLIOTECARIO, GERENTE y ADMIN.
      *
-     * @return response entity{@code <list<reservacion hoy response dto>>} with the resulting state after the operation
+     * @return lista de reservaciones con vencimiento de hoy
      */
     @GetMapping("/hoy")
     @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
@@ -58,9 +65,10 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.searchReservationsToday());
     }
     /**
-     * Handles reservations proximas.
+     * Lista las reservaciones próximas a vencer para la gestión del bibliotecario, sin paginar.
+     * Roles BIBLIOTECARIO, GERENTE y ADMIN.
      *
-     * @return response entity{@code <list<reservacion hoy response dto>>} with the resulting state after the operation
+     * @return lista de reservaciones próximas con su fecha de retiro
      */
     @GetMapping("/proximas")
     @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
@@ -74,12 +82,13 @@ public class ReservationController {
     // manual que faltaba del RF-10: hasta ahora el LECTOR podía crear y el
     // sistema expirar, pero nadie podía marcar "listo para retirar".
     /**
-     * Actualiza change status con las reglas de negocio requeridas por el flujo.
+     * Cambia el estado de una reservación como aceptar a lista para retiro, rechazar o cancelar.
+     * Roles LECTOR, BIBLIOTECARIO, GERENTE y ADMIN según la transición permitida.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id de la reservación a actualizar
+     * @param dto estado nuevo solicitado para la reserva
+     * @param authentication identidad que autoriza el cambio de estado
+     * @return reservación actualizada con su estado nuevo
      */
     @PatchMapping("/{id}/estado")
     @PreAuthorize("hasAnyRole('LECTOR','BIBLIOTECARIO','GERENTE','ADMIN')")
@@ -92,12 +101,13 @@ public class ReservationController {
 
     // ── GET /api/v1/reservaciones/usuario/{usuarioId} ─────
     /**
-     * Consulta list by user usando los filtros recibidos y devuelve el resultado solicitado.
+     * Lista en forma paginada las reservaciones de un usuario. Un LECTOR solo ve las suyas.
+     * Roles LECTOR, BIBLIOTECARIO y GERENTE.
      *
-     * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param userId id del usuario cuyas reservaciones se consultan
+     * @param authentication identidad autenticada que pide la consulta
+     * @param pageable paginación y orden solicitados
+     * @return página de reservaciones del usuario indicado
      */
     @GetMapping("/usuario/{usuarioId}")
     @PreAuthorize("hasAnyRole('LECTOR','BIBLIOTECARIO','GERENTE')")

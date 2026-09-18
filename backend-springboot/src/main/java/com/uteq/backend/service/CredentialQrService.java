@@ -29,15 +29,23 @@ public class CredentialQrService {
 
     private final UserRepository userRepo;
 
+    /**
+     * Constructor con el repositorio para resolver usuarios por correo o token de credencial.
+     *
+     * @param userRepo repositorio de usuarios
+     */
     public CredentialQrService(UserRepository userRepo) {
         this.userRepo = userRepo;
     }
 
     /**
-     * Genera o entrega generate image qr own a partir de los datos actuales del sistema.
+     * Genera la imagen PNG de 300 px con la credencial QR del usuario autenticado para identificarlo
+     * en ventanilla al prestar. El QR codifica solo el token, sin exponer datos personales si se pierde.
      *
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return contenido binario generado o recuperado por la operacion
+     * @param authentication identidad autenticada del titular de la credencial
+     * @return bytes de la imagen QR en formato PNG
+     * @throws jakarta.persistence.EntityNotFoundException si el correo autenticado ya no existe en usuarios
+     * @throws IllegalStateException si el generador del QR o la escritura de la imagen fallan
      */
     public byte[] generateImageQrOwn(Authentication authentication) {
         User user = userRepo.findByEmail(authentication.getName())
@@ -64,10 +72,12 @@ public class CredentialQrService {
     }
 
     /**
-     * Procesa resolve by token y devuelve el resultado calculado por el backend.
+     * Resuelve el usuario dueño de un token de credencial QR escaneado en ventanilla.
+     * Solo acepta titulares en estado ACTIVO; un token ajeno se reporta igual que uno inexistente.
      *
-     * @param token token de seguridad recibido para validar o renovar la sesion del usuario
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param token token UUID leído del QR presentado por el lector
+     * @return el usuario titular del token en estado ACTIVO
+     * @throws jakarta.persistence.EntityNotFoundException si el token no existe o el titular no está activo
      */
     public User resolveByToken(UUID token) {
         User user = userRepo.findByCredentialQrToken(token)

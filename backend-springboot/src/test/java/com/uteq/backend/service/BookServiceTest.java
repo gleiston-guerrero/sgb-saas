@@ -128,7 +128,7 @@ class BookServiceTest {
         Book coincidencia = bookWithId();
         coincidencia.setStockAvailable((short) 2);
         given(statusRepo.findByName("ACTIVO")).willReturn(Optional.of(active));
-        given(bookRepo.suggestByTitle("clean", active.getId()))
+        given(bookRepo.suggestByTitleCriteria("clean", active.getId()))
                 .willReturn(List.of(coincidencia));
 
         List<BookSuggestionDTO> result = bookService.suggest("clean");
@@ -143,7 +143,7 @@ class BookServiceTest {
     void sugerir_withoutCoincidencias_retornaListaVacia() {
         StatusBook active = statusWithName("ACTIVO");
         given(statusRepo.findByName("ACTIVO")).willReturn(Optional.of(active));
-        given(bookRepo.suggestByTitle(anyString(), anyInt())).willReturn(List.of());
+        given(bookRepo.suggestByTitleCriteria(anyString(), anyInt())).willReturn(List.of());
 
         List<BookSuggestionDTO> result = bookService.suggest("xyz-inexistente");
 
@@ -308,38 +308,38 @@ class BookServiceTest {
         );
     }
 
-    // Buscador lector: texto + autor usa la nativa de autor con sort traducido a columna fisica
+    // Buscador lector: texto + autor usa Criteria con sort a propiedad
     @Test
-    void listWithFilters_conQyAutor_usaQueryNativaDeAutorConSortTitulo() {
+    void listWithFilters_conQyAutor_usaCriteriaDeAutorConSortTitle() {
         given(statusRepo.findByName("ACTIVO")).willReturn(Optional.of(statusWithName("ACTIVO")));
-        given(bookRepo.searchByTextOrIsbnAndAuthor(anyString(), any(), anyInt(), any(Pageable.class)))
+        given(bookRepo.searchText(anyString(), anyInt(), any(), any(), any(), any(Pageable.class)))
                 .willReturn(Page.empty());
         Pageable entrada = org.springframework.data.domain.PageRequest.of(0, 10,
                 org.springframework.data.domain.Sort.by("title").ascending());
 
         bookService.listWithFilters("clean", null, null, 3L, entrada);
 
-        verify(bookRepo).searchByTextOrIsbnAndAuthor(
+        verify(bookRepo).searchText(
                 org.mockito.ArgumentMatchers.eq("clean"),
-                org.mockito.ArgumentMatchers.eq(3L),
                 org.mockito.ArgumentMatchers.eq(1),
+                org.mockito.ArgumentMatchers.isNull(),
+                org.mockito.ArgumentMatchers.eq(3L),
+                org.mockito.ArgumentMatchers.isNull(),
                 argThat((Pageable p) -> p.getSort().stream()
-                        .anyMatch(o -> o.getProperty().equals("titulo"))));
-        verify(bookRepo, never()).searchByTextOIsbn(anyString(), anyInt(), any(), any(Pageable.class));
+                        .anyMatch(o -> o.getProperty().equals("title"))));
     }
 
-    // Buscador lector: solo texto sigue usando la nativa general
+    // Buscador lector: solo texto sigue usando la búsqueda por texto
     @Test
     void listWithFilters_conQSolo_usaSearchByTextOIsbn() {
         given(statusRepo.findByName("ACTIVO")).willReturn(Optional.of(statusWithName("ACTIVO")));
-        given(bookRepo.searchByTextOIsbn(anyString(), anyInt(), any(), any(Pageable.class)))
+        given(bookRepo.searchText(anyString(), anyInt(), any(), any(), any(), any(Pageable.class)))
                 .willReturn(Page.empty());
 
         bookService.listWithFilters("clean", null, null, null,
                 org.springframework.data.domain.PageRequest.of(0, 10));
 
-        verify(bookRepo).searchByTextOIsbn(anyString(), anyInt(), any(), any(Pageable.class));
-        verify(bookRepo, never()).searchByTextOrIsbnAndAuthor(anyString(), any(), anyInt(), any(Pageable.class));
+        verify(bookRepo).searchText(anyString(), anyInt(), any(), any(), any(), any(Pageable.class));
     }
 
     // 500 /api/publico/libros del 16-sep: sort=titulo (bundle viejo/manual)
@@ -373,18 +373,18 @@ class BookServiceTest {
                         .anyMatch(o -> o.getProperty().equals("dateRegistration"))));
     }
 
-    // /pendientes es nativa: sort=title debe traducirse a columna fisica
+    // /pendientes es Criteria: sort=title llega como propiedad
     @Test
-    void listPending_conSortTitle_nativaRecibeTitulo() {
-        given(bookRepo.searchByStatuses(any(), any(), any(), any(Pageable.class)))
+    void listPending_conSortTitle_criteriaRecibeTitle() {
+        given(bookRepo.searchByStatusesCriteria(any(), any(), any(), any(Pageable.class)))
                 .willReturn(Page.empty());
 
         bookService.listPending(null, null, java.util.List.of(2),
                 org.springframework.data.domain.PageRequest.of(0, 10,
                         org.springframework.data.domain.Sort.by("title").ascending()));
 
-        verify(bookRepo).searchByStatuses(any(), any(), any(),
+        verify(bookRepo).searchByStatusesCriteria(any(), any(), any(),
                 argThat((Pageable p) -> p.getSort().stream()
-                        .anyMatch(o -> o.getProperty().equals("titulo"))));
+                        .anyMatch(o -> o.getProperty().equals("title"))));
     }
 }

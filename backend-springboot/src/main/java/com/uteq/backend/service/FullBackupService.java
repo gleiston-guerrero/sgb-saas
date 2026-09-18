@@ -24,6 +24,14 @@ public class FullBackupService {
 
     private final BackupStorageService storageService;
 
+    /**
+     * Constructor con los repositorios de configuración y registros de respaldo más el almacenamiento.
+     *
+     * @param configRepo repositorio de la configuración del respaldo completo
+     * @param registrationRepo repositorio del historial de ejecuciones de respaldo
+     * @param userRepository repositorio de usuarios para registrar quién actualiza la configuración
+     * @param storageService servicio de almacenamiento remoto o local de los archivos
+     */
     public FullBackupService(ConfigurationBackupRepository configRepo,
                                    RegistrationBackupRepository registrationRepo,
                                    UserRepository userRepository,
@@ -36,8 +44,10 @@ public class FullBackupService {
 
     // ── Configuración ────────────────────────────────────────────────────────
     /**
-         * Busca/lista recursos.
-     * @return lista o pagina de resultados
+     * Recupera la configuración del respaldo completo, creándola con valores apagados por defecto
+     * (deshabilitada, cada 6 horas, 14 días de retención) cuando aún no existe ninguna fila.
+     *
+     * @return la configuración vigente del respaldo completo
      */
     public ConfigurationBackup getConfiguration() {
         return configRepo.findAll().stream().findFirst().orElseGet(() -> {
@@ -50,12 +60,15 @@ public class FullBackupService {
         });
     }
     /**
-     * Actualiza update configuration con las reglas de negocio requeridas por el flujo.
+     * Actualiza la frecuencia, la retención y el encendido del respaldo completo registrando al
+     * usuario autenticado y la fecha del cambio. Si queda habilitada, recalcula la próxima ejecución
+     * desde ahora más la frecuencia. Los parámetros nulos conservan su valor actual.
      *
-     * @param frequencyTimes valor de entrada frequencyTimes usado por la operacion para completar su regla de negocio
-     * @param daysRetention valor de entrada daysRetention usado por la operacion para completar su regla de negocio
-     * @param enabled valor de entrada enabled usado por la operacion para completar su regla de negocio
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param frequencyTimes frecuencia en horas entre ejecuciones, entre 1 y 168; nulo la conserva
+     * @param daysRetention días de retención de los archivos, entre 1 y 90; nulo la conserva
+     * @param enabled verdadero para activar el respaldo programado, falso para pausarlo; nulo lo conserva
+     * @return la configuración con los valores actualizados
+     * @throws org.springframework.web.server.ResponseStatusException con 400 si algún valor está fuera de rango
      */
     @Transactional
     public ConfigurationBackup updateConfiguration(Integer frequencyTimes, Integer daysRetention, Boolean enabled) {
@@ -117,10 +130,12 @@ public class FullBackupService {
     }
 
     /**
-     * Genera o entrega download a partir de los datos actuales del sistema.
+     * Descarga los bytes del archivo asociado a un registro de respaldo completo, resolviendo su
+     * clave desde la ruta guardada (incluidas rutas remotas con esquema {@code s3://}).
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return contenido binario generado o recuperado por la operacion
+     * @param id identificador del registro de respaldo cuyo archivo se quiere descargar
+     * @return bytes del archivo de respaldo listos para enviar al cliente
+     * @throws org.springframework.web.server.ResponseStatusException con 404 si el registro no existe y con 400 si no tiene archivo asociado
      */
 
     public byte[] download(Long id) {
@@ -147,11 +162,12 @@ public class FullBackupService {
 
     // ── Registro de ejecución (llamado desde el microservicio Node.js via token interno) ──
     /**
-     * Registra register start validando los datos de entrada antes de persistir cambios.
+     * Registra el inicio de una ejecución del microservicio externo de respaldo como fila en estado
+     * {@code ejecutando}, para seguir su resultado cuando el microservicio informe por token interno.
      *
-     * @param type criterio de clasificacion usado para seleccionar la variante o filtro requerido
-     * @param executedBy valor de entrada executedBy usado por la operacion para completar su regla de negocio
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param type tipo de respaldo iniciado, por ejemplo completo o incremental
+     * @param executedBy identificador del ejecutor informado por el microservicio
+     * @return el registro de ejecución recién creado en estado ejecutando
      */
     @Transactional
     public RegistrationBackup registerStart(String type, Long executedBy) {
@@ -163,15 +179,17 @@ public class FullBackupService {
         return registrationRepo.save(r);
     }
     /**
-     * Registra register result validando los datos de entrada antes de persistir cambios.
+     * Cierra una ejecución de respaldo con su estado final, archivo y error si lo hubo.
+     * Cuando el resultado es exitoso avanza además la última y próxima ejecución de la configuración.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param status criterio de clasificacion usado para seleccionar la variante o filtro requerido
-     * @param nameFile valor de entrada nameFile usado por la operacion para completar su regla de negocio
-     * @param sizeBytes valor de entrada sizeBytes usado por la operacion para completar su regla de negocio
-     * @param pathR2 valor de entrada pathR2 usado por la operacion para completar su regla de negocio
-     * @param messageError valor de entrada messageError usado por la operacion para completar su regla de negocio
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param id identificador del registro de ejecución iniciado por {@link #registerStart}
+     * @param status estado final informado, por ejemplo exitoso o fallido
+     * @param nameFile nombre del archivo de respaldo generado, si lo hubo
+     * @param sizeBytes tamaño en bytes del archivo generado, si lo hubo
+     * @param pathR2 ruta del archivo en el almacenamiento, si lo hubo
+     * @param messageError mensaje del error ocurrido, si la ejecución falló
+     * @return el registro de ejecución con el resultado y la fecha de cierre
+     * @throws org.springframework.web.server.ResponseStatusException con 404 si el registro no existe
      */
     @Transactional
     public RegistrationBackup registerResult(Long id, String status, String nameFile,

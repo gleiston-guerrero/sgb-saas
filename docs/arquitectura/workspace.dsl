@@ -40,10 +40,22 @@
  *
  *      This generates one .puml per view (e.g. workspace-NivelContexto.puml,
  *      workspace-NivelContenedores.puml) in the same directory.
+ *      Sin Docker: descargar structurizr-cli.zip de GitHub releases y
+ *      correr con Java local:
+ *        java -cp "<dir>;<dir>/lib/*" com.structurizr.cli.StructurizrCliApplication validate -workspace workspace.dsl
+ *        java -cp "<dir>;<dir>/lib/*" com.structurizr.cli.StructurizrCliApplication export -workspace workspace.dsl -format plantuml
+ *      (validado 2026-09-17 con CLI v2025.03.28 + JDK 21: validate exit 0).
  *
  *   2) Render each .puml to PNG with PlantUML (requires Graphviz):
  *
  *        plantuml -tpng docs/arquitectura/*.puml
+ *
+ *      Sin PlantUML/Graphviz instalados: plantuml.jar de GitHub releases
+ *      (usa su motor Smetana incorporado, sin Graphviz):
+ *        java -jar plantuml.jar -tpng docs/arquitectura/structurizr-NivelContenedores.puml -o c4-out
+ *      (renderizado 2026-09-17 con PlantUML v1.2025.7: canvas completo,
+ *      PostgreSQL y Redis visibles; el PNG anterior estaba recortado a la
+ *      derecha por un viewport de exportación, no por el DSL).
  *
  *   Alternative for local visual review (not CI-suitable, it is interactive):
  *
@@ -91,7 +103,7 @@ workspace "SGB-SaaS" "Web library management system — catalog, loan, reservati
 
         sgb = softwareSystem "SGB-SaaS" "Web library management platform: catalog, loans, reservations, fines and user administration." {
 
-            spa = container "Angular Frontend" "Catalog SPA, reactive forms and session management (in-memory accessToken, never localStorage)." "TypeScript / Angular 17" "Frontend"
+            spa = container "Angular Frontend" "Catalog SPA, reactive forms and session management (in-memory accessToken, never localStorage)." "TypeScript / Angular 21" "Frontend"
 
             backend = container "Spring Boot Backend" "REST API: JWT authentication (HttpOnly cookie for the refresh token), role-based RBAC authorization, loan/reservation/fine business logic via JPA + SQL procedures." "Java 21 / Spring Boot 4.0.6" {
 
@@ -146,8 +158,8 @@ workspace "SGB-SaaS" "Web library management system — catalog, loan, reservati
         admin -> spa "Uses" "HTTPS"
         anonimo -> spa "Uses" "HTTPS"
 
-        spa -> backend "REST requests (JSON) -- JWT in Authorization header; HttpOnly+Secure+SameSite=Strict refresh cookie for /api/auth/refresh" "HTTPS/JSON"
-        backend -> postgres "Reads/writes via Spring Data JPA (CRUD) and 7 SQL procedures/functions (joins, aggregations, complex transactions)" "JDBC"
+        spa -> backend "REST requests (JSON) -- JWT in Authorization header; HttpOnly+Secure+SameSite=None refresh cookie for /api/auth/refresh" "HTTPS/JSON"
+        backend -> postgres "Reads/writes via Spring Data JPA (CRUD, JPQL/Criteria) and stored procedures (positional calls)" "JDBC"
         backend -> redis "Checks revoked-token blacklist; reads/writes catalog cache (@Cacheable)" "Redis protocol"
 
         // Level 3 -- relationships between backend components (API -> Service,

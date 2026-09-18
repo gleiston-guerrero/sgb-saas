@@ -1,0 +1,1563 @@
+This is XeTeX, Version 3.141592653-2.6-0.999997 (MiKTeX 25.12) (preloaded format=xelatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+(informe-final.tex
+LaTeX2e <2025-11-01>
+L3 programming layer <2025-12-24>
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/base\report.cls
+Document Class: report 2025/01/22 v1.4n Standard LaTeX document class
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/base\size12.clo))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/base\inputenc.sty
+
+Package inputenc Warning: inputenc package ignored with utf8 based engines.
+
+) (C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/base\fontenc.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmr.fd))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/babel\babel.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/babel\xebabel.def)
+*************************************
+* Local config file bblopts.cfg used
+*
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/arabi\bblopts.cfg)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/babel/locale/es\babel
+-spanish.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/babel-spanish\spanish.l
+df))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/iftex\ifvtex.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.sty))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.cfg))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graphics.c
+fg)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\xetex.def)
+)) (C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/xcolor\xcolor.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\color.cfg)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/graphics\mathcolor.ltx)
+) (C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperref.sty
+
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/kvsetkeys\kvsetkeys.sty
+)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/kvdefinekeys\kvdefine
+keys.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pdfescape\pdfescape.s
+ty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/ltxcmds\ltxcmds.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pdftexcmds\pdftexcmds
+.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/infwarerr\infwarerr.s
+ty)))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/hycolor\hycolor.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcount.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/gettitlestring\gettit
+lestring.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/kvoptions\kvoptions.sty
+)))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/stringenc\stringenc.s
+ty) (C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.def
+) (C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/intcalc\intcalc.sty
+) (C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\puenc.def)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/bitset\bitset.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/bigintcalc\bigintcalc
+.sty)))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hxetex.def
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/rerunfilecheck\rerunfil
+echeck.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/uniquecounter\uniquec
+ounter.sty)))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/booktabs\booktabs.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/tools\longtable.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/tools\array.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/enumitem\enumitem.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/fancyhdr\fancyhdr.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/titlesec\titlesec.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/colortbl\colortbl.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/tools\tabularx.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/parskip\parskip.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/multirow\multirow.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/listings\listings.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstpatch.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstmisc.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/listings\listings.cfg))
+==> First Aid for listings.sty no longer applied!
+    Expected:
+        2024/09/23 1.10c (Carsten Heinz)
+    but found:
+        2025/11/14 1.11b (Carsten Heinz)
+    so I'm assuming it got fixed.
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/natbib\natbib.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/microtype\microtype.sty
+
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/microtype\microtype-xet
+ex.def)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/microtype\microtype.cfg
+))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pgf/frontendlayer\tikz.
+sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pgf/basiclayer\pgf.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgfrcs.st
+y
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfutil
+-common.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfutil
+-latex.def)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfrcs.
+code.tex
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf\pgf.revision.tex)
+))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pgf/basiclayer\pgfcore.
+sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pgf/systemlayer\pgfsys.
+sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsy
+s.code.tex
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfkeys
+.code.tex
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfkeys
+libraryfiltered.code.tex))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgf.c
+fg)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsy
+s-xetex.def
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsy
+s-dvipdfmx.def
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsy
+s-common-pdf.def))))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsy
+ssoftpath.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsy
+sprotocol.code.tex))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+e.code.tex
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmath.code
+.tex
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathutil.
+code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathparse
+r.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.basic.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.trigonometric.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.random.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.comparison.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.base.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.round.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.misc.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunct
+ions.integerarithmetics.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathcalc.
+code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfloat
+.code.tex))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfint.code.
+tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+epoints.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+epathconstruct.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+epathusage.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+escopes.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+egraphicstate.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+etransformations.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+equick.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+eobjects.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+epathprocessing.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+earrows.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+eshade.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+eimage.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+eexternal.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+elayers.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+etransparency.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+epatterns.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcor
+erdf.code.tex)))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodule
+shapes.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodule
+plot.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibility\pgfco
+mp-version-0-65.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibility\pgfco
+mp-version-1-18.sty))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgffor.st
+y
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgfkeys.s
+ty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfkeys
+.code.tex))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pgf/math\pgfmath.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmath.code
+.tex))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgffor.
+code.tex))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z\tikz.code.tex
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pgflibr
+aryplothandlers.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodule
+matrix.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z/libraries\tikzlibrarytopaths.code.tex)))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pgflibr
+aryarrows.meta.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
+z/libraries\tikzlibrarypositioning.code.tex)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pdflscape\pdflscape.sty
+
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/pdflscape\pdflscape-nom
+etadata.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/graphics\lscape.sty)))
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\amssymb.sty
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\amsfonts.sty))
+
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-xet
+ex.def)
+No file informe-final.aux.
+*geometry* driver: auto-detecting
+*geometry* detected driver: xetex
+
+Package hyperref Warning: Rerun to get /PageLabels entry.
+
+Couldn't patch \ttl@straight@ii
+Couldn't patch \ttl@straight@ii
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/microtype\mt-cmr.cfg)
+(capitulos/00-portada.tex
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/microtype\mt-msa.cfg)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/microtype\mt-msb.cfg)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmtt.fd) [1]
+[2])
+No file informe-final.toc.
+[1]
+No file informe-final.lof.
+[2]
+No file informe-final.lot.
+[3]
+No file informe-final.lol.
+[4]
+
+Package longtable Warning: Column widths have changed
+(longtable)                in table 1 on input line 240.
+
+ignored error: Infinite glue shrinkage found in box being split [5] [6]
+(capitulos/01-resumen.tex [7]) (capitulos/02-introduccion.tex [8]
+Cap├¡tulo 1.
+[9] [10]
+
+LaTeX Warning: Reference `cap:ingenieria-requisitos' on page 11 undefined on in
+put line 133.
+
+
+LaTeX Warning: Reference `cap:marco-teorico' on page 11 undefined on input line
+ 161.
+
+
+LaTeX Warning: Reference `cap:trabajos-relacionados' on page 11 undefined on in
+put line 166.
+
+
+LaTeX Warning: Reference `cap:ingenieria-requisitos' on page 11 undefined on in
+put line 169.
+
+
+LaTeX Warning: Reference `cap:materiales-metodos' on page 11 undefined on input
+ line 173.
+
+
+LaTeX Warning: Reference `cap:diseno-arquitectura' on page 11 undefined on inpu
+t line 177.
+
+
+LaTeX Warning: Reference `cap:implementacion' on page 11 undefined on input lin
+e 181.
+
+
+LaTeX Warning: Reference `cap:amenazas-validez' on page 11 undefined on input l
+ine 185.
+
+) (capitulos/04-marco-teorico.tex [11] [12]
+Cap├¡tulo 2.
+
+LaTeX Warning: Reference `cap:ingenieria-requisitos' on page 13 undefined on in
+put line 25.
+
+
+Package natbib Warning: Citation `bano2019elicitation' on page 13 undefined on 
+input line 28.
+
+
+Package natbib Warning: Citation `palomares2021elicitation' on page 13 undefine
+d on input line 32.
+
+
+LaTeX Warning: Reference `cap:ingenieria-requisitos' on page 13 undefined on in
+put line 37.
+
+
+LaTeX Warning: Reference `cap:ingenieria-requisitos' on page 13 undefined on in
+put line 55.
+
+[13]
+
+Package natbib Warning: Citation `brown2023c4model' on page 14 undefined on inp
+ut line 60.
+
+
+LaTeX Warning: Reference `cap:diseno-arquitectura' on page 14 undefined on inpu
+t line 69.
+
+
+LaTeX Warning: Reference `cap:diseno-arquitectura' on page 14 undefined on inpu
+t line 83.
+
+
+Package natbib Warning: Citation `walls2022springinaction' on page 14 undefined
+ on input line 93.
+
+
+LaTeX Warning: Reference `sec:mt-jwt' on page 14 undefined on input line 99.
+
+[14]
+
+LaTeX Warning: Reference `sec:mt-rest' on page 15 undefined on input line 113.
+
+
+Package natbib Warning: Citation `bucko2023jwtbehavior' on page 15 undefined on
+ input line 114.
+
+
+Package natbib Warning: Citation `shatnawi2024pythonjwt' on page 15 undefined o
+n input line 116.
+
+
+Package natbib Warning: Citation `ahmed2019jwtscheme' on page 15 undefined on i
+nput line 120.
+
+
+LaTeX Warning: Reference `cap:implementacion' on page 15 undefined on input lin
+e 126.
+
+
+Package natbib Warning: Citation `mckay2019tls' on page 15 undefined on input l
+ine 133.
+
+
+LaTeX Warning: Reference `cap:materiales-metodos' on page 15 undefined on input
+ line 149.
+
+
+Package natbib Warning: Citation `walls2022springinaction' on page 15 undefined
+ on input line 158.
+
+
+Package natbib Warning: Citation `colley2018ormperformance' on page 15 undefine
+d on input line 162.
+
+
+LaTeX Warning: Reference `cap:implementacion' on page 15 undefined on input lin
+e 172.
+
+[15]
+
+Package natbib Warning: Citation `kusuma2017rediscaching' on page 16 undefined 
+on input line 178.
+
+
+LaTeX Warning: Reference `cap:diseno-arquitectura' on page 16 undefined on inpu
+t line 187.
+
+
+LaTeX Warning: Reference `cap:materiales-metodos' on page 16 undefined on input
+ line 187.
+
+) (capitulos/03-trabajos-relacionados.tex [16]
+Cap├¡tulo 3.
+
+LaTeX Warning: Reference `sec:estrategia-busqueda' on page 17 undefined on inpu
+t line 11.
+
+
+Package natbib Warning: Citation `colley2018ormperformance' on page 17 undefine
+d on input line 25.
+
+
+Package natbib Warning: Citation `kusuma2017rediscaching' on page 17 undefined 
+on input line 26.
+
+[17]
+
+Package natbib Warning: Citation `kusuma2017rediscaching' on page 18 undefined 
+on input line 54.
+
+
+Package natbib Warning: Citation `ayinde2026ai' on page 18 undefined on input l
+ine 55.
+
+
+Package natbib Warning: Citation `brown2023c4model' on page 18 undefined on inp
+ut line 68.
+
+
+LaTeX Warning: Reference `fig:prisma-flow' on page 18 undefined on input line 7
+9.
+
+
+Package natbib Warning: Citation `ayinde2026ai' on page 18 undefined on input l
+ine 88.
+
+
+Package natbib Warning: Citation `liabor2023cataloging' on page 18 undefined on
+ input line 88.
+
+
+Package natbib Warning: Citation `shivaji2024intelligentlms' on page 18 undefin
+ed on input line 88.
+
+
+Package natbib Warning: Citation `rajacic2025gdpr' on page 18 undefined on inpu
+t line 88.
+
+
+Package natbib Warning: Citation `supriyono2018qr' on page 18 undefined on inpu
+t line 88.
+
+
+Package natbib Warning: Citation `ng2024libbot' on page 18 undefined on input l
+ine 88.
+
+
+Package natbib Warning: Citation `mukund2021rfid' on page 18 undefined on input
+ line 88.
+
+
+Package natbib Warning: Citation `adetayo2023chatgpt' on page 18 undefined on i
+nput line 88.
+
+
+Package natbib Warning: Citation `yan2023chatbotsslr' on page 18 undefined on i
+nput line 88.
+
+
+Package natbib Warning: Citation `ehrenpreis2022chatbot' on page 18 undefined o
+n input line 88.
+
+
+Package natbib Warning: Citation `wayesa2023recsys' on page 18 undefined on inp
+ut line 88.
+
+
+Package natbib Warning: Citation `hu2025bigdata' on page 18 undefined on input 
+line 88.
+
+
+Package natbib Warning: Citation `ayemowa2024genai' on page 18 undefined on inp
+ut line 88.
+
+
+Package natbib Warning: Citation `colley2018ormperformance' on page 18 undefine
+d on input line 88.
+
+
+Package natbib Warning: Citation `kusuma2017rediscaching' on page 18 undefined 
+on input line 88.
+
+
+Package natbib Warning: Citation `bano2019elicitation' on page 18 undefined on 
+input line 95.
+
+
+Package natbib Warning: Citation `palomares2021elicitation' on page 18 undefine
+d on input line 95.
+
+
+Package natbib Warning: Citation `yu1997istar' on page 18 undefined on input li
+ne 95.
+
+
+Package natbib Warning: Citation `kurtanovic2017classifying' on page 18 undefin
+ed on input line 95.
+
+
+Package natbib Warning: Citation `truong2025personality' on page 18 undefined o
+n input line 96.
+
+
+Package natbib Warning: Citation `rahman2024agile' on page 18 undefined on inpu
+t line 96.
+
+
+Package natbib Warning: Citation `parlakkilic2022responsive' on page 18 undefin
+ed on input line 98.
+
+
+Package natbib Warning: Citation `aienobe2025responsive' on page 18 undefined o
+n input line 98.
+
+
+Package natbib Warning: Citation `mckay2019tls' on page 18 undefined on input l
+ine 99.
+
+
+Package natbib Warning: Citation `sommerville2011se' on page 18 undefined on in
+put line 101.
+
+
+Package natbib Warning: Citation `fowler2002poeaa' on page 18 undefined on inpu
+t line 101.
+
+
+Package natbib Warning: Citation `walls2022springinaction' on page 18 undefined
+ on input line 101.
+
+
+Package natbib Warning: Citation `bass2021softwarearch' on page 18 undefined on
+ input line 101.
+
+
+Package natbib Warning: Citation `brown2023c4model' on page 18 undefined on inp
+ut line 101.
+
+
+Package natbib Warning: Citation `baltes2022sampling' on page 18 undefined on i
+nput line 102.
+
+
+LaTeX Warning: Reference `cap:amenazas-validez' on page 18 undefined on input l
+ine 103.
+
+
+Package natbib Warning: Citation `bucko2023jwtbehavior' on page 18 undefined on
+ input line 111.
+
+
+Package natbib Warning: Citation `shatnawi2024pythonjwt' on page 18 undefined o
+n input line 111.
+
+
+Package natbib Warning: Citation `ahmed2019jwtscheme' on page 18 undefined on i
+nput line 111.
+
+
+LaTeX Warning: Reference `cap:diseno-arquitectura' on page 18 undefined on inpu
+t line 117.
+
+
+Package natbib Warning: Citation `ayinde2026ai' on page 18 undefined on input l
+ine 156.
+
+
+Package natbib Warning: Citation `liabor2023cataloging' on page 18 undefined on
+ input line 156.
+
+
+Package natbib Warning: Citation `adetayo2023chatgpt' on page 18 undefined on i
+nput line 156.
+
+
+Package natbib Warning: Citation `yan2023chatbotsslr' on page 18 undefined on i
+nput line 156.
+
+
+Package natbib Warning: Citation `ayemowa2024genai' on page 18 undefined on inp
+ut line 156.
+
+
+LaTeX Warning: Reference `sec:panorama-relacionados' on page 18 undefined on in
+put line 158.
+
+
+LaTeX Warning: Reference `tab:trabajos-comparativa' on page 18 undefined on inp
+ut line 161.
+
+
+LaTeX Warning: Reference `sec:proceso-seleccion' on page 18 undefined on input 
+line 171.
+
+
+LaTeX Warning: Reference `sec:proceso-seleccion' on page 18 undefined on input 
+line 171.
+
+[18]
+
+Package natbib Warning: Citation `ayinde2026ai' on page 19 undefined on input l
+ine 184.
+
+
+Package natbib Warning: Citation `yan2023chatbotsslr' on page 19 undefined on i
+nput line 185.
+
+
+Package natbib Warning: Citation `ayemowa2024genai' on page 19 undefined on inp
+ut line 185.
+
+
+Package natbib Warning: Citation `adetayo2023chatgpt' on page 19 undefined on i
+nput line 187.
+
+
+Package natbib Warning: Citation `liabor2023cataloging' on page 19 undefined on
+ input line 189.
+
+
+LaTeX Warning: Reference `fig:prisma-flow' on page 19 undefined on input line 1
+92.
+
+
+LaTeX Warning: Reference `tab:trabajos-comparativa' on page 19 undefined on inp
+ut line 195.
+
+[19] [20]
+
+Package natbib Warning: Citation `supriyono2018qr' on page 21 undefined on inpu
+t line 237.
+
+
+Package natbib Warning: Citation `mukund2021rfid' on page 21 undefined on input
+ line 251.
+
+
+Package natbib Warning: Citation `ng2024libbot' on page 21 undefined on input l
+ine 264.
+
+
+Package natbib Warning: Citation `rajacic2025gdpr' on page 21 undefined on inpu
+t line 275.
+
+
+Package natbib Warning: Citation `wayesa2023recsys' on page 21 undefined on inp
+ut line 290.
+
+
+Package natbib Warning: Citation `hu2025bigdata' on page 21 undefined on input 
+line 304.
+
+
+Package natbib Warning: Citation `ehrenpreis2022chatbot' on page 21 undefined o
+n input line 319.
+
+
+Package natbib Warning: Citation `shivaji2024intelligentlms' on page 21 undefin
+ed on input line 336.
+
+
+Package natbib Warning: Citation `colley2018ormperformance' on page 21 undefine
+d on input line 351.
+
+
+LaTeX Warning: Reference `sec:sp-invocacion' on page 21 undefined on input line
+ 364.
+
+
+Package natbib Warning: Citation `kusuma2017rediscaching' on page 21 undefined 
+on input line 367.
+
+
+LaTeX Warning: Reference `sec:cache-redis' on page 21 undefined on input line 3
+78.
+
+[21] [22] [23]
+
+Package natbib Warning: Citation `bano2019elicitation' on page 24 undefined on 
+input line 388.
+
+
+Package natbib Warning: Citation `palomares2021elicitation' on page 24 undefine
+d on input line 390.
+
+
+Package natbib Warning: Citation `yu1997istar' on page 24 undefined on input li
+ne 392.
+
+
+Package natbib Warning: Citation `kurtanovic2017classifying' on page 24 undefin
+ed on input line 394.
+
+
+LaTeX Warning: Reference `cap:ingenieria-requisitos' on page 24 undefined on in
+put line 398.
+
+
+Package natbib Warning: Citation `truong2025personality' on page 24 undefined o
+n input line 404.
+
+
+Package natbib Warning: Citation `rahman2024agile' on page 24 undefined on inpu
+t line 406.
+
+
+LaTeX Warning: Reference `cap:amenazas-validez' on page 24 undefined on input l
+ine 412.
+
+
+Package natbib Warning: Citation `parlakkilic2022responsive' on page 24 undefin
+ed on input line 416.
+
+
+Package natbib Warning: Citation `aienobe2025responsive' on page 24 undefined o
+n input line 418.
+
+
+LaTeX Warning: Reference `sec:validez-externa' on page 24 undefined on input li
+ne 423.
+
+
+Package natbib Warning: Citation `mckay2019tls' on page 24 undefined on input l
+ine 427.
+
+
+LaTeX Warning: Reference `cap:implementacion' on page 24 undefined on input lin
+e 430.
+
+
+LaTeX Warning: Reference `cap:diseno-arquitectura' on page 24 undefined on inpu
+t line 434.
+
+
+LaTeX Warning: Reference `cap:implementacion' on page 24 undefined on input lin
+e 435.
+
+
+Package natbib Warning: Citation `sommerville2011se' on page 24 undefined on in
+put line 436.
+
+
+Package natbib Warning: Citation `fowler2002poeaa' on page 24 undefined on inpu
+t line 437.
+
+
+Package natbib Warning: Citation `walls2022springinaction' on page 24 undefined
+ on input line 440.
+
+
+Package natbib Warning: Citation `bass2021softwarearch' on page 24 undefined on
+ input line 441.
+
+
+LaTeX Warning: Reference `cap:diseno-arquitectura' on page 24 undefined on inpu
+t line 443.
+
+
+Package natbib Warning: Citation `brown2023c4model' on page 24 undefined on inp
+ut line 443.
+
+
+LaTeX Warning: Reference `sec:estrategia-busqueda' on page 24 undefined on inpu
+t line 445.
+
+[24]
+
+Package natbib Warning: Citation `ng2024libbot' on page 25 undefined on input l
+ine 462.
+
+
+Package natbib Warning: Citation `ehrenpreis2022chatbot' on page 25 undefined o
+n input line 463.
+
+
+Package natbib Warning: Citation `colley2018ormperformance' on page 25 undefine
+d on input line 466.
+
+
+Package natbib Warning: Citation `kusuma2017rediscaching' on page 25 undefined 
+on input line 469.
+
+
+LaTeX Warning: Reference `sec:estrategia-busqueda' on page 25 undefined on inpu
+t line 478.
+
+
+LaTeX Warning: Reference `cap:amenazas-validez' on page 25 undefined on input l
+ine 487.
+
+) (capitulos/09-ingenieria-requisitos.tex [25]
+Cap├¡tulo 4.
+[26]
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\leavevmode@ifvmode' on input line 107.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                \kern 1.95836pt
+(hyperref)                removed on input line 107.
+
+[27] [28]
+
+LaTeX Warning: Reference `sec:mt-incose' on page 29 undefined on input line 183
+.
+
+
+LaTeX Warning: Reference `sec:mt-requisitos' on page 29 undefined on input line
+ 206.
+
+) (capitulos/05-materiales-metodos.tex [29] [30]
+Cap├¡tulo 5.
+
+Package natbib Warning: Citation `peffers2007dsrm' on page 31 undefined on inpu
+t line 12.
+
+
+Package natbib Warning: Citation `hevner2004design' on page 31 undefined on inp
+ut line 16.
+
+
+LaTeX Warning: Reference `cap:introduccion' on page 31 undefined on input line 
+24.
+
+
+LaTeX Warning: Reference `cap:introduccion' on page 31 undefined on input line 
+28.
+
+
+LaTeX Warning: Reference `cap:diseno-arquitectura' on page 31 undefined on inpu
+t line 34.
+
+
+LaTeX Warning: Reference `sec:mm-instrumentos' on page 31 undefined on input li
+ne 41.
+
+
+LaTeX Warning: Reference `cap:introduccion' on page 31 undefined on input line 
+49.
+
+[31]
+
+Package natbib Warning: Citation `brooke1996sus' on page 32 undefined on input 
+line 56.
+
+
+LaTeX Warning: Reference `sec:mm-poblacion' on page 32 undefined on input line 
+62.
+
+
+LaTeX Warning: Reference `sec:mm-protocolo-perf' on page 32 undefined on input 
+line 67.
+
+Missing character: There is no ÔÇö in font ec-lmr12!
+
+LaTeX Warning: Reference `sec:res-cobertura' on page 32 undefined on input line
+ 79.
+
+Missing character: There is no ÔÇö in font ec-lmr12!
+
+LaTeX Warning: Reference `sec:res-cobertura' on page 32 undefined on input line
+ 84.
+
+
+LaTeX Warning: Reference `sec:mt-owasp' on page 32 undefined on input line 89.
+
+[32]
+
+LaTeX Warning: Reference `cap:diseno-arquitectura' on page 33 undefined on inpu
+t line 129.
+
+
+Package natbib Warning: Citation `baltes2022sampling' on page 33 undefined on i
+nput line 142.
+
+[33]
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty)
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty)
+
+LaTeX Warning: Reference `cap:diseno-arquitectura' on page 34 undefined on inpu
+t line 197.
+
+
+LaTeX Warning: Reference `cap:amenazas-validez' on page 34 undefined on input l
+ine 214.
+
+[34]) (capitulos/06-diseno-arquitectura.tex [35]
+Cap├¡tulo 6.
+
+LaTeX Warning: Reference `sec:mt-c4' on page 36 undefined on input line 8.
+
+
+LaTeX Warning: Reference `fig:c4-nivel1-contexto' on page 36 undefined on input
+ line 19.
+
+
+LaTeX Warning: Reference `fig:c4-nivel2-contenedores' on page 36 undefined on i
+nput line 20.
+
+
+LaTeX Warning: Reference `fig:c4-componentes' on page 36 undefined on input lin
+e 20.
+
+
+LaTeX Warning: Reference `sec:c4-exportacion' on page 36 undefined on input lin
+e 23.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: Reference `sec:c4-nivel3' on page 36 undefined on input line 64.
+
+
+[36] [37]
+
+LaTeX Warning: Reference `fig:der-real' on page 38 undefined on input line 91.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[38]
+
+LaTeX Warning: Reference `sec:adrs' on page 39 undefined on input line 145.
+
+
+LaTeX Warning: Reference `fig:c4-componentes' on page 39 undefined on input lin
+e 177.
+
+
+LaTeX Warning: Reference `fig:c4-nivel1-contexto' on page 39 undefined on input
+ line 181.
+
+
+LaTeX Warning: Reference `fig:c4-nivel2-contenedores' on page 39 undefined on i
+nput line 181.
+
+[39] [40]
+
+LaTeX Warning: Reference `sec:mt-25010' on page 41 undefined on input line 255.
+
+
+
+LaTeX Warning: Reference `cap:amenazas-validez' on page 41 undefined on input l
+ine 274.
+
+
+LaTeX Warning: Reference `sec:tf-csrf' on page 41 undefined on input line 283.
+
+
+LaTeX Warning: Reference `sec:adrs' on page 41 undefined on input line 285.
+
+[41]
+
+Package longtable Warning: Column widths have changed
+(longtable)                in table 6.1 on input line 288.
+
+ignored error: Infinite glue shrinkage found in box being split [42]
+
+LaTeX Warning: Reference `cap:ingenieria-requisitos' on page 43 undefined on in
+put line 298.
+
+[43]
+
+LaTeX Warning: Reference `fig:diseno-endpoints-roles' on page 44 undefined on i
+nput line 373.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: Reference `fig:diseno-migraciones' on page 44 undefined on input
+ line 391.
+
+[44]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+) (capitulos/07-implementacion.tex [45] [46]
+Cap├¡tulo 7.
+
+LaTeX Warning: Reference `sec:mt-acceso-datos' on page 47 undefined on input li
+ne 18.
+
+
+LaTeX Warning: Reference `sec:adrs' on page 47 undefined on input line 18.
+
+
+LaTeX Warning: Reference `lst:sp-crear-prestamo' on page 47 undefined on input 
+line 25.
+
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty)
+[47] [48]
+(C:\Users\moise\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty)
+[49]
+
+LaTeX Warning: Reference `sec:sp-invocacion' on page 50 undefined on input line
+ 165.
+
+
+LaTeX Warning: Reference `lst:global-exception-handler' on page 50 undefined on
+ input line 166.
+
+[50]
+
+LaTeX Warning: Reference `lst:config-service' on page 51 undefined on input lin
+e 223.
+
+[51]
+
+LaTeX Warning: Reference `sec:cache-redis' on page 52 undefined on input line 2
+54.
+
+
+LaTeX Warning: Reference `lst:libro-service-cache' on page 52 undefined on inpu
+t line 268.
+
+
+LaTeX Warning: Reference `lst:jwt-cookie' on page 52 undefined on input line 30
+6.
+
+[52]
+
+LaTeX Warning: Reference `cap:ingenieria-requisitos' on page 53 undefined on in
+put line 326.
+
+) (capitulos/08-resultados.tex [53]
+Cap├¡tulo 8.
+
+LaTeX Warning: Reference `cap:introduccion' on page 54 undefined on input line 
+9.
+
+
+LaTeX Warning: Reference `cap:amenazas-validez' on page 54 undefined on input l
+ine 19.
+
+
+LaTeX Warning: Reference `cap:materiales-metodos' on page 54 undefined on input
+ line 42.
+
+[54]
+
+LaTeX Warning: Reference `tab:res-perf-descriptivo' on page 55 undefined on inp
+ut line 71.
+
+
+LaTeX Warning: Reference `fig:res-perf-distribucion' on page 55 undefined on in
+put line 74.
+
+
+LaTeX Warning: Reference `fig:res-perf-throughput' on page 55 undefined on inpu
+t line 75.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: Reference `fig:res-perf-comparacion' on page 55 undefined on inp
+ut line 124.
+
+
+LaTeX Warning: Reference `cap:amenazas-validez' on page 55 undefined on input l
+ine 136.
+
+[55]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[56]
+
+LaTeX Warning: Reference `fig:res-zap-riesgos' on page 57 undefined on input li
+ne 219.
+
+[57]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[58] [59]
+
+LaTeX Warning: Reference `tab:res-jacoco' on page 60 undefined on input line 36
+2.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: Reference `tab:res-jacoco-capas-vigente' on page 60 undefined on
+ input line 381.
+
+
+LaTeX Warning: Reference `fig:res-jacoco-paquetes' on page 60 undefined on inpu
+t line 381.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[60]
+
+LaTeX Warning: Reference `cap:introduccion' on page 61 undefined on input line 
+399.
+
+[61]
+
+LaTeX Warning: Reference `tab:res-lighthouse' on page 62 undefined on input lin
+e 451.
+
+[62]
+
+LaTeX Warning: Reference `tab:res-cls' on page 63 undefined on input line 515.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: Reference `tab:res-lighthouse-perfiles' on page 63 undefined on 
+input line 568.
+
+
+LaTeX Warning: Reference `fig:res-lighthouse-medias' on page 63 undefined on in
+put line 568.
+
+[63]
+
+Package natbib Warning: Citation `brooke1996sus' on page 64 undefined on input 
+line 588.
+
+
+LaTeX Warning: Reference `cap:materiales-metodos' on page 64 undefined on input
+ line 588.
+
+[64]
+
+LaTeX Warning: Reference `cap:materiales-metodos' on page 65 undefined on input
+ line 613.
+
+
+LaTeX Warning: Reference `sec:tf-sus' on page 65 undefined on input line 618.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+) (capitulos/09-discusion.tex [65] [66]
+Cap├¡tulo 9.
+
+LaTeX Warning: Reference `cap:resultados' on page 67 undefined on input line 7.
+
+
+
+LaTeX Warning: Reference `cap:introduccion' on page 67 undefined on input line 
+9.
+
+
+LaTeX Warning: Reference `cap:trabajos-relacionados' on page 67 undefined on in
+put line 12.
+
+
+LaTeX Warning: Reference `sec:rqs' on page 67 undefined on input line 20.
+
+
+LaTeX Warning: Reference `sec:res-rendimiento' on page 67 undefined on input li
+ne 27.
+
+
+LaTeX Warning: Reference `sec:res-rendimiento' on page 67 undefined on input li
+ne 34.
+
+
+LaTeX Warning: Reference `cap:amenazas-validez' on page 67 undefined on input l
+ine 35.
+
+
+LaTeX Warning: Reference `sec:res-seguridad' on page 67 undefined on input line
+ 48.
+
+[67]
+
+LaTeX Warning: Reference `sec:res-usabilidad' on page 68 undefined on input lin
+e 77.
+
+
+LaTeX Warning: Reference `sec:matriz-resumen' on page 68 undefined on input lin
+e 89.
+
+
+LaTeX Warning: Reference `cap:diseno-arquitectura' on page 68 undefined on inpu
+t line 90.
+
+
+LaTeX Warning: Reference `sec:res-cobertura' on page 68 undefined on input line
+ 97.
+
+
+LaTeX Warning: Reference `cap:implementacion' on page 68 undefined on input lin
+e 114.
+
+[68]
+
+LaTeX Warning: Reference `cap:trabajos-relacionados' on page 69 undefined on in
+put line 123.
+
+
+Package natbib Warning: Citation `colley2018ormperformance' on page 69 undefine
+d on input line 131.
+
+
+Package natbib Warning: Citation `kusuma2017rediscaching' on page 69 undefined 
+on input line 136.
+
+
+LaTeX Warning: Reference `cap:trabajos-relacionados' on page 69 undefined on in
+put line 142.
+
+
+LaTeX Warning: Reference `cap:diseno-arquitectura' on page 69 undefined on inpu
+t line 162.
+
+
+LaTeX Warning: Reference `cap:resultados' on page 69 undefined on input line 17
+1.
+
+
+LaTeX Warning: Reference `cap:materiales-metodos' on page 69 undefined on input
+ line 181.
+
+[69]) (capitulos/10-trabajo-futuro.tex [70]
+Cap├¡tulo 10.
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 13.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\geq' on input line 13.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 13.
+
+
+Package natbib Warning: Citation `brooke1996sus' on page 71 undefined on input 
+line 27.
+
+[71]
+
+LaTeX Warning: Reference `cap:implementacion' on page 72 undefined on input lin
+e 48.
+
+
+LaTeX Warning: Reference `cap:implementacion' on page 72 undefined on input lin
+e 71.
+
+
+LaTeX Warning: Reference `cap:resultados' on page 72 undefined on input line 83
+.
+
+
+LaTeX Warning: Reference `sec:res-seguridad' on page 72 undefined on input line
+ 83.
+
+
+LaTeX Warning: Reference `cap:resultados' on page 72 undefined on input line 10
+1.
+
+
+LaTeX Warning: Reference `tab:res-owasp' on page 72 undefined on input line 106
+.
+
+[72]
+
+LaTeX Warning: Reference `cap:resultados' on page 73 undefined on input line 11
+4.
+
+
+LaTeX Warning: Reference `sec:res-lighthouse' on page 73 undefined on input lin
+e 114.
+
+[73]) (capitulos/11-conclusiones.tex [74]
+Cap├¡tulo 11.
+
+LaTeX Warning: Reference `sec:disc-rqs' on page 75 undefined on input line 9.
+
+
+LaTeX Warning: Reference `sec:rqs' on page 75 undefined on input line 10.
+
+
+LaTeX Warning: Reference `sec:matriz-resumen' on page 75 undefined on input lin
+e 36.
+
+
+LaTeX Warning: Reference `cap:ingenieria-requisitos' on page 75 undefined on in
+put line 37.
+
+
+LaTeX Warning: Reference `cap:introduccion' on page 75 undefined on input line 
+46.
+
+
+LaTeX Warning: Reference `cap:resultados' on page 75 undefined on input line 47
+.
+
+[75]
+
+LaTeX Warning: Reference `cap:ingenieria-requisitos' on page 76 undefined on in
+put line 53.
+
+
+LaTeX Warning: Reference `sec:matriz-resumen' on page 76 undefined on input lin
+e 55.
+
+
+LaTeX Warning: Reference `cap:resultados' on page 76 undefined on input line 63
+.
+
+
+LaTeX Warning: Reference `cap:diseno-arquitectura' on page 76 undefined on inpu
+t line 70.
+
+
+LaTeX Warning: Reference `cap:trabajos-relacionados' on page 76 undefined on in
+put line 74.
+
+
+LaTeX Warning: Reference `sec:disc-trabajos-relacionados' on page 76 undefined 
+on input line 76.
+
+
+LaTeX Warning: Reference `cap:ingenieria-requisitos' on page 76 undefined on in
+put line 88.
+
+
+LaTeX Warning: Reference `sec:res-cobertura' on page 76 undefined on input line
+ 90.
+
+
+LaTeX Warning: Reference `tab:res-resumen' on page 76 undefined on input line 9
+4.
+
+
+LaTeX Warning: Reference `cap:trabajo-futuro' on page 76 undefined on input lin
+e 94.
+
+) (capitulos/12-amenazas-validez.tex [76]
+Cap├¡tulo 12.
+
+LaTeX Warning: Reference `sec:cache-redis' on page 77 undefined on input line 1
+6.
+
+
+LaTeX Warning: Reference `cap:diseno-arquitectura' on page 77 undefined on inpu
+t line 44.
+
+
+LaTeX Warning: Reference `cap:diseno-arquitectura' on page 77 undefined on inpu
+t line 61.
+
+[77]
+
+LaTeX Warning: Reference `sec:res-usabilidad' on page 78 undefined on input lin
+e 78.
+
+
+Package natbib Warning: Citation `baltes2022sampling' on page 78 undefined on i
+nput line 86.
+
+
+LaTeX Warning: Reference `sec:tf-sus' on page 78 undefined on input line 97.
+
+[78]
+
+LaTeX Warning: Reference `cap:trabajos-relacionados' on page 79 undefined on in
+put line 108.
+
+) (capitulos/13-declaraciones.tex [79] [80]
+Cap├¡tulo 13.
+
+LaTeX Warning: Reference `cap:resultados' on page 81 undefined on input line 35
+.
+
+
+LaTeX Warning: Reference `sec:decl-codigo' on page 81 undefined on input line 4
+0.
+
+
+LaTeX Warning: Reference `sec:decl-codigo' on page 81 undefined on input line 5
+5.
+
+[81]
+
+LaTeX Warning: Reference `sec:tf-sus' on page 82 undefined on input line 59.
+
+
+LaTeX Warning: Reference `sec:decl-etica' on page 82 undefined on input line 61
+.
+
+
+LaTeX Warning: Reference `sec:mm-semillas' on page 82 undefined on input line 8
+4.
+
+
+LaTeX Warning: Reference `sec:tf-sus' on page 82 undefined on input line 92.
+
+[82]
+
+LaTeX Warning: Reference `sec:tf-sus' on page 83 undefined on input line 112.
+
+
+LaTeX Warning: Reference `tab:decl-credit' on page 83 undefined on input line 1
+27.
+
+
+LaTeX Warning: Reference `cap:discusion' on page 83 undefined on input line 169
+.
+
+
+LaTeX Warning: Reference `sec:tf-zap' on page 83 undefined on input line 172.
+
+[83]
+
+LaTeX Warning: Reference `cap:resultados' on page 84 undefined on input line 17
+7.
+
+
+LaTeX Warning: Reference `sec:tf-sus' on page 84 undefined on input line 187.
+
+
+LaTeX Warning: Reference `fig:decl-commits-mensuales' on page 84 undefined on i
+nput line 191.
+
+
+LaTeX Warning: Reference `fig:decl-commits-autores' on page 84 undefined on inp
+ut line 191.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[84] [85]
+
+LaTeX Warning: Reference `sec:anexo-control-rubrica' on page 86 undefined on in
+put line 262.
+
+) (capitulos/14-anexos.tex [86]
+Cap├¡tulo 14.
+
+LaTeX Warning: Reference `cap:trabajos-relacionados' on page 87 undefined on in
+put line 8.
+
+
+LaTeX Warning: Reference `sec:estrategia-busqueda' on page 87 undefined on inpu
+t line 19.
+
+
+LaTeX Warning: Reference `cap:trabajos-relacionados' on page 87 undefined on in
+put line 19.
+
+
+LaTeX Warning: Reference `sec:estrategia-busqueda' on page 87 undefined on inpu
+t line 37.
+
+
+LaTeX Warning: Reference `fig:prisma-flow' on page 87 undefined on input line 3
+9.
+
+
+Package natbib Warning: Citation `brooke1996sus' on page 87 undefined on input 
+line 44.
+
+
+LaTeX Warning: Reference `sec:res-usabilidad' on page 87 undefined on input lin
+e 47.
+
+
+LaTeX Warning: Reference `cap:resultados' on page 87 undefined on input line 48
+.
+
+[87]
+
+LaTeX Warning: Reference `sec:mm-poblacion' on page 88 undefined on input line 
+63.
+
+[88]
+
+Package natbib Warning: Citation `brooke1996sus' on page 89 undefined on input 
+line 127.
+
+
+Package natbib Warning: Citation `ralph2021empiricalstandards' on page 89 undef
+ined on input line 161.
+
+
+LaTeX Warning: Reference `tab:anexo-ralph-esenciales' on page 89 undefined on i
+nput line 169.
+
+
+LaTeX Warning: Reference `tab:anexo-ralph-deseables' on page 89 undefined on in
+put line 170.
+
+
+LaTeX Warning: Reference `tab:anexo-ralph-extraordinarios' on page 89 undefined
+ on input line 171.
+
+
+LaTeX Warning: Reference `tab:anexo-ralph-antipatrones' on page 89 undefined on
+ input line 172.
+
+
+LaTeX Warning: Reference `tab:anexo-ralph-resumen' on page 89 undefined on inpu
+t line 173.
+
+[89]
+ignored error: Infinite glue shrinkage found in box being split [90] [91]
+
+LaTeX Warning: Reference `tab:anexo-matriz' on page 92 undefined on input line 
+368.
+
+[92] [93] [94] [95] [96] [97] [98] [99]
+
+LaTeX Warning: Reference `sec:res-cobertura' on page 100 undefined on input lin
+e 527.
+
+
+LaTeX Warning: Reference `sec:tf-service-branch-coverage' on page 100 undefined
+ on input line 528.
+
+[100])
+No file informe-final.bbl.
+
+Package natbib Warning: There were undefined citations.
+
+
+Package longtable Warning: Table widths have changed. Rerun LaTeX.
+
+[101] (informe-final.aux)
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+
+Package rerunfilecheck Warning: File `informe-final.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+ )
+Output written on informe-final.pdf (103 pages).
+Transcript written on informe-final.log.

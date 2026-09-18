@@ -528,14 +528,15 @@ class LoanServiceTest {
     @Test
     void listActivesByUser_librarianPideCualquiera_retornaMapeados() {
         Authentication auth = authComoRole("biblio@correo.com", "BIBLIOTECARIO");
-        com.uteq.backend.repository.projection.LoanActiveProjection p =
-                mock(com.uteq.backend.repository.projection.LoanActiveProjection.class);
+        com.uteq.backend.repository.projection.LoanActiveBaseProjection p =
+                mock(com.uteq.backend.repository.projection.LoanActiveBaseProjection.class);
+        java.time.OffsetDateTime estimada = java.time.LocalDate.now(java.time.ZoneId.systemDefault())
+                .plusDays(5).atStartOfDay(java.time.ZoneId.systemDefault()).toOffsetDateTime();
         lenient().when(p.getLoanId()).thenReturn(10L);
         lenient().when(p.getBookTitle()).thenReturn("Clean Code");
         lenient().when(p.getBookIsbn()).thenReturn("123");
         lenient().when(p.getDateLoan()).thenReturn(null);
-        lenient().when(p.getDateLoanReturnEstimada()).thenReturn(null);
-        lenient().when(p.getDaysRemaining()).thenReturn(5);
+        lenient().when(p.getDateLoanReturnEstimada()).thenReturn(estimada);
         lenient().when(p.getStatusName()).thenReturn("ACTIVO");
         given(loanRepo.findActivesByUserId(1L)).willReturn(List.of(p));
 
@@ -544,6 +545,7 @@ class LoanServiceTest {
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).loanId()).isEqualTo(10L);
+        assertThat(result.get(0).daysRemaining()).isEqualTo(5);
     }
 
     @Test

@@ -18,23 +18,31 @@ public class QueryFinesTool extends AbstractUserAwareTool {
     private final FineRepository fineRepo;
     private final StatusFineRepository statusFineRepo;
 
+    /**
+     * Crea la tool con los repositorios de multas y de estados de multa.
+     *
+     * @param fineRepo repositorio para contar y sumar saldos de multas por usuario y estado
+     * @param statusFineRepo repositorio para resolver el estado {@code PENDIENTE}
+     */
     public QueryFinesTool(FineRepository fineRepo, StatusFineRepository statusFineRepo) {
         this.fineRepo = fineRepo;
         this.statusFineRepo = statusFineRepo;
     }
     /**
-     * Retrieves name.
+     * Devuelve el nombre único que Gemini usa para invocar esta tool.
      *
-     * @return resulting text payload
+     * @return nombre {@code consultar_multas}
      */
     @Override
     public String getName() {
         return "consultar_multas";
     }
     /**
-     * Retrieves scription.
+     * Describe que esta tool expone las multas pendientes de un usuario.
+     * Recibe {@code usuario_id} y devuelve un JSON con {@code multas_pendientes},
+     * {@code saldo_total_pendiente} y {@code tiene_multas_pendientes}.
      *
-     * @return resulting text payload
+     * @return descripción legible por Gemini para decidir cuándo invocar la tool
      */
     @Override
     public String getDescription() {
@@ -42,10 +50,11 @@ public class QueryFinesTool extends AbstractUserAwareTool {
                 + "Devuelve el saldo total adeudado y la cantidad de multas pendientes.";
     }
     /**
-     * Procesa execute y devuelve el resultado calculado por el backend.
+     * Consulta las multas en estado {@code PENDIENTE} del usuario: cuenta cuántas hay
+     * y suma sus saldos para el total adeudado.
      *
-     * @param args argumento recibido por la herramienta del chatbot para decidir y ejecutar la accion
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param args nodo JSON con {@code usuario_id} inyectado desde la sesión autenticada
+     * @return nodo JSON con el conteo, el saldo total y el indicador de deuda, o error si falta el usuario o el catálogo
      */
     @Override
     public JsonNode execute(JsonNode args) {

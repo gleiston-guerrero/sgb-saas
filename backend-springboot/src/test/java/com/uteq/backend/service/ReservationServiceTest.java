@@ -358,7 +358,7 @@ class ReservationServiceTest {
         lenient().when(p.getBookIsbn()).thenReturn("123");
         lenient().when(p.getStatusName()).thenReturn("PENDIENTE");
         lenient().when(p.getDateLimitPickup()).thenReturn(null);
-        given(reservationRepo.searchReservationsToday()).willReturn(List.of(p));
+        given(reservationRepo.searchReservationsToday(any(), any())).willReturn(List.of(p));
 
         List<com.uteq.backend.dto.ReservationTodayResponseDTO> result =
                 reservationService.searchReservationsToday();
@@ -379,8 +379,8 @@ class ReservationServiceTest {
         lenient().when(p.getBookIsbn()).thenReturn("456");
         lenient().when(p.getStatusName()).thenReturn("PENDIENTE");
         lenient().when(p.getDateLimitPickup())
-                .thenReturn(java.time.Instant.now().plusSeconds(3600));
-        given(reservationRepo.searchReservationsNexts()).willReturn(List.of(p));
+                .thenReturn(java.time.OffsetDateTime.now().plusHours(1));
+        given(reservationRepo.searchReservationsNexts(any())).willReturn(List.of(p));
 
         List<com.uteq.backend.dto.ReservationTodayResponseDTO> result =
                 reservationService.searchReservationsNexts();

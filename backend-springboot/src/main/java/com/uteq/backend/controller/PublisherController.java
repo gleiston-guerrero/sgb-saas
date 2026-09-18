@@ -21,13 +21,18 @@ public class PublisherController {
 
     private final PublisherRepository publisherRepository;
 
+    /**
+     * Constructor con el repositorio de editoriales.
+     *
+     * @param publisherRepository repositorio del catálogo de editoriales
+     */
     public PublisherController(PublisherRepository publisherRepository) {
         this.publisherRepository = publisherRepository;
     }
     /**
-     * Lists publisher.
+     * Lista todas las editoriales del catálogo para cualquier usuario autenticado.
      *
-     * @return response entity{@code <list<editorial response dto>>} with the resulting state after the operation
+     * @return lista completa de editoriales con id y nombre
      */
     @GetMapping
     public ResponseEntity<List<PublisherResponseDTO>> list() {
@@ -37,10 +42,10 @@ public class PublisherController {
         return ResponseEntity.ok(publishers);
     }
     /**
-     * Consulta search usando los filtros recibidos y devuelve el resultado solicitado.
+     * Busca hasta cinco editoriales cuyo nombre contenga el texto dado, sin distinguir mayúsculas.
      *
-     * @param q texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param q texto parcial del nombre de la editorial
+     * @return lista de hasta cinco editoriales coincidentes
      */
     @GetMapping("/buscar")
     public ResponseEntity<List<PublisherResponseDTO>> search(@RequestParam String q) {
@@ -50,10 +55,10 @@ public class PublisherController {
                         .toList());
     }
     /**
-     * Registra create validando los datos de entrada antes de persistir cambios.
+     * Crea una editorial nueva si el nombre no existe. Solo GERENTE y ADMIN.
      *
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param dto nombre de la editorial a registrar
+     * @return editorial creada con su id y cabecera de ubicación
      */
     @PostMapping
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")

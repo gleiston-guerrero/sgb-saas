@@ -41,6 +41,15 @@ public class GeminiClient {
     private final String modelo;
     private final String urlBase;
 
+    /**
+     * Crea el cliente con la clave, el modelo, la URL base y el timeout configurados.
+     * Construye el {@code RestClient} con timeouts de conexión y lectura, y avisa si no hay clave.
+     *
+     * @param apiKey clave de la API de Gemini, vacía para operar en modo degradado
+     * @param modelo nombre del modelo a invocar en {@code generateContent}
+     * @param urlBase URL base de la API de Gemini
+     * @param timeoutMs timeout de conexión y lectura en milisegundos
+     */
     public GeminiClient(
             @Value("${app.gemini.api-key}") String apiKey,
             @Value("${app.gemini.modelo}") String modelo,
@@ -69,12 +78,13 @@ public class GeminiClient {
     // ── API legacy (sin tools, backward-compatible) ───────────────────────
 
     /**
-     * Genera o entrega generate response a partir de los datos actuales del sistema.
+     * Genera una respuesta de texto sin tools: delega al modo con tools con lista vacía
+     * y devuelve solo el texto resultante.
      *
-     * @param promptSystem valor de entrada promptSystem usado por la operacion para completar su regla de negocio
-     * @param history valor de entrada history usado por la operacion para completar su regla de negocio
-     * @param messageFresh valor de entrada messageFresh usado por la operacion para completar su regla de negocio
-     * @return texto generado o recuperado por la operacion
+     * @param promptSystem prompt de sistema con el rol y la base de conocimiento
+     * @param history mensajes previos de la sesión en orden cronológico
+     * @param messageFresh mensaje actual del usuario
+     * @return texto de respuesta del asistente
      */
     public String generateResponse(String promptSystem, List<MessageChat> history, String messageFresh) {
         GeminiResponse response = generateResponseWithTools(promptSystem, history, messageFresh, List.of());
@@ -260,12 +270,12 @@ public class GeminiClient {
     // ── Response record ───────────────────────────────────────────────────
 
     /**
-     * Procesa gemini response y devuelve el resultado calculado por el backend.
+     * Contenedor de la respuesta de Gemini: texto final o solicitud de {@code functionCall}.
      *
-     * @param text texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @param functionName valor de entrada functionName usado por la operacion para completar su regla de negocio
-     * @param functionArgs valor de entrada functionArgs usado por la operacion para completar su regla de negocio
-     * @param isFunctionCall valor de entrada isFunctionCall usado por la operacion para completar su regla de negocio
+     * @param text texto de respuesta cuando no hay llamada a función
+     * @param functionName nombre de la tool solicitada cuando hay llamada a función
+     * @param functionArgs argumentos JSON de la llamada a función
+     * @param isFunctionCall true si la respuesta es una llamada a función
      */
     public record GeminiResponse(
             String text,
@@ -274,21 +284,21 @@ public class GeminiClient {
             boolean isFunctionCall
     ) {
     /**
-     * Procesa text y devuelve el resultado calculado por el backend.
+     * Crea una respuesta de texto final del asistente.
      *
-     * @param text texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param text texto de respuesta
+     * @return respuesta sin llamada a función
      */
     public static GeminiResponse text(String text) {
             return new GeminiResponse(text, null, null, false);
         }
 
         /**
-         * Procesa function call y devuelve el resultado calculado por el backend.
+         * Crea una respuesta que solicita ejecutar una tool del chatbot.
          *
-         * @param name valor de entrada name usado por la operacion para completar su regla de negocio
-         * @param args argumento recibido por la herramienta del chatbot para decidir y ejecutar la accion
-         * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+         * @param name nombre de la tool solicitada por Gemini
+         * @param args argumentos JSON de la llamada a función
+         * @return respuesta con llamada a función
          */
 
         public static GeminiResponse functionCall(String name, JsonNode args) {
@@ -296,9 +306,9 @@ public class GeminiClient {
         }
 
         /**
-     * Retrieves texto.
+     * Devuelve el texto de la respuesta, o cadena vacía si es una llamada a función.
      *
-     * @return resulting text payload
+     * @return texto de respuesta del asistente
      */
 
         public String getText() {

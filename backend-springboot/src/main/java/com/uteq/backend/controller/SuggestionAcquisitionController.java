@@ -25,6 +25,12 @@ public class SuggestionAcquisitionController {
     private final SuggestionAcquisitionService suggestionService;
     private final ReportPdfService reportPdfService;
 
+    /**
+     * Constructor con el servicio de sugerencias y el generador de reportes PDF.
+     *
+     * @param suggestionService servicio de creación y gestión de sugerencias de adquisición
+     * @param reportPdfService servicio de generación de reportes en PDF
+     */
     public SuggestionAcquisitionController(SuggestionAcquisitionService suggestionService,
                                            ReportPdfService reportPdfService) {
         this.suggestionService = suggestionService;
@@ -33,11 +39,11 @@ public class SuggestionAcquisitionController {
 
     // ── POST /api/v1/sugerencias-adquisicion ──────────────
     /**
-     * Registra create validando los datos de entrada antes de persistir cambios.
+     * Crea una sugerencia de adquisición de un libro para el propio LECTOR. Solo LECTOR.
      *
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param dto título, autor e ISBN del libro sugerido
+     * @param authentication identidad del LECTOR que sugiere la compra
+     * @return sugerencia creada con estado 201
      */
     @PostMapping
     @PreAuthorize("hasRole('LECTOR')")
@@ -50,11 +56,11 @@ public class SuggestionAcquisitionController {
 
     // ── GET /api/v1/sugerencias-adquisicion/mias ──────────
     /**
-     * Consulta list owns usando los filtros recibidos y devuelve el resultado solicitado.
+     * Lista en forma paginada las sugerencias del propio LECTOR autenticado. Solo LECTOR.
      *
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param authentication identidad del LECTOR cuyas sugerencias se consultan
+     * @param pageable paginación y orden solicitados
+     * @return página con las sugerencias del lector
      */
     @GetMapping("/mias")
     @PreAuthorize("hasRole('LECTOR')")
@@ -66,11 +72,12 @@ public class SuggestionAcquisitionController {
 
     // ── GET /api/v1/sugerencias-adquisicion?estado=PENDIENTE ──
     /**
-     * Consulta list todas usando los filtros recibidos y devuelve el resultado solicitado.
+     * Lista en forma paginada todas las sugerencias, opcionalmente filtradas por estado.
+     * Solo GERENTE y ADMIN.
      *
-     * @param status criterio de clasificacion usado para seleccionar la variante o filtro requerido
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param status estado a filtrar como PENDIENTE, null para todos
+     * @param pageable paginación y orden solicitados
+     * @return página con las sugerencias que cumplen el filtro
      */
     @GetMapping
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
@@ -82,12 +89,12 @@ public class SuggestionAcquisitionController {
 
     // ── PATCH /api/v1/sugerencias-adquisicion/{id}/estado ─
     /**
-     * Actualiza change status con las reglas de negocio requeridas por el flujo.
+     * Aprueba o rechaza una sugerencia de adquisición registrando al revisor. Solo GERENTE y ADMIN.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id de la sugerencia a resolver
+     * @param dto estado nuevo de la sugerencia
+     * @param authentication identidad del gerente que resuelve la sugerencia
+     * @return sugerencia actualizada con su estado nuevo
      */
     @PatchMapping("/{id}/estado")
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
@@ -104,10 +111,11 @@ public class SuggestionAcquisitionController {
     // Importante: va ANTES de que alguien agregue un @GetMapping("/{id}")
     // para que "mas-pedidos" no se confunda con un id.
     /**
-     * Procesa most pedidos y devuelve el resultado calculado por el backend.
+     * Devuelve en forma paginada las sugerencias pendientes agrupadas por ISBN para compra por demanda.
+     * Solo GERENTE y ADMIN.
      *
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param pageable paginación solicitada
+     * @return página de ISBN sugeridos con su conteo de pedidos
      */
     @GetMapping("/mas-pedidos")
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
@@ -119,11 +127,12 @@ public class SuggestionAcquisitionController {
     // ── POST /api/v1/sugerencias-adquisicion/confirmar-adquisicion?isbn= ──
     // Marca adquiridas todas las PENDIENTE de ese ISBN (salen del agrupado).
     /**
-     * Procesa confirm acquisition y devuelve el resultado calculado por el backend.
+     * Marca como adquiridas todas las sugerencias pendientes de un ISBN y las saca del agrupado.
+     * Solo GERENTE y ADMIN.
      *
-     * @param isbn valor de entrada isbn usado por la operacion para completar su regla de negocio
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param isbn ISBN cuyas sugerencias pendientes se confirman
+     * @param authentication identidad del gerente que confirma la adquisición
+     * @return mapa con el ISBN y la cantidad de sugerencias confirmadas
      */
     @PostMapping("/confirmar-adquisicion")
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
@@ -138,9 +147,10 @@ public class SuggestionAcquisitionController {
 
     // ── GET /api/v1/sugerencias-adquisicion/reporte-pdf ──
     /**
-     * Handles report pdf.
+     * Descarga el reporte PDF de las sugerencias más pedidas agrupadas por ISBN.
+     * Solo GERENTE y ADMIN.
      *
-     * @return response entity{@code <byte[]>} with the resulting state after the operation
+     * @return bytes del PDF con cabecera de descarga
      */
     @GetMapping("/reporte-pdf")
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")

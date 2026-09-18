@@ -16,6 +16,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Servicio JWT con firma HS256: genera tokens de acceso y refresco, valida firma y
+ * expiración, y extrae el correo, el identificador y la expiración desde los claims.
+ */
 @Service
 public class JwtService {
 
@@ -36,9 +40,9 @@ public class JwtService {
     private long refreshExpirationMs;
 
     /**
-     * Retrieves expiration ms.
+     * Devuelve el tiempo de vida del token de acceso en milisegundos.
      *
-     * @return generated identifier of the affected record
+     * @return expiración del token de acceso en milisegundos
      */
 
     public long getExpirationMs() {
@@ -46,9 +50,9 @@ public class JwtService {
     }
 
     /**
-     * Retrieves refresh expiration ms.
+     * Devuelve el tiempo de vida del token de refresco en milisegundos.
      *
-     * @return generated identifier of the affected record
+     * @return expiración del token de refresco en milisegundos
      */
 
     public long getRefreshExpirationMs() {
@@ -71,10 +75,10 @@ public class JwtService {
     }
 
     /**
-     * Genera o entrega generate refresh token a partir de los datos actuales del sistema.
+     * Genera un JWT de refresco con el tiempo de vida de refresco.
      *
-     * @param user valor de entrada user usado por la operacion para completar su regla de negocio
-     * @return texto generado o recuperado por la operacion
+     * @param user usuario para el token de refresco
+     * @return JWT de refresco firmado
      */
 
     public String generateRefreshToken(User user) {
@@ -137,10 +141,10 @@ public class JwtService {
     }
 
     /**
-     * Procesa extract email y devuelve el resultado calculado por el backend.
+     * Extrae el correo del claim {@code correo} del token.
      *
-     * @param token token de seguridad recibido para validar o renovar la sesion del usuario
-     * @return texto generado o recuperado por la operacion
+     * @param token JWT firmado a leer
+     * @return correo contenido en el token
      */
 
     public String extractEmail(String token) {
@@ -148,10 +152,10 @@ public class JwtService {
     }
 
     /**
-     * Procesa extract jti y devuelve el resultado calculado por el backend.
+     * Extrae el identificador único ({@code jti}) del token.
      *
-     * @param token token de seguridad recibido para validar o renovar la sesion del usuario
-     * @return texto generado o recuperado por la operacion
+     * @param token JWT firmado a leer
+     * @return identificador único del token
      */
 
     public String extractJti(String token) {
@@ -159,10 +163,10 @@ public class JwtService {
     }
 
     /**
-     * Procesa extract expiration y devuelve el resultado calculado por el backend.
+     * Extrae la fecha de expiración del token.
      *
-     * @param token token de seguridad recibido para validar o renovar la sesion del usuario
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param token JWT firmado a leer
+     * @return fecha de expiración contenida en el token
      */
 
     public Date extractExpiration(String token) {

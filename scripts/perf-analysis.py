@@ -26,9 +26,16 @@ Uso:
 """
 import json
 import math
+import os
 import random
 import statistics
 import sys
+
+# Salida UTF-8 en Windows sin exigir PYTHONUTF8=1: el locale cp1252
+# rompe print() con tildes o U+FFFD. Solo reconfigura, no imprime.
+if hasattr(__import__("sys").stdout, "reconfigure"):
+    __import__("sys").stdout.reconfigure(encoding="utf-8", errors="replace")
+    __import__("sys").stderr.reconfigure(encoding="utf-8", errors="replace")
 from collections import defaultdict
 
 SCENARIOS = ("cache_caliente", "cache_frio")
@@ -363,7 +370,9 @@ def main():
     print(f"Cliff's delta = {delta:.4f} (efecto {interpretacion}; "
           f"{'cache_caliente tiende a ser MÁS lento' if delta < 0 else 'cache_frio tiende a ser MÁS lento' if delta > 0 else 'sin tendencia'})")
 
-    grafico_path = "docs/mediciones/perf/p95-comparacion-escenarios.svg"
+    grafico_path = os.environ.get(
+        "SGB_PERF_GRAFICO",
+        "docs/mediciones/perf/p95-comparacion-escenarios.svg")
     try:
         generar_grafico_p95(por_escenario, grafico_path)
         print(f"\nGráfico guardado en {grafico_path}")

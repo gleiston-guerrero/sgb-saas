@@ -11,15 +11,21 @@ import software.amazon.awssdk.services.s3.S3Configuration;
 
 import java.net.URI;
 
+/**
+ * Configuración del cliente S3 compatible con Cloudflare R2 para los respaldos.
+ * Lee el endpoint y las credenciales desde las propiedades {@code app.backup.r2}.
+ */
 @Configuration
 public class R2Config {
     @Value("${app.backup.r2.endpoint:}") private String endpoint;
     @Value("${app.backup.r2.access-key:}") private String accessKey;
     @Value("${app.backup.r2.secret-key:}") private String secretKey;
     /**
-     * Handles s3 client.
+     * Crea el cliente S3 hacia R2 con el endpoint configurado, credenciales estáticas,
+     * región automática y acceso estilo path. Devuelve null si falta el endpoint o la
+     * clave de acceso, dejando los respaldos remotos deshabilitados.
      *
-     * @return s3 client with the resulting state after the operation
+     * @return cliente S3 configurado, o null si R2 no está configurado
      */
     @Bean
     public S3Client s3Client() {

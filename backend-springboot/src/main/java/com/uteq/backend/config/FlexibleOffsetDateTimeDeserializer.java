@@ -10,6 +10,11 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 
+/**
+ * Deserializador Jackson que acepta fechas ISO flexibles con o sin segundos,
+ * milisegundos y offset. Si falta el offset usa {@code -05:00} de América/Guayaquil
+ * y normaliza el espacio como separador {@code T}.
+ */
 public class FlexibleOffsetDateTimeDeserializer extends StdDeserializer<OffsetDateTime> {
     private static final ZoneOffset DEFAULT_OFFSET = ZoneOffset.ofHours(-5); // America/Guayaquil
     private static final DateTimeFormatter FMT = new DateTimeFormatterBuilder()
@@ -24,14 +29,18 @@ public class FlexibleOffsetDateTimeDeserializer extends StdDeserializer<OffsetDa
             .parseDefaulting(ChronoField.OFFSET_SECONDS, DEFAULT_OFFSET.getTotalSeconds())
             .toFormatter();
 
+    /**
+     * Crea el deserializador para {@code OffsetDateTime}.
+     */
     public FlexibleOffsetDateTimeDeserializer() { super(OffsetDateTime.class); }
     /**
-     * Procesa deserialize y devuelve el resultado calculado por el backend.
+     * Convierte el texto JSON a {@code OffsetDateTime} con el formato flexible.
+     * Devuelve null si el texto está vacío y usa {@code LocalDateTime} como respaldo.
      *
-     * @param p objeto del framework usado para integrar esta operacion con Spring o Jackson
-     * @param ctxt objeto del framework usado para integrar esta operacion con Spring o Jackson
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
-     * @throws IOException si la operacion no puede completarse por validacion, permisos o fallo del recurso asociado
+     * @param p parser JSON posicionado en el valor de fecha
+     * @param ctxt contexto de deserialización de Jackson
+     * @return fecha con offset interpretada, o null si el texto está vacío
+     * @throws IOException si el texto no tiene un formato de fecha soportado
      */
     @Override
     public OffsetDateTime deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {

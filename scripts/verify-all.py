@@ -21,6 +21,12 @@ import os
 import re
 import subprocess
 import sys
+
+# Salida UTF-8 en Windows sin exigir PYTHONUTF8=1: el locale cp1252
+# rompe print() con tildes o U+FFFD. Solo reconfigura, no imprime.
+if hasattr(__import__("sys").stdout, "reconfigure"):
+    __import__("sys").stdout.reconfigure(encoding="utf-8", errors="replace")
+    __import__("sys").stderr.reconfigure(encoding="utf-8", errors="replace")
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -39,9 +45,12 @@ def mvnw() -> list[str]:
 
 
 def corre(cmd: list[str], timeout: int, trabajo: Path = ROOT):
+    # encoding explicito: en Windows el locale por defecto (cp1252)
+    # rompe al decodificar salidas UTF-8; no se requiere PYTHONUTF8=1.
     try:
         return subprocess.run(cmd, cwd=trabajo, capture_output=True,
-                              text=True, timeout=timeout)
+                              text=True, timeout=timeout,
+                              encoding="utf-8", errors="replace")
     except FileNotFoundError as exc:
         return subprocess.CompletedProcess(cmd, 127, "", str(exc))
     except subprocess.TimeoutExpired:
@@ -53,6 +62,10 @@ def paso_simple(nombre: str, cmd: list[str], timeout: int,
     proc = corre(cmd, timeout)
     print(proc.stdout[-2000:])
     if proc.returncode != 0:
+        # Diagnóstico CI: el stderr trae la causa real (verify-p4-k6.py
+        # reporta vía falla() a stderr). Solo se imprime en fallo, sin
+        # cambiar criterios de aprobación.
+        print(proc.stderr[-2000:])
         return FALLO, f"{nombre} exit={proc.returncode}"
     print(f">> {nombre}: {etiqueta_ok}")
     return etiqueta_ok, ""
@@ -111,7 +124,7 @@ def main() -> int:
         ("P2", [PY, "scripts/verify-p2-dois.py"], 600, VALIDA),
         ("P4", [PY, "scripts/verify-p4-k6.py"], 900, VALIDA),
         ("P5", [PY, "scripts/verify-p5-nativequery.py"], 300,
-         "pendiente documentado (excepcion tecnica)"),
+         "migrado (0 nativeQuery + 0 CALL nativos)"),
         ("P6", [PY, "scripts/verify-p6-javadoc.py"], 300, VALIDA),
         ("P7", [PY, "scripts/verify-p7-names.py"], 300, VALIDA),
         ("P8/P9", [PY, "scripts/verify-p8-p9-figures.py"], 300, VALIDA),

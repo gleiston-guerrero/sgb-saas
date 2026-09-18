@@ -15,22 +15,29 @@ import java.util.List;
 @Component
 public class InfoPoliciesTool extends AbstractKnowledgeBaseTool {
 
+    /**
+     * Crea la tool con el repositorio de la base de conocimiento.
+     *
+     * @param baseKnowledgeRepo repositorio de entradas de conocimiento activas
+     */
     public InfoPoliciesTool(BaseKnowledgeRepository baseKnowledgeRepo) {
         super(baseKnowledgeRepo);
     }
     /**
-     * Retrieves name.
+     * Devuelve el nombre único que Gemini usa para invocar esta tool.
      *
-     * @return resulting text payload
+     * @return nombre {@code info_politicas}
      */
     @Override
     public String getName() {
         return "info_politicas";
     }
     /**
-     * Retrieves scription.
+     * Describe que esta tool expone las políticas de la biblioteca (préstamo, devolución,
+     * renovaciones, sanciones y reglas generales). No recibe argumentos y devuelve
+     * un JSON con el arreglo {@code politicas} y su {@code total}.
      *
-     * @return resulting text payload
+     * @return descripción legible por Gemini para decidir cuándo invocar la tool
      */
     @Override
     public String getDescription() {

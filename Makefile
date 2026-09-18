@@ -83,6 +83,10 @@ test-frontend:
 # scripts/perf-analysis.py. NO genera el .md de analisis -- eso es un paso
 # manual de interpretacion.
 #
+# Auth de carga: el script exige ADMIN_CORREO / ADMIN_PASSWORD en el entorno
+# (nunca versionadas; el script falla si faltan). Pasarlas al invocar:
+#   ADMIN_CORREO=... ADMIN_PASSWORD=... make bench
+#
 # FIX (descubierto en la verificacion de 'make all' desde clone limpio en
 # Windows): el shell que usa make (Git Bash sh.exe) resuelve $(pwd) a un
 # path MSYS-aliasado (/tmp/... = %TEMP%) cuando PWD no viene en el
@@ -108,6 +112,7 @@ bench:
 	next=$$(( $${last:-0} + 1 )); \
 	echo "Corrida k6 -> docs/mediciones/perf/k6-run$$next.json"; \
 	MSYS_NO_PATHCONV=1 docker run --rm --network sgb-saas_default \
+		-e ADMIN_CORREO -e ADMIN_PASSWORD \
 		-v "$$host/k6:/scripts" -v "$$host/docs/mediciones/perf:/out" \
 		grafana/k6 run --out json=/out/k6-run$$next.json /scripts/libros-listado-test.js; \
 	echo ""; \
@@ -263,8 +268,11 @@ clean:
 # scripts/verify-all.py (unica fuente de verdad; mismo script corre con
 # `python scripts/verify-all.py` donde no hay GNU Make). Clasifica cada
 # punto P1-P12 como "evidencia válida", "PENDIENTE" (visible, nunca
-# aprobado: P3, P5-parcial, firmas P11) o "FALLO", y sale 0 solo si no
-# hay ningun FALLO. Requiere: Python 3 + git + red (p2) + Maven/JDK 21
+# aprobado: P3, P10-bloqueado, firmas P11) o "FALLO", y sale 0 solo si no
+# hay ningun FALLO. Solo lectura: ningun verificador modifica NDJSON,
+# figuras, PDFs ni evidencia (P4 genera su grafico en temporal).
+# UTF-8 interno: no requiere PYTHONUTF8=1 en Windows.
+# Requiere: Python 3 + git + red (p2) + Maven/JDK 21
 # (javadoc, P10) + Docker (P10 Testcontainers; sin Docker ese punto
 # queda PENDIENTE-bloqueado, nunca exito).
 verify:

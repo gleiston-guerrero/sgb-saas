@@ -17,16 +17,23 @@ public class SubscriptionAvailabilityController {
     private final SubscriptionAvailabilityService service;
     private final UserRepository userRepo;
 
+    /**
+     * Constructor con el servicio de suscripciones y el repositorio de usuarios.
+     *
+     * @param service servicio de suscripciones de disponibilidad por libro
+     * @param userRepo repositorio para resolver el id del usuario por correo
+     */
     public SubscriptionAvailabilityController(SubscriptionAvailabilityService service, UserRepository userRepo) {
         this.service = service;
         this.userRepo = userRepo;
     }
     /**
-     * Procesa suscribir y devuelve el resultado calculado por el backend.
+     * Suscribe al usuario autenticado a los avisos de disponibilidad de un libro.
+     * Cualquier usuario autenticado puede suscribirse.
      *
-     * @param bookId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param auth identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param bookId id del libro al que se suscribe
+     * @param auth identidad autenticada que pide el aviso
+     * @return respuesta vacía con estado 200 si se registró
      */
     @PostMapping("/{libroId}/suscripciones")
     @PreAuthorize("isAuthenticated()")
@@ -36,11 +43,12 @@ public class SubscriptionAvailabilityController {
         return ResponseEntity.ok().build();
     }
     /**
-     * Procesa desuscribir y devuelve el resultado calculado por el backend.
+     * Cancela la suscripción del usuario autenticado a los avisos de un libro.
+     * Cualquier usuario autenticado puede desuscribirse.
      *
-     * @param bookId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param auth identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param bookId id del libro del que se desuscribe
+     * @param auth identidad autenticada que cancela el aviso
+     * @return respuesta vacía con estado 204 si se canceló
      */
     @DeleteMapping("/{libroId}/suscripciones")
     @PreAuthorize("isAuthenticated()")
@@ -50,10 +58,11 @@ public class SubscriptionAvailabilityController {
         return ResponseEntity.noContent().build();
     }
     /**
-     * Procesa mis subscriptions y devuelve el resultado calculado por el backend.
+     * Devuelve los ids de libros a los que está suscrito el usuario autenticado.
+     * Cualquier usuario autenticado puede consultar los suyos.
      *
-     * @param auth identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param auth identidad autenticada cuyas suscripciones se consultan
+     * @return lista de ids de libros con suscripción vigente
      */
     @GetMapping("/suscripciones/mias")
     @PreAuthorize("isAuthenticated()")

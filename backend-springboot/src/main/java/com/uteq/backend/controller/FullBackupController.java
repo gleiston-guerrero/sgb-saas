@@ -22,15 +22,20 @@ public class FullBackupController {
 
     private final FullBackupService service;
 
+    /**
+     * Constructor con el servicio de respaldo completo.
+     *
+     * @param service servicio de configuración y registros del respaldo completo
+     */
     public FullBackupController(FullBackupService service) {
         this.service = service;
     }
 
     // ── Configuración DR ──────────────────────────────────────────────────────
     /**
-     * Retrieves fig.
+     * Devuelve la configuración de recuperación ante desastres del respaldo completo. Solo ADMIN.
      *
-     * @return response entity{@code <configuracion respaldo>} with the resulting state after the operation
+     * @return configuración vigente con frecuencia, retención y habilitado
      */
     @GetMapping("/config")
     @PreAuthorize("hasRole('ADMIN')")
@@ -38,10 +43,10 @@ public class FullBackupController {
         return ResponseEntity.ok(service.getConfiguration());
     }
     /**
-     * Actualiza update config con las reglas de negocio requeridas por el flujo.
+     * Actualiza la frecuencia, retención y habilitado del respaldo completo. Solo ADMIN.
      *
-     * @param req datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param req frecuencia en horas, días de retención y bandera de habilitado
+     * @return configuración actualizada del respaldo completo
      */
     @PutMapping("/config")
     @PreAuthorize("hasRole('ADMIN')")
@@ -51,10 +56,11 @@ public class FullBackupController {
 
     // ── Historial de registros ─────────────────────────────────────────────────
     /**
-     * Consulta list registrations usando los filtros recibidos y devuelve el resultado solicitado.
+     * Lista el historial de ejecuciones del respaldo completo, opcionalmente filtrado por tipo.
+     * Solo ADMIN.
      *
-     * @param type criterio de clasificacion usado para seleccionar la variante o filtro requerido
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param type tipo de respaldo a filtrar, null para todos
+     * @return lista de registros del historial solicitado
      */
     @GetMapping("/registros")
     @PreAuthorize("hasRole('ADMIN')")
@@ -66,10 +72,10 @@ public class FullBackupController {
         return ResponseEntity.ok(lista);
     }
     /**
-     * Elimina o anula delete registration despues de validar que la operacion sea permitida.
+     * Elimina un registro del historial del respaldo completo. Solo ADMIN.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id del registro a eliminar
+     * @return respuesta vacía con estado 204 si se eliminó
      */
     @DeleteMapping("/registros/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -78,10 +84,10 @@ public class FullBackupController {
         return ResponseEntity.noContent().build();
     }
     /**
-     * Genera o entrega download registration a partir de los datos actuales del sistema.
+     * Descarga el archivo ZIP de una ejecución del respaldo completo. Solo ADMIN.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id del registro cuyo archivo se solicita
+     * @return bytes del ZIP con cabecera de descarga
      */
     @GetMapping("/registros/{id}/download")
     @PreAuthorize("hasRole('ADMIN')")
@@ -96,10 +102,11 @@ public class FullBackupController {
 
     // ── Registro de ejecución (llamado desde el microservicio Node.js vía token interno) ──
     /**
-     * Registra register start validando los datos de entrada antes de persistir cambios.
+     * Registra el inicio de una ejecución del respaldo completo desde el microservicio Node.
+     * Solo ADMIN.
      *
-     * @param req datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param req tipo de respaldo y usuario que lo ejecuta
+     * @return registro de inicio creado
      */
     @PostMapping("/registros")
     @PreAuthorize("hasRole('ADMIN')")
@@ -107,11 +114,11 @@ public class FullBackupController {
         return ResponseEntity.ok(service.registerStart(req.type, req.executedBy));
     }
     /**
-     * Registra register result validando los datos de entrada antes de persistir cambios.
+     * Registra el resultado final de una ejecución del respaldo completo. Solo ADMIN.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param req datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id del registro de ejecución a cerrar
+     * @param req estado final, nombre y tamaño del archivo, ruta y mensaje de error
+     * @return registro actualizado con el resultado de la ejecución
      */
     @PutMapping("/registros/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -123,10 +130,11 @@ public class FullBackupController {
 
     // ── Proxy hacia el microservicio Node.js ───────────────────────────────────
     /**
-     * Procesa trigger backup full y devuelve el resultado calculado por el backend.
+     * Dispara un respaldo completo en el microservicio Node y actúa como proxy de su respuesta.
+     * Solo ADMIN. Devuelve 503 en JSON si el microservicio no responde.
      *
-     * @param principal identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param principal identidad autenticada que solicita el respaldo
+     * @return mapa con mensaje y detalle de la respuesta del microservicio
      */
     @PostMapping("/trigger")
     @PreAuthorize("hasRole('ADMIN')")

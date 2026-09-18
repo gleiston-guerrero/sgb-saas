@@ -19,13 +19,13 @@ anterior a `html/` como tercer artefacto canonico, que habia quedado
 desactualizada tras esa limpieza.
 
 Estos artefactos corresponden a la corrida de cierre citada en
-`docs/capitulos/08-resultados.tex`: 87,41 % de lineas
-(`1805 / 2065`) y 76,19 % de ramas (`448 / 588`), calculado desde
-`report.csv` (corrida `mvnw clean verify` del 2026-09-13 sobre el HEAD que
-incluye V51 -- procedures nativos para P4 -- y la migracion de 3
-`nativeQuery` a JPQL: 620 tests, 0 fallos; servicios y controladores por
-capa quedan en el XML versionado, no se repiten aqui para evitar otra
-cifra que se desincronice por separado).
+`docs/capitulos/08-resultados.tex`: 86,30 % de líneas
+(`2337 / 2708`) y 74,53 % de ramas (`594 / 797`), calculado desde
+`report.csv` (corrida `mvnw clean verify` del 2026-09-17: 655 tests,
+0 fallos; incluye la migración P5 a mecanismos JPA sin SQL nativo, la
+política de cookie productiva y 11 tests H2 de repositorios;
+servicios y controladores por capa quedan en el XML versionado, no se
+repiten aqui para evitar otra cifra que se desincronice por separado).
 
 ## Corridas historicas
 

@@ -24,7 +24,7 @@ import com.uteq.backend.repository.ReservationRepository;
 import com.uteq.backend.repository.UserRepository;
 import com.uteq.backend.repository.projection.BookMostLoanedDetailedProjection;
 import com.uteq.backend.repository.projection.BookMostLoanedProjection;
-import com.uteq.backend.repository.projection.LoanActiveProjection;
+import com.uteq.backend.repository.projection.LoanActiveBaseProjection;
 import com.uteq.backend.repository.projection.ReportCategoriesDemandedProjection;
 import com.uteq.backend.repository.projection.ReportInventoryProjection;
 import com.uteq.backend.repository.projection.ReportDelinquencyProjection;
@@ -75,6 +75,19 @@ public class LoanService {
     private final CredentialQrService credentialQrService;
     private final NotificationService notificationService;
 
+    /**
+     * Constructor con los repositorios de préstamos y reservaciones, la configuración y los servicios de apoyo.
+     *
+     * @param loanRepo repositorio de préstamos
+     * @param loanProcRepo repositorio de procedimientos y funciones de préstamos y reportes
+     * @param userRepo repositorio de usuarios para resolver al lector y al bibliotecario por correo
+     * @param statusLoanRepo repositorio de estados de préstamo
+     * @param reservationRepo repositorio de reservaciones para vincular el retiro en ventanilla
+     * @param statusReservationRepo repositorio de estados de reservación para validar vigencia
+     * @param configurationSystemService servicio de topes como días de préstamo y máximo de renovaciones
+     * @param credentialQrService servicio que resuelve al lector desde su QR de credencial
+     * @param notificationService servicio que avisa la multa generada al devolver con atraso
+     */
     public LoanService(LoanRepository loanRepo,
                            LoanProcedureRepository loanProcRepo,
                            UserRepository userRepo,
@@ -332,6 +345,25 @@ public class LoanService {
                 .toList();
     }
 
+    /**
+     * Días restantes con la semántica de la fórmula nativa original
+     * {@code (fecha_devolucion_estimada::date - NOW()::date)}: diferencia
+     * en días calendario entre hoy y la fecha estimada; nulo si no hay
+     * fecha estimada (igual que la resta SQL con NULL). Usa la zona del
+     * sistema — igual que CURRENT_DATE/NOW() del lado BD cuando JVM y BD
+     * comparten zona (prod: UTC/UTC) — no UTC fijo, que desplaza el corte
+     * de día cuando la BD corre en otra zona.
+     */
+    public static Integer diasRestantes(java.time.Instant estimada) {
+        if (estimada == null) {
+            return null;
+        }
+        java.time.ZoneId zona = java.time.ZoneId.systemDefault();
+        return (int) java.time.temporal.ChronoUnit.DAYS.between(
+                java.time.LocalDate.now(zona),
+                estimada.atZone(zona).toLocalDate());
+    }
+
     private static final int LIMITE_REPORTE_DEFAULT = 10;
 
     /**
@@ -480,14 +512,16 @@ public class LoanService {
                 p.getStatusLoanId());
     }
 
-    private LoanActiveResponseDTO toDTO(LoanActiveProjection p) {
+    private LoanActiveResponseDTO toDTO(
+            LoanActiveBaseProjection p) {
         return new LoanActiveResponseDTO(
                 p.getLoanId(),
                 p.getBookTitle(),
                 p.getBookIsbn(),
-                p.getDateLoan() != null ? p.getDateLoan().atOffset(ZoneOffset.UTC) : null,
-                p.getDateLoanReturnEstimada() != null ? p.getDateLoanReturnEstimada().atOffset(ZoneOffset.UTC) : null,
-                p.getDaysRemaining(),
+                p.getDateLoan() != null ? p.getDateLoan().toInstant().atOffset(ZoneOffset.UTC) : null,
+                p.getDateLoanReturnEstimada() != null ? p.getDateLoanReturnEstimada().toInstant().atOffset(ZoneOffset.UTC) : null,
+                diasRestantes(p.getDateLoanReturnEstimada() != null
+                        ? p.getDateLoanReturnEstimada().toInstant() : null),
                 p.getStatusName());
     }
 
@@ -779,7 +813,7 @@ public class LoanService {
 
     private void validateLimitLoans(Long userId) {
         int maxLoans = configurationSystemService.getIntegerValue("max_prestamos_usuario");
-        List<LoanActiveProjection> actives = loanProcRepo.fnListLoansActivesByUser(userId);
+        List<LoanActiveBaseProjection> actives = loanProcRepo.fnListLoansActivesByUser(userId);
         if (actives.size() >= maxLoans) {
             throw new LimitLoansExceededException(
                     "El usuario ya tiene " + actives.size() + " préstamos activos. El máximo permitido es " + maxLoans + ".");

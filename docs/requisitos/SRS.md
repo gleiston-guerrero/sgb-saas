@@ -2415,10 +2415,10 @@ Top 10 en vivo, no una elección arbitraria de énfasis de este documento.
   `page=0&size=10`, misma key de `@Cacheable`) vs `cache_frio` (página
   distinta en cada request, PRNG determinista, siempre cache miss).
 - **Criterio de aceptación medible (cifras reales agregadas de 5
-  corridas, `docs/mediciones/perf/REPORT.md`)**:
-  1. p95 `cache_caliente` < 200ms — real: **19.49ms** (9929 peticiones).
-  2. p95 `cache_frio` < 500ms — real: **7.50ms** (10074 peticiones).
-  3. Tasa de error HTTP >=500: 0% — real: **0.00%** (0 de 20003
+  corridas, `docs/mediciones/perf/REPORT.md`, serie vigente 2026-09-17)**:
+  1. p95 `cache_caliente` < 200ms — real: **65.60ms** (9821 peticiones).
+  2. p95 `cache_frio` < 500ms — real: **17.13ms** (10006 peticiones).
+  3. Tasa de error HTTP >=500: 0% — real: **0.00%** (0 de 19827
      peticiones).
 - **Método de verificación**: **Demonstration**
   (`docs/mediciones/perf/REPORT.md`, `k6/libros-listado-test.js`, 5

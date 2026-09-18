@@ -10,6 +10,11 @@ package com.uteq.backend.service;
  */
 public class CodeVerificationInvalidException extends RuntimeException {
 
+    /**
+     * Constructor con el motivo del rechazo del código de verificación.
+     *
+     * @param message detalle de por qué el código es inválido o expiró
+     */
     public CodeVerificationInvalidException(String message) {
         super(message);
     }

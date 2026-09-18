@@ -37,6 +37,12 @@ public class LoanController {
     private final LoanService loanService;
     private final ReportPdfService reportPdfService;
 
+    /**
+     * Constructor con el servicio de préstamos y el generador de reportes PDF.
+     *
+     * @param loanService servicio de creación, renovación y reportes de préstamos
+     * @param reportPdfService servicio de generación de reportes en PDF
+     */
     public LoanController(LoanService loanService, ReportPdfService reportPdfService) {
         this.loanService = loanService;
         this.reportPdfService = reportPdfService;
@@ -44,11 +50,12 @@ public class LoanController {
 
     // ── POST /api/v1/prestamos ────────────────────────────
     /**
-     * Registra create validando los datos de entrada antes de persistir cambios.
+     * Crea un préstamo de ventanilla, opcionalmente convirtiendo una reserva vigente.
+     * Roles BIBLIOTECARIO, GERENTE y ADMIN.
      *
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param dto libro, usuario y reserva opcional del préstamo
+     * @param authentication identidad del personal que registra el préstamo
+     * @return préstamo creado con estado 201
      */
     @PostMapping
     @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
@@ -61,10 +68,11 @@ public class LoanController {
 
     // ── POST /api/v1/prestamos/{id}/devolucion ────────────
     /**
-     * Registra register loan return validando los datos de entrada antes de persistir cambios.
+     * Registra la devolución simple de un préstamo sin inspección de daños.
+     * Roles BIBLIOTECARIO, GERENTE y ADMIN.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id del préstamo a devolver
+     * @return detalle de la devolución registrada
      */
     @PostMapping("/{id}/devolucion")
     @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
@@ -76,11 +84,12 @@ public class LoanController {
     // LECTOR solo su propio préstamo (verificado dentro de
     // PrestamoService.renovar()); BIBLIOTECARIO/GERENTE/ADMIN, cualquiera.
     /**
-     * Actualiza renew con las reglas de negocio requeridas por el flujo.
+     * Renueva un préstamo extendiendo su fecha de vencimiento según el reglamento.
+     * El LECTOR solo renueva los suyos; el personal renueva cualquiera.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id del préstamo a renovar
+     * @param authentication identidad que solicita la renovación
+     * @return renovación aplicada con la nueva fecha de vencimiento
      */
     @PostMapping("/{id}/renovacion")
     @PreAuthorize("hasAnyRole('LECTOR','BIBLIOTECARIO','GERENTE','ADMIN')")
@@ -91,12 +100,13 @@ public class LoanController {
 
     // ── GET /api/v1/prestamos/usuario/{usuarioId}?page=0&size=10 ──
     /**
-     * Consulta list by user usando los filtros recibidos y devuelve el resultado solicitado.
+     * Lista en forma paginada los préstamos de un usuario. Un LECTOR solo ve los suyos.
+     * Roles LECTOR, BIBLIOTECARIO y GERENTE.
      *
-     * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param userId id del usuario cuyos préstamos se consultan
+     * @param authentication identidad autenticada que pide la consulta
+     * @param pageable paginación y orden solicitados
+     * @return página de préstamos del usuario indicado
      */
     @GetMapping("/usuario/{usuarioId}")
     @PreAuthorize("hasAnyRole('LECTOR','BIBLIOTECARIO','GERENTE')")
@@ -110,11 +120,12 @@ public class LoanController {
 
     // ── GET /api/v1/prestamos/usuario/{usuarioId}/activos ─
     /**
-     * Consulta list actives by user usando los filtros recibidos y devuelve el resultado solicitado.
+     * Lista los préstamos activos y vencidos de un usuario para la ventanilla de gestión.
+     * Roles LECTOR, BIBLIOTECARIO y GERENTE. Un LECTOR solo ve los suyos.
      *
-     * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param userId id del usuario cuyos préstamos activos se consultan
+     * @param authentication identidad autenticada que pide la consulta
+     * @return lista de préstamos activos del usuario indicado
      */
     @GetMapping("/usuario/{usuarioId}/activos")
     @PreAuthorize("hasAnyRole('LECTOR','BIBLIOTECARIO','GERENTE')")
@@ -127,12 +138,13 @@ public class LoanController {
 
     // ── GET /api/v1/prestamos/reportes/libros-mas-prestados ──
     /**
-     * Procesa report books most loaned y devuelve el resultado calculado por el backend.
+     * Devuelve el ranking de libros más prestados en el rango de fechas indicado.
+     * Solo GERENTE y ADMIN.
      *
-     * @param limit valor de entrada limit usado por la operacion para completar su regla de negocio
-     * @param from fecha limite usada para acotar el rango temporal de la consulta
-     * @param until fecha limite usada para acotar el rango temporal de la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param limit tope de libros del ranking, null para el defecto del servicio
+     * @param from fecha inicial del rango, null sin límite inferior
+     * @param until fecha final del rango, null sin límite superior
+     * @return lista de libros más prestados con su conteo
      */
     @GetMapping("/reportes/libros-mas-prestados")
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
@@ -146,14 +158,15 @@ public class LoanController {
 
     // ── GET /api/v1/prestamos/reportes/libros-mas-prestados-detallado ──
     /**
-     * Procesa report books most loaned detailed y devuelve el resultado calculado por el backend.
+     * Devuelve en forma paginada el detalle de libros más prestados con filtro por categoría.
+     * Solo GERENTE y ADMIN.
      *
-     * @param limit valor de entrada limit usado por la operacion para completar su regla de negocio
-     * @param from fecha limite usada para acotar el rango temporal de la consulta
-     * @param until fecha limite usada para acotar el rango temporal de la consulta
-     * @param categoryId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param limit tope de libros del ranking, null para el defecto del servicio
+     * @param from fecha inicial del rango, null sin límite inferior
+     * @param until fecha final del rango, null sin límite superior
+     * @param categoryId id de categoría a filtrar, null para todas
+     * @param pageable paginación solicitada
+     * @return página con el detalle de libros más prestados
      */
     @GetMapping("/reportes/libros-mas-prestados-detallado")
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
@@ -167,13 +180,14 @@ public class LoanController {
                 loanService.reportBooksMostLoanedDetailedPaginated(limit, from, until, categoryId, pageable));
     }
     /**
-     * Procesa report books most loaned detailed todo y devuelve el resultado calculado por el backend.
+     * Devuelve sin paginar todo el detalle de libros más prestados para exportación.
+     * Solo GERENTE y ADMIN.
      *
-     * @param limit valor de entrada limit usado por la operacion para completar su regla de negocio
-     * @param from fecha limite usada para acotar el rango temporal de la consulta
-     * @param until fecha limite usada para acotar el rango temporal de la consulta
-     * @param categoryId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param limit tope de libros del ranking, null para el defecto del servicio
+     * @param from fecha inicial del rango, null sin límite inferior
+     * @param until fecha final del rango, null sin límite superior
+     * @param categoryId id de categoría a filtrar, null para todas
+     * @return lista completa del detalle de libros más prestados
      */
 
     @GetMapping("/reportes/libros-mas-prestados-detallado/todo")
@@ -188,11 +202,11 @@ public class LoanController {
 
     // ── GET /api/v1/prestamos/reportes/morosidad ──────────
     /**
-     * Procesa report delinquency y devuelve el resultado calculado por el backend.
+     * Devuelve en forma paginada el reporte de usuarios con morosidad vigente. Solo GERENTE y ADMIN.
      *
-     * @param limit valor de entrada limit usado por la operacion para completar su regla de negocio
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param limit tope de filas del reporte, null para el defecto del servicio
+     * @param pageable paginación solicitada
+     * @return página de usuarios morosos con sus atrasos
      */
     @GetMapping("/reportes/morosidad")
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
@@ -202,10 +216,10 @@ public class LoanController {
         return ResponseEntity.ok(loanService.reportDelinquencyPaginated(limit, pageable));
     }
     /**
-     * Procesa report delinquency todo y devuelve el resultado calculado por el backend.
+     * Devuelve sin paginar todo el reporte de usuarios con morosidad vigente. Solo GERENTE y ADMIN.
      *
-     * @param limit valor de entrada limit usado por la operacion para completar su regla de negocio
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param limit tope de filas del reporte, null para el defecto del servicio
+     * @return lista completa de usuarios morosos con sus atrasos
      */
 
     @GetMapping("/reportes/morosidad/todo")
@@ -217,13 +231,14 @@ public class LoanController {
 
     // ── GET /api/v1/prestamos/reportes/uso?granularidad=dia|semana|mes ──
     /**
-     * Procesa report usage by period y devuelve el resultado calculado por el backend.
+     * Devuelve en forma paginada el uso de préstamos agrupado por día, semana o mes.
+     * Solo GERENTE y ADMIN.
      *
-     * @param granularidad criterio de clasificacion usado para seleccionar la variante o filtro requerido
-     * @param from fecha limite usada para acotar el rango temporal de la consulta
-     * @param until fecha limite usada para acotar el rango temporal de la consulta
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param granularidad agrupación temporal con valores dia, semana o mes
+     * @param from fecha inicial del rango, null sin límite inferior
+     * @param until fecha final del rango, null sin límite superior
+     * @param pageable paginación solicitada
+     * @return página de uso de préstamos por período
      */
     @GetMapping("/reportes/uso")
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
@@ -235,12 +250,13 @@ public class LoanController {
         return ResponseEntity.ok(loanService.reportUsageByPeriodPaginated(granularidad, from, until, pageable));
     }
     /**
-     * Procesa report usage by period todo y devuelve el resultado calculado por el backend.
+     * Devuelve sin paginar todo el uso de préstamos agrupado por día, semana o mes.
+     * Solo GERENTE y ADMIN.
      *
-     * @param granularidad criterio de clasificacion usado para seleccionar la variante o filtro requerido
-     * @param from fecha limite usada para acotar el rango temporal de la consulta
-     * @param until fecha limite usada para acotar el rango temporal de la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param granularidad agrupación temporal con valores dia, semana o mes
+     * @param from fecha inicial del rango, null sin límite inferior
+     * @param until fecha final del rango, null sin límite superior
+     * @return lista completa de uso de préstamos por período
      */
 
     @GetMapping("/reportes/uso/todo")
@@ -254,10 +270,10 @@ public class LoanController {
 
     // ── GET /api/v1/prestamos/reportes/morosidad/pdf ──────
     /**
-     * Procesa report delinquency pdf y devuelve el resultado calculado por el backend.
+     * Descarga el reporte de morosidad como archivo PDF. Solo GERENTE y ADMIN.
      *
-     * @param limit valor de entrada limit usado por la operacion para completar su regla de negocio
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param limit tope de filas del reporte, null para el defecto del servicio
+     * @return bytes del PDF con cabecera de descarga
      */
     @GetMapping(value = "/reportes/morosidad/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
@@ -273,13 +289,13 @@ public class LoanController {
 
     // ── GET /api/v1/prestamos/reportes/libros-mas-prestados/pdf ──
     /**
-     * Procesa report books most loaned pdf y devuelve el resultado calculado por el backend.
+     * Descarga el ranking detallado de libros más prestados como archivo PDF. Solo GERENTE y ADMIN.
      *
-     * @param limit valor de entrada limit usado por la operacion para completar su regla de negocio
-     * @param from fecha limite usada para acotar el rango temporal de la consulta
-     * @param until fecha limite usada para acotar el rango temporal de la consulta
-     * @param categoryId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param limit tope de libros del ranking, null para el defecto del servicio
+     * @param from fecha inicial del rango, null sin límite inferior
+     * @param until fecha final del rango, null sin límite superior
+     * @param categoryId id de categoría a filtrar, null para todas
+     * @return bytes del PDF con cabecera de descarga
      */
     @GetMapping(value = "/reportes/libros-mas-prestados/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
@@ -299,12 +315,13 @@ public class LoanController {
 
     // ── GET /api/v1/prestamos/reportes/inventario/pdf ─────
     /**
-     * Procesa report inventory pdf y devuelve el resultado calculado por el backend.
+     * Descarga el reporte de inventario como archivo PDF con los filtros gerenciales.
+     * Solo GERENTE y ADMIN.
      *
-     * @param categoryId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param statusStock valor de entrada statusStock usado por la operacion para completar su regla de negocio
-     * @param busqueda texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param categoryId id de categoría a filtrar, null para todas
+     * @param statusStock estado de stock a filtrar, null para todos
+     * @param busqueda texto a buscar en título o ISBN, null sin filtro
+     * @return bytes del PDF con cabecera de descarga
      */
     @GetMapping(value = "/reportes/inventario/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
@@ -323,11 +340,11 @@ public class LoanController {
 
     // ── GET /api/v1/prestamos/reportes/vencidos/pdf ───────
     /**
-     * Procesa report overdues pdf y devuelve el resultado calculado por el backend.
+     * Descarga el reporte de préstamos vencidos como archivo PDF. Solo GERENTE y ADMIN.
      *
-     * @param daysAtrasoMin valor de entrada daysAtrasoMin usado por la operacion para completar su regla de negocio
-     * @param busqueda texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param daysAtrasoMin mínimo de días de atraso a incluir, null sin mínimo
+     * @param busqueda texto a buscar en título o usuario, null sin filtro
+     * @return bytes del PDF con cabecera de descarga
      */
     @GetMapping(value = "/reportes/vencidos/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
@@ -345,12 +362,12 @@ public class LoanController {
 
     // ── GET /api/v1/prestamos/reportes/categorias-demandadas/pdf ──
     /**
-     * Procesa report categories demanded pdf y devuelve el resultado calculado por el backend.
+     * Descarga el reporte de categorías más demandadas como archivo PDF. Solo GERENTE y ADMIN.
      *
-     * @param limit valor de entrada limit usado por la operacion para completar su regla de negocio
-     * @param from fecha limite usada para acotar el rango temporal de la consulta
-     * @param until fecha limite usada para acotar el rango temporal de la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param limit tope de categorías del ranking, null para el defecto del servicio
+     * @param from fecha inicial del rango, null sin límite inferior
+     * @param until fecha final del rango, null sin límite superior
+     * @return bytes del PDF con cabecera de descarga
      */
     @GetMapping(value = "/reportes/categorias-demandadas/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
@@ -369,12 +386,12 @@ public class LoanController {
 
     // ── GET /api/v1/prestamos/reportes/uso/pdf ───────────
     /**
-     * Procesa report usage pdf y devuelve el resultado calculado por el backend.
+     * Descarga el reporte de uso por período como archivo PDF. Solo GERENTE y ADMIN.
      *
-     * @param granularidad criterio de clasificacion usado para seleccionar la variante o filtro requerido
-     * @param from fecha limite usada para acotar el rango temporal de la consulta
-     * @param until fecha limite usada para acotar el rango temporal de la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param granularidad agrupación temporal con valores dia, semana o mes
+     * @param from fecha inicial del rango, null sin límite inferior
+     * @param until fecha final del rango, null sin límite superior
+     * @return bytes del PDF con cabecera de descarga
      */
     @GetMapping(value = "/reportes/uso/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
@@ -393,24 +410,25 @@ public class LoanController {
     // ── GET /api/v1/prestamos/reportes/inventario ─────────
     // Paginacion real + 8 filtros gerenciales (categoria/editorial/año/stock/ubicacion/proveedor/estado/idioma)
     /**
-     * Procesa report inventory y devuelve el resultado calculado por el backend.
+     * Devuelve en forma paginada el inventario con filtros de categoría, stock, editorial y ubicación.
+     * Solo GERENTE y ADMIN.
      *
-     * @param categoryId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param statusStock valor de entrada statusStock usado por la operacion para completar su regla de negocio
-     * @param busqueda texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @param publisherId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param supplierId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param statusBookId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param languageId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param yearFrom valor de entrada yearFrom usado por la operacion para completar su regla de negocio
-     * @param yearUntil valor de entrada yearUntil usado por la operacion para completar su regla de negocio
-     * @param stockTotalMin valor de entrada stockTotalMin usado por la operacion para completar su regla de negocio
-     * @param stockTotalMax valor de entrada stockTotalMax usado por la operacion para completar su regla de negocio
-     * @param stockDispMin valor de entrada stockDispMin usado por la operacion para completar su regla de negocio
-     * @param stockDispMax valor de entrada stockDispMax usado por la operacion para completar su regla de negocio
-     * @param location valor de entrada location usado por la operacion para completar su regla de negocio
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param categoryId id de categoría a filtrar, null para todas
+     * @param statusStock estado de stock a filtrar, null para todos
+     * @param busqueda texto a buscar en título o ISBN, null sin filtro
+     * @param publisherId id de editorial a filtrar, null para todas
+     * @param supplierId id de proveedor a filtrar, null para todos
+     * @param statusBookId id de estado del libro a filtrar, null para todos
+     * @param languageId id de idioma a filtrar, null para todos
+     * @param yearFrom año de publicación inicial, null sin límite
+     * @param yearUntil año de publicación final, null sin límite
+     * @param stockTotalMin stock total mínimo, null sin mínimo
+     * @param stockTotalMax stock total máximo, null sin máximo
+     * @param stockDispMin stock disponible mínimo, null sin mínimo
+     * @param stockDispMax stock disponible máximo, null sin máximo
+     * @param location ubicación a filtrar, null para todas
+     * @param pageable paginación solicitada
+     * @return página del inventario con los filtros aplicados
      */
     @GetMapping("/reportes/inventario")
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
@@ -439,23 +457,24 @@ public class LoanController {
                 yearFrom, yearUntil, stockTotalMin, stockTotalMax, stockDispMin, stockDispMax, location, pageable));
     }
     /**
-     * Procesa report inventory todo y devuelve el resultado calculado por el backend.
+     * Devuelve sin paginar todo el inventario con filtros de categoría, stock, editorial y ubicación.
+     * Solo GERENTE y ADMIN.
      *
-     * @param categoryId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param statusStock valor de entrada statusStock usado por la operacion para completar su regla de negocio
-     * @param busqueda texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @param publisherId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param supplierId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param statusBookId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param languageId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param yearFrom valor de entrada yearFrom usado por la operacion para completar su regla de negocio
-     * @param yearUntil valor de entrada yearUntil usado por la operacion para completar su regla de negocio
-     * @param stockTotalMin valor de entrada stockTotalMin usado por la operacion para completar su regla de negocio
-     * @param stockTotalMax valor de entrada stockTotalMax usado por la operacion para completar su regla de negocio
-     * @param stockDispMin valor de entrada stockDispMin usado por la operacion para completar su regla de negocio
-     * @param stockDispMax valor de entrada stockDispMax usado por la operacion para completar su regla de negocio
-     * @param location valor de entrada location usado por la operacion para completar su regla de negocio
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param categoryId id de categoría a filtrar, null para todas
+     * @param statusStock estado de stock a filtrar, null para todos
+     * @param busqueda texto a buscar en título o ISBN, null sin filtro
+     * @param publisherId id de editorial a filtrar, null para todas
+     * @param supplierId id de proveedor a filtrar, null para todos
+     * @param statusBookId id de estado del libro a filtrar, null para todos
+     * @param languageId id de idioma a filtrar, null para todos
+     * @param yearFrom año de publicación inicial, null sin límite
+     * @param yearUntil año de publicación final, null sin límite
+     * @param stockTotalMin stock total mínimo, null sin mínimo
+     * @param stockTotalMax stock total máximo, null sin máximo
+     * @param stockDispMin stock disponible mínimo, null sin mínimo
+     * @param stockDispMax stock disponible máximo, null sin máximo
+     * @param location ubicación a filtrar, null para todas
+     * @return lista completa del inventario con los filtros aplicados
      */
 
     @GetMapping("/reportes/inventario/todo")
@@ -482,12 +501,13 @@ public class LoanController {
 
     // ── GET /api/v1/prestamos/reportes/vencidos ───────────
     /**
-     * Procesa report loans overdues y devuelve el resultado calculado por el backend.
+     * Devuelve en forma paginada los préstamos vencidos con sus días de atraso.
+     * Solo GERENTE y ADMIN.
      *
-     * @param daysAtrasoMin valor de entrada daysAtrasoMin usado por la operacion para completar su regla de negocio
-     * @param busqueda texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param daysAtrasoMin mínimo de días de atraso a incluir, null sin mínimo
+     * @param busqueda texto a buscar en título o usuario, null sin filtro
+     * @param pageable paginación solicitada
+     * @return página de préstamos vencidos
      */
     @GetMapping("/reportes/vencidos")
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
@@ -498,11 +518,12 @@ public class LoanController {
         return ResponseEntity.ok(loanService.reportLoansOverduesPaginated(daysAtrasoMin, busqueda, pageable));
     }
     /**
-     * Procesa report loans overdues todo y devuelve el resultado calculado por el backend.
+     * Devuelve sin paginar todos los préstamos vencidos con sus días de atraso.
+     * Solo GERENTE y ADMIN.
      *
-     * @param daysAtrasoMin valor de entrada daysAtrasoMin usado por la operacion para completar su regla de negocio
-     * @param busqueda texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param daysAtrasoMin mínimo de días de atraso a incluir, null sin mínimo
+     * @param busqueda texto a buscar en título o usuario, null sin filtro
+     * @return lista completa de préstamos vencidos
      */
 
     @GetMapping("/reportes/vencidos/todo")
@@ -515,13 +536,14 @@ public class LoanController {
 
     // ── GET /api/v1/prestamos/reportes/categorias-demandadas ──
     /**
-     * Procesa report categories demanded y devuelve el resultado calculado por el backend.
+     * Devuelve en forma paginada el ranking de categorías más demandadas en préstamo.
+     * Solo GERENTE y ADMIN.
      *
-     * @param limit valor de entrada limit usado por la operacion para completar su regla de negocio
-     * @param from fecha limite usada para acotar el rango temporal de la consulta
-     * @param until fecha limite usada para acotar el rango temporal de la consulta
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param limit tope de categorías del ranking, null para el defecto del servicio
+     * @param from fecha inicial del rango, null sin límite inferior
+     * @param until fecha final del rango, null sin límite superior
+     * @param pageable paginación solicitada
+     * @return página de categorías más demandadas con su conteo
      */
     @GetMapping("/reportes/categorias-demandadas")
     @PreAuthorize("hasAnyRole('GERENTE','ADMIN')")
@@ -533,12 +555,13 @@ public class LoanController {
         return ResponseEntity.ok(loanService.reportCategoriesDemandedPaginated(limit, from, until, pageable));
     }
     /**
-     * Procesa report categories demanded todo y devuelve el resultado calculado por el backend.
+     * Devuelve sin paginar todo el ranking de categorías más demandadas en préstamo.
+     * Solo GERENTE y ADMIN.
      *
-     * @param limit valor de entrada limit usado por la operacion para completar su regla de negocio
-     * @param from fecha limite usada para acotar el rango temporal de la consulta
-     * @param until fecha limite usada para acotar el rango temporal de la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param limit tope de categorías del ranking, null para el defecto del servicio
+     * @param from fecha inicial del rango, null sin límite inferior
+     * @param until fecha final del rango, null sin límite superior
+     * @return lista completa de categorías más demandadas con su conteo
      */
 
     @GetMapping("/reportes/categorias-demandadas/todo")

@@ -48,17 +48,25 @@ public class SuggestionAcquisitionService {
         return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), traducido);
     }
 
+    /**
+     * Constructor con el repositorio de sugerencias y el de usuarios para resolver al solicitante.
+     *
+     * @param suggestionRepo repositorio de sugerencias de adquisición
+     * @param userRepo repositorio de usuarios para resolver el dueño desde su correo
+     */
     public SuggestionAcquisitionService(SuggestionAcquisitionRepository suggestionRepo,
                                          UserRepository userRepo) {
         this.suggestionRepo = suggestionRepo;
         this.userRepo = userRepo;
     }
     /**
-     * Registra create validando los datos de entrada antes de persistir cambios.
+     * Registra una sugerencia de compra en estado PENDIENTE a nombre del lector autenticado.
+     * El ISBN vacío se guarda como nulo para no chocar con el formato exigido al darlo de alta.
      *
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param dto título, autor, ISBN opcional y justificación de la compra sugerida
+     * @param authentication identidad autenticada del lector solicitante, dueña de la sugerencia
+     * @return la sugerencia persistida en estado PENDIENTE sin revisor asignado
+     * @throws jakarta.persistence.EntityNotFoundException si el usuario autenticado ya no existe
      */
     @Transactional
     public SuggestionAcquisitionResponseDTO create(SuggestionAcquisitionRequestDTO dto, Authentication authentication) {
@@ -77,11 +85,13 @@ public class SuggestionAcquisitionService {
         return toDTO(suggestionRepo.save(suggestion));
     }
     /**
-     * Consulta list owns usando los filtros recibidos y devuelve el resultado solicitado.
+     * Lista en forma paginada las sugerencias propias del lector autenticado para su seguimiento.
+     * Tolera el orden legacy {@code creadoEn} traduciéndolo al atributo real de la entidad.
      *
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @return pagina de resultados que coincide con los filtros y la paginacion solicitada
+     * @param authentication identidad autenticada del lector cuyas sugerencias se consultan
+     * @param pageable paginación, tamaño y orden solicitados por la vista de seguimiento
+     * @return página de sugerencias del lector con su estado y revisor
+     * @throws jakarta.persistence.EntityNotFoundException si el usuario autenticado ya no existe
      */
     @Transactional(readOnly = true)
     public Page<SuggestionAcquisitionResponseDTO> listOwns(Authentication authentication, Pageable pageable) {
@@ -91,11 +101,12 @@ public class SuggestionAcquisitionService {
 
     // Solo GERENTE/ADMIN llegan acá: listado sin filtrar por dueño.
     /**
-     * Consulta list todas usando los filtros recibidos y devuelve el resultado solicitado.
+     * Lista en forma paginada todas las sugerencias para la bandeja de GERENTE o ADMIN, con filtro
+     * opcional por estado. Tolera el orden legacy {@code creadoEn} traduciéndolo al atributo real.
      *
-     * @param status criterio de clasificacion usado para seleccionar la variante o filtro requerido
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @return pagina de resultados que coincide con los filtros y la paginacion solicitada
+     * @param status estado por el que se filtra, por ejemplo PENDIENTE; nulo o vacío trae todos
+     * @param pageable paginación, tamaño y orden solicitados por la bandeja
+     * @return página de sugerencias de todos los lectores con su estado y revisor
      */
     @Transactional(readOnly = true)
     public Page<SuggestionAcquisitionResponseDTO> listAll(String status, Pageable pageable) {
@@ -106,12 +117,14 @@ public class SuggestionAcquisitionService {
         return suggestionRepo.findByStatus(status, tolerante).map(this::toDTO);
     }
     /**
-     * Actualiza change status con las reglas de negocio requeridas por el flujo.
+     * Cambia el estado de una sugerencia (aprobada o rechazada) registrando al revisor autenticado.
+     * Solo GERENTE o ADMIN llegan a este punto por la regla de la ruta que lo expone.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param freshStatus valor de entrada freshStatus usado por la operacion para completar su regla de negocio
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param id identificador de la sugerencia a dictaminar
+     * @param freshStatus estado nuevo que reemplaza al anterior
+     * @param authentication identidad autenticada del revisor que queda registrada en la sugerencia
+     * @return la sugerencia con el estado nuevo y su revisor
+     * @throws jakarta.persistence.EntityNotFoundException si la sugerencia o el revisor no existen
      */
     @Transactional
     public SuggestionAcquisitionResponseDTO changeStatus(Long id, String freshStatus, Authentication authentication) {
@@ -128,10 +141,12 @@ public class SuggestionAcquisitionService {
     // ── Gestión por demanda: lo más pedido primero ──
     // El orden vive en el JPQL; el sort del Pageable se ignora a propósito.
     /**
-     * Consulta get most pedidos usando los filtros recibidos y devuelve el resultado solicitado.
+     * Pagina las sugerencias agrupadas por título con su conteo de solicitudes, de lo más pedido
+     * a lo menos pedido, para priorizar las compras. El orden vive en la consulta y el sort del
+     * pageable se ignora a propósito.
      *
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @return pagina de resultados que coincide con los filtros y la paginacion solicitada
+     * @param pageable página y tamaño solicitados por el reporte de demanda
+     * @return página de grupos con título, autor, ISBN y cantidad de solicitudes
      */
     @Transactional(readOnly = true)
     public Page<SuggestionGroupedDTO> getMostRequested(Pageable pageable) {
@@ -139,8 +154,9 @@ public class SuggestionAcquisitionService {
         return suggestionRepo.findMostRequestedGrouped(effective);
     }
     /**
-         * Busca/lista recursos.
-     * @return lista o pagina de resultados
+     * Devuelve todos los grupos de sugerencias por demanda sin paginar para el PDF de más pedidas.
+     *
+     * @return grupos con título, autor, ISBN y cantidad de solicitudes, de lo más pedido primero
      */
     @Transactional(readOnly = true)
     public List<SuggestionGroupedDTO> getMostRequestedList() {
@@ -150,11 +166,12 @@ public class SuggestionAcquisitionService {
     }
 
     /**
-     * Procesa confirm acquisition y devuelve el resultado calculado por el backend.
+     * Marca como APROBADA cada sugerencia PENDIENTE con el ISBN recién ingresado al catálogo.
+     * Se invoca al crear un libro para cerrar el ciclo pedido-compra sin revisión manual una por una.
      *
-     * @param isbn valor de entrada isbn usado por la operacion para completar su regla de negocio
-     * @param revisorId valor de entrada revisorId usado por la operacion para completar su regla de negocio
-     * @return valor numerico calculado o recuperado por la operacion
+     * @param isbn ISBN del libro dado de alta que confirma los pedidos pendientes
+     * @param revisorId identificador del revisor a registrar; nulo deja el campo sin revisor
+     * @return cantidad de sugerencias pendientes que pasaron a APROBADA
      */
     @Transactional
     public int confirmAcquisition(String isbn, Long revisorId) {
@@ -175,10 +192,12 @@ public class SuggestionAcquisitionService {
 
     /** Versión pública para el controller (confirmar-adquisicion). */
     /**
-     * Procesa resolve id by email public y devuelve el resultado calculado por el backend.
+     * Resuelve el identificador de un usuario por su correo para el endpoint de confirmar adquisición.
+     * Puente público hacia la resolución interna usada al crear y revisar sugerencias.
      *
-     * @param email texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @return valor numerico calculado o recuperado por la operacion
+     * @param email correo del usuario a resolver
+     * @return identificador del usuario dueño de ese correo
+     * @throws jakarta.persistence.EntityNotFoundException si ningún usuario tiene ese correo
      */
     public Long resolveIdByEmailPublic(String email) {
         return resolveIdByEmail(email);

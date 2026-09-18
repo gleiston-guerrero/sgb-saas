@@ -74,11 +74,11 @@ notificaciones:
 
 app:
   auth:
-    # Secure de la cookie refreshToken. true en prod (https + SameSite=None
-    # para cross-site Render). En dev local http://localhost:4200 la cookie
-    # con Secure se descarta y el refresh falla con 400: arrancar con
-    # AUTH_COOKIE_SECURE=false (pasa a SameSite=Lax, ver AuthController).
-    cookie-secure: ${AUTH_COOKIE_SECURE:true}
+    # Cookie refreshToken: siempre Secure + SameSite=None (ver
+    # RefreshCookieConfig). Sin propiedad ni variable para degradarla en
+    # prod. Dev local http:// (sin TLS): activar el perfil
+    # dev-local-http (SPRING_PROFILES_ACTIVE=dev-local-http), que emite
+    # sin Secure + SameSite=Lax solo en ese perfil.
   cache:
     libros:
       # TTL del listado de libros (GET /api/v1/libros). Se invalida con @CacheEvict al mutar.

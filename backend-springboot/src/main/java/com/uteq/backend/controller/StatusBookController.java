@@ -18,13 +18,18 @@ public class StatusBookController {
 
     private final StatusBookRepository statusBookRepository;
 
+    /**
+     * Constructor con el repositorio de estados del libro.
+     *
+     * @param statusBookRepository repositorio del catálogo de estados del libro
+     */
     public StatusBookController(StatusBookRepository statusBookRepository) {
         this.statusBookRepository = statusBookRepository;
     }
     /**
-     * Lists status book.
+     * Lista todos los estados del libro para los selectores del formulario de libros.
      *
-     * @return response entity{@code <list<estado book response dto>>} with the resulting state after the operation
+     * @return lista completa de estados con id y nombre
      */
     @GetMapping
     public ResponseEntity<List<StatusBookResponseDTO>> list() {

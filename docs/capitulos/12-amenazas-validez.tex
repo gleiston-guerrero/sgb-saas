@@ -43,8 +43,8 @@ real.
 
 La corrida~1 de las 5 corridas de k6 (\autoref{cap:diseno-arquitectura},
 \texttt{docs/mediciones/perf/REPORT.md}) presenta una cola de latencia
-anómala en \texttt{cache\_caliente} (p95$=$107{,}31\,ms, frente a un
-rango de 6{,}25--12{,}36\,ms en las 4 corridas siguientes) que no se
+anómala en \texttt{cache\_caliente} (p95$=$129{,}63\,ms, frente a un
+rango de 31{,}16--41{,}57\,ms en las 4 corridas siguientes) que no se
 repite en ninguna corrida posterior. La explicación documentada es
 \emph{warm-up} de JVM/JIT y del \emph{pool} de conexiones de HikariCP:
 la corrida~1 fue la primera ejecución de carga real contra un contenedor
@@ -144,7 +144,7 @@ en la misma dirección sin excepción -- que es precisamente lo que
 ocurre aquí (\texttt{cache\_caliente} $>$ \texttt{cache\_frio} en las 5
 corridas) --, por lo que el resultado \textbf{no alcanza el umbral
 convencional de significancia} ($p<0{,}05$) pese a un tamaño de efecto
-grande y consistente (Cliff's delta $=-0{,}68$). Tratar este resultado
+grande y consistente (Cliff's delta $=-1{,}00$). Tratar este resultado
 como ``no hay diferencia'' sería una conclusión estadísticamente
 incorrecta: el límite real es la potencia estadística del tamaño de
 muestra mínimo exigido por la guía ($n=5$ corridas), no evidencia

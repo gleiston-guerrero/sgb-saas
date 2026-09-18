@@ -5,6 +5,11 @@ package com.uteq.backend.service;
  */
 public class ServiceTemporarilyNotAvailableException extends RuntimeException {
 
+    /**
+     * Constructor con la dependencia externa que obligó a responder 503.
+     *
+     * @param message detalle de la dependencia no disponible
+     */
     public ServiceTemporarilyNotAvailableException(String message) {
         super(message);
     }

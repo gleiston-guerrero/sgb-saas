@@ -1,0 +1,159 @@
+Fecha ISO real: 2026-09-17 (corrida America/Guayaquil, -05:00)
+SHA: d65b8ade19c9681c31b66fd6915d5cbf17af0bed
+Rama: fix/fase01-sus-n0
+Sistema operativo: Windows 11 (CPython 3.14.6, MiKTeX local)
+Python: Python 3.14.6
+Comando ejecutado: python scripts/verify-all.py
+Arbol: limpio salvo docs/evidencia/ (este directorio, sin commitear)
+
+----- salida completa -----
+[OK] 00b2630 (commit)
+[OK] 00b26306 (commit)
+[OK] 1028ad02 (commit)
+[OK] 437ebe5 (commit)
+[OK] 454be77 (commit)
+[OK] 4d69f24 (commit)
+[OK] 4d69f244 (commit)
+[OK] 5f3e5e5 (commit)
+[OK] 5f3e5e5b (commit)
+[OK] 6549becb (commit)
+[OK] 6bce625 (commit)
+[OK] 6bce6257 (commit)
+[OK] 75d635b (commit)
+[OK] 75d635b1 (commit)
+[OK] 7debd0b (commit)
+[OK] 7debd0b1 (commit)
+[OK] 862672b (commit)
+[OK] 862672b2 (commit)
+[OK] 9a46712 (commit)
+[OK] 9a467125 (commit)
+[OK] 9f370270 (commit)
+[OK] bca23c2 (commit)
+[OK] d8443e6 (commit)
+[OK] d8443e66 (commit)
+[OK] df09f0d (commit)
+[OK] df09f0db (commit)
+[OK] df11c6e (commit)
+[OK] df11c6ed (commit)
+[OK] e3f3f7f (commit)
+[OK] e3f3f7fa (commit)
+[OK] e6909a5 (commit)
+[OK] e6909a5d (commit)
+[OK] e8477021 (commit)
+[OK] ed42c42 (commit)
+[OK] ed42c421 (commit)
+verify-p1: OK (35 hashes existen)
+
+>> P1: evidencia válida
+[OK] 10.5281/zenodo.21712467 (doi.org: 200 -> https://zenodo.org/records/21712467; zenodo: published, 1 archivo(s)) <- VERIFICACION.md, docs\informe-entrega-3.tex
+[OK] 10.5281/zenodo.22715710 (doi.org: 200 -> https://zenodo.org/records/22715710; zenodo: published, 1 archivo(s)) <- README.md, VERIFICACION.md
+[OK] 10.5281/zenodo.22728199 (doi.org: 200 -> https://zenodo.org/records/22806568; zenodo: published, 1 archivo(s)) <- README.md, VERIFICACION.md
+[OK] 10.5281/zenodo.22741050 (doi.org: 200 -> https://zenodo.org/records/22741050; zenodo: published, 1 archivo(s)) <- CITATION.cff, VERIFICACION.md, docs\capitulos\00-portada.tex, docs\capitulos\02-introduccion.tex, docs\capitulos\13-declaraciones.tex
+verify-p2: OK (4 DOI resuelven)
+
+>> P2: evidencia válida
+verify-p4: OK (existen 5 corridas)
+verify-p4: OK (5 archivos en LF, sin CRLF)
+verify-p4: OK (NDJSON legible, ambos escenarios en las 5)
+verify-p4: OK (SHA-256 de las 5 coincide con REPORT.md)
+verify-p4: OK (agregado coincide por escenario: n exacto, p95 [65.6, 17.13], error 0%)
+verify-p4: OK (5 corridas crudas versionables y fieles al reporte)
+
+>> P4: evidencia válida
+ository.spPaymentParcialFine -> wrapper V54 proc_pago_parcial_multa + StoredProcedureQuery posicional (mismas 4 claves) [P5SpikeIT.s9e]
+verify-p5: migrada FineProcedureRepository.fnReportSummaryFinancial -> Criteria CASE (mismo patron que summaryByCategory) + cero NUMERIC(12,2) [P5SpikeIT.s10 + FineServiceTest 9/9]
+verify-p5: migrada FineProcedureRepository.fnPaymentsRecientes -> Criteria cartesiana PAGADA + setMaxResults (default 5) [P5SpikeIT.s10 + FineServiceTest 9/9]
+verify-p5: migrada LoanProcedureRepository.fnListLoansActivesByUser -> JPQL cartesiana (base sin dias; LoanService solo usa size) [P5TabularSpikeIT.t1]
+verify-p5: migrada LoanProcedureRepository.fnReportBooksMostLoaned -> Criteria GROUP/COUNT + maxResults (NULL = todo, como LIMIT NULL) [P5TabularSpikeIT.t2]
+verify-p5: migrada LoanProcedureRepository.fnReportIndexDelinquency[+Paginated] -> Criteria filas PENDIENTE + AVG Java ROUND(,1) + ORDER/LIMIT en Java [P5TabularSpikeIT.t3]
+verify-p5: migrada LoanProcedureRepository.fnReportUsageByPeriod[+Paginated] -> Criteria date_trunc + FULL OUTER en Java (TreeMap) [P5TabularSpikeIT.t4]
+verify-p5: migrada LoanProcedureRepository.fnReportBooksMostLoanedDetailed[+Paginated] -> Criteria filas + string_agg en Java (TreeSet, defaults) + pct [P5TabularSpikeIT.t5]
+verify-p5: migrada LoanProcedureRepository.fnReportInventory[+Paginated] -> Criteria 14 filtros + agregados en Java + estado_disponibilidad [P5TabularSpikeIT.t6]
+verify-p5: migrada LoanProcedureRepository.fnReportLoansOverdues[+Paginated] -> Criteria ventana + dias/multa en Java (tarifa config, default 1) [P5TabularSpikeIT.t7]
+verify-p5: migrada LoanProcedureRepository.fnReportCategoriesDemanded[+Paginated] -> Criteria GROUP/COUNT + pct en Java (limite ignorado como la funcion) [P5TabularSpikeIT.t8]
+verify-p5: OK (CALL nativos en CustomImpl pineados)
+verify-p5: OK (unico createNativeQuery fuera de repositorios: AuditAspect set_config, justificado)
+verify-p5: OK (0 nativeQuery + 0 CALL nativos: P5 migrado)
+
+>> P5: migrado (0 nativeQuery + 0 CALL nativos)
+Javadoc audit
+source=backend-springboot\src\main\java
+java_files=278
+public_methods=435
+documented_methods=435
+documented_pct=100.00
+javadoc_param_tags=987
+javadoc_return_tags=402
+javadoc_throws_tags=142
+files_with_missing_javadocs=0
+verify-p6: OK (100.00% >= 90.00%)
+
+>> P6: evidencia válida
+Types: 0/300 flagged (0.00%)
+Methods: 1/696 flagged (0.14%)
+Worst rubric percentage: 0.14%
+
+backend-springboot\src\main\java\com\uteq\backend\repository\LoanProcedureRepositoryCustomImpl.java:724: method estadoDisponibilidad -> estado
+verify-p7: OK (0.14% <= 5.00%)
+
+>> P7: evidencia válida
+verify-p8-p9: OK (15 entornos figure)
+verify-p8-p9: OK (15 labels unicos)
+verify-p8-p9: OK (las 15 citadas; 0 rotas)
+verify-p8-p9: OK (14 includegraphics existen en disco)
+verify-p8-p9: OK (0 palabras espanolas en .svg versionados)
+verify-p8-p9: OK (captions de figuras en ingles)
+verify-p8-p9: OK (15/15 figuras referenciadas; figuras en ingles)
+
+>> P8/P9: evidencia válida
+verify-p11: rev citado e55f43b0 es ancestro de HEAD (+1 commits propios declarados en prosa)
+verify-p11: OK (shortlog a e55f43b0: 763/343/363, total 1471)
+verify-p11: OK (CONTRIBUCIONES.md coincide)
+verify-p11: OK (CONTRIBUTORS.md coincide)
+verify-p11: OK (cap. 13 coincide)
+verify-p11: OK (roles-commit-counts.txt exacto)
+verify-p11: OK (conteos verificables; ver seccion Firmas en CONTRIBUCIONES.md)
+
+>> P11: conteos verificables (firmas externas pendientes)
+verify-p12: OK (árbol limpio, 1009 archivos revisados)
+
+>> P12: evidencia válida
+verify-p3: OK (sin sus.csv ni derivados en el arbol evaluado)
+verify-p3: OK (sus/README.md declara N=0 y dataset retirado)
+verify-p3: OK (ningun .tex cita artefactos SUS retirados)
+verify-p3: OK (P3 declara N=0 y estado no aprobado, sin CUMPLE)
+verify-p3: PENDIENTE — no puntuable (N=0, sin respuestas reales)
+
+>> P3: PENDIENTE — no puntuable
+>> P10: PENDIENTE — bloqueado por entorno (sin Docker; Testcontainers omitiria)
+d/controller/EvidenceDamageController*:com/uteq/backend/controller/LoanReturnController*:com/uteq/backend/controller/FavoriteController*:com/uteq/backend/controller/CredentialQrController*:com/uteq/backend/controller/LoansManagementController*:com/uteq/backend/controller/PublicCategoryController*:com/uteq/backend/controller/ReservationController*:com/uteq/backend/controller/TestController*:com/uteq/backend/controller/ReservationsManagementController*:com/uteq/backend/BackendApplication.class"
+[INFO] 
+[INFO] <<< javadoc:3.12.0:javadoc (default-cli) < generate-sources @ backend <<<
+[INFO] 
+[INFO] 
+[INFO] --- javadoc:3.12.0:javadoc (default-cli) @ backend ---
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  4.163 s
+[INFO] Finished at: 2026-09-17T20:04:01-05:00
+[INFO] ------------------------------------------------------------------------
+
+>> Javadoc: evidencia válida (BUILD SUCCESS)
+
+===== verify-all: resumen P1-P12 =====
+P1: evidencia válida
+P2: evidencia válida
+P3: PENDIENTE — no puntuable
+P4: evidencia válida
+P5: migrado (0 nativeQuery + 0 CALL nativos)
+P6: evidencia válida
+P7: evidencia válida
+P8/P9: evidencia válida
+P10: PENDIENTE
+P11: conteos verificables (firmas externas pendientes)
+P12: evidencia válida
+Javadoc: evidencia válida
+verify-all: exit 0 = coherencia/reproducibilidad de la evidencia disponible, NO cumplimiento academico total (P3 y firmas no puntuan)
+
+Codigo de salida: 0

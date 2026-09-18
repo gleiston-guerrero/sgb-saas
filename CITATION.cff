@@ -29,11 +29,10 @@ keywords:
   - Angular
   - PostgreSQL
   - RBAC
-# DOI del depósito real de v1.0.1 en Zenodo, generado el 2026-09-14 a
-# partir del Release de GitHub sobre el tag v1.0.1. Zenodo lo vinculó
-# automáticamente como nueva versión del mismo registro que v1.0.0
-# (10.5281/zenodo.22636466, DOI de la versión anterior, ver historial
-# de versiones en https://zenodo.org/records/22636466).
+# DOI del depósito vigente en Zenodo (v1.0.1, generado el 2026-09-14 a
+# partir del Release de GitHub sobre el tag v1.0.1). Es el identificador
+# que resuelve para citar este software; el historial de versiones vive
+# en Zenodo y en el historial Git.
 doi: 10.5281/zenodo.22741050
 # ---
 # Digests reales de las imágenes v1.0.0 (docker pull + docker inspect,
@@ -43,12 +42,11 @@ doi: 10.5281/zenodo.22741050
 # CFF 1.2.0 no tiene un campo estándar para digests de imágenes: se deja
 # como comentario para no inventar un campo no contemplado por el esquema.
 # ---
-# Digest SHA256 de docs/informe-final.pdf (regenerado 2026-09-14, 102
-# paginas tras integrar fix/finales -- trazabilidad DATA-PROVENANCE,
-# retiro formal de SUS, roles CRediT -- y el fix de sort nativo
-# desalineado con columna fisica; mismo valor que README.md
+# Digest SHA256 de docs/informe-final.pdf (regenerado 2026-09-17, 109
+# paginas -- P4 unificado, serie k6 vigente, DOI vigente, figuras
+# C4/DER/JaCoCo corregidas, P11 re-sincronizado; mismo valor que README.md
 # "Integridad del entregable"):
-# 3244efffbd37c8817f0d405bd08528d92c73a10877bc3ca98fbbcebd6cd5758b
+# FD541B819F3DDC9C488B36739F29AD53F0E76F0AD01630745772B8CC4C134560
 # NOTA: si el PDF se recompila al cierre, re-sincronizar este digest y
 # el del README con el nuevo `Get-FileHash docs/informe-final.pdf
 # -Algorithm SHA256` (docs/capitulos/00-portada.tex no fija un valor

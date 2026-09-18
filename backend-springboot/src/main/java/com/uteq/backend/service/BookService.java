@@ -67,6 +67,20 @@ public class BookService {
 
     // La auditoria de esta tabla ya no se hace aqui: trg_auditoria_libros
     // (V49__auditoria_triggers_negocio.sql) audita INSERT/UPDATE/DELETE a nivel de motor.
+    /**
+     * Constructor con los repositorios de catálogos, la configuración y los servicios opcionales de apoyo.
+     *
+     * @param bookRepo repositorio de libros
+     * @param publisherRepo repositorio de editoriales
+     * @param languageRepo repositorio de idiomas
+     * @param statusRepo repositorio de estados de libro
+     * @param categoryRepo repositorio de categorías
+     * @param authorRepo repositorio de autores
+     * @param supplierRepo repositorio de proveedores
+     * @param configurationSystemService servicio de parámetros como el tamaño máximo de portada
+     * @param subscriptionAvailabilityService avisos de disponibilidad, nulo si no está configurado
+     * @param suggestionAcquisitionService confirmación de sugerencias por ISBN, nulo si no está configurado
+     */
     public BookService(BookRepository bookRepo,
                         PublisherRepository publisherRepo,
                         LanguageRepository languageRepo,
@@ -119,15 +133,15 @@ public class BookService {
     public Page<BookResponseDTO> listWithFilters(String q, Integer statusBookId, Integer categoryId, Long authorId, Boolean available, Pageable pageable) {
         Integer statusId = resolveStatusId(statusBookId);
 
-        // Con disponible y/o q, usar queries nativas con filtro stock
+        // Con disponible y/o q, usar Criteria con filtros opcionales (P5)
         if (q != null && !q.isBlank()) {
             if (categoryId != null) {
-                return bookRepo.searchByTextOIsbnYCategory(q, categoryId, statusId, available, nativeSort(pageable)).map(this::toDTO);
+                return bookRepo.searchText(q, statusId, categoryId, null, available, derivedSort(pageable)).map(this::toDTO);
             }
             if (authorId != null) {
-                return bookRepo.searchByTextOrIsbnAndAuthor(q, authorId, statusId, nativeSort(pageable)).map(this::toDTO);
+                return bookRepo.searchText(q, statusId, null, authorId, available, derivedSort(pageable)).map(this::toDTO);
             }
-            return bookRepo.searchByTextOIsbn(q, statusId, available, nativeSort(pageable)).map(this::toDTO);
+            return bookRepo.searchText(q, statusId, null, null, available, derivedSort(pageable)).map(this::toDTO);
         }
 
         if (available != null) {
@@ -176,29 +190,18 @@ public class BookService {
         return listWithFilters(q, statusBookId, categoryId, authorId, null, pageable);
     }
 
-    // listWithFilters alterna entre queries derivadas de Spring Data (Book.title,
-    // Book.java @Column(name="titulo")) y queries nativas de BookRepository, que
-    // no traducen propiedad->columna: Spring Data inyecta el Sort tal cual como
-    // texto SQL. Los clientes mandan ambas convenciones (frontend nuevo: "title";
-    // bundles viejos/peticiones manuales: "titulo", como el 500 de /api/publico/libros
-    // del 16-sep): cada rama traduce a la suya para que el Sort nunca llegue
+    // listWithFilters usa queries derivadas y Criteria de Spring Data (P5):
+    // el Sort siempre viaja como propiedad de entidad. Los clientes mandan
+    // ambas convenciones (frontend nuevo: "title"; bundles viejos/peticiones
+    // manuales: "titulo", como el 500 de /api/publico/libros del 16-sep):
+    // derivedSort traduce columna->propiedad para que el Sort nunca llegue
     // sin traducir a la query. Ver BookController.list/PublicBookController.list.
-    private static final Map<String, String> SORT_TO_COLUMN = Map.of(
-            "title", "titulo",
-            "dateRegistration", "fecha_registro",
-            "yearPublication", "anio_publicacion",
-            "stockAvailable", "stock_disponible",
-            "stockTotal", "stock_total");
     private static final Map<String, String> SORT_TO_PROPERTY = Map.of(
             "titulo", "title",
             "fecha_registro", "dateRegistration",
             "anio_publicacion", "yearPublication",
             "stock_disponible", "stockAvailable",
             "stock_total", "stockTotal");
-
-    private static Pageable nativeSort(Pageable pageable) {
-        return remapSort(pageable, SORT_TO_COLUMN);
-    }
 
     private static Pageable derivedSort(Pageable pageable) {
         return remapSort(pageable, SORT_TO_PROPERTY);
@@ -247,7 +250,7 @@ public class BookService {
         }
         Short yearShort = yearPublication != null ? yearPublication.shortValue() : null;
         try {
-            return bookRepo.searchByStatuses(statuses, q, yearShort, nativeSort(pageable)).map(this::toDTO);
+            return bookRepo.searchByStatusesCriteria(statuses, q, yearShort, derivedSort(pageable)).map(this::toDTO);
         } catch (Exception e) {
             log.error("listarPendientes error consultando {} libros con estados {}", statuses.size(), q, e);
             throw new RuntimeException("Error interno al listar libros pendientes", e);
@@ -338,7 +341,7 @@ public class BookService {
         StatusBook statusActive = statusRepo.findByName(ESTADO_ACTIVO)
                 .orElseThrow(() -> new IllegalStateException(
                         "Catálogo estados_libro sin fila '" + ESTADO_ACTIVO + "'"));
-        return bookRepo.suggestByTitle(text, statusActive.getId()).stream()
+        return bookRepo.suggestByTitleCriteria(text, statusActive.getId()).stream()
                 .map(l -> new BookSuggestionDTO(
                         l.getId(),
                         l.getTitle(),

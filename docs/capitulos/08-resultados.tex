@@ -302,8 +302,8 @@ sobre la cobertura de pruebas.
 \texttt{jacoco-maven-plugin}. La cifra de cierre vigente se calcula
 desde los artefactos raíz versionados en \texttt{docs/mediciones/jacoco/}:
 \texttt{report.csv}, \texttt{report.xml} y el HTML asociado. Esos
-artefactos declaran \textbf{87,41\,\%} de líneas (1805/2065) y
-\textbf{76,19\,\%} de ramas (448/588). Esta es la única cifra vigente de
+artefactos declaran \textbf{86,30\,\%} de líneas (2337/2708) y
+\textbf{74,53\,\%} de ramas (594/797). Esta es la única cifra vigente de
 cobertura citada en el entregable final. Las mediciones anteriores quedan
 archivadas como evidencia histórica en \texttt{docs/mediciones/jacoco/},
 pero no se defienden como resultado de cierre.
@@ -321,7 +321,7 @@ histórica, pero esta sección solo usa los artefactos raíz; la regla de
 canonicidad queda declarada en \texttt{docs/mediciones/jacoco/README.md}.
 
 \textbf{Estadística descriptiva.} Esta métrica es una medición agregada
-sobre la totalidad del código analizado (49 clases en la corrida
+sobre la totalidad del código analizado (54 clases en la corrida
 vigente, tras exclusiones documentadas de DTOs/entidades/configuración
 de framework), no una muestra de un proceso aleatorio -- no aplica
 media/desviación típica/IC~95\% de la misma forma que el Bloque~1; el
@@ -334,8 +334,8 @@ número reportado es el porcentaje real exacto, sin margen de muestreo.
 \toprule
 Métrica & Cubierto/total & \textbf{Vigente} & Umbral \\
 \midrule
-Lines & 1805/2065 & \textbf{87,41\,\%} & $\geq$70\,\% \textbf{Sí} \\
-Branches & 448/588 & \textbf{76,19\,\%} & $\geq$70\,\% \textbf{Sí} \\
+Lines & 2337/2708 & \textbf{86,30\,\%} & $\geq$70\,\% \textbf{Sí} \\
+Branches & 594/797 & \textbf{74,53\,\%} & $\geq$70\,\% \textbf{Sí} \\
 \bottomrule
 \end{tabular}
 \caption{Cobertura JaCoCo vigente al cierre de la Entrega Final.}
@@ -344,17 +344,18 @@ Branches & 448/588 & \textbf{76,19\,\%} & $\geq$70\,\% \textbf{Sí} \\
 
 \textbf{Interpretación.} El resultado responde a RQ4 con un dato
 concreto y un artefacto versionado que lo respalda: la base de líneas
-analizables cerró en 2065 líneas tras las exclusiones JaCoCo documentadas, con los commits
+analizables cerró en 2708 líneas tras las exclusiones JaCoCo documentadas, con los commits
 posteriores al merge de los 8 módulos (nuevos controladores, chatbot,
-auditoría, QR, backups, sugerencias de adquisición, etc.) y los
-procedures nativos agregados para la estrategia híbrida de acceso a
-datos (ver \texttt{docs/basedatos/CATALOGO-SP.md}), y la
+auditoría, QR, backups, sugerencias de adquisición, etc.), los
+procedimientos migrados a mecanismos JPA sin SQL nativo (P5, ver
+\texttt{docs/basedatos/P5-MATRIZ-33.md}) y la política de cookie
+productiva, y la
 cobertura global de líneas supera el \textbf{umbral informal de 70\,\%}
-fijado por el equipo para la Entrega Final (87,41\,\% al cierre). Las
-capas \texttt{controller} (97,03\,\% líneas, 75,51\,\% ramas),
-\texttt{security}, \texttt{scheduling} y \texttt{service} (87,38\,\%
-líneas, 77,70\,\% ramas) quedan por encima del umbral interno en líneas
-y ramas; las ramas globales cierran en 76,19\,\% y cumplen el umbral de
+fijado por el equipo para la Entrega Final (86,30\,\% al cierre). Las
+capas \texttt{controller} (96,54\,\% líneas, 75,51\,\% ramas),
+\texttt{security}, \texttt{scheduling} y \texttt{service} (87,55\,\%
+líneas, 77,31\,\% ramas) quedan por encima del umbral interno en líneas
+y ramas; las ramas globales cierran en 74,53\,\% y cumplen el umbral de
 70\,\% exigido por la rúbrica para servicios y controladores.
 Las discrepancias históricas quedan documentadas en la bitácora de
 observaciones y en los artefactos fechados. Para la defensa y para la
@@ -378,13 +379,13 @@ Domain/Entity & --- & Excluido & N/A \\
 \label{tab:res-jacoco-capas-vigente}
 \end{table}
 
-\textbf{Interpretación por capa (vigente al cierre, \autoref{tab:res-jacoco-capas-vigente}).} La medición vigente deja \texttt{controller} por encima del umbral interno (97,03\,\% de líneas; 75,51\,\% de ramas) y \texttt{service} cruza el umbral en líneas (87,38\,\%) y ramas (77,70\,\%). El detalle numérico queda en el XML versionado para evitar mezclar cifras de cierre con cifras históricas dentro del texto defendido. La \autoref{fig:res-jacoco-paquetes} desagrega la cobertura de instrucciones por paquete desde el CSV canónico.
+\textbf{Interpretación por capa (vigente al cierre, \autoref{tab:res-jacoco-capas-vigente}).} La medición vigente deja \texttt{controller} por encima del umbral interno (96,54\,\% de líneas; 75,51\,\% de ramas) y \texttt{service} cruza el umbral en líneas (87,55\,\%) y ramas (77,31\,\%). El detalle numérico queda en el XML versionado para evitar mezclar cifras de cierre con cifras históricas dentro del texto defendido. La \autoref{fig:res-jacoco-paquetes} desagrega la cobertura de instrucciones por clase (top 12) desde el CSV canónico.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.85\textwidth]{mediciones/figuras/fig-jacoco-paquetes.pdf}
-\caption{JaCoCo instruction coverage by package (top 12), from the
-canonical \texttt{docs/mediciones/jacoco/report.csv} (49 instrumented
+\caption{JaCoCo instruction coverage by class (top 12), from the
+canonical \texttt{docs/mediciones/jacoco/report.csv} (54 instrumented
 classes). Generated with
 \texttt{scripts/generar-figuras-evaluacion.py}.}
 \label{fig:res-jacoco-paquetes}

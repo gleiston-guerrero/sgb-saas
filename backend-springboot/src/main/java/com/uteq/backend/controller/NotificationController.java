@@ -19,6 +19,11 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
+    /**
+     * Constructor con el servicio de notificaciones.
+     *
+     * @param notificationService servicio de consulta de notificaciones por usuario
+     */
     public NotificationController(NotificationService notificationService) {
         this.notificationService = notificationService;
     }
@@ -28,12 +33,13 @@ public class NotificationController {
     // las suyas (validado en NotificacionService), el resto de roles puede
     // consultar cualquiera.
     /**
-     * Consulta list by user usando los filtros recibidos y devuelve el resultado solicitado.
+     * Lista en forma paginada las notificaciones de un usuario. Un LECTOR solo ve las suyas.
+     * Roles LECTOR, BIBLIOTECARIO, GERENTE y ADMIN.
      *
-     * @param userId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param userId id del usuario cuyas notificaciones se consultan
+     * @param authentication identidad autenticada que pide la consulta
+     * @param pageable paginación y orden solicitados
+     * @return página de notificaciones del usuario indicado
      */
     @GetMapping("/usuario/{usuarioId}")
     @PreAuthorize("hasAnyRole('LECTOR','BIBLIOTECARIO','GERENTE','ADMIN')")

@@ -8,6 +8,7 @@ import com.uteq.backend.dto.ResetPasswordRequestDTO;
 import com.uteq.backend.dto.RequestResetRequestDTO;
 import com.uteq.backend.dto.TokenResponseDTO;
 import com.uteq.backend.dto.UserResponseDTO;
+import com.uteq.backend.config.RefreshCookieConfig;
 import com.uteq.backend.security.JwtService;
 import com.uteq.backend.service.AuthService;
 import com.uteq.backend.service.ServiceTemporarilyNotAvailableException;
@@ -18,7 +19,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,31 +41,28 @@ public class AuthController {
 
     private final AuthService authService;
     private final JwtService jwtService;
+    private final RefreshCookieConfig.RefreshCookiePolicy cookiePolicy;
 
     /**
      * Constructor con los servicios de autenticación y JWT.
      *
      * @param authService servicio de registro, login y tokens
      * @param jwtService servicio de emisión y validación de JWT
+     * @param cookiePolicy política de la cookie refreshToken (Secure en
+     *        prod; relajada solo bajo el perfil dev-local-http)
      */
-    public AuthController(AuthService authService, JwtService jwtService) {
+    public AuthController(AuthService authService, JwtService jwtService,
+            RefreshCookieConfig.RefreshCookiePolicy cookiePolicy) {
         this.authService = authService;
         this.jwtService = jwtService;
+        this.cookiePolicy = cookiePolicy;
     }
-
-    // Secure de la cookie refreshToken (app.auth.cookie-secure, default
-    // true). En dev local http:// sin TLS la cookie con Secure=true es
-    // descartada por el navegador: el login devuelve 200 pero sin cookie
-    // y el siguiente refresh falla con 400 "Falta la cookie refreshToken".
-    // Con AUTH_COOKIE_SECURE=false se emite sin Secure y con SameSite=Lax
-    // (SameSite=None exige Secure por especificacion).
-    @Value("${app.auth.cookie-secure:true}")
-    private boolean cookieSecure;
     /**
-     * Procesa registration y devuelve el resultado calculado por el backend.
+     * Registra un usuario nuevo en estado pendiente de verificación y envía el código al correo.
+     * Endpoint público POST /registro.
      *
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param dto datos de registro con correo, clave y datos personales
+     * @return usuario creado con estado pendiente de verificación
      */
     @PostMapping("/registro")
     public ResponseEntity<UserResponseDTO> registration(@Valid @RequestBody RegistrationRequestDTO dto) {
@@ -102,10 +99,11 @@ public class AuthController {
     }
 
     /**
-     * Procesa reset y devuelve el resultado calculado por el backend.
+     * Restablece la contraseña validando el código de recuperación enviado al correo.
+     * Endpoint público POST /reset.
      *
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param dto correo, código de recuperación y contraseña nueva
+     * @return respuesta vacía con estado 204 si el cambio se aplicó
      */
     @PostMapping("/reset")
     public ResponseEntity<Void> reset(@Valid @RequestBody ResetPasswordRequestDTO dto) {
@@ -129,11 +127,12 @@ public class AuthController {
         return ResponseEntity.ok(user);
     }
     /**
-     * Procesa login y devuelve el resultado calculado por el backend.
+     * Autentica al usuario con correo y contraseña y emite el par de tokens de acceso y refresco.
+     * Endpoint público POST /login. El token de refresco viaja además en cookie HttpOnly.
      *
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @param request datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param dto correo y contraseña del usuario
+     * @param request petición HTTP usada para registrar la IP de origen
+     * @return tokens de acceso y refresco del usuario autenticado
      */
     @PostMapping("/login")
     public ResponseEntity<TokenResponseDTO> login(@Valid @RequestBody LoginRequestDTO dto, HttpServletRequest request) {
@@ -144,11 +143,12 @@ public class AuthController {
                 .body(tokens);
     }
     /**
-     * Procesa logout y devuelve el resultado calculado por el backend.
+     * Cierra la sesión invalidando el token de acceso y limpiando la cookie de refresco.
+     * Endpoint POST /logout con cabecera Authorization Bearer.
      *
-     * @param authHeader token de seguridad recibido para validar o renovar la sesion del usuario
-     * @param request datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param authHeader cabecera Authorization con el token de acceso a invalidar
+     * @param request petición HTTP usada para registrar la IP de origen
+     * @return respuesta vacía con estado 204 y cookie de refresco limpia
      */
 
     @PostMapping("/logout")
@@ -174,10 +174,12 @@ public class AuthController {
     // handler ya existente de IllegalArgumentException (400, RFC 7807) en
     // vez de en el mecanismo de error por defecto de Spring MVC.
     /**
-     * Procesa refresh y devuelve el resultado calculado por el backend.
+     * Renueva el par de tokens a partir de la cookie HttpOnly de refresco y la rota.
+     * Endpoint público POST /refresh.
      *
-     * @param refreshTokenCookie token de seguridad recibido para validar o renovar la sesion del usuario
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param refreshTokenCookie valor de la cookie refreshToken, obligatorio
+     * @return tokens nuevos de acceso y refresco
+     * @throws IllegalArgumentException si la cookie falta o está vacía
      */
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponseDTO> refresh(
@@ -197,13 +199,9 @@ public class AuthController {
     // autenticación (nunca viaja en llamadas a /api/v1/**). Ver
     // docs/adr/adr-007-cookies-jwt.md para el resto de decisiones de diseño
     // (por qué solo el refreshToken migra a cookie, no el accessToken).
+    // La dureza Secure+SameSite=None vive en RefreshCookieConfig (siempre
+    // en prod; excepción solo bajo el perfil dev-local-http).
     private ResponseCookie buildRefreshCookie(String value, long maxAgeMs) {
-        return ResponseCookie.from(REFRESH_COOKIE_NAME, value)
-                .httpOnly(true)
-                .secure(cookieSecure)
-                .sameSite(cookieSecure ? "None" : "Lax")
-                .path("/api/auth")
-                .maxAge(Duration.ofMillis(maxAgeMs))
-                .build();
+        return cookiePolicy.build(REFRESH_COOKIE_NAME, value, Duration.ofMillis(maxAgeMs));
     }
 }

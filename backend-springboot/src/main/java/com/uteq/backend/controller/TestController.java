@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/test")
 public class TestController {
     /**
-     * Handles protegido.
+     * Devuelve un mensaje de prueba para verificar que la autenticación funciona.
      *
-     * @return response entity{@code <string>} with the resulting state after the operation
+     * @return mensaje de confirmación de acceso autenticado
      */
     @GetMapping("/protegido")
     public ResponseEntity<String> protectedEndpoint() {

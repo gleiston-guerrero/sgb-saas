@@ -32,9 +32,12 @@ public class VerificationEmailService {
     private long ttlMinutes;
 
     /**
-     * Genera o entrega generate ysend code a partir de los datos actuales del sistema.
+     * Genera un código aleatorio de 6 dígitos, lo guarda en Redis con el TTL configurado y lo envía
+     * al correo del titular. Si Redis no responde el registro se interrumpe; si solo falla el correo,
+     * el código queda guardado y el usuario puede pedir el reenvío.
      *
-     * @param user valor de entrada user usado por la operacion para completar su regla de negocio
+     * @param user usuario recién registrado que debe confirmar su correo
+     * @throws ServiceTemporarilyNotAvailableException si Redis no acepta el guardado del código
      */
     public void generateAndSendCode(User user) {
         String code = generateCode();
@@ -57,10 +60,12 @@ public class VerificationEmailService {
     }
 
     /**
-     * Verifica validate y devuelve el resultado de la comprobacion.
+     * Valida el código de un solo uso contra el guardado en Redis y lo consume al acertar.
+     * Rechaza códigos vencidos o nunca solicitados igual que los incorrectos.
      *
-     * @param email texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @param codeIngresado valor de entrada codeIngresado usado por la operacion para completar su regla de negocio
+     * @param email correo pendiente de confirmación cuyo código se valida
+     * @param codeIngresado código de 6 dígitos ingresado por el titular
+     * @throws CodeVerificationInvalidException si el código expiró, es incorrecto o Redis no responde a la lectura
      */
     public void validate(String email, String codeIngresado) {
         String key = key(email);

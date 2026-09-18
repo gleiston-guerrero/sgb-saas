@@ -11,11 +11,13 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     // GET /notificaciones/usuario/{id} (lector solo ve las suyas, mismo
     // patrón de autorización que MultaController).
+    /** Pagina las notificaciones del usuario dado. */
     Page<Notification> findByUserId(Long userId, Pageable pageable);
 
     // Usada por NotificacionVencimientoScheduler para no reenviar la misma
     // alerta de VENCIMIENTO sobre un préstamo que ya la tiene (evitar
     // duplicados si el scheduler corre más de una vez dentro de la ventana
     // de anticipación configurada).
+    /** Indica si ya existe una notificación del tipo dado para el préstamo dado. */
     boolean existsByLoanIdAndTypeNotificationId(Long loanId, Integer typeNotificationId);
 }

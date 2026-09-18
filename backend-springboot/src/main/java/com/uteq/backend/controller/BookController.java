@@ -52,15 +52,16 @@ public class BookController {
     // Filtros combinables: q (título/ISBN), estadoLibroId, categoriaId, autorId.
     // Si no se envía estadoLibroId, default = ACTIVO.
     /**
-     * Consulta list usando los filtros recibidos y devuelve el resultado solicitado.
+     * Lista el catálogo de libros con filtros combinables por texto, estado, categoría, autor y disponibilidad.
+     * Sin estadoLibroId aplica el estado ACTIVO por defecto. Roles LECTOR, BIBLIOTECARIO, GERENTE y ADMIN.
      *
-     * @param q texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @param statusBookId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param categoryId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param authorId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param available criterio de clasificacion usado para seleccionar la variante o filtro requerido
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param q texto a buscar en título o ISBN, null para no filtrar
+     * @param statusBookId id del estado del libro, null para el defecto ACTIVO
+     * @param categoryId id de categoría, null para todas
+     * @param authorId id de autor, null para todos
+     * @param available true solo disponibles, false solo no disponibles, null todos
+     * @param pageable paginación y orden solicitados
+     * @return página de libros que cumplen los filtros
      */
     @GetMapping
     @PreAuthorize("hasAnyRole('LECTOR','BIBLIOTECARIO','GERENTE','ADMIN')")
@@ -70,13 +71,8 @@ public class BookController {
             @RequestParam(name = "categoriaId", required = false) Integer categoryId,
             @RequestParam(name = "autorId", required = false) Long authorId,
             @RequestParam(name = "disponible", required = false) Boolean available,
-            // sort con el nombre de PROPIEDAD JPA (title): listWithFilters
-            // alterna entre queries derivadas (necesitan "title") y nativas
-            // (necesitan "titulo") segun los filtros recibidos. BookService
-            // traduce titulo<->title solo antes de invocar la rama nativa
-            // (ver BookService.nativeSort); aca se mantiene "title" para no
-            // romper la rama derivada, que es la que Spring Data valida
-            // contra la entidad Book.
+            // sort con el nombre de PROPIEDAD JPA (title): BookService
+            // traduce columna->propiedad (derivedSort, P5) antes de consultar.
             @PageableDefault(size = 10, sort = "title") Pageable pageable) {
         return ResponseEntity.ok(bookService.listWithFilters(q, statusBookId, categoryId, authorId, available, pageable));
     }
@@ -84,10 +80,11 @@ public class BookController {
     // ── GET /api/v1/libros/sugerencias?texto= ─────────────
     // Autocompletado de catálogo. Cualquier usuario autenticado puede buscar.
     /**
-     * Procesa suggestions y devuelve el resultado calculado por el backend.
+     * Devuelve sugerencias de autocompletado del catálogo para el texto dado.
+     * Cualquier usuario autenticado puede usarlo.
      *
-     * @param text texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param text texto parcial del título con entre 2 y 60 caracteres
+     * @return lista de sugerencias de libros coincidentes
      */
     @GetMapping("/sugerencias")
     @PreAuthorize("isAuthenticated()")
@@ -100,13 +97,14 @@ public class BookController {
     // Listado de libros en estados de gestión: DADO_DE_BAJA, PENDIENTE, EN_REPARACION, PERDIDO
     // Si no se envía estadoIds, usa los 4 por defecto.
     /**
-     * Consulta los libros pendientes de revision y devuelve una pagina filtrada para gestion.
+     * Lista los libros en estados de gestión como DADO_DE_BAJA, PENDIENTE, EN_REPARACION o PERDIDO.
+     * Sin estadoIds usa esos cuatro por defecto. Roles BIBLIOTECARIO, GERENTE y ADMIN.
      *
-     * @param q texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @param yearPublication valor de entrada yearPublication usado por la operacion para completar su regla de negocio
-     * @param statusIds coleccion de datos usada como entrada para filtrar o construir la respuesta
-     * @param pageable configuracion de pagina, tamano y orden usada para limitar la consulta
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param q texto a buscar en título o ISBN, null para no filtrar
+     * @param yearPublication año de publicación a filtrar, null para todos
+     * @param statusIds ids de estado a incluir, null para los cuatro de gestión
+     * @param pageable paginación y orden solicitados
+     * @return página de libros pendientes de revisión
      */
     @GetMapping("/pendientes")
     @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
@@ -124,10 +122,11 @@ public class BookController {
     // Autocompletar desde Google Books. La ruta literal gana sobre /{id};
     // 404 con ProblemDetail si no hay resultado.
     /**
-     * Procesa lookup isbn y devuelve el resultado calculado por el backend.
+     * Busca los datos bibliográficos de un ISBN en Google Books para autocompletar el formulario.
+     * Roles BIBLIOTECARIO, GERENTE y ADMIN.
      *
-     * @param isbn valor de entrada isbn usado por la operacion para completar su regla de negocio
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param isbn ISBN de 10 a 13 dígitos a consultar en el servicio externo
+     * @return datos del libro encontrado para precargar el formulario
      */
     @GetMapping("/lookup-isbn")
     @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
@@ -142,10 +141,11 @@ public class BookController {
     // thumbnail y lo devuelve como binario (el navegador no debe llamar
     // a Google Books directo). Igual que /{id}/portada, 404 si no hay.
     /**
-     * Procesa lookup isbn cover y devuelve el resultado calculado por el backend.
+     * Actúa como proxy de la portada de Google Books y devuelve su binario para el ISBN dado.
+     * Roles BIBLIOTECARIO, GERENTE y ADMIN. Responde 404 si no hay portada.
      *
-     * @param isbn valor de entrada isbn usado por la operacion para completar su regla de negocio
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param isbn ISBN de 10 a 13 dígitos cuya portada externa se solicita
+     * @return bytes de la imagen con su tipo de contenido original
      */
     @GetMapping("/lookup-isbn/portada")
     @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
@@ -160,10 +160,11 @@ public class BookController {
 
     // ── GET /api/v1/libros/{id} ───────────────────────────
     /**
-     * Consulta search usando los filtros recibidos y devuelve el resultado solicitado.
+     * Obtiene el detalle de un libro del catálogo por su id.
+     * Roles LECTOR, BIBLIOTECARIO, GERENTE y ADMIN.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id del libro a consultar
+     * @return detalle del libro solicitado
      */
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('LECTOR','BIBLIOTECARIO','GERENTE','ADMIN')")
@@ -173,10 +174,10 @@ public class BookController {
 
     // ── POST /api/v1/libros ───────────────────────────────
     /**
-     * Registra create validando los datos de entrada antes de persistir cambios.
+     * Crea un libro nuevo en el catálogo. Roles BIBLIOTECARIO, GERENTE y ADMIN.
      *
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param dto datos del libro con título, ISBN, categoría, autor y existencias
+     * @return libro creado con estado 201
      */
     @PostMapping
     @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
@@ -188,11 +189,11 @@ public class BookController {
 
     // ── PUT /api/v1/libros/{id} ───────────────────────────
     /**
-     * Actualiza update con las reglas de negocio requeridas por el flujo.
+     * Actualiza los datos de un libro existente. Roles BIBLIOTECARIO, GERENTE y ADMIN.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id del libro a actualizar
+     * @param dto datos nuevos del libro con título, ISBN, categoría, autor y existencias
+     * @return libro actualizado
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
@@ -204,10 +205,10 @@ public class BookController {
 
     // ── DELETE /api/v1/libros/{id} ────────────────────────
     /**
-     * Elimina o anula delete despues de validar que la operacion sea permitida.
+     * Elimina un libro del catálogo por su id. Roles BIBLIOTECARIO, GERENTE y ADMIN.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id del libro a eliminar
+     * @return respuesta vacía con estado 204 si se eliminó
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
@@ -220,11 +221,12 @@ public class BookController {
     // Subida multipart con campo "archivo". La validación de tipo/tamaño
     // vive en LibroService y responde 400 vía GlobalExceptionHandler.
     /**
-     * Procesa upload cover y devuelve el resultado calculado por el backend.
+     * Sube o reemplaza la imagen de portada de un libro mediante archivo multipart.
+     * Roles BIBLIOTECARIO, GERENTE y ADMIN. El tipo y tamaño se validan en el servicio.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param file archivo recibido en la peticion y usado como contenido principal de la operacion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id del libro al que pertenece la portada
+     * @param file archivo de imagen enviado en el campo archivo
+     * @return libro actualizado con los datos de su portada
      */
     @PostMapping(value = "/{id}/portada", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
@@ -241,10 +243,11 @@ public class BookController {
     // placeholder) si el libro no existe o no tiene portada -- eso es
     // decisión del frontend.
     /**
-     * Consulta get cover usando los filtros recibidos y devuelve el resultado solicitado.
+     * Descarga el binario de la portada guardada de un libro con su tipo de contenido.
+     * Roles LECTOR, BIBLIOTECARIO, GERENTE y ADMIN. Responde 404 si no tiene portada.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param id id del libro cuya portada se solicita
+     * @return bytes de la imagen con su tipo de contenido
      */
     @GetMapping("/{id}/portada")
     @PreAuthorize("hasAnyRole('LECTOR','BIBLIOTECARIO','GERENTE','ADMIN')")

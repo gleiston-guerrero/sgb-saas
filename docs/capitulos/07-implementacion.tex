@@ -90,15 +90,18 @@ $$;
 
 \textbf{Nota de honestidad sobre el mecanismo de invocación.} La guía de
 esta entrega espera que el backend conecte los procedimientos con
-\texttt{@Procedure} o \texttt{@NamedStoredProcedureQuery}. Ese es el
-contrato vigente para las rutinas principales con efectos secundarios:
-\texttt{sp\_crear\_prestamo} y
-\texttt{sp\_expirar\_reservaciones\_vencidas} se exponen con
-\texttt{@Procedure}; \texttt{sp\_registrar\_devolucion},
-\texttt{sp\_pagar\_multa} y \texttt{sp\_anular\_multa} se declaran como
+\texttt{@Procedure} o \texttt{@NamedStoredProcedureQuery}. Las anotaciones
+\texttt{@Procedure} documentan ese mapeo en los repositorios y existen
 \texttt{@NamedStoredProcedureQuery} en las entidades \texttt{Loan} y
-\texttt{Fine}, y sus repositorios los referencian con
-\texttt{@Procedure}. El siguiente listado muestra el método vigente hoy en
+\texttt{Fine}; la ejecución real usa \texttt{StoredProcedureQuery} JPA con
+binding exclusivamente posicional (ver Listado
+\ref{lst:sp-crear-prestamo-java}), porque el proxy estándar de
+\texttt{@Procedure} de Hibernate~6 genera sintaxis de parámetros nombrados
+de PostgreSQL dentro del escape JDBC \texttt{\{call ...\}} y pgjdbc la
+rechaza (spring-projects/spring-data-jpa\#3393). Sin SQL nativo en el
+proceso: cero \texttt{nativeQuery = true} y cero \texttt{createNativeQuery}
+en \texttt{src/main} (verificado por \texttt{scripts/verify-p5-nativequery.py}).
+El siguiente listado muestra el método vigente hoy en
 \texttt{LoanProcedureRepository.java}:
 
 \begin{lstlisting}[language=Java, caption={\texttt{LoanProcedureRepository.spCreateLoanProcedure} (mecanismo vigente)}, label={lst:sp-crear-prestamo-java}]
@@ -106,7 +109,7 @@ contrato vigente para las rutinas principales con efectos secundarios:
 public interface LoanProcedureRepository
         extends Repository<Loan, Long>, LoanProcedureRepositoryCustom {
 
-    @Procedure(procedureName = "sp_crear_prestamo")
+    @Procedure(procedureName = "proc_crear_prestamo")
     Long spCreateLoanProcedure(Long userId, Long bookId,
                                Long librarianId, Integer daysLoan);
 
@@ -116,18 +119,12 @@ public interface LoanProcedureRepository
 \end{lstlisting}
 
 Las funciones de reporte/listado que retornan \texttt{TABLE} (varias
-filas) permanecen con \texttt{@Query(nativeQuery = true)} por una
-limitación distinta: JPA~2.1 no expone de forma estándar un
-\texttt{RETURNS TABLE} de PostgreSQL mediante \texttt{@Procedure} salvo
-reescribiendo esas funciones a \texttt{REF\_CURSOR}. Esa excepción queda
-acotada a rutinas tabulares de lectura, no a las operaciones principales
-con efectos secundarios. Tras la limpieza de cierre, el conteo estático
-del backend queda en 13 apariciones de \texttt{@Procedure}/
-\texttt{@NamedStoredProcedureQuery} y 37 apariciones de
-\texttt{nativeQuery = true}; las variantes nativas obsoletas de
-\texttt{ReservationProcedureRepository} fueron retiradas y la expiración
-de reservaciones usa solo el método \texttt{@Procedure} que invoca el
-\emph{scheduler}.
+filas) se reimplementaron en Criteria/JPQL con cómputo Java de semántica
+idéntica (P5): las funciones SQL quedan en BD solo para psql directo y
+JPA ya no las invoca. Tras la migración, el conteo estático del backend
+queda en 0 apariciones de \texttt{nativeQuery = true} y 0
+\texttt{createNativeQuery} en \texttt{src/main}; la expiración de
+reservaciones usa el procedimiento vía el \emph{scheduler}.
 
 \subsection*{¿Esto viola la prohibición de SQL dinámico de la guía (A.2.1)?}
 
@@ -142,16 +139,18 @@ usuario} dentro del propio literal de la consulta -- p.~ej.
 cadena SQL antes de ejecutarse, el vector clásico de inyección SQL.
 
 El código real de este proyecto \textbf{no hace eso en ningún punto}. En
-las rutinas principales se usa \texttt{@Procedure}/
-\texttt{@NamedStoredProcedureQuery}; en las funciones tabulares que usan
-\texttt{@Query(nativeQuery = true)}, el literal SQL es fijo y los
-parámetros se bindean por separado. El valor de cada parámetro nunca se
-concatena, formatea ni interpola dentro de la cadena SQL.
+las rutinas principales se usa \texttt{StoredProcedureQuery} posicional;
+en los reportes, Criteria/JPQL con parámetros bindeados por separado. El
+valor de cada parámetro nunca se concatena, formatea ni interpola dentro
+de la cadena SQL.
 
 En síntesis: \textbf{la regla A.2.1 prohíbe construir SQL concatenando
-entrada de usuario dentro del texto de la consulta}. Este proyecto
-mantiene el mecanismo exigido para las rutinas principales y conserva
-\texttt{@Query} solo donde la forma tabular de PostgreSQL lo justifica.
+entrada de usuario dentro del texto de la consulta}. Este proyecto ya no
+usa \texttt{createNativeQuery} en ningún punto de \texttt{src/main}: las
+rutinas principales van por \texttt{StoredProcedureQuery} posicional y los
+reportes por Criteria/JPQL con parámetros bindeados. El valor de cada
+parámetro nunca se concatena, formatea ni interpola dentro de la cadena
+SQL.
 El CI ejecuta \texttt{scripts/audit-sql-dynamic.sh} para rechazar SQL
 dinámico en \texttt{db/procs/}.
 

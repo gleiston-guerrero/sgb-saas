@@ -28,6 +28,11 @@ public class ChatbotToolRegistry {
 
     private final Map<String, ChatbotTool> tools;
 
+    /**
+     * Crea el registro a partir de las tools detectadas por Spring.
+     *
+     * @param toolList lista de tools inyectada por Spring
+     */
     public ChatbotToolRegistry(List<ChatbotTool> toolList) {
         this.tools = new LinkedHashMap<>();
         for (ChatbotTool tool : toolList) {
@@ -38,9 +43,10 @@ public class ChatbotToolRegistry {
     }
 
     /**
-     * Procesa build tools payload y devuelve el resultado calculado por el backend.
+     * Construye el payload de declaraciones de función en formato Gemini.
+     * Cada tool aporta su nombre, su descripción y su schema de parámetros.
      *
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @return lista con el mapa {@code functionDeclarations} para el campo {@code tools}
      */
     public List<Map<String, Object>> buildToolsPayload() {
         ArrayNode functionDeclarations = MAPPER.createArrayNode();
@@ -60,11 +66,12 @@ public class ChatbotToolRegistry {
     }
 
     /**
-     * Procesa execute y devuelve el resultado calculado por el backend.
+     * Ejecuta la tool indicada por nombre con los argumentos de Gemini.
+     * Si la tool no existe o falla, devuelve un nodo JSON con la clave {@code error}.
      *
-     * @param toolName argumento recibido por la herramienta del chatbot para decidir y ejecutar la accion
-     * @param args argumento recibido por la herramienta del chatbot para decidir y ejecutar la accion
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param toolName nombre de la tool solicitada por Gemini
+     * @param args argumentos JSON del {@code functionCall}
+     * @return resultado JSON de la tool o nodo de error
      */
     public JsonNode execute(String toolName, JsonNode args) {
         ChatbotTool tool = tools.get(toolName);
@@ -81,10 +88,10 @@ public class ChatbotToolRegistry {
     }
 
     /**
-     * Verifica contains y devuelve el resultado de la comprobacion.
+     * Indica si existe una tool registrada con ese nombre.
      *
-     * @param toolName argumento recibido por la herramienta del chatbot para decidir y ejecutar la accion
-     * @return true cuando la comprobacion se cumple; false en caso contrario
+     * @param toolName nombre de la tool a buscar
+     * @return true si la tool está registrada; false en caso contrario
      */
 
     public boolean contains(String toolName) {
@@ -92,10 +99,11 @@ public class ChatbotToolRegistry {
     }
 
     /**
-     * Consulta get tool schema usando los filtros recibidos y devuelve el resultado solicitado.
+     * Devuelve el schema JSON de entrada de una tool.
+     * Si la tool no existe, devuelve un objeto vacío.
      *
-     * @param toolName argumento recibido por la herramienta del chatbot para decidir y ejecutar la accion
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param toolName nombre de la tool a consultar
+     * @return schema de entrada como nodo JSON
      */
     public JsonNode getToolSchema(String toolName) {
         ChatbotTool tool = tools.get(toolName);
@@ -106,10 +114,10 @@ public class ChatbotToolRegistry {
     }
 
     /**
-     * Procesa requires user id y devuelve el resultado calculado por el backend.
+     * Indica si el schema de la tool exige {@code usuario_id} en su arreglo {@code required}.
      *
-     * @param toolName argumento recibido por la herramienta del chatbot para decidir y ejecutar la accion
-     * @return true cuando la comprobacion se cumple; false en caso contrario
+     * @param toolName nombre de la tool a consultar
+     * @return true si requiere {@code usuario_id}; false en caso contrario
      */
     public boolean requiresUserId(String toolName) {
         JsonNode schema = getToolSchema(toolName);

@@ -1,8 +1,9 @@
 package com.uteq.backend.repository;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.ParameterMode;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
+import jakarta.persistence.StoredProcedureQuery;
 import org.springframework.stereotype.Repository;
 
 import java.time.OffsetDateTime;
@@ -18,19 +19,20 @@ class ReservationProcedureRepositoryCustomImpl implements ReservationProcedureRe
      * procedure proc_expirar_reservaciones_vencidas (CREATE PROCEDURE
      * nativo de V51, invocado con CALL), que envuelve la función
      * sp_expirar_reservaciones_vencidas. Se pasa explícitamente
-     * {@code OffsetDateTime.now()} como IN: un CALL emitido desde SQL
-     * plano (no PL/pgSQL) no puede depender del DEFAULT de la función
-     * envuelta. Binding exclusivamente posicional -- ver nota extensa en
+     * {@code OffsetDateTime.now()} como IN. Binding exclusivamente
+     * posicional -- ver nota extensa en
      * {@link LoanProcedureRepositoryCustomImpl#spCreateLoanProcedure}.
+     * Sin SQL nativo: P5.
      *
      * @return cantidad de reservaciones expiradas en esta ejecución
      */
     @Override
     public Integer spExpireReservationsVencidasProcedure() {
-        Query q = em.createNativeQuery("CALL proc_expirar_reservaciones_vencidas(?1, NULL)");
-        q.setParameter(1, OffsetDateTime.now());
-        Object result = q.getSingleResult();
-        Object value = (result instanceof Object[] row) ? row[0] : result;
-        return ((Number) value).intValue();
+        StoredProcedureQuery sp = em.createStoredProcedureQuery("proc_expirar_reservaciones_vencidas");
+        sp.registerStoredProcedureParameter(1, OffsetDateTime.class, ParameterMode.IN);
+        sp.registerStoredProcedureParameter(2, Integer.class, ParameterMode.OUT);
+        sp.setParameter(1, OffsetDateTime.now());
+        sp.execute();
+        return (Integer) sp.getOutputParameterValue(2);
     }
 }

@@ -1,12 +1,16 @@
 # Consentimientos y acceso — SUS
 
-Estado: no se incluyen consentimientos firmados en este repositorio por
-razones de privacidad. El conjunto `docs/mediciones/sus/sus.csv` contiene
-los datos anónimos agregados derivados del instrumento SUS usado en las
-fechas indicadas; los valores personales identificables se mantienen
-fuera del repositorio.
+Estado: bloque SUS en **N = 0**. No se incluyen consentimientos
+firmados ni respuestas en este repositorio: no existe una corrida
+válida que respaldar.
 
-Procedimiento para publicar consentimientos (si el equipo lo autoriza):
+No hay dataset SUS en el árbol evaluado: el `sus.csv` previo (15 filas
+aparentes) se retiró del árbol en Fase 0.1 por los motivos técnicos de
+abajo. Solo permanece en el historial Git; el commit/tag evaluado no lo
+contiene. Tampoco se conservan sus figuras derivadas (`sus_boxplot.*`,
+`sus_items_breakdown.*`).
+
+Procedimiento para una futura corrida válida (si el equipo la ejecuta):
 
 1. Obtener consentimiento explícito firmado por cada participante para
    publicación (escaneo PDF o firma electrónica) y almacenar los archivos
@@ -19,13 +23,10 @@ Procedimiento para publicar consentimientos (si el equipo lo autoriza):
 3. Incluir en DATA-PROVENANCE.md la traza hacia el manifiesto y la política
    de acceso a los consentimientos.
 
-Por ahora: el bloque SUS queda retirado (N=0) como evidencia pública
-exigible — el instrumento y los datos agregados se conservan en
-`docs/mediciones/sus/` como evidencia metodológica, pero no se publican
-consentimientos individuales.
+Motivo técnico del retiro (registro de auditoría, se conserva como
+constancia histórica):
 
-Motivo técnico de la retirada (resumen):
-- Análisis del CSV `sus.csv` detectó señales incompatibles con respuestas
+- Análisis del CSV retirado detectó señales incompatibles con respuestas
   independientes: tres ítems (Q8, Q9, Q10) con varianza exactamente cero;
   el campo `sexo` alterna sistemáticamente Femenino/Masculino en las 15
   filas; el campo `dispositivo` muestra un patrón repetitivo por paridad;
@@ -33,12 +34,12 @@ Motivo técnico de la retirada (resumen):
   Estas inconsistencias impiden aceptar estas respuestas como evidencia
   reproducible sin trazabilidad y consentimientos verificables.
 
-Decisión tomada (no destructiva):
-- NO se reescribió el historial Git para intentar restaurar hashes; ese
-  enfoque fue descartado por riesgo a la integridad del repositorio.
-- El dataset `docs/mediciones/sus/sus.csv` se conserva como "dataset
-  retirado" para auditoría interna y validación del pipeline, pero el
-  entregable declara formalmente N=0 y no utiliza los puntajes SUS como
-  evidencia. Si el equipo aporta el instrumento original y los
-  consentimientos verificables, se revertirá la retirada siguiendo el
-  procedimiento documentado arriba.
+Decisión tomada:
+
+- NO se reescribió el historial Git (permanece como estaba, por
+  integridad del repositorio).
+- El dataset retirado NO forma parte del árbol evaluado; el entregable
+  declara formalmente N=0 y no utiliza puntajes SUS como evidencia. Si el
+  equipo aporta el instrumento original y los consentimientos
+  verificables, se revertirá la retirada siguiendo el procedimiento
+  documentado arriba.

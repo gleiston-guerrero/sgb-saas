@@ -135,7 +135,7 @@ alcance funcional nuevo al sistema.
 | REQ-F-041 | Pago parcial de multa | Complementa REQ-F-014 |
 | REQ-F-042 | Respaldo y restauración | Restauración desde `backup-service` NO existe todavía (brecha conocida en `BACKUP.md`) |
 | REQ-NF-016 | Redis fail-open/closed por servicio | `JwtAuthFilter`/`VerificacionCorreoService` fail-closed; `LoginRateLimiter`/`ChatbotRateLimiter` fail-open |
-| REQ-NF-017 | Umbral de rendimiento (p95) | p95 caliente 19.49ms, p95 frío 7.50ms, 50 VUs |
+| REQ-NF-017 | Umbral de rendimiento (p95) | p95 caliente 65.60ms, p95 frío 17.13ms, 50 VUs (serie vigente 2026-09-17; antes 19.49/7.50 de serie histórica) |
 | REQ-NF-018 | Usabilidad SUS | N=0 (muestra anterior retractada, OBS-08) — no se usa la cifra 82.17 |
 | REQ-NF-019 | Accesibilidad (Lighthouse) | 95/100, cumple; reporte no cita nivel WCAG específico |
 | REQ-NF-020 | SEO del portal público (Lighthouse) | 82/100, **no cumple** el umbral ≥90; causas: meta-description y robots.txt |

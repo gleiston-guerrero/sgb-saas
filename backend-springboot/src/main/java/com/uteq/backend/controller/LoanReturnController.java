@@ -23,18 +23,25 @@ public class LoanReturnController {
     private final LoanReturnService loanReturnService;
     private final UserRepository userRepo;
 
+    /**
+     * Constructor con el servicio de devoluciones y el repositorio de usuarios.
+     *
+     * @param loanReturnService servicio de devoluciones con inspección de daños
+     * @param userRepo repositorio para resolver el id del bibliotecario por correo
+     */
     public LoanReturnController(LoanReturnService loanReturnService,
                                 UserRepository userRepo) {
         this.loanReturnService = loanReturnService;
         this.userRepo = userRepo;
     }
     /**
-     * Registra register loan return validando los datos de entrada antes de persistir cambios.
+     * Registra la devolución de un préstamo con inspección de estado y posibles daños y multas.
+     * Roles BIBLIOTECARIO, GERENTE y ADMIN. Registra al bibliotecario autenticado.
      *
-     * @param loanId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param dto datos validados de la peticion con la informacion necesaria para ejecutar la operacion
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param loanId id del préstamo que se devuelve
+     * @param dto estado del ejemplar y observaciones de la devolución
+     * @param authentication identidad del bibliotecario que registra la devolución
+     * @return devolución completa con daños y multa si corresponden
      */
     @PostMapping("/prestamo/{prestamoId}")
     @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")
@@ -47,10 +54,11 @@ public class LoanReturnController {
                 .body(loanReturnService.registerLoanReturn(loanId, dto, librarianId));
     }
     /**
-     * Procesa history loan returns y devuelve el resultado calculado por el backend.
+     * Lista el historial de devoluciones registradas por el bibliotecario autenticado.
+     * Roles BIBLIOTECARIO, GERENTE y ADMIN.
      *
-     * @param authentication identidad autenticada usada para aplicar permisos y registrar autoria de la accion
-     * @return respuesta HTTP con el estado y el cuerpo definidos por la operacion
+     * @param authentication identidad del bibliotecario cuyo historial se consulta
+     * @return lista de devoluciones registradas por ese bibliotecario
      */
     @GetMapping("/historial")
     @PreAuthorize("hasAnyRole('BIBLIOTECARIO','GERENTE','ADMIN')")

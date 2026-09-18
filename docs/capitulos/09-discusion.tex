@@ -22,8 +22,8 @@ Retomando las cuatro preguntas planteadas en la
 \subsection*{RQ1 -- ¿En qué medida el caché reduce la latencia, y con qué margen se cumplen los umbrales?}
 
 Ambos umbrales de rendimiento se cumplen con margen amplio -- p95
-$19{,}49$\,ms contra un límite de $200$\,ms en caché caliente, p95
-$7{,}50$\,ms contra $500$\,ms en frío
+$65{,}60$\,ms contra un límite de $200$\,ms en caché caliente, p95
+$17{,}13$\,ms contra $500$\,ms en frío
 (\autoref{sec:res-rendimiento})--, así que en el sentido estricto que
 exige la guía, la respuesta a RQ1 es afirmativa: el sistema cumple. Pero
 la comparación \emph{entre} escenarios no permite concluir de forma
@@ -34,9 +34,11 @@ página vacía, no la consulta completa que \texttt{cache\_frio} debería
 representar (\autoref{sec:res-rendimiento},
 \autoref{cap:amenazas-validez}). Lo que sí se sostiene pese a esa
 limitación es la dirección y el tamaño del efecto entre corridas de
-\texttt{cache\_caliente}: Cliff's delta $=-0{,}68$ (grande, consistente en
+\texttt{cache\_caliente}: Cliff's delta $=-1{,}00$ (grande, consistente en
 las 5 corridas), exactamente la dirección que la hipótesis de caché
-predeciría si la comparación fuera limpia. En síntesis: RQ1 se responde
+predeciría si la comparación fuera limpia; el Wilcoxon pareado da
+$p=0{,}0625$, no significativo por potencia ($n=5$, mínimo exacto
+alcanzable), no por falta de efecto. En síntesis: RQ1 se responde
 con evidencia de cumplimiento de umbral sólida, y con evidencia de efecto
 del caché sugestiva pero no aislada limpiamente -- una distinción que
 este documento no difumina.

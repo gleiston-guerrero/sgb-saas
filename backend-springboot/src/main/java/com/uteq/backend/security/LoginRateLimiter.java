@@ -32,11 +32,12 @@ public class LoginRateLimiter {
     private long rateLimitWindowSeconds;
 
     /**
-     * Procesa esta blocked y devuelve el resultado calculado por el backend.
+     * Indica si el par correo e IP alcanzó el máximo de intentos fallidos en la ventana vigente.
+     * Degrada a sin bloqueo si Redis no responde.
      *
-     * @param email texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @param ip valor de entrada ip usado por la operacion para completar su regla de negocio
-     * @return true cuando la comprobacion se cumple; false en caso contrario
+     * @param email correo usado en el intento de login
+     * @param ip dirección IP del intento de login
+     * @return true si está bloqueado; false en caso contrario o si Redis no responde
      */
 
     public boolean isBlocked(String email, String ip) {
@@ -50,10 +51,11 @@ public class LoginRateLimiter {
     }
 
     /**
-     * Registra register failure validando los datos de entrada antes de persistir cambios.
+     * Registra un intento fallido: incrementa el contador del par correo e IP y fija
+     * la expiración de la ventana solo en el primer intento.
      *
-     * @param email texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @param ip valor de entrada ip usado por la operacion para completar su regla de negocio
+     * @param email correo usado en el intento fallido
+     * @param ip dirección IP del intento fallido
      */
     public void registerFailure(String email, String ip) {
         try {
@@ -68,10 +70,10 @@ public class LoginRateLimiter {
     }
 
     /**
-     * Ejecuta resetear aplicando las validaciones necesarias del proceso.
+     * Limpia el contador de intentos fallidos tras un login exitoso.
      *
-     * @param email texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @param ip valor de entrada ip usado por la operacion para completar su regla de negocio
+     * @param email correo cuyo contador se limpia
+     * @param ip dirección IP cuyo contador se limpia
      */
 
     public void reset(String email, String ip) {
@@ -83,11 +85,12 @@ public class LoginRateLimiter {
     }
 
     /**
-     * Procesa seconds restantes y devuelve el resultado calculado por el backend.
+     * Devuelve los segundos restantes de la ventana de bloqueo del par correo e IP.
+     * Si no hay TTL o Redis no responde, informa la ventana completa configurada.
      *
-     * @param email texto de busqueda o filtro usado para reducir los resultados devueltos
-     * @param ip valor de entrada ip usado por la operacion para completar su regla de negocio
-     * @return valor numerico calculado o recuperado por la operacion
+     * @param email correo a consultar
+     * @param ip dirección IP a consultar
+     * @return segundos restantes de bloqueo
      */
     public long remainingSeconds(String email, String ip) {
         try {

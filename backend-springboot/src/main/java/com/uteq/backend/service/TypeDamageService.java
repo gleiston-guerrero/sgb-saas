@@ -27,29 +27,36 @@ public class TypeDamageService {
                 t.getTypeCost(), t.getValue());
     }
     /**
-         * Lista todos los backups registrados.
-     * @return lista de backups ordenados por fecha descendente
+     * Lista todos los tipos de daño con su categoría y costo, incluidos los desactivados, para la
+     * gestión del catálogo que cobra los daños en devolución.
+     *
+     * @return tipos de daño registrados con nombre, categoría, tipo de costo y valor
      */
     @Transactional(readOnly = true)
     public List<TypeDamageDTO> listAll() {
         return typeDamageRepo.findAll().stream().map(this::toDTO).toList();
     }
     /**
-         * Lista programaciones de backup activas.
-     * @return lista de programaciones activas
+     * Lista los tipos de daño activos con su categoría y costo para el formulario de revisión en ventanilla.
+     *
+     * @return tipos de daño vigentes con nombre, categoría, tipo de costo y valor
      */
     @Transactional(readOnly = true)
     public List<TypeDamageDTO> listActives() {
         return typeDamageRepo.findByActiveTrue().stream().map(this::toDTO).toList();
     }
     /**
-     * Registra create validando los datos de entrada antes de persistir cambios.
+     * Da de alta un tipo de daño activo con su categoría y costo para cobrarlo en devoluciones.
+     * Rechaza nombres duplicados y valida que el costo sea FIJO o PORCENTAJE con valor no negativo
+     * (el porcentaje además no supera 100).
      *
-     * @param name valor de entrada name usado por la operacion para completar su regla de negocio
-     * @param categoryId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param typeCost valor de entrada typeCost usado por la operacion para completar su regla de negocio
-     * @param value clave o valor de configuracion que se valida antes de guardarse
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param name nombre del tipo de daño, único en el catálogo
+     * @param categoryId identificador de la categoría de daño a la que pertenece
+     * @param typeCost forma de cobro, {@code FIJO} en moneda o {@code PORCENTAJE} del precio base
+     * @param value monto fijo o porcentaje a cobrar por este daño
+     * @return el tipo de daño persistido en estado activo
+     * @throws IllegalArgumentException si el nombre ya existe o el costo o valor son inválidos
+     * @throws jakarta.persistence.EntityNotFoundException si la categoría de daño no existe
      */
     @Transactional
     public TypeDamageDTO create(String name, Integer categoryId, String typeCost, BigDecimal value) {
@@ -69,14 +76,17 @@ public class TypeDamageService {
         return toDTO(guardado);
     }
     /**
-     * Actualiza update con las reglas de negocio requeridas por el flujo.
+     * Reemplaza nombre, categoría y costo de un tipo de daño existente para corregir su cobro.
+     * Rechaza nombres usados por otro tipo y aplica la misma validación de costo que el alta.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param name valor de entrada name usado por la operacion para completar su regla de negocio
-     * @param categoryId identificador del registro que se usa para ubicar el recurso en la base de datos
-     * @param typeCost valor de entrada typeCost usado por la operacion para completar su regla de negocio
-     * @param value clave o valor de configuracion que se valida antes de guardarse
-     * @return objeto con el resultado de la operacion y los datos relevantes para el cliente
+     * @param id identificador del tipo de daño a actualizar
+     * @param name nombre nuevo, único entre los demás tipos del catálogo
+     * @param categoryId identificador de la categoría de daño a la que pasa a pertenecer
+     * @param typeCost forma de cobro, {@code FIJO} en moneda o {@code PORCENTAJE} del precio base
+     * @param value monto fijo o porcentaje nuevo a cobrar por este daño
+     * @return el tipo de daño con los datos actualizados
+     * @throws IllegalArgumentException si el nombre pertenece a otro tipo o el costo o valor son inválidos
+     * @throws jakarta.persistence.EntityNotFoundException si el tipo o la categoría no existen
      */
     @Transactional
     public TypeDamageDTO update(Integer id, String name, Integer categoryId, String typeCost, BigDecimal value) {
@@ -105,9 +115,11 @@ public class TypeDamageService {
             throw new IllegalArgumentException("porcentaje no puede superar 100");
     }
     /**
-     * Elimina o anula delete despues de validar que la operacion sea permitida.
+     * Desactiva un tipo de daño (baja lógica) para que deje de ofrecerse en la revisión en ventanilla.
+     * La fila y su historial de cobros se conservan.
      *
-     * @param id identificador del registro que se usa para ubicar el recurso en la base de datos
+     * @param id identificador del tipo de daño a desactivar
+     * @throws jakarta.persistence.EntityNotFoundException si el tipo de daño no existe
      */
     @Transactional
     public void delete(Integer id) {
