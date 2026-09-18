@@ -138,17 +138,24 @@ transcribe firmas por otros integrantes.
   Filas aceptadas: P2, P4, P5 trabajo previo parcial, P7, P8/P9 y
   sección B CRediT de Loor.
   Firma: Loor Medranda Marlon Taylor.
-- **Cajas Ibarra Irvin Marcelo** — `icajasi@msuteq.edu.ec` — Fecha: 2026-09-17.
-  Declaración: Yo, Cajas Ibarra Irvin Marcelo, declaro que revisé
-  la atribución EV-4 y acepto como reales y verificables las
-  contribuciones asignadas a mi nombre en este documento. Acepto mi
-  titularidad en P1, P3 únicamente como retiro honesto de evidencia
-  mock y N=0, P5 como trabajo previo parcial, P6, P7, P10, P12 y
-  sección B CRediT de Cajas, según los archivos, commits y comandos
-  indicados. No reclamo puntaje para P3 SUS ni autoría sobre filas no
-  asignadas a mi nombre.
-  Filas aceptadas: P1, P3 retiro/N=0, P5 trabajo previo parcial, P6,
-  P7, P10, P12 y sección B CRediT de Cajas.
+- **Cajas Ibarra Irvin Marcelo** — `icajasi@msuteq.edu.ec` — Fecha: 2026-09-18.
+  Declaración de aceptación personal: Yo, Cajas Ibarra Irvin Marcelo,
+  revisé personalmente la evidencia listada en este documento y acepto
+  únicamente las atribuciones que reconozco como propias: P1 en las
+  anotaciones indicadas; P3 únicamente como retiro honesto de evidencia
+  sin puntaje; P5 como trabajo previo parcial; P6; P7; P10; y P12,
+  según los archivos, commits y comandos indicados en cada fila.
+
+  No reclamo autoría sobre filas no asignadas a mi nombre, no reclamo
+  puntaje para P3 SUS y no declaro como trabajo nuevo posterior a
+  `8d1b7999` ningún cambio que no haya realizado personalmente.
+
+  Esta aceptación se emite mediante mi propio commit, con mi identidad
+  y correo institucional reales. La sección B de conteos CRediT queda
+  pendiente de recálculo contra el HEAD final.
+
+  Filas aceptadas: P1 (anotaciones), P3 retiro/N=0, P5 trabajo previo
+  parcial, P6, P7, P10 y P12.
   Firma: Cajas Ibarra Irvin Marcelo.
 
 Para el tag de entrega (EV-3/EV-4, solo el administrador): incluir
