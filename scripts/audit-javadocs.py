@@ -11,6 +11,7 @@ descripcion breve que omite el contrato de la firma.
 from __future__ import annotations
 
 import re
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -169,12 +170,15 @@ def main() -> int:
 
     missing = [item for item in stats if item.public_methods > item.documented_methods]
     print(f"files_with_incomplete_javadocs={len(missing)}")
-    for item in missing[:30]:
-        rel = item.path.relative_to(ROOT)
-        missing_count = item.public_methods - item.documented_methods
-        print(f"incomplete {rel}: {missing_count}/{item.public_methods}")
-        for detail in item.incomplete[:8]:
-            print(f"  - {detail}")
+    if "--verbose" in sys.argv:
+        for item in missing[:30]:
+            rel = item.path.relative_to(ROOT)
+            missing_count = item.public_methods - item.documented_methods
+            print(f"incomplete {rel}: {missing_count}/{item.public_methods}")
+            for detail in item.incomplete[:8]:
+                print(f"  - {detail}")
+    else:
+        print("incomplete_details=python scripts/audit-javadocs.py --verbose")
 
     return 0
 

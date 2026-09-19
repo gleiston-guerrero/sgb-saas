@@ -342,7 +342,30 @@ python scripts/verify-p5-nativequery.py
 
 ```text
 verify-p5: OK (inventario 0=0+0 coincide)
-(... 22 líneas "migrada <método> -> <reemplazo> [<prueba>]" ...)
+verify-p5: migrada ReservationRepository.searchReservationsToday -> JPQL cartesiana + ventana :start/:end desde el service (zona sistema) [P5SpikeIT.s5_ventanaHoyYProximas + ReservationServiceTest 21/21]
+verify-p5: migrada ReservationRepository.searchReservationsNexts -> JPQL cartesiana + :start desde el service (zona sistema) [P5SpikeIT.s5_ventanaHoyYProximas + ReservationServiceTest 21/21]
+verify-p5: migrada LoanRepository.findActivesByUserId -> JPQL cartesiana + diasRestantes en Java (zona sistema, igual que NOW()::date) [P5SpikeIT.s6_activosPorUsuarioJpqlYDiasJava + LoanServiceTest 31/31]
+verify-p5: migrada BookRepository.searchByTextOIsbn -> Criteria searchText (sin categoria/autor, available tri-estado) [P5SpikeIT.s7 + BookServiceTest 21/21]
+verify-p5: migrada BookRepository.searchByTextOIsbnYCategory -> Criteria searchText con join categories + countDistinct [P5SpikeIT.s7 + BookServiceTest 21/21]
+verify-p5: migrada BookRepository.searchByTextOrIsbnAndAuthor -> Criteria searchText con join authors [P5SpikeIT.s7 + BookServiceTest 21/21]
+verify-p5: migrada BookRepository.suggestByTitle -> Criteria function(similarity) + maxResults 10 [P5SpikeIT.s7 + BookServiceTest 21/21]
+verify-p5: migrada BookRepository.searchPendientes -> Eliminada: sin llamadores en src/main ni tests [compilacion + suite (sin referencias)]
+verify-p5: migrada BookRepository.searchByStatuses -> Criteria searchByStatusesCriteria (q/year opcionales) [P5SpikeIT.s7 + BookServiceTest 21/21]
+verify-p5: migrada AuditLogAuditRepository.searchWithFilters -> Criteria dinamico + Sort fecha_hora->dateTime (controller y exportCsv a dateTime) [P5SpikeIT.s8 + AuditServiceTest 4/4]
+verify-p5: migrada LoanProcedureRepositoryCustomImpl.spCreateLoanProcedure/spRegisterLoanReturn -> createStoredProcedureQuery posicional (proc_crear_prestamo/proc_registrar_devolucion) [P5SpikeIT.s1/s9a + LoanFineProcedureIntegrationTest (CI)]
+verify-p5: migrada FineProcedureRepositoryCustomImpl.spPayFineProcedure/spVoidFineProcedure -> createStoredProcedureQuery posicional (proc_pagar_multa/proc_anular_multa) [P5SpikeIT.s9b/s9c + LoanFineProcedureIntegrationTest (CI)]
+verify-p5: migrada ReservationProcedureRepositoryCustomImpl.spExpireReservationsVencidasProcedure -> createStoredProcedureQuery posicional (proc_expirar_reservaciones_vencidas) [P5SpikeIT.s9d]
+verify-p5: migrada FineProcedureRepository.spPaymentParcialFine -> wrapper V54 proc_pago_parcial_multa + StoredProcedureQuery posicional (mismas 4 claves) [P5SpikeIT.s9e]
+verify-p5: migrada FineProcedureRepository.fnReportSummaryFinancial -> Criteria CASE (mismo patron que summaryByCategory) + cero NUMERIC(12,2) [P5SpikeIT.s10 + FineServiceTest 9/9]
+verify-p5: migrada FineProcedureRepository.fnPaymentsRecientes -> Criteria cartesiana PAGADA + setMaxResults (default 5) [P5SpikeIT.s10 + FineServiceTest 9/9]
+verify-p5: migrada LoanProcedureRepository.fnListLoansActivesByUser -> JPQL cartesiana (base sin dias; LoanService solo usa size) [P5TabularSpikeIT.t1]
+verify-p5: migrada LoanProcedureRepository.fnReportBooksMostLoaned -> Criteria GROUP/COUNT + maxResults (NULL = todo, como LIMIT NULL) [P5TabularSpikeIT.t2]
+verify-p5: migrada LoanProcedureRepository.fnReportIndexDelinquency[+Paginated] -> Criteria filas PENDIENTE + AVG Java ROUND(,1) + ORDER/LIMIT en Java [P5TabularSpikeIT.t3]
+verify-p5: migrada LoanProcedureRepository.fnReportUsageByPeriod[+Paginated] -> Criteria date_trunc + FULL OUTER en Java (TreeMap) [P5TabularSpikeIT.t4]
+verify-p5: migrada LoanProcedureRepository.fnReportBooksMostLoanedDetailed[+Paginated] -> Criteria filas + string_agg en Java (TreeSet, defaults) + pct [P5TabularSpikeIT.t5]
+verify-p5: migrada LoanProcedureRepository.fnReportInventory[+Paginated] -> Criteria 14 filtros + agregados en Java + estado_disponibilidad [P5TabularSpikeIT.t6]
+verify-p5: migrada LoanProcedureRepository.fnReportLoansOverdues[+Paginated] -> Criteria ventana + dias/multa en Java (tarifa config, default 1) [P5TabularSpikeIT.t7]
+verify-p5: migrada LoanProcedureRepository.fnReportCategoriesDemanded[+Paginated] -> Criteria GROUP/COUNT + pct en Java (limite ignorado como la funcion) [P5TabularSpikeIT.t8]
 verify-p5: OK (CALL nativos en CustomImpl pineados)
 verify-p5: OK (unico createNativeQuery fuera de repositorios: AuditAspect set_config, justificado)
 verify-p5: OK (0 nativeQuery + 0 CALL nativos: P5 migrado)
@@ -388,7 +411,7 @@ python scripts/verify-p6-javadoc.py
 cd backend-springboot; ./mvnw -B javadoc:javadoc
 ```
 
-### Salida (2026-09-17, rev 24885d18)
+### Salida literal del auditor
 
 ```text
 Javadoc audit
@@ -401,6 +424,7 @@ javadoc_param_tags=1192
 javadoc_return_tags=536
 javadoc_throws_tags=142
 files_with_incomplete_javadocs=31
+incomplete_details=python scripts/audit-javadocs.py --verbose
 verify-p6: OK (90.54% >= 90.00%)
 ```
 
@@ -412,8 +436,10 @@ verify-p6: OK (90.54% >= 90.00%)
 
 90,54 % (555/613) mediante conteo amplio de contratos públicos que
 incluye interfaces y proyecciones y exige `@param`/`@return` cuando
-corresponde. `mvn javadoc:javadoc` debe volver a ejecutarse en la
-revisión final; no se declara ausencia de advertencias sin esa salida.
+corresponde. El detalle de los 31 archivos pendientes se obtiene con
+`python scripts/audit-javadocs.py --verbose`. El build `mvn javadoc:javadoc`
+debe terminar sin error en la revisión final; no se declara ausencia de
+advertencias.
 
 ---
 
@@ -571,7 +597,7 @@ python scripts/verify-p11-counts.py
 ### Salida (base de conteos `3489e2c5`)
 
 ```text
-verify-p11: rev citado 3489e2c5 es ancestro de HEAD (+0 commits propios declarados en prosa)
+verify-p11: rev citado 3489e2c5 es ancestro de HEAD (conteos pineados; commits posteriores no alteran la base)
 verify-p11: OK (shortlog a 3489e2c5: 764/344/370, total 1480)
 verify-p11: OK (CONTRIBUCIONES.md coincide)
 verify-p11: OK (CONTRIBUTORS.md coincide)
