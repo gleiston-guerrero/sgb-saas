@@ -39,6 +39,8 @@ VERIFICACION = ROOT / "VERIFICACION.md"
 SUS_DIR = ROOT / "docs" / "mediciones" / "sus"
 
 ARTEFACTOS_RETIRADOS = ("sus.csv", "sus_items_breakdown", "sus_boxplot")
+EXCLUIR_DIRS = {".git", "node_modules", "target", "dist", ".opencode",
+                "graphify-out", ".venv", "venv", "__pycache__"}
 
 
 def falla(mensaje: str) -> int:
@@ -54,7 +56,22 @@ def main() -> int:
                        or p.name.startswith("sus_items_breakdown"))
     if presentes:
         return falla(f"artefactos SUS retirados presentes en el arbol: {', '.join(presentes)}")
-    print("verify-p3: OK (sin sus.csv ni derivados en el arbol evaluado)")
+    # M6: una respuesta nueva en una ruta alternativa (p.ej.
+    # sus/respuestas.csv) tambien contradice el estado N=0. No basta con
+    # vigilar solo el antiguo nombre sus.csv.
+    respuestas_alternas = []
+    for ruta in ROOT.rglob("*.csv"):
+        if any(parte in EXCLUIR_DIRS for parte in ruta.parts):
+            continue
+        partes = [parte.lower() for parte in ruta.relative_to(ROOT).parts]
+        nombre = ruta.name.lower()
+        if ("sus" in partes or "sus" in ruta.stem.lower()
+                or "respuesta" in nombre or "response" in nombre):
+            respuestas_alternas.append(str(ruta.relative_to(ROOT)))
+    if respuestas_alternas:
+        return falla("CSV SUS/respuestas incompatible con N=0: "
+                     + ", ".join(sorted(respuestas_alternas)))
+    print("verify-p3: OK (sin sus.csv, respuestas ni derivados en el arbol evaluado)")
 
     # 1. Declaracion de retirada con N=0.
     try:

@@ -136,37 +136,48 @@ RELATIONS = [
 ]
 
 POS = {
-    "Users": (2.0, 2.2), "Roles": (9.0, 2.2), "Permissions": (16.0, 2.2),
-    "Books": (2.0, 6.4), "Authors": (9.0, 6.4), "Categories": (16.0, 6.4),
-    "Publishers": (23.0, 6.4),
-    "Loans": (2.0, 10.6), "Reservations": (9.0, 10.6), "Fines": (16.0, 10.6),
-    "Notifications": (23.0, 10.6),
-    "Acquisition Suggestions": (2.0, 14.8), "Backups": (9.0, 14.8),
-    "Audit Log": (16.0, 14.8), "System Settings": (23.0, 14.8),
+    # Top-left coordinates in centimetres.  The four compact rows leave a
+    # deliberate gutter for the relationship labels, avoiding the clipping
+    # and hidden cardinalities of the previous rendering.
+    "Users": (1.0, 5.9), "Roles": (8.0, 5.9), "Permissions": (15.0, 5.9),
+    "Books": (1.0, 10.0), "Authors": (8.0, 10.0), "Categories": (15.0, 10.0),
+    "Publishers": (22.0, 10.0),
+    "Loans": (1.0, 14.1), "Reservations": (8.0, 14.1), "Fines": (15.0, 14.1),
+    "Notifications": (22.0, 14.1),
+    "Acquisition Suggestions": (1.0, 18.2), "Backups": (8.0, 18.2),
+    "Audit Log": (15.0, 18.2), "System Settings": (22.0, 18.2),
 }
+
+
+def box_geometry(tablas: list[tuple[str, list[tuple[str, str]]]],
+                 x_cm: float, y_cm: float) -> tuple[float, float, float, float]:
+    """Return (left, bottom, right, top) for one compact area box."""
+    x, top = x_cm * cm, y_cm * cm
+    w = 5.8 * cm
+    n_lineas = sum(1 + len(cols) for _t, cols in tablas)
+    h = (0.62 + 0.22 * n_lineas) * cm
+    return x, top - h, x + w, top
 
 
 def draw_box(c: canvas.Canvas, title: str,
              tablas: list[tuple[str, list[tuple[str, str]]]],
-             x_cm: float, y_cm: float) -> None:
-    x, y = x_cm * cm, y_cm * cm
-    w = 5.1 * cm
-    n_lineas = sum(1 + len(cols) for _t, cols in tablas)
-    h = (0.9 + 0.32 * n_lineas) * cm
+             x_cm: float, y_cm: float) -> tuple[float, float, float, float]:
+    x, bottom, right, top = box_geometry(tablas, x_cm, y_cm)
+    w, h = right - x, top - bottom
     c.setStrokeColor(colors.HexColor("#334155"))
     c.setFillColor(colors.HexColor("#F8FAFC"))
-    c.roundRect(x, y - h + 1.6 * cm, w, h, 5, fill=1, stroke=1)
+    c.roundRect(x, bottom, w, h, 5, fill=1, stroke=1)
     c.setFillColor(colors.HexColor("#0F172A"))
-    c.setFont("Helvetica-Bold", 8)
-    c.drawString(x + 0.25 * cm, y + 0.95 * cm, title)
-    yy = y + 0.45 * cm
-    c.setFont("Helvetica", 5.5)
+    c.setFont("Helvetica-Bold", 7)
+    c.drawString(x + 0.22 * cm, top - 0.38 * cm, title)
+    yy = top - 0.78 * cm
+    c.setFont("Helvetica", 4.5)
     for tabla, cols in tablas:
         c.setFillColor(colors.HexColor("#0F172A"))
-        c.setFont("Helvetica-Bold", 5.5)
+        c.setFont("Helvetica-Bold", 4.6)
         c.drawString(x + 0.25 * cm, yy, tabla)
-        yy -= 0.32 * cm
-        c.setFont("Helvetica", 5.5)
+        yy -= 0.22 * cm
+        c.setFont("Helvetica", 4.5)
         for col, kind in cols:
             es_pk = "PK" in kind
             es_fk = kind.startswith("FK>") or ",FK>" in kind
@@ -176,10 +187,36 @@ def draw_box(c: canvas.Canvas, title: str,
             c.setFillColor(colors.HexColor("#475569"))
             c.drawString(x + 0.45 * cm, yy, f"{col}{marca}")
             if ref:
-                c.setFont("Helvetica-Oblique", 4.5)
-                c.drawString(x + 2.9 * cm, yy, "-> " + ref)
-                c.setFont("Helvetica", 5.5)
-            yy -= 0.32 * cm
+                c.setFont("Helvetica-Oblique", 3.8)
+                c.drawString(x + 3.55 * cm, yy, "-> " + ref)
+                c.setFont("Helvetica", 4.5)
+            yy -= 0.22 * cm
+    return x, bottom, right, top
+
+
+def boundary_point(box: tuple[float, float, float, float],
+                   other: tuple[float, float, float, float]) -> tuple[float, float]:
+    """Point just on ``box``'s border in the direction of ``other``."""
+    left, bottom, right, top = box
+    ox, oy = other[0], other[1]
+    cx, cy = (left + right) / 2, (bottom + top) / 2
+    ocx, ocy = (other[0] + other[2]) / 2, (other[1] + other[3]) / 2
+    dx, dy = ocx - cx, ocy - cy
+    if not dx and not dy:
+        return cx, cy
+    scale = min((right - left) / 2 / abs(dx) if dx else float("inf"),
+                (top - bottom) / 2 / abs(dy) if dy else float("inf"))
+    return cx + dx * scale, cy + dy * scale
+
+
+def draw_cardinality(c: canvas.Canvas, x: float, y: float, label: str) -> None:
+    """Draw a white-backed label so 1/N remains readable above every line."""
+    c.setFont("Helvetica-Bold", 5.5)
+    width = c.stringWidth(label, "Helvetica-Bold", 5.5) + 4
+    c.setFillColor(colors.white)
+    c.roundRect(x - width / 2, y - 3, width, 7, 2, fill=1, stroke=0)
+    c.setFillColor(colors.HexColor("#0F172A"))
+    c.drawCentredString(x, y - 1, label)
 
 
 def main() -> None:
@@ -197,19 +234,28 @@ def main() -> None:
                  "(migrations V1-V54). [PK] primary key, [FK] foreign key, * NOT NULL. "
                  "Full 45-table schema in database/migrations/.")
 
-    centros = {t: ((x + 2.55) * cm, (y + 0.8) * cm) for t, (x, y) in POS.items()}
+    boxes = {area: box_geometry(AREAS[area], *POS[area]) for area in AREAS}
     c.setStrokeColor(colors.HexColor("#94A3B8"))
-    c.setFont("Helvetica-Bold", 6)
-    c.setFillColor(colors.HexColor("#334155"))
+    c.setLineWidth(0.6)
     for a, b, ca, cb2, _nota in RELATIONS:
-        x1, y1 = centros[a]
-        x2, y2 = centros[b]
+        x1, y1 = boundary_point(boxes[a], boxes[b])
+        x2, y2 = boundary_point(boxes[b], boxes[a])
         c.line(x1, y1, x2, y2)
-        c.drawString(x1 + (x2 - x1) * 0.08 - 4, y1 + (y2 - y1) * 0.08 + 2, ca)
-        c.drawString(x1 + (x2 - x1) * 0.92 - 4, y1 + (y2 - y1) * 0.92 + 2, cb2)
 
     for area, (x, y) in POS.items():
         draw_box(c, area, AREAS[area], x, y)
+
+    # Relation lines sit behind the area boxes; their endpoint labels are
+    # redrawn above them, so each verified 1/N or N/N cardinality remains
+    # readable even where routes cross another area.
+    for a, b, ca, cb2, _nota in RELATIONS:
+        x1, y1 = boundary_point(boxes[a], boxes[b])
+        x2, y2 = boundary_point(boxes[b], boxes[a])
+        dx, dy = x2 - x1, y2 - y1
+        length = max((dx * dx + dy * dy) ** 0.5, 1)
+        offset = 0.22 * cm
+        draw_cardinality(c, x1 + dx * offset / length, y1 + dy * offset / length, ca)
+        draw_cardinality(c, x2 - dx * offset / length, y2 - dy * offset / length, cb2)
 
     c.setFont("Helvetica", 6)
     c.setFillColor(colors.HexColor("#64748B"))

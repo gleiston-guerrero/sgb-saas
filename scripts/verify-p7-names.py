@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """P7: tipos con raíz española <= 5% (guía examen suspenso).
 
-Reejecuta scripts/audit-english-names.py sobre el backend (criterio
-oficial de la guía: 35/283 tipos del backend) y exige worst <= 5%.
+Reejecuta scripts/audit-english-names.py sobre el backend, incluidos
+records, interfaces y enums, y exige worst <= 5%.
 El frontend no entra en el conteo oficial (usa contratos JSON en
 español a propósito, no identificadores Java).
 

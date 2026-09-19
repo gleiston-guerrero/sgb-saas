@@ -364,5 +364,5 @@ make verify   # = scripts/verify-all.py: P1-P12 + javadoc en un solo comando
 Digest SHA256 de `docs/informe-final.pdf` (regenerado 2026-09-18, 109 páginas):
 
 ```
-DB0936341ED488E16F56DF615EE685E533A0F2E05D12307997297E4A508FFBE1
+4209D49EE57E3F6E95BD1D5BE8B3862F4AF552B90374B1182A0FC3912236FAB2
 ```

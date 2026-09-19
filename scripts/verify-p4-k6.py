@@ -185,6 +185,20 @@ def main() -> int:
     print("verify-p4: OK (agregado coincide por escenario: n exacto,"
           f" p95 {[round(vistos[e][0], 2) for e in ESPERADO]}, error 0%)")
 
+    # M12: además de los datos crudos, el bloque de la serie vigente del
+    # informe debe publicar esos mismos p95. El reporte conserva una serie
+    # histórica, por eso se ancla explícitamente a la última sección vigente.
+    matches = list(re.finditer(r"^#\s+Serie vigente al cierre\b", texto,
+                               re.MULTILINE | re.IGNORECASE))
+    if not matches:
+        return falla("REPORT.md sin sección 'Serie vigente al cierre'")
+    vigente = texto[matches[-1].start():]
+    for esc, esp in ESPERADO.items():
+        patron = rf"{esc}:.*?\*{{0,2}}p95\s+{esp['p95_ms']:.2f}\*{{0,2}}"
+        if not re.search(patron, vigente, re.DOTALL):
+            return falla(f"REPORT.md vigente no publica p95={esp['p95_ms']:.2f} para {esc}")
+    print("verify-p4: OK (REPORT.md vigente coincide con p95 recalculado)")
+
     print("verify-p4: OK (5 corridas crudas versionables y fieles al reporte)")
     return 0
 

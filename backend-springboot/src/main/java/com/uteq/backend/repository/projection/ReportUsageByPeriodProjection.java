@@ -10,12 +10,24 @@ import java.time.Instant;
  */
 public interface ReportUsageByPeriodProjection {
 
-    /** Inicio del período (día/semana/mes según granularidad). */
+    /**
+     * Inicio del período (día/semana/mes según granularidad).
+     *
+     * @return instante que identifica el período agregado.
+     */
     Instant getPeriod();
 
-    /** Total de préstamos iniciados en el período. */
+    /**
+     * Total de préstamos iniciados en el período.
+     *
+     * @return cantidad de préstamos registrados.
+     */
     Long getTotalLoans();
 
-    /** Total de devoluciones registradas en el período. */
+    /**
+     * Total de devoluciones registradas en el período.
+     *
+     * @return cantidad de devoluciones registradas.
+     */
     Long getTotalLoanReturns();
 }
