@@ -1,9 +1,10 @@
 # Declaración de aportes por punto — SGB-SaaS (EV-4)
 
-Rev de referencia: `e55f43b0782166b4d0586ccd34eb2d30e3e14c59`
-(rama `fix/fase01-sus-n0`).
-Base de conteos CRediT verificada: `e55f43b0782166b4d0586ccd34eb2d30e3e14c59`
-(re-sincronizar al cierre con los comandos de abajo).
+Rev de referencia de conteos: `3489e2c568a5874cc60d4d66d70653c9028dd1bc`
+(cierre EV-4 previo al siguiente commit documental).
+Base de conteos CRediT verificada: `3489e2c568a5874cc60d4d66d70653c9028dd1bc`.
+El verificador informa el delta que agregue el propio commit de cierre;
+no se presenta una base anterior como si fuera el HEAD final.
 
 Regla de este documento: la columna **Responsable propuesto** se infiere
 del historial (`git log -- <ruta>`) y está **pendiente de aceptación
@@ -30,13 +31,13 @@ git log --format='%H %ae %s' -- <ruta-especifica>
 | P3 SUS (1,4) | **No cerrado — N=0 — no se atribuye puntaje** | Cajas Ibarra (retiro) + Panamá Murillo (retiro del árbol Fase 0.1) | Retiro de evidencia mock; retiro de `sus.csv` y derivados del árbol; notebook modo N=0 | `docs/mediciones/sus/README.md`, `docs/mediciones/sus/CONSENT.md`, `scripts/sus-analysis.ipynb`, `scripts/verify-p3-sus.py` | `e6df3ff6ad3796f7ea4d41b97674d0741862043d` (Cajas), `1c28085ffcc66098e558b49634397d6984f4df4b`, `902e5133e929b6c03a7790baf136bf5d7767fa8b` (Panamá) | `python scripts/verify-p3-sus.py` | *(vacía — no hay puntaje que aceptar)* |
 | P4 k6 (1,0) | Cerrado 100 % (serie única 65,60/17,13 en todo el informe; Wilcoxon NS + hot/cold declarados; notebooks al día) | Panamá Murillo (serie y verificador) + Loor Medranda (corridas y estadística) | 5 corridas NDJSON, blindaje CRLF, REPORT con IC/Wilcoxon/Cliff; 5.ª corrida y `perf-analysis.py`; unificación de cifras en capítulos; fix encoding notebook | `docs/mediciones/perf/`, `k6/`, `scripts/perf-analysis.py`, `scripts/verify-p4-k6.py`, caps 01/05/06/09/11/12 | `9f3702705eab68971b9d275b59da36da57a0ce06`, `b82ae0e231c7ddd5db4074126c62f40f0301c26a` (Panamá), `ef0600e8c8e533a9622c9845832f20257a3832f9` (Loor) | `python scripts/verify-p4-k6.py` | *(vacía)* |
 | P5 nativeQuery (1,1) | Cerrado 100 % (0 `nativeQuery=true` + 0 CALL nativos; 22 migraciones auditadas) | Panamá Murillo (migración completa P5) + Loor Medranda + Cajas Ibarra (trabajo previo: JPQL parciales, V51, alias) | 10 ordinarias a JPQL/Criteria; 6 side-effects a StoredProcedureQuery posicional (V54 incluida); 17 tabulares a Criteria/JPQL con equivalencia PG; matriz P5-MATRIZ-33 | Repositorios + `*CustomImpl`, `database/migrations/V54__proc_pago_parcial_multa.sql`, `scripts/verify-p5-nativequery.py`, `docs/basedatos/P5-MATRIZ-33.md`, `ProcedureMappingContractTest` | `160ef7f693acb304950221f1fa4f01c938c2d672` (O-9/O-10), `eada9c2350b09b97e3c19d23561480db4868bf89` (O-8), `a250caa63845c66bfb5652e08af7033dfaea6d0a` (Book), `9b5c6ba52106a2beed69311d56a73151710f414b` (O-1), `c528742f2f38a6e533394ee56f4bbf5b02ac59f1` (side-effects+V54), `56259a7fb9b61df591ab264d4b7b73aec05eec86` (R-T9/R-T10), `82d52b61113fb5f2ae06c0d2224227e434dab4f7` (tabulares), `3e411995d0a8b6b81925a5f48fd94bb2859c4231` (matriz+spikes) — todos Panamá; previo: `8f551aa65b263866d7109a23c39bacfdbfe21ab0`, `cad89874d25790b4b0434cfd6ee1a5d3587c7e91` (Loor), `2e17fcc25c11dc02c66e1f3870ed8f5ba982cd77` (Cajas), `cba3b508564316850fd9bce488ce423c160c6315` (Panamá) | `python scripts/verify-p5-nativequery.py` | *(vacía)* |
-| P6 Javadoc (0,9) | Cerrado 100 % (100 % explícito + 99,6 % amplio; plantillas eliminadas; javadoc sin warnings) | Cajas Ibarra (cobertura E2) + Panamá Murillo (doclint) + equipo (reescritura por paquetes) | Cobertura Javadoc E2; auditoría versionada; doclint limpio; ~500 Javadocs reales | `scripts/audit-javadocs.py`, `scripts/verify-p6-javadoc.py`, fuentes Java documentadas | `3fc642ff7863d405158dcd5a222e7eef828c19c7` (Cajas), `822e5d42dd443d1c4d4875232ab091eedae4d5c6` (Panamá) | `python scripts/verify-p6-javadoc.py` + `mvn javadoc:javadoc` | *(vacía)* |
-| P7 Tipos en español (0,7) | Cerrado 100 % (0/283 en `src/main`) | Cajas Ibarra (segunda pasada E1) + Loor Medranda (renombres) | Cero raíces españolas en tipos y métodos | Fuentes renombradas, `scripts/verify-p7-names.py`, `scripts/audit-english-names.py` | `c68e1cfc0ad4429259a9ecdd7c49dbda4eaa7683` (Cajas), `bb22bb1256ce61dd997dbec870b2afb185166af0` (Loor) | `python scripts/verify-p7-names.py` | *(vacía)* |
-| P8/P9 Figuras (0,8+0,6) | Cerrado 100 % (15/15 + C4-N2 sin recorte + DER verificado + top-12 + babel; visual humano pendiente) | Panamá Murillo (evidencia y re-render C4/DER) + Loor Medranda (C4 reales) | 15 figuras citadas; C4 N1/N2 desde `workspace.dsl` re-renderizado; DER con spec verificada; verificadores P8/P9 | `docs/arquitectura/`, `docs/diagramas/er-english.pdf`, `docs/mediciones/figuras/`, `scripts/generar-figuras-evaluacion.py`, `scripts/generate-english-er-figure.py`, `scripts/verify-p8-p9-figures.py` | `b82ae0e231c7ddd5db4074126c62f40f0301c26a`, `36b899b26f10ff7911ffeb757063e61e53c7352e` (Panamá), `c16f54872c45f14cf5860a33ce39c4fc87455d02`, `9b3994ea556dbc0d169d197bbfb94c5ed9f06de6` (Loor) | `python scripts/verify-p8-p9-figures.py` | *(vacía)* |
+| P6 Javadoc (0,9) | Cerrado 100 % (555/613 = 90,54 % de contratos públicos amplios, con `@param`/`@return` exigidos) | Cajas Ibarra (cobertura E2) + Panamá Murillo (auditoría amplia y contratos) + equipo (reescritura por paquetes) | Auditoría que incluye interfaces/proyecciones; contratos versionados y salida reproducible | `scripts/audit-javadocs.py`, `scripts/verify-p6-javadoc.py`, fuentes Java documentadas | `3fc642ff7863d405158dcd5a222e7eef828c19c7` (Cajas), cierre documental y contratos en este commit (Panamá) | `python scripts/verify-p6-javadoc.py` + `mvn javadoc:javadoc` | *(vacía)* |
+| P7 Tipos en español (0,7) | Cerrado 100 % (8/300 = 2,67 %; métodos 1/696 = 0,14 %) | Cajas Ibarra (segunda pasada E1) + Loor Medranda (renombres) | El auditor incluye clases, interfaces, enums y records; los ocho records históricos siguen bajo 5 % | Fuentes renombradas, `scripts/verify-p7-names.py`, `scripts/audit-english-names.py` | `c68e1cfc0ad4429259a9ecdd7c49dbda4eaa7683` (Cajas), `bb22bb1256ce61dd997dbec870b2afb185166af0` (Loor) | `python scripts/verify-p7-names.py` | *(vacía)* |
+| P8/P9 Figuras (0,8+0,6) | Cerrado 100 % (15/15 + C4-N2 sin recorte + DER verificado, cardinalidades legibles + top-12 + babel) | Panamá Murillo (evidencia y re-render C4/DER) + Loor Medranda (C4 reales) | 15 figuras citadas; C4 N1/N2 desde `workspace.dsl` re-renderizado; DER con spec verificada y revisión visual local; verificadores P8/P9 | `docs/arquitectura/`, `docs/diagramas/er-english.pdf`, `docs/mediciones/figuras/`, `scripts/generar-figuras-evaluacion.py`, `scripts/generate-english-er-figure.py`, `scripts/verify-p8-p9-figures.py` | `b82ae0e231c7ddd5db4074126c62f40f0301c26a`, `36b899b26f10ff7911ffeb757063e61e53c7352e` (Panamá), `c16f54872c45f14cf5860a33ce39c4fc87455d02`, `9b3994ea556dbc0d169d197bbfb94c5ed9f06de6` (Loor) | `python scripts/verify-p8-p9-figures.py` | *(vacía)* |
 | P10 Cuenta demo (0,6) | Cerrado 100 % (login LECTOR + JWT + doble 403 en despliegue, evidencia sanitizada) | Panamá Murillo (test de autorización + evidencia deploy) + Cajas Ibarra (cuenta demo) | `DemoAccountAuthorizationIntegrationTest` (Testcontainers, cero mocks); cuenta demo LECTOR; script de evidencia contra despliegue | `backend-springboot/.../integration/DemoAccountAuthorizationIntegrationTest.java`, `docs/mediciones/demo-account.md`, `scripts/p10-deploy-evidence.py`, `docs/evidencia/examen/p10-deploy.txt` | `b82ae0e231c7ddd5db4074126c62f40f0301c26a` (Panamá), `b6e696409c263dcedb87c1f1d0862a16b045d5a3` (Cajas) | `python scripts/p10-deploy-evidence.py` | *(vacía)* |
-| P11 CRediT (0,5) | Parcial 70 % (conteos por área, no autoría; ver sección B) | Panamá Murillo | 14 roles con conteos y artefacto por celda; verificador de conteos | `CONTRIBUCIONES.md`, `scripts/verify-p11-counts.py` | `f23598724c86c946625e709b313d4f956d4aeaeb` | `python scripts/verify-p11-counts.py` | *(vacía)* |
+| P11 CRediT (0,5) | Parcial 70 % (conteos por área, no autoría; base y delta explícitos en sección B) | Panamá Murillo | 14 roles con conteos y artefacto por celda; verificador de conteos | `CONTRIBUCIONES.md`, `scripts/verify-p11-counts.py` | `f23598724c86c946625e709b313d4f956d4aeaeb` | `python scripts/verify-p11-counts.py` | *(vacía)* |
 | P12 Credencial (0,4) | Cerrado 100 % (rotación declarada 13-sep; árbol limpio) | Cajas Ibarra (acta) + Panamá Murillo (verificador) | Acta de rotación Neon; verificador de secretos | `docs/despliegue/NEON-ROTATION-ACTA.md`, `scripts/verify-p12-secrets.py` | `f0e22b474c3e9dbdc9b16a5fbefc1f5d6c37844e` (Cajas), `ca5bee901197c0c28c6932694b45f323f2c75448` (Panamá) | `python scripts/verify-p12-secrets.py` | *(vacía)* |
-| EV-1/EV-2 Expediente+verify | Operativo (solo-lectura, UTF-8 sin PYTHONUTF8, exit 0 sin FALLO; PENDIENTEs visibles P3/P10/firmas) | Panamá Murillo | Expediente sin fechas futuras ni elipsis; orquestador `verify-all.py`; verifiers P1-P12; evidencia por SHA; job CI | `VERIFICACION.md`, `Makefile`, `scripts/verify-all.py`, `scripts/verify-*.py`, `docs/evidencia/examen/` | `ca5bee901197c0c28c6932694b45f323f2c75448`, `6549becb6cb5e32a0efdd99fdc691d7a47ada311`, `840ba5c17d22e4b60bbafa1232243bf44ef002c6`, `4a4a26cb8fa1e592f64468bc8449ffde9948a6bf` (PLAN ignorado Fase 0.1), `1c28085ffcc66098e558b49634397d6984f4df4b`, `902e5133e929b6c03a7790baf136bf5d7767fa8b`, `d92ba03a28cebd970a15b841dfbbaf9ac1ab534d` (solo-lectura+UTF-8), `059b46b974b4b180264de2519cb56c7d51a2e2e5` + siguientes (expediente por SHA) | `python scripts/verify-all.py` | *(vacía)* |
+| EV-1/EV-2 Expediente+verify | Operativo (solo-lectura, UTF-8 sin PYTHONUTF8, exit 0 sin FALLO; P3 N=0 visible; P10 requiere Docker solo en ejecución local) | Panamá Murillo | Expediente sin fechas futuras ni elipsis; orquestador `verify-all.py`; verificadores P1-P12; evidencia por SHA; job CI | `VERIFICACION.md`, `Makefile`, `scripts/verify-all.py`, `scripts/verify-*.py`, `docs/evidencia/examen/` | `ca5bee901197c0c28c6932694b45f323f2c75448`, `6549becb6cb5e32a0efdd99fdc691d7a47ada311`, `840ba5c17d22e4b60bbafa1232243bf44ef002c6`, `4a4a26cb8fa1e592f64468bc8449ffde9948a6bf` (PLAN ignorado Fase 0.1), `1c28085ffcc66098e558b49634397d6984f4df4b`, `902e5133e929b6c03a7790baf136bf5d7767fa8b`, `d92ba03a28cebd970a15b841dfbbaf9ac1ab534d` (solo-lectura+UTF-8), `059b46b974b4b180264de2519cb56c7d51a2e2e5` + siguientes (expediente por SHA) | `python scripts/verify-all.py` | *(vacía)* |
 
 Lectura de la columna **Aceptación**: las celdas de la tabla quedan como
 marcador histórico, pero la aceptación institucional válida está en la
@@ -53,10 +54,10 @@ Nota cookie/regresión §1 (punto ya resuelto, restaurado): `3d6d53382550a2c0e65
 vía `RefreshCookieConfig` (excepción solo en perfil `dev-local-http`);
 test 23/23 en `AuthControllerTest`.
 
-## B. Roles CRediT (base verificada a `0ca73a0f`)
+## B. Roles CRediT (base verificada a `3489e2c5`)
 
-Totales globales a `e55f43b0`: **Cajas 763, Loor 343, Panamá 363**
-(763+343+363+1+1 = 1471 = `rev-list`; +1 TeilorSuit esqueleto Angular
+Totales globales a `3489e2c5`: **Cajas 764, Loor 344, Panamá 370**
+(764+344+370+1+1 = 1480 = `rev-list`; +1 TeilorSuit esqueleto Angular
 no atribuible, +1 bot excluido — ver `CONTRIBUTORS.md`). Los conteos
 por área cuentan commits que tocan el área de evidencia, no autoría
 exclusiva. Re-sincronizar al cierre listando SHAs explícitos, nunca
@@ -68,7 +69,7 @@ individualizado"** (el cap. 13 lo asigna pero no se encontró
 artefacto propio), **"—"** (sin asignación ni evidencia),
 **"no aplica"** (rol imposible en este proyecto).
 
-| Rol CRediT | Cajas (763) | Loor (343) | Panamá (363) |
+| Rol CRediT | Cajas (764) | Loor (344) | Panamá (370) |
 |---|---|---|---|
 | Conceptualization | Declarado sin artefacto individualizado (cap. 13 lo asigna; el alcance de módulos se infiere del volumen backend, sin ADR propio) | **22** `docs/adr` (ADR-001/007/013, estrategia ramas y versionado) + **10** `docs/arquitectura` (`workspace.dsl`, C4) | Declarado sin artefacto individualizado (cap. 13 lo asigna; sin ADR/arquitectura propios) |
 | Data curation | **10** `mediciones/sec` (índice, commit `4b7f50a75f7e0236573721168e8bee61e1e52c5b`) + retiro SUS (`e6df3ff6ad3796f7ea4d41b97674d0741862043d`) | **21** `mediciones/sec` + **8** `mediciones/perf` + `DATA-DICTIONARY.md`, `DATA-PROVENANCE.md` | Retiro SUS del árbol Fase 0.1 (`1c28085ffcc66098e558b49634397d6984f4df4b`) + **3** `mediciones/perf` (`9f3702705eab68971b9d275b59da36da57a0ce06` REPORT policy, `b82ae0e231c7ddd5db4074126c62f40f0301c26a` JSONs, `6549becb6cb5e32a0efdd99fdc691d7a47ada311` REPORT+p95) + `ETHICS.md`, `DATA-DICTIONARY.md` (sección SUS, 22 campos) |
@@ -104,9 +105,8 @@ Writing–review 3.
 - `CONTRIBUTORS.md` atribuía Formal analysis (SUS) a Panamá y el
   cap. 13 solo a Loor: ambos constan con artefacto propio arriba.
 - Conteos globales: `CONTRIBUTORS.md` y
-  `docs/mediciones/roles-commit-counts.txt` (este último, antes con
-  `--all`) citaban revs distintos; los vigentes a `b500878d` son
-  **763/343/363** (este archivo, verificados por
+  `docs/mediciones/roles-commit-counts.txt` se recalcularon a la misma
+  base `3489e2c5`: **764/344/370** (este archivo, verificados por
   `verify-p11-counts.py`).
 
 ## Firmas y aceptaciones
@@ -128,28 +128,49 @@ transcribe firmas por otros integrantes.
   Filas aceptadas: P1, P2, P3 retiro/N=0, P4, P5, P6, P8/P9, P10,
   P11, P12, EV-1/EV-2 y sección B CRediT de Panamá.
   Firma: Panamá Murillo Moisés Antonio.
-- **Loor Medranda Marlon Taylor** — `mloorm14@uteq.edu.ec` — Fecha: 2026-09-17.
-  Declaración: Yo, Loor Medranda Marlon Taylor, declaro que revisé
-  la atribución EV-4 y acepto como reales y verificables las
-  contribuciones asignadas a mi nombre en este documento. Acepto mi
-  titularidad en P2, P4, P5 como trabajo previo parcial, P7, P8/P9 y
-  sección B CRediT de Loor, según los archivos, commits y comandos
-  indicados. No reclamo autoría sobre filas no asignadas a mi nombre.
-  Filas aceptadas: P2, P4, P5 trabajo previo parcial, P7, P8/P9 y
-  sección B CRediT de Loor.
+- **Loor Medranda Marlon Taylor** — `mloorm14@uteq.edu.ec` — Fecha: 2026-09-18.
+  Declaración de aceptación personal: Yo, Loor Medranda Marlon Taylor,
+  revisé personalmente la evidencia y los commits indicados en este
+  documento. Acepto únicamente las atribuciones que reconozco como
+  propias: P2; P4; P5 como trabajo previo parcial; P7; y P8/P9,
+  conforme a los archivos, commits y comandos de verificación
+  identificados en cada fila.
+
+  Esta aceptación distingue mis aportes históricos de cualquier cierre
+  posterior del examen suspenso. No declaro como trabajo nuevo posterior
+  a `8d1b7999` ningún cambio que no haya realizado personalmente.
+
+  No reclamo autoría sobre filas no asignadas a mi nombre, no reclamo
+  puntaje para P3 SUS y dejo la sección B de conteos CRediT pendiente de
+  recálculo contra el HEAD final.
+
+  Filas aceptadas: P2, P4, P5 como trabajo previo parcial, P7 y P8/P9.
   Firma: Loor Medranda Marlon Taylor.
-- **Cajas Ibarra Irvin Marcelo** — `icajasi@msuteq.edu.ec` — Fecha: 2026-09-17.
-  Declaración: Yo, Cajas Ibarra Irvin Marcelo, declaro que revisé
-  la atribución EV-4 y acepto como reales y verificables las
-  contribuciones asignadas a mi nombre en este documento. Acepto mi
-  titularidad en P1, P3 únicamente como retiro honesto de evidencia
-  mock y N=0, P5 como trabajo previo parcial, P6, P7, P10, P12 y
-  sección B CRediT de Cajas, según los archivos, commits y comandos
-  indicados. No reclamo puntaje para P3 SUS ni autoría sobre filas no
-  asignadas a mi nombre.
-  Filas aceptadas: P1, P3 retiro/N=0, P5 trabajo previo parcial, P6,
-  P7, P10, P12 y sección B CRediT de Cajas.
+- **Cajas Ibarra Irvin Marcelo** — `icajasi@msuteq.edu.ec` — Fecha: 2026-09-18.
+  Declaración de aceptación personal: Yo, Cajas Ibarra Irvin Marcelo,
+  revisé personalmente la evidencia listada en este documento y acepto
+  únicamente las atribuciones que reconozco como propias: P1 en las
+  anotaciones indicadas; P3 únicamente como retiro honesto de evidencia
+  sin puntaje; P5 como trabajo previo parcial; P6; P7; P10; y P12,
+  según los archivos, commits y comandos indicados en cada fila.
+
+  No reclamo autoría sobre filas no asignadas a mi nombre, no reclamo
+  puntaje para P3 SUS y no declaro como trabajo nuevo posterior a
+  `8d1b7999` ningún cambio que no haya realizado personalmente.
+
+  Esta aceptación se emite mediante mi propio commit, con mi identidad
+  y correo institucional reales. La sección B de conteos CRediT queda
+  pendiente de recálculo contra el HEAD final.
+
+  Filas aceptadas: P1 (anotaciones), P3 retiro/N=0, P5 trabajo previo
+  parcial, P6, P7, P10 y P12.
   Firma: Cajas Ibarra Irvin Marcelo.
+
+Nota factual de cierre: tras esas declaraciones personales se recalcularon
+los conteos contra la base verificable `3489e2c5`, con resultado
+**764/344/370** y `verify-p11-counts.py` en verde. Esta nota no amplía
+ni reemplaza el alcance de ninguna aceptación personal: Cajas y Loor
+conservan exactamente las filas que aceptaron en sus propios commits.
 
 Para el tag de entrega (EV-3/EV-4, solo el administrador): incluir
 este archivo únicamente cuando las tres aceptaciones estén completas.

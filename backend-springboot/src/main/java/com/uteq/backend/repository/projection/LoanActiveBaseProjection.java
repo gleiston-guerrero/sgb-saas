@@ -13,21 +13,45 @@ import java.time.OffsetDateTime;
  */
 public interface LoanActiveBaseProjection {
 
-    /** Identificador del préstamo activo. */
+    /**
+     * Identificador del préstamo activo.
+     *
+     * @return identificador del préstamo.
+     */
     Long getLoanId();
 
-    /** Título del libro prestado. */
+    /**
+     * Título del libro prestado.
+     *
+     * @return título del libro asociado.
+     */
     String getBookTitle();
 
-    /** ISBN del libro prestado. */
+    /**
+     * ISBN del libro prestado.
+     *
+     * @return ISBN del libro asociado.
+     */
     String getBookIsbn();
 
-    /** Fecha de inicio del préstamo. */
+    /**
+     * Fecha de inicio del préstamo.
+     *
+     * @return instante de registro del préstamo.
+     */
     OffsetDateTime getDateLoan();
 
-    /** Fecha estimada de devolución. */
+    /**
+     * Fecha estimada de devolución.
+     *
+     * @return plazo calculado para devolver el libro.
+     */
     OffsetDateTime getDateLoanReturnEstimada();
 
-    /** Nombre del estado del préstamo. */
+    /**
+     * Nombre del estado del préstamo.
+     *
+     * @return etiqueta del estado vigente.
+     */
     String getStatusName();
 }

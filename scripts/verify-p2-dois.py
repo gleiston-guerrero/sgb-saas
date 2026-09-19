@@ -10,7 +10,10 @@ mencionados también deben resolver: si alguno devuelve 404, hay que
 actualizar la referencia (barrido P2: solo DOIs vigentes).
 
 Uso: python scripts/verify-p2-dois.py
-Sale 0 si todos resuelven, 1 si alguno falla.
+Sale 0 si todos resuelven, 1 si algún DOI responde pero no es válido,
+y 2 si la red pública no estuvo disponible para ninguno de ellos. El
+código 2 no convierte un fallo académico en éxito: el orquestador lo
+declara PENDIENTE para que el mismo comando pueda reintentarse en CI.
 """
 
 from __future__ import annotations
@@ -123,6 +126,7 @@ def main() -> int:
         print("verify-p2: no se encontró ningún DOI", file=sys.stderr)
         return 1
     fallos = 0
+    red_inaccesible = 0
     for doi in sorted(hallados):
         ok, detalle = resuelve(doi)
         donde = ", ".join(sorted(set(hallados[doi]))[:5])
@@ -130,7 +134,15 @@ def main() -> int:
         print(f"[{estado}] {doi} ({detalle}) <- {donde}")
         if not ok:
             fallos += 1
+            # URLError/timeout significa que no hubo respuesta para evaluar
+            # el DOI. Un 404 o un estado Zenodo inválido sigue siendo FALLO.
+            if "URLError:" in detalle or "TimeoutError:" in detalle:
+                red_inaccesible += 1
     if fallos:
+        if red_inaccesible == fallos:
+            print("verify-p2: PENDIENTE — red pública inaccesible; reintentar en CI",
+                  file=sys.stderr)
+            return 2
         print(f"verify-p2: {fallos} DOI sin resolver", file=sys.stderr)
         return 1
     print(f"verify-p2: OK ({len(hallados)} DOI resuelven)")

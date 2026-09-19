@@ -37,8 +37,7 @@ git status --short
 * d65b8ade docs(blindaje-final): P11 a e55f43b0, PDF FD54, P4 unificado, verificadores
 * e55f43b0 docs(cierre): evidencia verify-all final, exit 0
 * f590bb6b docs(cierre): PDF final 109pp + SHA real + derivados
-v1.1.0 -> 6803730704269737bce4e4c17b7b61bb89702380 (tag anotado)
-v1.1.0^{} -> bec80ecbd8973d93b45894155981ad4409a405c8 (commit, anterior al cierre; lo mueve el admin al SHA final)
+v1.1.0 -> 080450c22e02551c6dfe1248060e243298aae43c (commit, etiqueta ligera)
 M VERIFICACION.md
 ?? docs/evidencia/examen/24885d18/
 ```
@@ -74,8 +73,8 @@ modificar el historial.
 El target delega en `scripts/verify-all.py` (única fuente de verdad;
 `python scripts/verify-all.py` es el equivalente exacto donde no hay
 GNU Make — sin `make` en este Windows). Clasifica cada punto como
-`evidencia válida`, `PENDIENTE` (visible, nunca aprobado: P3, P10-bloqueado,
-firmas P11) o `FALLO`; sale 0 solo si no hay ningún
+`evidencia válida`, `PENDIENTE` (visible, nunca aprobado: P3 N=0 o una
+dependencia local sin Docker) o `FALLO`; sale 0 solo si no hay ningún
 `FALLO`. Solo lectura: ningún verificador modifica NDJSON, figuras, PDF
 ni evidencia (P4 genera su gráfico en temporal vía `SGB_PERF_GRAFICO`).
 UTF-8 interno: no requiere `PYTHONUTF8=1` en Windows.
@@ -91,15 +90,15 @@ python scripts/verify-all.py
 ```text
 ===== verify-all: resumen P1-P12 =====
 P1: evidencia válida
-P2: evidencia válida
+P2: PENDIENTE — red pública inaccesible localmente; reintentar en CI
 P3: PENDIENTE — no puntuable
 P4: evidencia válida
 P5: migrado (0 nativeQuery + 0 CALL nativos)
 P6: evidencia válida
 P7: evidencia válida
 P8/P9: evidencia válida
-P10: PENDIENTE
-P11: conteos verificables (firmas externas pendientes)
+P10: PENDIENTE (sin Docker local; el job CI lo ejecuta)
+P11: conteos verificables (aceptaciones personales registradas por alcance)
 P12: evidencia válida
 Javadoc: evidencia válida (BUILD SUCCESS)
 verify-all: exit 0 = coherencia/reproducibilidad de la evidencia disponible, NO cumplimiento academico total (P3 y firmas no puntuan)
@@ -121,7 +120,9 @@ despliegue (login LECTOR + JWT + doble 403) vive en la sección P10.
 ### Resultado
 
 Operativo (orquestador completo, solo lectura, UTF-8, exit 0 sin FALLO;
-PENDIENTEs visibles: P3 N=0, P10 sin Docker, firmas P11).
+PENDIENTEs visibles: P2 mientras `doi.org`/Zenodo estén inaccesibles
+desde la máquina que verifica, P3 N=0; P10 solo queda bloqueado en
+máquinas locales sin Docker.
 
 ---
 
@@ -133,14 +134,13 @@ PENDIENTEs visibles: P3 N=0, P10 sin Docker, firmas P11).
 python scripts/verify-p1-hashes.py
 ```
 
-### Salida (2026-09-17, rama fix/fase01-sus-n0, completa)
+### Salida reproducida el 2026-09-18 (verificador ampliado con vínculos directos)
 
 ```text
 [OK] 00b2630 (commit)
 [OK] 00b26306 (commit)
 [OK] 1028ad02 (commit)
 [OK] 437ebe5 (commit)
-[OK] 437ebe5b (commit)
 [OK] 454be77 (commit)
 [OK] 4d69f24 (commit)
 [OK] 4d69f244 (commit)
@@ -159,7 +159,6 @@ python scripts/verify-p1-hashes.py
 [OK] 9a467125 (commit)
 [OK] 9f370270 (commit)
 [OK] bca23c2 (commit)
-[OK] bca23c2c (commit)
 [OK] d8443e6 (commit)
 [OK] d8443e66 (commit)
 [OK] df09f0d (commit)
@@ -173,7 +172,23 @@ python scripts/verify-p1-hashes.py
 [OK] e8477021 (commit)
 [OK] ed42c42 (commit)
 [OK] ed42c421 (commit)
-verify-p1: OK (35 hashes existen)
+[VINCULO] 9f370270 -> docs/mediciones/perf/REPORT.md
+[VINCULO] e8477021 -> docs/mediciones/jacoco/report.xml
+[VINCULO] e8477021 -> docs/mediciones/jacoco/report.csv
+[VINCULO] 6549becb -> docs/mediciones/perf/p95-comparacion-escenarios.svg
+[VINCULO] 6549becb -> docs/mediciones/perf/p95-comparacion-escenarios.pdf
+[VINCULO] 4d69f244 -> docs/mediciones/sec/zap/2026-08-17-zap-ajax-full-report.html
+[VINCULO] 00b26306 -> docs/capitulos/08-resultados.tex
+[VINCULO] 862672b2 -> docs/bibliografia.bib
+[VINCULO] 9a467125 -> docs/capitulos/03-trabajos-relacionados.tex
+[VINCULO] 6bce6257 -> docs/adr/README.md
+[VINCULO] 6bce6257 -> docs/arquitectura/ISO25010.md
+[VINCULO] 5f3e5e5b -> docs/capitulos/06-diseno-arquitectura.tex
+[VINCULO] 7debd0b1 -> docs/trazabilidad/matriz.csv
+[VINCULO] e3f3f7fa -> docs/capitulos/09-ingenieria-requisitos.tex
+[VINCULO] d8443e66 -> docs/capitulos/13-declaraciones.tex
+[VINCULO] df09f0db -> docs/mediciones/DATA-PROVENANCE.md
+verify-p1: OK (35 hashes existen; 16 vínculos directos coinciden)
 ```
 
 ### Archivo que respalda
@@ -183,11 +198,10 @@ verify-p1: OK (35 hashes existen)
 
 ### Resultado
 
-Cerrado 100 %: los 35 hashes existen y cada fila apunta al commit que
-realmente tocó el archivo (fila 4 → `e8477021`, regeneración JaCoCo del
-2026-09-17; filas 1–2 declaran los NDJSON versionados con SHA en
-REPORT.md; `.svg`/`.pdf` → `6549becb`). La sección "Verificación de
-hashes citados" de `DATA-PROVENANCE.md` pega las 35 salidas tal cual.
+Cerrado: los 35 hashes existen. Además, 16 vínculos directos
+archivo↔commit se comprueban con `git show --name-only`, incluida la
+medición JaCoCo (`e8477021`), los NDJSON de rendimiento y las figuras
+P4; el verificador falla si cualquiera deja de tocar la ruta declarada.
 
 ---
 
@@ -223,6 +237,16 @@ verificador endurecido) desapareció de portada, introducción,
 declaraciones, FAIR y `CITATION.cff`; los 4 DOI restantes resuelven
 `doi.org` 200 final. Derivados regenerables (`informe-final-text.txt`,
 extracción del PDF) se retiran del árbol y se regeneran en fase PDF.
+
+### Estado de red al cierre
+
+En la comprobación local final del 2026-09-18, Windows devolvió
+`WinError 10061` para los cuatro DOI tanto en `doi.org` como en Zenodo.
+No se reinterpretó como un DOI válido: `verify-p2-dois.py` devuelve
+estado **PENDIENTE** solamente cuando ninguna URL pudo evaluarse por red
+inaccesible; si cualquier URL responde y no es válida, conserva
+**FALLO**. El job CI debe ejecutar la comprobación desde su red pública
+y quedar verde antes del PR a `main`.
 
 ---
 
@@ -314,11 +338,34 @@ guardia CRLF dentro de `verify-p4-k6.py`.
 python scripts/verify-p5-nativequery.py
 ```
 
-### Salida (2026-09-17, rev 24885d18)
+### Salida (reproducida sobre el árbol de cierre)
 
 ```text
 verify-p5: OK (inventario 0=0+0 coincide)
-(... 22 líneas "migrada <método> -> <reemplazo> [<prueba>]" ...)
+verify-p5: migrada ReservationRepository.searchReservationsToday -> JPQL cartesiana + ventana :start/:end desde el service (zona sistema) [P5SpikeIT.s5_ventanaHoyYProximas + ReservationServiceTest 21/21]
+verify-p5: migrada ReservationRepository.searchReservationsNexts -> JPQL cartesiana + :start desde el service (zona sistema) [P5SpikeIT.s5_ventanaHoyYProximas + ReservationServiceTest 21/21]
+verify-p5: migrada LoanRepository.findActivesByUserId -> JPQL cartesiana + diasRestantes en Java (zona sistema, igual que NOW()::date) [P5SpikeIT.s6_activosPorUsuarioJpqlYDiasJava + LoanServiceTest 31/31]
+verify-p5: migrada BookRepository.searchByTextOIsbn -> Criteria searchText (sin categoria/autor, available tri-estado) [P5SpikeIT.s7 + BookServiceTest 21/21]
+verify-p5: migrada BookRepository.searchByTextOIsbnYCategory -> Criteria searchText con join categories + countDistinct [P5SpikeIT.s7 + BookServiceTest 21/21]
+verify-p5: migrada BookRepository.searchByTextOrIsbnAndAuthor -> Criteria searchText con join authors [P5SpikeIT.s7 + BookServiceTest 21/21]
+verify-p5: migrada BookRepository.suggestByTitle -> Criteria function(similarity) + maxResults 10 [P5SpikeIT.s7 + BookServiceTest 21/21]
+verify-p5: migrada BookRepository.searchPendientes -> Eliminada: sin llamadores en src/main ni tests [compilacion + suite (sin referencias)]
+verify-p5: migrada BookRepository.searchByStatuses -> Criteria searchByStatusesCriteria (q/year opcionales) [P5SpikeIT.s7 + BookServiceTest 21/21]
+verify-p5: migrada AuditLogAuditRepository.searchWithFilters -> Criteria dinamico + Sort fecha_hora->dateTime (controller y exportCsv a dateTime) [P5SpikeIT.s8 + AuditServiceTest 4/4]
+verify-p5: migrada LoanProcedureRepositoryCustomImpl.spCreateLoanProcedure/spRegisterLoanReturn -> createStoredProcedureQuery posicional (proc_crear_prestamo/proc_registrar_devolucion) [P5SpikeIT.s1/s9a + LoanFineProcedureIntegrationTest (CI)]
+verify-p5: migrada FineProcedureRepositoryCustomImpl.spPayFineProcedure/spVoidFineProcedure -> createStoredProcedureQuery posicional (proc_pagar_multa/proc_anular_multa) [P5SpikeIT.s9b/s9c + LoanFineProcedureIntegrationTest (CI)]
+verify-p5: migrada ReservationProcedureRepositoryCustomImpl.spExpireReservationsVencidasProcedure -> createStoredProcedureQuery posicional (proc_expirar_reservaciones_vencidas) [P5SpikeIT.s9d]
+verify-p5: migrada FineProcedureRepository.spPaymentParcialFine -> wrapper V54 proc_pago_parcial_multa + StoredProcedureQuery posicional (mismas 4 claves) [P5SpikeIT.s9e]
+verify-p5: migrada FineProcedureRepository.fnReportSummaryFinancial -> Criteria CASE (mismo patron que summaryByCategory) + cero NUMERIC(12,2) [P5SpikeIT.s10 + FineServiceTest 9/9]
+verify-p5: migrada FineProcedureRepository.fnPaymentsRecientes -> Criteria cartesiana PAGADA + setMaxResults (default 5) [P5SpikeIT.s10 + FineServiceTest 9/9]
+verify-p5: migrada LoanProcedureRepository.fnListLoansActivesByUser -> JPQL cartesiana (base sin dias; LoanService solo usa size) [P5TabularSpikeIT.t1]
+verify-p5: migrada LoanProcedureRepository.fnReportBooksMostLoaned -> Criteria GROUP/COUNT + maxResults (NULL = todo, como LIMIT NULL) [P5TabularSpikeIT.t2]
+verify-p5: migrada LoanProcedureRepository.fnReportIndexDelinquency[+Paginated] -> Criteria filas PENDIENTE + AVG Java ROUND(,1) + ORDER/LIMIT en Java [P5TabularSpikeIT.t3]
+verify-p5: migrada LoanProcedureRepository.fnReportUsageByPeriod[+Paginated] -> Criteria date_trunc + FULL OUTER en Java (TreeMap) [P5TabularSpikeIT.t4]
+verify-p5: migrada LoanProcedureRepository.fnReportBooksMostLoanedDetailed[+Paginated] -> Criteria filas + string_agg en Java (TreeSet, defaults) + pct [P5TabularSpikeIT.t5]
+verify-p5: migrada LoanProcedureRepository.fnReportInventory[+Paginated] -> Criteria 14 filtros + agregados en Java + estado_disponibilidad [P5TabularSpikeIT.t6]
+verify-p5: migrada LoanProcedureRepository.fnReportLoansOverdues[+Paginated] -> Criteria ventana + dias/multa en Java (tarifa config, default 1) [P5TabularSpikeIT.t7]
+verify-p5: migrada LoanProcedureRepository.fnReportCategoriesDemanded[+Paginated] -> Criteria GROUP/COUNT + pct en Java (limite ignorado como la funcion) [P5TabularSpikeIT.t8]
 verify-p5: OK (CALL nativos en CustomImpl pineados)
 verify-p5: OK (unico createNativeQuery fuera de repositorios: AuditAspect set_config, justificado)
 verify-p5: OK (0 nativeQuery + 0 CALL nativos: P5 migrado)
@@ -364,23 +411,21 @@ python scripts/verify-p6-javadoc.py
 cd backend-springboot; ./mvnw -B javadoc:javadoc
 ```
 
-### Salida (2026-09-17, rev 24885d18)
+### Salida literal del auditor
 
 ```text
 Javadoc audit
 source=backend-springboot\src\main\java
 java_files=278
-public_methods=435
-documented_methods=435
-documented_pct=100.00
-javadoc_param_tags=987
-javadoc_return_tags=402
+public_methods=613
+documented_methods=555
+documented_pct=90.54
+javadoc_param_tags=1192
+javadoc_return_tags=536
 javadoc_throws_tags=142
-files_with_missing_javadocs=0
-verify-p6: OK (100.00% >= 90.00%)
-[INFO] BUILD SUCCESS
-[INFO] Total time:  15.389 s
->> Javadoc: evidencia válida (BUILD SUCCESS)
+files_with_incomplete_javadocs=31
+incomplete_details=python scripts/audit-javadocs.py --verbose
+verify-p6: OK (90.54% >= 90.00%)
 ```
 
 ### Archivo que respalda
@@ -389,11 +434,12 @@ verify-p6: OK (100.00% >= 90.00%)
 
 ### Resultado
 
-100 % con el conteo del auditor (métodos públicos explícitos) y
-`mvn javadoc:javadoc` BUILD SUCCESS sin warnings. Conteo amplio
-(métodos + constructores + interfaces/proyecciones): 99,6 % con
- Javadoc real; ~500 Javadocs añadidos/reescritos eliminando plantillas
-genéricas (`mvn clean verify`: 655 tests, 0 fallos).
+90,54 % (555/613) mediante conteo amplio de contratos públicos que
+incluye interfaces y proyecciones y exige `@param`/`@return` cuando
+corresponde. El detalle de los 31 archivos pendientes se obtiene con
+`python scripts/audit-javadocs.py --verbose`. El build `mvn javadoc:javadoc`
+debe terminar sin error en la revisión final; no se declara ausencia de
+advertencias.
 
 ---
 
@@ -405,13 +451,13 @@ genéricas (`mvn clean verify`: 655 tests, 0 fallos).
 python scripts/verify-p7-names.py
 ```
 
-### Salida (2026-09-17, rev 24885d18, completa)
+### Salida (reproducida sobre el árbol de cierre)
 
 ```text
-Types: 0/286 flagged (0.00%)
-Methods: 0/650 flagged (0.00%)
-Worst rubric percentage: 0.00%
-verify-p7: OK (0.00% <= 5.00%)
+Types: 8/300 flagged (2.67%)
+Methods: 1/696 flagged (0.14%)
+Worst rubric percentage: 2.67%
+verify-p7: OK (2.67% <= 5.00%)
 ```
 
 ### Archivo que respalda
@@ -420,7 +466,9 @@ verify-p7: OK (0.00% <= 5.00%)
 
 ### Resultado
 
-Cerrado 100 %.
+Cerrado respecto del umbral: el auditor ahora cubre clases, interfaces,
+enums y records. Los ocho tipos y un método españoles permanecen
+visibles y el peor porcentaje real es 2,67 %, bajo el 5 %.
 
 ---
 
@@ -546,11 +594,11 @@ README en fase de regresiones (rotación en prod: acción humana).
 python scripts/verify-p11-counts.py
 ```
 
-### Salida (2026-09-17, rev 24885d18 — corrida sobre ese SHA; el delta posterior lo imprime el propio verificador)
+### Salida (base de conteos `3489e2c5`)
 
 ```text
-verify-p11: rev citado e55f43b0 es ancestro de HEAD (+3 commits propios declarados en prosa)
-verify-p11: OK (shortlog a e55f43b0: 763/343/363, total 1471)
+verify-p11: rev citado 3489e2c5 es ancestro de HEAD (conteos pineados; commits posteriores no alteran la base)
+verify-p11: OK (shortlog a 3489e2c5: 764/344/370, total 1480)
 verify-p11: OK (CONTRIBUCIONES.md coincide)
 verify-p11: OK (CONTRIBUTORS.md coincide)
 verify-p11: OK (cap. 13 coincide)
@@ -565,9 +613,10 @@ verify-p11: OK (conteos verificables; ver seccion Firmas en CONTRIBUCIONES.md)
 
 ### Resultado
 
-Base verificable exacta al rev citado + artefactos. Pendiente (fase
-P11/EV-4): aceptaciones genuinas de los tres integrantes; los conteos
-miden commits por área, no autoría.
+Base verificable exacta al rev citado + artefactos. Las aceptaciones
+personales de Panamá, Cajas y Loor están registradas en sus propios
+commits; sus alcances no se infieren ni se amplían automáticamente.
+Los conteos miden commits por área, no autoría exclusiva.
 
 ---
 

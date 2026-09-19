@@ -361,8 +361,8 @@ make verify   # = scripts/verify-all.py: P1-P12 + javadoc en un solo comando
 
 ## Integridad del entregable
 
-Digest SHA256 de `docs/informe-final.pdf` (regenerado 2026-09-17, 109 páginas):
+Digest SHA256 de `docs/informe-final.pdf` (regenerado 2026-09-18, 109 páginas):
 
 ```
-FD541B819F3DDC9C488B36739F29AD53F0E76F0AD01630745772B8CC4C134560
+4209D49EE57E3F6E95BD1D5BE8B3862F4AF552B90374B1182A0FC3912236FAB2
 ```

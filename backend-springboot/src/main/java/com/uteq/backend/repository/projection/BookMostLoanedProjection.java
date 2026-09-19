@@ -8,15 +8,31 @@ package com.uteq.backend.repository.projection;
  */
 public interface BookMostLoanedProjection {
 
-    /** Identificador del libro. */
+    /**
+     * Identificador del libro.
+     *
+     * @return identificador persistente del libro.
+     */
     Long getBookId();
 
-    /** Título del libro. */
+    /**
+     * Título del libro.
+     *
+     * @return título mostrado en el reporte.
+     */
     String getTitle();
 
-    /** ISBN del libro. */
+    /**
+     * ISBN del libro.
+     *
+     * @return ISBN asociado al libro.
+     */
     String getIsbn();
 
-    /** Total de préstamos del libro. */
+    /**
+     * Total de préstamos del libro.
+     *
+     * @return cantidad acumulada de préstamos.
+     */
     Long getTotalLoans();
 }

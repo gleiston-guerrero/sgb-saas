@@ -10,9 +10,17 @@ import java.math.BigDecimal;
  */
 public interface FinePendingByLoanProjection {
 
-    /** Identificador del préstamo con multa pendiente. */
+    /**
+     * Identificador del préstamo con multa pendiente.
+     *
+     * @return identificador del préstamo.
+     */
     Long getLoanId();
 
-    /** Suma de montos pendientes del préstamo. */
+    /**
+     * Suma de montos pendientes del préstamo.
+     *
+     * @return importe acumulado aún pendiente.
+     */
     BigDecimal getTotalPending();
 }

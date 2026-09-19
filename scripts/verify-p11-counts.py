@@ -71,12 +71,8 @@ def main() -> int:
                          cwd=ROOT, capture_output=True)
     if anc.returncode != 0:
         return falla(f"rev citado {citado[:8]} no es ancestro de HEAD")
-    try:
-        delta = int(git("rev-list", "--count", f"{citado}..HEAD").strip())
-    except RuntimeError:
-        delta = -1
     print(f"verify-p11: rev citado {citado[:8]} es ancestro de HEAD "
-          f"(+{delta} commits propios declarados en prosa)")
+          "(conteos pineados; commits posteriores no alteran la base)")
 
     lineas = git("-c", "log.mailmap=true", "shortlog", "-sne",
                  "--no-merges", rev).splitlines()

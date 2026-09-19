@@ -98,9 +98,13 @@ binding exclusivamente posicional (ver Listado
 \ref{lst:sp-crear-prestamo-java}), porque el proxy estándar de
 \texttt{@Procedure} de Hibernate~6 genera sintaxis de parámetros nombrados
 de PostgreSQL dentro del escape JDBC \texttt{\{call ...\}} y pgjdbc la
-rechaza (spring-projects/spring-data-jpa\#3393). Sin SQL nativo en el
-proceso: cero \texttt{nativeQuery = true} y cero \texttt{createNativeQuery}
-en \texttt{src/main} (verificado por \texttt{scripts/verify-p5-nativequery.py}).
+rechaza (spring-projects/spring-data-jpa\#3393). El criterio P5 queda
+cerrado con cero \texttt{nativeQuery = true} y cero \texttt{CALL} nativos
+en \texttt{*CustomImpl} para procedimientos del dominio (verificado por
+\texttt{scripts/verify-p5-nativequery.py}). Existe una sola llamada a
+\texttt{createNativeQuery} fuera de repositorios, en \texttt{AuditAspect},
+para \texttt{set\_config(...)} de PostgreSQL con parámetro bindeado; no
+invoca un procedimiento almacenado del dominio ni concatena entrada.
 El siguiente listado muestra el método vigente hoy en
 \texttt{LoanProcedureRepository.java}:
 
@@ -122,9 +126,11 @@ Las funciones de reporte/listado que retornan \texttt{TABLE} (varias
 filas) se reimplementaron en Criteria/JPQL con cómputo Java de semántica
 idéntica (P5): las funciones SQL quedan en BD solo para psql directo y
 JPA ya no las invoca. Tras la migración, el conteo estático del backend
-queda en 0 apariciones de \texttt{nativeQuery = true} y 0
-\texttt{createNativeQuery} en \texttt{src/main}; la expiración de
-reservaciones usa el procedimiento vía el \emph{scheduler}.
+queda en 0 apariciones de \texttt{nativeQuery = true} y 0 \texttt{CALL}
+nativos en \texttt{*CustomImpl}; se conserva únicamente el
+\texttt{createNativeQuery} justificado de \texttt{AuditAspect} para
+\texttt{set\_config(...)}. La expiración de reservaciones usa el
+procedimiento vía el \emph{scheduler}.
 
 \subsection*{¿Esto viola la prohibición de SQL dinámico de la guía (A.2.1)?}
 
@@ -146,11 +152,12 @@ de la cadena SQL.
 
 En síntesis: \textbf{la regla A.2.1 prohíbe construir SQL concatenando
 entrada de usuario dentro del texto de la consulta}. Este proyecto ya no
-usa \texttt{createNativeQuery} en ningún punto de \texttt{src/main}: las
-rutinas principales van por \texttt{StoredProcedureQuery} posicional y los
-reportes por Criteria/JPQL con parámetros bindeados. El valor de cada
-parámetro nunca se concatena, formatea ni interpola dentro de la cadena
-SQL.
+usa \texttt{createNativeQuery} para invocar procedimientos del dominio:
+las rutinas principales van por \texttt{StoredProcedureQuery} posicional y
+los reportes por Criteria/JPQL con parámetros bindeados. La única llamada
+de \texttt{AuditAspect} fija \texttt{set\_config(...)} con parámetro
+bindeado. El valor de cada parámetro nunca se concatena, formatea ni
+interpela dentro de la cadena SQL.
 El CI ejecuta \texttt{scripts/audit-sql-dynamic.sh} para rechazar SQL
 dinámico en \texttt{db/procs/}.
 

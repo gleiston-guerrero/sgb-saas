@@ -23,13 +23,13 @@ por la auditoría.
 
 | Persona | Alias Git considerados | Commits |
 |---|---|---|
-| Irvin Cajas Ibarra | `Theirvin1 <icajasi@msuteq.edu.ec>`, `TheIrvin <irvincajas72@gmail.com>`, `Irvin <icajasi@msuteq.edu.ec>`, `Irvin Cajas <icajasi@msuteq.edu.ec>` | **763** |
-| Marlon Loor Medranda | `Marlon Loor <mloorm14@uteq.edu.ec>`, `mloorm14 <mloorm14@uteq.edu.ec>`, `Loor Marlon <mloorm14@uteq.edu.ec>`, `Marlon Taylor Loor Medranda <mloorm14@uteq.edu.ec>` | **343** |
+| Irvin Cajas Ibarra | `Theirvin1 <icajasi@msuteq.edu.ec>`, `TheIrvin <irvincajas72@gmail.com>`, `Irvin <icajasi@msuteq.edu.ec>`, `Irvin Cajas <icajasi@msuteq.edu.ec>` | **764** |
+| Marlon Loor Medranda | `Marlon Loor <mloorm14@uteq.edu.ec>`, `mloorm14 <mloorm14@uteq.edu.ec>`, `Loor Marlon <mloorm14@uteq.edu.ec>`, `Marlon Taylor Loor Medranda <mloorm14@uteq.edu.ec>` | **344** |
 | Moises Panama Murillo | `MoisesPanama <mpanamam@uteq.edu.ec>`, `Moisés Panamá
-<mpanamam@uteq.edu.ec>`, `Moises Panama <mpanamam@uteq.edu.ec>` | **363** |
+<mpanamam@uteq.edu.ec>`, `Moises Panama <mpanamam@uteq.edu.ec>` | **370** |
 
-763+343+326 = 1432, más 1 de `TeilorSuit` y 1 del bot = 1434
-(rev `840ba5c1`, rama `fix/examen-evidencia`). Para
+764+344+370 = 1478, más 1 de `TeilorSuit` y 1 del bot = 1480
+(rev `3489e2c5`, cierre EV-4). Para
 re-sincronizar al cierre: `git rev-list --count --no-merges <rev>` y
 `git -c log.mailmap=true shortlog -sne --no-merges <rev>`.
 

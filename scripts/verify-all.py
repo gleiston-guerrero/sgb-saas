@@ -72,6 +72,11 @@ def paso_simple(nombre: str, cmd: list[str], timeout: int,
 
 
 def paso_p10() -> tuple[str, str]:
+    policy = corre([PY, "scripts/verify-p10-cookie-policy.py"], 60)
+    print(policy.stdout[-1000:])
+    if policy.returncode != 0:
+        print(policy.stderr[-1000:])
+        return FALLO, "política de cookie productiva inválida"
     # Docker presente?
     dock = corre(["docker", "info"], 60)
     sin_docker = dock.returncode != 0
@@ -101,6 +106,21 @@ def paso_p10() -> tuple[str, str]:
     return VALIDA, ""
 
 
+def paso_p2() -> tuple[str, str]:
+    """Distingue una red pública caída de un DOI que realmente no resuelve."""
+    proc = corre([PY, "scripts/verify-p2-dois.py"], 600)
+    print(proc.stdout[-2000:])
+    if proc.returncode == 2:
+        print(proc.stderr[-1000:])
+        print(">> P2: PENDIENTE — red pública inaccesible; reintentar en CI")
+        return PENDIENTE, ""
+    if proc.returncode != 0:
+        print(proc.stderr[-2000:])
+        return FALLO, f"P2 exit={proc.returncode}"
+    print(">> P2: evidencia válida")
+    return VALIDA, ""
+
+
 def paso_javadoc() -> tuple[str, str]:
     proc = corre(mvnw() + ["javadoc:javadoc"], 600, BACKEND)
     print(proc.stdout[-1000:])
@@ -121,7 +141,7 @@ def main() -> int:
 
     simples = [
         ("P1", [PY, "scripts/verify-p1-hashes.py"], 300, VALIDA),
-        ("P2", [PY, "scripts/verify-p2-dois.py"], 600, VALIDA),
+        ("Integridad", [PY, "scripts/verify-report-integrity.py"], 300, VALIDA),
         ("P4", [PY, "scripts/verify-p4-k6.py"], 900, VALIDA),
         ("P5", [PY, "scripts/verify-p5-nativequery.py"], 300,
          "migrado (0 nativeQuery + 0 CALL nativos)"),
@@ -129,12 +149,15 @@ def main() -> int:
         ("P7", [PY, "scripts/verify-p7-names.py"], 300, VALIDA),
         ("P8/P9", [PY, "scripts/verify-p8-p9-figures.py"], 300, VALIDA),
         ("P11", [PY, "scripts/verify-p11-counts.py"], 300,
-         "conteos verificables (firmas externas pendientes)"),
+         "conteos verificables (aceptaciones por alcance)"),
         ("P12", [PY, "scripts/verify-p12-secrets.py"], 300, VALIDA),
     ]
     for punto, cmd, t, etiqueta in simples:
         etiqueta_out, error = paso_simple(punto, [PY] + cmd[1:] if cmd[0] == PY else cmd, t, etiqueta)
         registra(punto, etiqueta_out, error)
+
+    etiqueta, error = paso_p2()
+    registra("P2", etiqueta, error)
 
     etiqueta, error = paso_simple("P3", [PY, "scripts/verify-p3-sus.py"], 300,
                                   "PENDIENTE — no puntuable")

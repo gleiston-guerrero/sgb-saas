@@ -17,6 +17,9 @@ public interface FineProcedureRepository extends Repository<Fine, Long>, FinePro
      * la ejecución real está en
      * {@link FineProcedureRepositoryCustom#spPayFineProcedure(Long)} por el
      * mismo motivo que {@link com.uteq.backend.repository.LoanProcedureRepository#spCreateLoanProcedure}.
+     *
+     * @param fineId identificador de la multa que se paga.
+     * @return datos de salida declarados por el procedimiento.
      */
     @Procedure(name = "Multa.pagarMulta")
     Map<String, Object> spPayFineProcedure(Long fineId);
@@ -25,6 +28,11 @@ public interface FineProcedureRepository extends Repository<Fine, Long>, FinePro
      * Desde V51 existe el PROCEDURE nativo proc_anular_multa (SECURITY
      * DEFINER, invocable con CALL). Misma situación que
      * {@link #spPayFineProcedure}.
+     *
+     * @param fineId identificador de la multa que se anula.
+     * @param reason motivo de la anulación.
+     * @param roleExecutor rol del usuario que ejecuta la anulación.
+     * @return datos de salida declarados por el procedimiento.
      */
     @Procedure(name = "Multa.anularMulta")
     Map<String, Object> spVoidFineProcedure(Long fineId, String reason, String roleExecutor);
@@ -36,6 +44,10 @@ public interface FineProcedureRepository extends Repository<Fine, Long>, FinePro
      * exigido por la rúbrica; la ejecución real está en
      * {@link FineProcedureRepositoryCustom#spPaymentParcialFine(Long, java.math.BigDecimal)}
      * (StoredProcedureQuery posicional, P5).
+     *
+     * @param fineId identificador de la multa.
+     * @param amountPaid importe abonado de forma parcial.
+     * @return datos de salida declarados por el procedimiento.
      */
     @Procedure(procedureName = "proc_pago_parcial_multa")
     Map<String, Object> spPaymentParcialFine(
