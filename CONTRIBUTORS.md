@@ -133,17 +133,17 @@ Rol nominal en el equipo: Frontend.
   del entregable por falta de trazabilidad empírica; no se cuentan como
   evidencia vigente.
 - **Data curation** — creación y retiro declarado del dataset SUS previo
-  como evidencia empírica (N=0 en todo el entregable, ver OBS-08
-  reabierta y `DATA-PROVENANCE.md`: sin commit de datos reales),
+  como evidencia empírica; posteriormente, cierre de una nueva corrida
+  anonimizada de $N=15$ con manifest de custodia y cálculo reproducible,
   eliminación de
   15 PDFs con PII del historial de Git por cumplimiento de protección de
   datos, actualización de `ETHICS.md`, `DATA-DICTIONARY.md` (sección SUS,
   22 campos) y `DATA-PROVENANCE.md` (hash histórico invalidado por la
   reescritura del historial).
-- **Formal analysis** — reescritura completa de
-  `scripts/sus-analysis.ipynb`: estadística descriptiva, intervalo de
-  confianza al 95% y desglose por ítem del instrumento SUS (evidencia
-  versionada en el cuaderno; hash histórico invalidado por la reescritura
+- **Formal analysis** — implementación de `scripts/analyze-sus.py` y
+  `scripts/verify-p3-sus.py`: estadística descriptiva, intervalo de
+  confianza al 95% y desglose por ítem del instrumento SUS desde el export
+  anonimizado; el notebook histórico no se usa como fuente de resultados.
   del historial).
 - **Validation** — evidencia E2E del frontend contra el backend real
   para préstamos/reservaciones/multas (commit `84ffc30`); corrección de

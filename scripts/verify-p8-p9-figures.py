@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-"""P8/P9: 15 figuras referenciadas y texto dentro de figuras en ingles.
+"""P8/P9: al menos 15 figuras referenciadas y texto dentro de figuras en ingles.
 
 P8: cuenta \\begin{figure}, \\includegraphics, \\label{fig:...} en
-  docs/capitulos/*.tex; exige 15 figuras con label unico, cada label
+  docs/capitulos/*.tex; exige al menos 15 figuras con label unico, cada label
   citado al menos una vez (\\autoref) y cada grafico existente en disco.
 P9: busca texto espanol SOLO dentro de figuras (archivos .svg
   versionados + captions de entornos figure). Tablas y sus captions
-  quedan fuera de alcance. docs/mediciones/sus/** se excluye a
-  proposito: dataset retirado, no evidencia.
+  quedan fuera de alcance.
 
 Uso: python scripts/verify-p8-p9-figures.py
 Sale 0 si todo cumple, 1 con el primer incumplimiento.
@@ -28,7 +27,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CAPS = sorted((ROOT / "docs" / "capitulos").glob("*.tex"))
 
-N_FIGURAS = 15
+MIN_FIGURAS = 15
 
 # Palabras que delatan texto espanol dentro de una figura (svg o caption
 # de entorno figure). Lista acotada a vocabulario del dominio; los
@@ -55,8 +54,8 @@ def main() -> int:
     cuerpos = {p: p.read_text(encoding="utf-8", errors="replace") for p in CAPS}
 
     n_fig = sum(len(re.findall(r"\\begin\{figure\}", t)) for t in cuerpos.values())
-    if n_fig != N_FIGURAS:
-        return falla(f"figuras: {n_fig} != {N_FIGURAS} esperadas")
+    if n_fig < MIN_FIGURAS:
+        return falla(f"figuras: {n_fig} < {MIN_FIGURAS} mínimas")
     print(f"verify-p8-p9: OK ({n_fig} entornos figure)")
 
     labels: dict[str, int] = {}
@@ -66,8 +65,8 @@ def main() -> int:
     dup = sorted(l for l, c in labels.items() if c > 1)
     if dup:
         return falla(f"labels duplicados: {dup}")
-    if len(labels) != N_FIGURAS:
-        return falla(f"labels fig: {len(labels)} != {N_FIGURAS}")
+    if len(labels) != n_fig:
+        return falla(f"labels fig: {len(labels)} != {n_fig} entornos figure")
     print(f"verify-p8-p9: OK ({len(labels)} labels unicos)")
 
     refs: set[str] = set()
@@ -93,6 +92,7 @@ def main() -> int:
     # P9: texto de los .svg versionados (fuera sus/ retirado).
     svg_dirs = [ROOT / "docs" / "mediciones" / "figuras",
                 ROOT / "docs" / "mediciones" / "perf",
+                ROOT / "docs" / "mediciones" / "sus",
                 ROOT / "docs" / "arquitectura"]
     patron = re.compile(r"|".join(rf"\b{w}\b" for w in ES_SVG), re.IGNORECASE)
     for d in svg_dirs:
@@ -118,7 +118,7 @@ def main() -> int:
                     return falla(f"P9: caption en espanol ({p.name}): ...{w.strip()}...")
     print("verify-p8-p9: OK (captions de figuras en ingles)")
 
-    print("verify-p8-p9: OK (15/15 figuras referenciadas; figuras en ingles)")
+    print(f"verify-p8-p9: OK ({n_fig}/{n_fig} figuras referenciadas; figuras en ingles)")
     return 0
 
 

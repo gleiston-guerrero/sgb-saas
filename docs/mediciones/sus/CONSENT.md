@@ -1,45 +1,23 @@
-# Consentimientos y acceso — SUS
+# Consentimientos y acceso — SUS 2026-09-19
 
-Estado: bloque SUS en **N = 0**. No se incluyen consentimientos
-firmados ni respuestas en este repositorio: no existe una corrida
-válida que respaldar.
+Los nombres, correos, firmas electrónicas y la hoja original no se
+publican. Se conservan bajo custodia privada de Moisés Panamá Murillo y
+pueden mostrarse al docente para contrastar una fila del manifiesto con
+el registro fuente. El repositorio contiene solamente códigos P01--P15,
+metadatos de respuesta y contenido ya anonimizado.
 
-No hay dataset SUS en el árbol evaluado: el `sus.csv` previo (15 filas
-aparentes) se retiró del árbol en Fase 0.1 por los motivos técnicos de
-abajo. Solo permanece en el historial Git; el commit/tag evaluado no lo
-contiene. Tampoco se conservan sus figuras derivadas (`sus_boxplot.*`,
-`sus_items_breakdown.*`).
+La recolección se cerró con 17 envíos. Se incluyeron 15 respuestas de
+personas adultas que aceptaron el consentimiento y completaron SUS. Se
+excluyeron antes de calcular: una respuesta de una persona que indicó no
+poder participar por edad y una respuesta con correo de demostración/no
+verificable. No se excluyó ni alteró ninguna respuesta por su puntaje.
 
-Procedimiento para una futura corrida válida (si el equipo la ejecuta):
+Además del consentimiento inicial para uso académico agregado, el
+responsable informó una autorización oral grupal de los 15 participantes
+válidos para publicar únicamente la versión anonimizada. Esa autorización
+se registra con transparencia en `consents-manifest.md`; no se presenta
+como una segunda firma escrita.
 
-1. Obtener consentimiento explícito firmado por cada participante para
-   publicación (escaneo PDF o firma electrónica) y almacenar los archivos
-   en un repositorio de artefactos privado/controlado (no en el repo
-   público) o en un ZIP cifrado con clave gestionada por el equipo.
-2. Publicar en este repositorio solo un manifiesto (`docs/mediciones/sus/consents-manifest.md`)
-   que contenga metadatos: `codigo` (ID de participante), fecha de firma,
-   alcance del consentimiento (p. ej. publicación agregada, reuso), y
-   referencia al artefacto depositado externamente (URL segura o DOI).
-3. Incluir en DATA-PROVENANCE.md la traza hacia el manifiesto y la política
-   de acceso a los consentimientos.
-
-Motivo técnico del retiro (registro de auditoría, se conserva como
-constancia histórica):
-
-- Análisis del CSV retirado detectó señales incompatibles con respuestas
-  independientes: tres ítems (Q8, Q9, Q10) con varianza exactamente cero;
-  el campo `sexo` alterna sistemáticamente Femenino/Masculino en las 15
-  filas; el campo `dispositivo` muestra un patrón repetitivo por paridad;
-  además el commit de origen referido en la traza no existe en este árbol.
-  Estas inconsistencias impiden aceptar estas respuestas como evidencia
-  reproducible sin trazabilidad y consentimientos verificables.
-
-Decisión tomada:
-
-- NO se reescribió el historial Git (permanece como estaba, por
-  integridad del repositorio).
-- El dataset retirado NO forma parte del árbol evaluado; el entregable
-  declara formalmente N=0 y no utiliza puntajes SUS como evidencia. Si el
-  equipo aporta el instrumento original y los consentimientos
-  verificables, se revertirá la retirada siguiendo el procedimiento
-  documentado arriba.
+El CSV se usa solo como evidencia académica y de reproducibilidad. No se
+debe intentar reidentificar participantes ni reutilizar los textos para
+fines distintos de la evaluación del proyecto.

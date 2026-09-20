@@ -74,17 +74,15 @@ público.
 
 \subsection*{RQ3 -- ¿Cómo perciben usuarios reales la usabilidad del sistema (SUS)?}
 
-RQ3 \textbf{no tiene respuesta todavía}. Con $N=0$ de los $N\geq15$
-participantes exigidos, no existe ninguna puntuación SUS que interpretar
-(\autoref{sec:res-usabilidad}). Forzar una respuesta aquí -- aunque fuera
-calificada de ``preliminar'' o ``estimada'' -- sería exactamente el tipo
-de afirmación no verificada que este documento se niega a producir en
-cualquier otro capítulo; no hay razón para relajar ese criterio en la
-discusión. La respuesta honesta a RQ3, a la fecha de este documento, es
-que sigue siendo trabajo en progreso, bloqueado en la cadena de
-dependencias correcta (protocolo de consentimiento ya definido
-$\to$ despliegue público $\to$ reclutamiento $\to$ aplicación del
-instrumento), no una omisión arbitraria.
+RQ3 cuenta ahora con una respuesta descriptiva y acotada. La muestra por
+conveniencia de $N=15$ participantes adultos obtuvo una media SUS de
+$66{,}00$ (mediana $67{,}50$, IC95\%: $56{,}95$--$75{,}05$), con 13 tareas
+completadas y 2 parcialmente completadas. Esto sugiere una experiencia
+usable pero con margen claro de mejora; los comentarios reportan lentitud,
+acceso y búsqueda como puntos a priorizar. No se infiere aceptación de toda
+la comunidad UTEQ: el reclutamiento no fue aleatorio y la autorización de
+publicación de filas anonimizadas fue oral y grupal, limitaciones documentadas
+en \autoref{sec:res-usabilidad}.
 
 \subsection*{RQ4 -- ¿Qué efecto tiene la estrategia híbrida CRUD-ORM/SP sobre trazabilidad y cobertura?}
 
@@ -197,12 +195,12 @@ pieza pendiente, la verificación de TLS end-to-end en un entorno de
 despliegue público real (A02), también se completó -- el header
 \texttt{Strict-Transport-Security} se confirmó activo en producción el
 18-ago-2026, dejando los 6 controles auditados con resultado cerrado. Lo
-que todavía no está listo para una decisión de adopción informada es la
-evidencia de usabilidad percibida por usuarios reales (RQ3, pendiente,
-$N=0$) -- la única pieza que sigue dependiendo de participantes externos
-al propio código, no de trabajo de ingeniería adicional dentro del
-repositorio. Una institución que considere este sistema debería tratar
+que requiere cautela antes de una decisión de adopción informada es la
+evidencia de usabilidad percibida por usuarios reales (RQ3): existe una
+muestra por conveniencia de $N=15$, pero no un estudio representativo.
+Una institución que considere este sistema debería tratar
 la Entrega Final como una base arquitectónica y de calidad de código
 sólida -- incluyendo su superficie de seguridad, ya verificada en su
 totalidad --, pero condicionar cualquier decisión de producción a que la
-pieza de usabilidad (SUS) se complete primero.
+hallazgos de usabilidad (SUS) como base para priorizar mejoras y validar
+de nuevo con una muestra más diversa.

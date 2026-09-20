@@ -15,8 +15,8 @@ rendimiento, seguridad, usabilidad y arquitectura híbrida de acceso a
 datos, con evidencia versionada y verificable. Bajo \emph{Design
 Science Research} se aplicaron k6 (50~VUs, 5~corridas, Wilcoxon y
 Cliff's delta), auditoría OWASP manual y automatizada (Top~10:2021 +
-ZAP), JaCoCo, Lighthouse, y un protocolo SUS con consentimiento
-definido pero aún no ejecutado. Ambos umbrales p95 se cumplen con
+ZAP), JaCoCo, Lighthouse, y una ejecución SUS con 15 participantes
+adultos, consentimiento privado y export anonimizado. Ambos umbrales p95 se cumplen con
 margen amplio ($65{,}60$/$17{,}13$\,ms, bajo $200$/$500$\,ms); de
 6~controles OWASP, 4 presentaron hallazgos reales, $100$\,\%
 corregidos y re-verificados; ZAP en producción no reportó hallazgos
@@ -25,12 +25,14 @@ adicional en desarrollo detectó \emph{High} aún en triage; JaCoCo
 alcanza $86{,}30$\,\% de líneas (2337/2708) y $74{,}53$\,\% de ramas
 (594/797) sobre 655
 pruebas de backend, y 23 de los 26~requisitos
-\texttt{Must} (71 totales) tienen verificación real. Usabilidad ($N=0$ de 15) y calidad
-web (2 de 6~corridas Lighthouse) permanecen incompletas. SGB-SaaS
+\texttt{Must} (71 totales) tienen verificación real. La muestra de
+usabilidad ($N=15$) obtuvo una media SUS de $66{,}00$ (IC95\%:
+$56{,}95$--$75{,}05$); es una muestra por conveniencia y no se presenta
+como representativa. SGB-SaaS
 cumple sus umbrales de rendimiento y cobertura con margen sólido; su
 auditoría de seguridad, con hallazgos reales corregidos, confirma un
-proceso genuino; los gaps de usabilidad, TLS extremo a extremo y
-ZAP/Lighthouse completos quedan declarados como trabajo futuro, no
+proceso genuino; los límites de generalización de la muestra y los
+hallazgos de experiencia de usuario quedan declarados como trabajo futuro, no
 ocultados.
 
 \textbf{Palabras clave:} ingeniería de requisitos; control de acceso;
@@ -50,7 +52,7 @@ architecture, backed by versioned, verifiable evidence. Under Design
 Science Research, the team ran k6 (50~VUs, 5~runs, paired Wilcoxon and
 Cliff's delta), a manual and automated OWASP audit (Top~10:2021 + ZAP),
 JaCoCo coverage, Lighthouse auditing, and a System Usability Scale
-(SUS) protocol with consent defined but not yet executed. Both p95
+(SUS) run with 15 adult participants, private consent, and an anonymized export. Both p95
 latency thresholds are met with a wide margin (65.60~ms and 17.13~ms,
 under 200/500~ms limits); of 6~audited OWASP controls, 4 had real
 findings, 100\% fixed and re-verified; the production ZAP scan reported
@@ -59,12 +61,13 @@ separate development scan did surface \emph{High} issues still under
 triage; JaCoCo coverage reaches 86.30\% of lines (2337/2708) and 74.53\% of
 branches (594/797) across 655~backend tests, and 23 of the
 26~\texttt{Must}-priority
-requirements (71~total) carry real verification. Usability
-($N=0$ of 15) and web-quality auditing (2 of 6~required runs) remain
-incomplete. SGB-SaaS meets its performance and coverage thresholds with
+requirements (71~total) carry real verification. The usability sample
+($N=15$) produced a mean SUS score of 66.00 (95\% CI: 56.95--75.05);
+it is a convenience sample and is not presented as population-representative.
+SGB-SaaS meets its performance and coverage thresholds with
 a solid margin; its security audit, with real findings fixed, confirms
-a genuine process; the usability, end-to-end TLS, and full
-ZAP/Lighthouse gaps are explicitly declared as future work rather than
+a genuine process; the sample's generalization limits and user-experience
+findings are explicitly declared as future work rather than
 hidden.
 
 \textbf{Keywords:} requirements engineering; access control; web

@@ -54,11 +54,13 @@ bajo el mismo DOI del software citado en la portada de este documento
 en el mismo repositorio y bajo la misma licencia MIT
 (\autoref{sec:decl-codigo}).
 
-Los formularios de consentimiento informado firmados por participantes
-reales de las pruebas de usabilidad (cuando se ejecuten,
-\autoref{sec:tf-sus}) están explícitamente excluidos de este
-repositorio y de cualquier archivado público, por la razón declarada en
-la \autoref{sec:decl-etica}.
+Los formularios de consentimiento informado, correos y firmas de la
+corrida SUS ejecutada el 19 de septiembre de 2026 permanecen fuera de
+este repositorio y de cualquier archivado público. En cambio,
+\texttt{docs/mediciones/sus/sus.csv} contiene únicamente las 15 filas
+anonimizadas autorizadas para la evaluación académica; el manifiesto por
+código permite al docente contrastarlas con los registros privados sin
+exponer identidades.
 
 \section{Disponibilidad de materiales}
 
@@ -87,11 +89,10 @@ trazables:
   \item \textbf{Configuración de Lighthouse CI}: \texttt{frontend-angular/lighthouserc.js},
     con el perfil móvil/Slow~4G ya parametrizado y comentado, listo para
     ejecutarse contra el stack Docker real.
-  \item \textbf{Protocolo de usabilidad SUS}: plantilla de consentimiento
-    informado en \texttt{docs/etica/consentimientos/plantilla.md}
-    (\autoref{sec:tf-sus}). No hay respuestas SUS, consentimientos
-    firmados ni figuras derivadas versionadas en esta entrega; el bloque
-    permanece en $N=0$.
+  \item \textbf{Evidencia de usabilidad SUS}: instrumento aplicado,
+    CSV anónimo de 15 respuestas, manifiesto de consentimientos,
+    recálculo y figuras en \texttt{docs/mediciones/sus/}. Las firmas y
+    registros identificables permanecen bajo custodia privada.
 \end{itemize}
 
 \section{Declaración ética}
@@ -108,18 +109,14 @@ este capítulo. En síntesis:
     título, autor, editorial); ninguna contraseña se almacena en texto
     plano (hash BCrypt, costo 12); se verificó por auditoría de código
     que ningún endpoint expone el campo \texttt{passwordHash}.
-  \item Los participantes de las pruebas SUS (cuando se ejecuten,
-    \autoref{sec:tf-sus}) firman un consentimiento informado bajo la
-    plantilla ya versionada, que declara explícitamente el propósito de
-    la prueba, los datos recogidos (sin datos identificables, solo un
-    código de participante \texttt{P01}, \texttt{P02}, ...), el
-    mecanismo de anonimización, y el derecho a retirarse en cualquier
-    momento sin consecuencias.
-  \item No existen formularios SUS firmados para esta entrega, porque la
-    corrida queda diferida. Cuando se ejecute, los formularios
-    \textbf{no se subirán a este repositorio público bajo ninguna forma};
-    se custodiarán, según \texttt{ETHICS.md}, en un medio separado
-    (físico o digital con acceso restringido).
+  \item Los 15 participantes incluidos en la corrida SUS confirmaron ser
+    mayores de edad, aceptaron el consentimiento y firmaron el formulario
+    privado. La publicación expone solo códigos P01--P15 y datos
+    anonimizados; la custodia permite revisión docente bajo solicitud.
+  \item Los formularios originales, firmas y correos \textbf{no se
+    suben} a este repositorio público. El manifiesto declara de forma
+    transparente que la autorización para publicar las filas anónimas se
+    confirmó oralmente el 19 de septiembre de 2026.
 \end{itemize}
 
 \section{Contribuciones de autoría (taxonomía CRediT)}
@@ -182,8 +179,9 @@ este capítulo:
     Préstamos, Reservaciones y Multas (\texttt{frontend-angular/}) y de
     varias historias de usuario en \texttt{docs/requisitos/}. 370 commits humanos sin merges según la misma consulta con
     \texttt{.mailmap} (rev \texttt{3489e2c5}; conteos vigentes por
-    rol en \texttt{CONTRIBUCIONES.md}). Asignado a la ejecución de las
-    pruebas SUS pendientes (OBS-08, \autoref{sec:tf-sus}).
+    rol en \texttt{CONTRIBUCIONES.md}). Ejecutó el cierre SUS de
+    $N=15$; sus límites de muestreo y privacidad se documentan en
+    \texttt{docs/mediciones/sus/} y \autoref{sec:tf-sus}.
 \end{itemize}
 
 La actividad temporal y el reparto por autor se visualizan en las

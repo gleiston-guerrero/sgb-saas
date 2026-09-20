@@ -2,10 +2,10 @@
 """Orquestador unico de verificacion P1-P12 (fuente de verdad de `make verify`).
 
 Ejecuta cada verificador y clasifica por punto:
-  "evidencia válida" | "PENDIENTE" (visible, nunca aprobado) | "FALLO".
+"evidencia válida" | "PENDIENTE" (visible, nunca aprobado) | "FALLO".
 Sale 0 solo si no hay ningun FALLO. Un exit 0 con pendientes significa
 coherencia/reproducibilidad de la evidencia disponible, NO cumplimiento
-academico total: P3 y las firmas de P11 siguen sin puntuar.
+académico total; una dependencia local puede dejar P2 o P10 pendiente.
 
 P10 corre DemoAccountAuthorizationIntegrationTest en subproceso y exige
 leer el resumen Surefire con exactamente 3/0/0/0 (run/fallos/errores/
@@ -159,9 +159,8 @@ def main() -> int:
     etiqueta, error = paso_p2()
     registra("P2", etiqueta, error)
 
-    etiqueta, error = paso_simple("P3", [PY, "scripts/verify-p3-sus.py"], 300,
-                                  "PENDIENTE — no puntuable")
-    registra("P3", "PENDIENTE — no puntuable" if etiqueta != FALLO else FALLO, error)
+    etiqueta, error = paso_simple("P3", [PY, "scripts/verify-p3-sus.py"], 300, VALIDA)
+    registra("P3", etiqueta, error)
 
     etiqueta, error = paso_p10()
     registra("P10", etiqueta, error)
@@ -178,8 +177,7 @@ def main() -> int:
         for f in fallos:
             print(f"  - {f}")
         return 1
-    print("verify-all: exit 0 = coherencia/reproducibilidad de la evidencia "
-          "disponible, NO cumplimiento academico total (P3 y firmas no puntuan)")
+    print("verify-all: exit 0 = coherencia/reproducibilidad de la evidencia disponible")
     return 0
 
 

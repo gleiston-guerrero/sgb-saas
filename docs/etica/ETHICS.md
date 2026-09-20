@@ -108,18 +108,16 @@ lectores y personal (tabla `usuarios`, `db/schema.sql`).
 
 ## (iii) Consentimiento informado para pruebas de usabilidad (SUS, Bloque C.3)
 
-El protocolo ético y la plantilla de consentimiento informado
-(`docs/etica/consentimientos/plantilla.md`) quedaron **diseñados,
-aprobados y versionados**, pero la fase de recolección en campo con
-participantes **se postergó**: el bloque de usabilidad sigue en $N=0$
-(ver `OBS-08` en `docs/observaciones/OBSERVACIONES.md`, reabierta, y la
-toma de datos diferida a la fase de despliegue en producción). No hay
-consentimientos firmados que custodiar a la fecha de este documento.
+El 19-sep-2026 se cerró una corrida SUS de $N=15$ participantes adultos.
+Cada participante aceptó el consentimiento en el formulario privado antes
+de responder; los formularios con identidad y firma electrónica quedan bajo
+custodia del responsable y no se versionan. El repositorio conserva el
+instrumento, el export anonimizado, el manifest de custodia y el cálculo
+reproducible en `docs/mediciones/sus/`.
 
 **Protección de datos personales (PII) — regla permanente:** Por
 cumplimiento estricto de normativas de protección de datos personales,
-los consentimientos que se firmen en la futura corrida (física o
-digitalmente) **no deben conservarse en este repositorio público bajo
+los consentimientos firmados (física o digitalmente) **no deben conservarse en este repositorio público bajo
 ninguna forma**.
 
 **Justificación de anonimización:** El repositorio del proyecto es
@@ -139,19 +137,19 @@ como referencia pública del protocolo utilizado.
 - **`docs/mediciones/`** solo contendrá evidencia técnica: timings
   (ej. `TIME:0.169557` en `docs/mediciones/sec/2026-07-21-cache-libros-ttl.md`),
   hashes (ej. `TTL`/keys de Redis), códigos de estado HTTP, y — para las
-  futuras corridas de SUS del Bloque C.3 — **puntuaciones agregadas y
+  corridas SUS del Bloque C.3 — **puntuaciones agregadas y
   respuestas identificadas solo por código de participante** (`P01`,
   `P02`, ... ver plantilla de TAREA 2), nunca nombre, correo ni ningún
   otro dato que permita identificar a una persona real. Los 2 archivos
   existentes hoy en `docs/mediciones/sec/` ya cumplen este criterio —
   fueron generados contra el usuario de desarrollo `admin@sgb-saas.local`
   (no una persona real), como se documenta en cada uno de esos archivos.
-- **Consentimientos de SUS:** a la fecha no hay formularios firmados que
-  custodiar (bloque en $N=0$, ver sección (iii)).
-  `docs/etica/consentimientos/` contiene únicamente la plantilla en blanco
-  (versionada, pública); los formularios que se firmen en la futura corrida
-  se conservarán fuera de este repositorio, en un medio separado de acceso
-  restringido, y nunca se versionarán aquí.
+- **Consentimientos de SUS:** existen en el formulario privado y se
+  conservan fuera de este repositorio, en un medio de acceso restringido.
+  La publicación de las filas anonimizadas fue confirmada oralmente de forma
+  grupal según informó el responsable de difusión; esta confirmación no se
+  presenta como una segunda firma escrita. La plantilla pública sigue en
+  `docs/etica/consentimientos/` como referencia del protocolo.
 - Este mismo criterio aplica a cualquier evidencia futura del Bloque C
   (k6, Lighthouse, JaCoCo): son mediciones técnicas sobre el sistema, no
   sobre personas, y no está previsto que requieran ningún dato personal.

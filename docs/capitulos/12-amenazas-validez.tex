@@ -72,29 +72,25 @@ resueltos con funciones puras y \texttt{ClockService} y registrados como
 \section{Validez externa}
 \label{sec:validez-externa}
 
-La amenaza de validez externa más relevante en este bloque es la
-ausencia de evidencia de usabilidad (System Usability Scale, SUS): la
-guía de esta entrega exige un mínimo de $N\geq15$ participantes y el
-bloque sigue en $N=0$ (\autoref{sec:res-usabilidad}; corrida anterior
-retirada por falta de trazabilidad, ver \texttt{OBS-08} en
-\texttt{docs/observaciones/OBSERVACIONES.md}, reabierta). Sin muestra
-no hay conclusión de usabilidad que generalizar -- y esa es
-precisamente la amenaza declarada: RQ3 queda sin respuesta hasta la
-fase de despliegue. Para la corrida futura, el diseño ya anticipa sus
-límites: la muestra se reclutará \textbf{por conveniencia dentro de la
-comunidad UTEQ}, no de forma aleatoria ni fuera de ese contexto
+La amenaza de validez externa más relevante en este bloque es el alcance
+de la evidencia de usabilidad (System Usability Scale, SUS). La guía
+exige un mínimo de $N\geq15$ participantes y se alcanzó una muestra de
+$N=15$ (\autoref{sec:res-usabilidad}), pero se reclutó \textbf{por
+conveniencia dentro de la comunidad UTEQ}, no de forma aleatoria ni fuera
+de ese contexto
 institucional. \citet{baltes2022sampling} documentan, en su revisión
 crítica de prácticas de muestreo en investigación de ingeniería de
 software, que muestras pequeñas y no aleatorizadas -- exactamente el
-perfil previsto de este estudio SUS -- limitan severamente la
+perfil de este estudio SUS -- limitan severamente la
 generalización de cualquier conclusión más allá de la muestra concreta
 estudiada, y recomiendan reportar explícitamente el método de
 reclutamiento y sus límites en vez de presentar el resultado como
-representativo de una población más amplia sin justificarlo. El
-protocolo completo -- plantilla de consentimiento informado, tarea de
-\emph{onboarding} de dos pasos, código de participante anónimo -- ya
-está definido y se aplicará según lo definido cuando se ejecute la
-corrida (\autoref{sec:tf-sus}).
+representativo de una población más amplia sin justificarlo. Los datos
+publicados usan códigos anónimos, mientras que el consentimiento y las
+identidades permanecen privados. La autorización adicional para publicar
+filas anónimas se comunicó oralmente de forma grupal, no como segunda firma
+escrita; por ello la reproducibilidad pública no sustituye una futura
+validación con muestreo más diverso (\autoref{sec:tf-sus}).
 
 Una segunda amenaza de validez externa, más estructural: todos los
 hallazgos de este proyecto provienen de un único contexto (una biblioteca

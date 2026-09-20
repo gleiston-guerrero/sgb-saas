@@ -42,11 +42,10 @@ doi: 10.5281/zenodo.22741050
 # CFF 1.2.0 no tiene un campo estándar para digests de imágenes: se deja
 # como comentario para no inventar un campo no contemplado por el esquema.
 # ---
-# Digest SHA256 de docs/informe-final.pdf (regenerado 2026-09-18, 109
-# paginas -- P4 unificado, serie k6 vigente, DOI vigente, figuras
-# C4/DER/JaCoCo corregidas, P11 re-sincronizado; mismo valor que README.md
+# Digest SHA256 de docs/informe-final.pdf (regenerado 2026-09-19, 110
+# paginas -- P3 SUS anonimizado y capítulos sincronizados; mismo valor que README.md
 # "Integridad del entregable"):
-# 4209D49EE57E3F6E95BD1D5BE8B3862F4AF552B90374B1182A0FC3912236FAB2
+# 41C5BF4CCBF57977C80E03D1C3EA431F17DDED5ECEA6CBFE5F15847A97BED924
 # NOTA: si el PDF se recompila al cierre, re-sincronizar este digest y
 # el del README con el nuevo `Get-FileHash docs/informe-final.pdf
 # -Algorithm SHA256` (docs/capitulos/00-portada.tex no fija un valor
