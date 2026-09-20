@@ -128,6 +128,15 @@ transcribe firmas por otros integrantes.
   Filas aceptadas: P1, P2, P3 retiro/N=0, P4, P5, P6, P8/P9, P10,
   P11, P12, EV-1/EV-2 y sección B CRediT de Panamá.
   Firma: Panamá Murillo Moisés Antonio.
+
+  **Adenda personal — 2026-09-20.** Confirmo personalmente que realicé la
+  recolección, anonimización, análisis y verificación de la corrida SUS
+  $N=15$ del 19 de septiembre de 2026. Esta adenda sustituye únicamente la
+  limitación previa de mi declaración respecto de P3; no reclamo autoría
+  sobre las respuestas individuales de los participantes. La evidencia
+  pública permanece anonimizada y el export original con consentimientos se
+  conserva para contraste docente privado.
+  Firma: Panamá Murillo Moisés Antonio.
 - **Loor Medranda Marlon Taylor** — `mloorm14@uteq.edu.ec` — Fecha: 2026-09-18.
   Declaración de aceptación personal: Yo, Loor Medranda Marlon Taylor,
   revisé personalmente la evidencia y los commits indicados en este

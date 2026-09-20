@@ -33,6 +33,10 @@ STATS = SUS / "sus-statistics.json"
 README = SUS / "README.md"
 CONSENT = SUS / "CONSENT.md"
 RESULTS = ROOT / "docs" / "capitulos" / "08-resultados.tex"
+OBSERVATIONS = ROOT / "docs" / "observaciones" / "OBSERVACIONES.md"
+REPOSITORY_README = ROOT / "README.md"
+DECLARATIONS = ROOT / "docs" / "capitulos" / "13-declaraciones.tex"
+RAW_EXPORT_SHA256 = "CA38657863181D248947B0B582A5A588C03D52DCEEADB962695A14C5A326586E"
 
 FIELDS = ["code", "timestamp", "task_completion", "device",
           "web_experience", "incidence", "q1", "q2", "q3", "q4",
@@ -158,6 +162,8 @@ def close(actual: object, wanted: object) -> bool:
 
 def main() -> int:
     required = (CSV_PATH, MANIFEST, INSTRUMENT, STATS, README, CONSENT,
+                SUS / "RAW-EXPORT-ATTESTATION.md", OBSERVATIONS,
+                REPOSITORY_README, DECLARATIONS,
                 RESULTS, SUS / "sus-score-boxplot.svg", SUS / "sus-score-boxplot.pdf",
                 SUS / "sus-item-means.svg", SUS / "sus-item-means.pdf")
     missing = [str(path.relative_to(ROOT)) for path in required if not path.is_file()]
@@ -197,12 +203,28 @@ def main() -> int:
     print("verify-p3: OK (instrumento y cuatro derivados SUS presentes; figuras en inglés)")
 
     readme = README.read_text(encoding="utf-8", errors="replace")
+    repository_readme = REPOSITORY_README.read_text(encoding="utf-8", errors="replace")
     results = RESULTS.read_text(encoding="utf-8", errors="replace")
+    observations = OBSERVATIONS.read_text(encoding="utf-8", errors="replace")
+    attestation = (SUS / "RAW-EXPORT-ATTESTATION.md").read_text(encoding="utf-8", errors="replace")
+    declarations = DECLARATIONS.read_text(encoding="utf-8", errors="replace")
     if "N=15" not in readme or "66,00" not in readme:
         return fail("README SUS no declara N=15 y la media vigente")
     if "N=0" in readme or "N=0" in results:
         return fail("documentación SUS aún declara N=0")
-    print("verify-p3: OK (documentación vigente, sin N=0)")
+    if "cuaderno histórico" not in repository_readme or "no es la" not in repository_readme:
+        return fail("README no distingue el notebook histórico del análisis vigente")
+    required_results = ("$N=15$", "media 66,00", "mediana 67,50",
+                        "DT 16,33", "[56,95; 75,05]")
+    if any(value not in results for value in required_results):
+        return fail("capítulo de resultados no coincide con las estadísticas SUS publicadas")
+    if "OBS-08" not in observations or "APLICADA CON RESERVA" not in observations:
+        return fail("OBS-08 no registra el cierre SUS vigente")
+    if RAW_EXPORT_SHA256 not in attestation or "17" not in attestation or "16:12" not in attestation:
+        return fail("constancia pública no fija la custodia del export original")
+    if "RAW-EXPORT-ATTESTATION.md" not in declarations or "al menos tres códigos" not in declarations:
+        return fail("declaraciones no describen el contraste docente privado del export")
+    print("verify-p3: OK (documentación, estadísticas, OBS-08 y custodia sincronizados)")
     print("verify-p3: evidencia válida (instrumento, CSV anónimo, manifiesto de custodia y recálculo reproducible)")
     return 0
 
