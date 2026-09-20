@@ -39,8 +39,8 @@ y documentada del proyecto:
     \texttt{docs/\allowbreak mediciones/\allowbreak frontend/\allowbreak 2026-07-30-flujo-\allowbreak frontend-\allowbreak prestamos-\allowbreak reservaciones-\allowbreak multas-e2e.md}.
   \item \textbf{Evaluación.} El conjunto de instrumentos de medición
     descrito en la \autoref{sec:mm-instrumentos} de este mismo capítulo
-    (k6, JaCoCo, Lighthouse, auditoría OWASP, y SUS pendiente de
-    ejecución).
+    (k6, JaCoCo, Lighthouse, auditoría OWASP y SUS ejecutado con
+    $N=15$ participantes).
   \item \textbf{Comunicación.} Este mismo informe académico, el checklist
     de calidad de requisitos INCOSE~v4
     (\texttt{docs/checklists/incose2023-req.md}), la documentación
@@ -57,8 +57,8 @@ y documentada del proyecto:
     ítems tipo Likert de 5 puntos, alternando afirmaciones positivas y
     negativas, que producen una puntuación agregada de 0 a 100 por
     participante mediante la fórmula estándar del instrumento. Es el
-    instrumento del Bloque~C.3 de esta guía; su estado de ejecución real
-    -- todavía pendiente -- se declara con honestidad en la
+    instrumento del Bloque~C.3 de esta guía; su ejecución y sus límites
+    de muestreo se declaran con honestidad en la
     \autoref{sec:mm-poblacion}.
   \item \textbf{k6} (\texttt{k6/libros-listado-test.js},
     \texttt{k6/opts.js}): herramienta de prueba de carga HTTP, usada para
@@ -148,21 +148,17 @@ cualquier conclusión más allá de la muestra concreta estudiada, y
 recomiendan declarar explícitamente el método de reclutamiento en vez de
 presentar el resultado como representativo de una población más amplia.
 
-\textbf{Nota de honestidad -- estado real de ejecución.} La muestra SUS
-\textbf{no se ha reclutado ni ejecutado todavía} al momento de escribir
-este capítulo (\texttt{OBS-08} en
-\texttt{docs/observaciones/OBSERVACIONES.md}: ``Pendiente -- en progreso,
-asignada a Panama''). Lo que sí existe, ya definido y versionado antes de
-la primera ejecución real (no de forma retroactiva), es el protocolo
-completo: plantilla de consentimiento informado
-(\texttt{docs/etica/consentimientos/plantilla.md}), técnica de muestreo
-por conveniencia dentro de la comunidad UTEQ, tamaño mínimo de muestra
-$N\geq15$ participantes exigido por la guía, y anonimización mediante
-código de participante (\texttt{P01}, \texttt{P02}, \ldots, ver
-\texttt{docs/etica/ETHICS.md}, sección~iii) -- nunca nombre ni correo. No
-se declara una muestra ya obtenida para no incurrir en el mismo tipo de
-afirmación no verificada que este documento evita de forma sistemática en
-el resto de sus capítulos.
+\textbf{Nota de honestidad -- ejecución y alcance.} El 19-sep-2026 se
+cerró una muestra por conveniencia de $N=15$ participantes adultos. Cada
+persona aceptó el consentimiento del formulario privado; los identificadores
+personales quedan bajo custodia y el repositorio publica únicamente códigos
+\texttt{P01}, \ldots, \texttt{P15} y respuestas anonimizadas. La media
+recalculada es $66{,}00$ (IC95\%: $56{,}95$--$75{,}05$), pero la muestra no
+es aleatoria ni representa a toda la población UTEQ. La autorización oral
+grupal para publicar filas anonimizadas fue comunicada por el responsable de
+la difusión y se documenta como tal; no se presenta como una segunda firma
+individual escrita. El instrumento, manifest de custodia y cálculo están en
+\texttt{docs/mediciones/sus/}.
 
 \section{Protocolo experimental de rendimiento (replicable)}
 \label{sec:mm-protocolo-perf}

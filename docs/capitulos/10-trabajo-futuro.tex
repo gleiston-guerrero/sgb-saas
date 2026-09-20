@@ -10,26 +10,17 @@ sino los gaps reales ya identificados en el propio repositorio a lo largo
 de este documento. Cada una indica por qué quedó fuera de alcance y cómo
 se abordaría.
 
-\section{Completar la evidencia de usabilidad (SUS, $N\geq15$) -- PENDIENTE}
+\section{Evidencia de usabilidad (SUS, $N=15$) -- CERRADO}
 \label{sec:tf-sus}
 
-El Bloque~5 de evaluación empírica sigue con $N=0$ de los $N\geq15$
-participantes que exige la guía, bloqueado hasta contar con un
-despliegue público funcional donde participantes reales puedan
-interactuar con el sistema. Una corrida previa se retiró por falta de
-trazabilidad a un export crudo del instrumento
-(ver \texttt{OBS-08} en
-\texttt{docs/observaciones/OBSERVACIONES.md}, reabierta). Lo que sí
-queda implementado y verificado: el protocolo ya definido en su momento
-(plantilla de consentimiento informado, muestreo por conveniencia
-dentro de la comunidad UTEQ, anonimización por código de participante,
-\texttt{docs/etica/consentimientos/plantilla.md}), el instrumento SUS
-de 10 ítems \citep{brooke1996sus} con sus 2 ítems suplementarios, y el
-pipeline de análisis previsto (\texttt{scripts/sus-analysis.ipynb}). La
-corrida real -- reclutamiento, sesiones de 15--20 minutos
-con registro de hora/duración, export crudo versionable sin PII,
-análisis y reporte -- se difiere formalmente a la fase de despliegue en
-producción.
+El Bloque~5 queda cerrado con una corrida de $N=15$ aplicada el 19 de
+septiembre de 2026. El instrumento, CSV anónimo, manifiesto de
+consentimientos, script de recálculo y figuras se encuentran en
+\texttt{docs/mediciones/sus/}. La media resultante es 66,00/100 con
+IC~95\,\% [56,95; 75,05]; el informe no generaliza el resultado de esta
+muestra de conveniencia. Como mejora futura quedan las incidencias que
+reportaron participantes: rendimiento de carga, visibilidad del acceso y
+salida de sesión, y búsqueda del catálogo.
 
 \section{Cerrar cobertura de ramas en servicios -- CERRADO}
 \label{sec:tf-service-branch-coverage}

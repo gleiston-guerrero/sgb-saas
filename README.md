@@ -311,7 +311,7 @@ make verify   # = scripts/verify-all.py: P1-P12 + javadoc en un solo comando
 ```
 
 - Clasifica cada punto como `evidencia válida`, `PENDIENTE` (visible,
-  nunca aprobado: P3, P10-bloqueado, firmas P11) o `FALLO`; sale 0 solo
+  nunca aprobado: P2/P10-bloqueado o firmas P11) o `FALLO`; sale 0 solo
   si no hay ningún `FALLO`. Un exit 0 con pendientes significa
   coherencia/reproducibilidad de la evidencia disponible, no
   cumplimiento académico total.
@@ -342,13 +342,14 @@ make verify   # = scripts/verify-all.py: P1-P12 + javadoc en un solo comando
 - **Notebooks con outputs archivados**: `scripts/perf-analysis.ipynb`
   (análisis de rendimiento, invoca `scripts/perf-analysis.py` — una sola
   fuente de verdad, no duplica lógica) y `scripts/sus-analysis.ipynb`
-  (SUS, en estado *pendiente de datos* — no se fabrican resultados).
+  (SUS con la corrida anónima real de N=15; el cálculo canónico vive en
+  `scripts/analyze-sus.py`).
 - **Semillas fijas (D.2)**: toda aleatoriedad del pipeline usa semilla
   explícita, no el default no determinista del lenguaje — el PRNG
   `mulberry32` de `k6/libros-listado-test.js` y el bootstrap del IC 95% del
   p95 en `scripts/perf-analysis.py` (`BOOTSTRAP_SEED`) usan **42**, ambos
   documentados en su propio código. El resto del pipeline (agregación
-  estadística, SUS pendiente) no usa muestreo aleatorio: *no aplica*,
+  estadística, SUS) no usa muestreo aleatorio: *no aplica*,
   confirmado. Ver también la convención en `docs/mediciones/README.md`.
 - **Requisitos adicionales** para `make all`: XeLaTeX, BibTeX y Pandoc para
   compilar los PDF; Chrome instalado (para `make test-frontend` con
@@ -361,8 +362,8 @@ make verify   # = scripts/verify-all.py: P1-P12 + javadoc en un solo comando
 
 ## Integridad del entregable
 
-Digest SHA256 de `docs/informe-final.pdf` (regenerado 2026-09-18, 109 páginas):
+Digest SHA256 de `docs/informe-final.pdf` (regenerado 2026-09-19, 110 páginas):
 
 ```
-4209D49EE57E3F6E95BD1D5BE8B3862F4AF552B90374B1182A0FC3912236FAB2
+41C5BF4CCBF57977C80E03D1C3EA431F17DDED5ECEA6CBFE5F15847A97BED924
 ```

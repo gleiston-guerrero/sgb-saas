@@ -1,7 +1,8 @@
 # Expediente de verificación — examen suspenso SGB-SaaS (EV-1)
 
-Rama de trabajo: `fix/fase01-sus-n0` (código evaluado/verificado: rev `24885d18`, 2026-09-17).
-Cierre: viernes 18-sep-2026 23:55. Etiqueta `v1.1.0`: la mueve el admin al final (ver EV-3).
+Base histórica: `fix/fase01-sus-n0` (rev `24885d18`, 2026-09-17).
+Cierre SUS vigente: rama `fix/cierre-p3-sus-real`, 19-sep-2026. La etiqueta
+`v1.1.0` se actualizará únicamente tras aprobar y fusionar este cierre.
 
 > Nota de cierre EV-4:
 > La verificación técnica integral fue ejecutada sobre el cierre técnico previo documentado.
@@ -52,9 +53,10 @@ M VERIFICACION.md
 Piso 1 en regla a esta fecha (tag existe, anterior al cierre); el admin
 mueve `v1.1.0` al SHA final de entrega. Piso 4: identidad de trabajo
 `MoisesPanama <mpanamam@uteq.edu.ec>` (institucional); ver EV-4 para
-autoría por punto. Riesgo Piso 3 en tratamiento explícito: Fase 0.1
-retiró `sus.csv` y derivados del árbol (P3 declara N=0); sin fechas
-futuras en este expediente.
+autoría por punto. Para Piso 3, la evidencia vigente es una corrida SUS
+anonimizada de $N=15$, recalculable y con consentimiento original privado;
+la autorización adicional de publicar las filas se declara como confirmación
+oral grupal, no como segunda firma escrita.
 
 ### EV-3/EV-4 (tag y entrega)
 
@@ -73,8 +75,8 @@ modificar el historial.
 El target delega en `scripts/verify-all.py` (única fuente de verdad;
 `python scripts/verify-all.py` es el equivalente exacto donde no hay
 GNU Make — sin `make` en este Windows). Clasifica cada punto como
-`evidencia válida`, `PENDIENTE` (visible, nunca aprobado: P3 N=0 o una
-dependencia local sin Docker) o `FALLO`; sale 0 solo si no hay ningún
+`evidencia válida`, `PENDIENTE` (visible, por ejemplo una dependencia
+local sin Docker) o `FALLO`; sale 0 solo si no hay ningún
 `FALLO`. Solo lectura: ningún verificador modifica NDJSON, figuras, PDF
 ni evidencia (P4 genera su gráfico en temporal vía `SGB_PERF_GRAFICO`).
 UTF-8 interno: no requiere `PYTHONUTF8=1` en Windows.
@@ -85,7 +87,7 @@ UTF-8 interno: no requiere `PYTHONUTF8=1` en Windows.
 python scripts/verify-all.py
 ```
 
-### Salida (2026-09-17, rev 24885d18, salida completa en `docs/evidencia/examen/24885d18/verify-all.txt`)
+### Salida histórica (2026-09-17, rev 24885d18, en `docs/evidencia/examen/24885d18/verify-all.txt`)
 
 ```text
 ===== verify-all: resumen P1-P12 =====
@@ -106,6 +108,11 @@ verify-all: exit 0 = coherencia/reproducibilidad de la evidencia disponible, NO 
 
 Código de salida: 0.
 
+La salida anterior se conserva como antecedente y no describe el estado
+vigente de P3. El cierre SUS de 19-sep-2026 se verifica en la sección P3
+de este expediente y con el mismo orquestador; no altera las declaraciones
+personales EV-4 de los demás integrantes.
+
 P10 local queda PENDIENTE-bloqueado sin Docker; la evidencia contra el
 despliegue (login LECTOR + JWT + doble 403) vive en la sección P10.
 
@@ -121,7 +128,7 @@ despliegue (login LECTOR + JWT + doble 403) vive en la sección P10.
 
 Operativo (orquestador completo, solo lectura, UTF-8, exit 0 sin FALLO;
 PENDIENTEs visibles: P2 mientras `doi.org`/Zenodo estén inaccesibles
-desde la máquina que verifica, P3 N=0; P10 solo queda bloqueado en
+desde la máquina que verifica; P10 solo queda bloqueado en
 máquinas locales sin Docker.
 
 ---
@@ -258,25 +265,24 @@ y quedar verde antes del PR a `main`.
 python scripts/verify-p3-sus.py
 ```
 
-### Salida (2026-09-17, rev 24885d18, completa)
+### Salida (2026-09-19, cierre SUS local, completa)
 
 ```text
-verify-p3: OK (sin sus.csv ni derivados en el arbol evaluado)
-verify-p3: OK (sus/README.md declara N=0 y dataset retirado)
-verify-p3: OK (ningun .tex cita artefactos SUS retirados)
-verify-p3: OK (P3 declara N=0 y estado no aprobado, sin CUMPLE)
-verify-p3: PENDIENTE — no puntuable (N=0, sin respuestas reales)
+verify-p3: OK (15 respuestas; códigos y manifiesto de custodia coinciden)
+verify-p3: OK (Brooke recalculado: N=15, media=66.00, IC95=[56.95, 75.05])
+verify-p3: OK (instrumento y cuatro derivados SUS presentes; figuras en inglés)
+verify-p3: OK (documentación vigente, sin N=0)
+verify-p3: evidencia válida (instrumento, CSV anónimo, manifiesto de custodia y recálculo reproducible)
 ```
 
 ### Resultado
 
-PENDIENTE deliberado y honesto (0 %, no se cerrará con datos): N=0 en
-todo el entregable, sin instrumento versionado con respuestas ni
-consentimientos verificables. Fase 0.1 retiró `sus.csv` (15 respuestas
-aparentes) y sus 4 derivados del árbol; el notebook
-`scripts/sus-analysis.ipynb` corre en modo N=0 con salidas reales
-(5/5 celdas ejecutadas, cero puntajes, cero gráficos). No se fabricará
-evidencia.
+Evidencia válida con alcance explícitamente limitado: $N=15$ respuestas
+reales de una muestra por conveniencia, CSV anonimizado, consentimiento
+original bajo custodia privada y cálculo de Brooke reproducible. La
+autorización adicional de publicación de filas anonimizadas fue oral y
+grupal según el responsable de difusión; no se presenta como consentimiento
+escrito individual adicional. La media es 66,00 (IC95%: 56,95--75,05).
 
 ---
 
@@ -484,25 +490,25 @@ xelatex -interaction=nonstopmode -halt-on-error informe-final.tex
 xelatex -interaction=nonstopmode -halt-on-error informe-final.tex
 ```
 
-### Salida (2026-09-17, rev 24885d18; logs en `docs/evidencia/examen/xelatex-c2-*.txt`, `bibtex-c2.txt`; los de `d92ba03a/` quedan como históricos)
+### Salida (2026-09-19, cierre local; los logs históricos permanecen en `docs/evidencia/examen/`)
 
 ```text
-verify-p8-p9: OK (15 entornos figure)
-verify-p8-p9: OK (15 labels unicos)
-verify-p8-p9: OK (las 15 citadas; 0 rotas)
-verify-p8-p9: OK (14 includegraphics existen en disco)
+verify-p8-p9: OK (17 entornos figure)
+verify-p8-p9: OK (17 labels unicos)
+verify-p8-p9: OK (las 17 citadas; 0 rotas)
+verify-p8-p9: OK (16 includegraphics existen en disco)
 verify-p8-p9: OK (0 palabras espanolas en .svg versionados)
 verify-p8-p9: OK (captions de figuras en ingles)
-verify-p8-p9: OK (15/15 figuras referenciadas; figuras en ingles)
+verify-p8-p9: OK (17/17 figuras referenciadas; figuras en ingles)
 xelatex x1/x2/x3: exit 0; bibtex: exit 0
-Output written on informe-final.pdf (109 pages).
+Output written on informe-final.pdf (110 pages).
 ```
 
 Sin errores (`^!`), sin referencias indefinidas en la pasada final; solo
 avisos benignos (inputenc ignorado con motor utf8, tokens hyperref en
-strings PDF, `h`→`ht` en floats). Compilación reproducida desde clon
-limpio (109 páginas, exit 0; el SHA varía entre builds por metadatos de
-xelatex, esperado). El PDF versionado es el de la fase PDF con SHA en
+strings PDF, `h`→`ht` en floats). Compilación local reproducida (110
+páginas, exit 0; el SHA varía entre builds por metadatos de xelatex,
+esperado). El PDF versionado es el de la fase PDF con SHA en
 README/`CITATION.cff`.
 
 Generador de las 9 figuras nuevas (`scripts/generar-figuras-evaluacion.py`,

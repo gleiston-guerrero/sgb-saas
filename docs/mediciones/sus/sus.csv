@@ -1,0 +1,16 @@
+code,timestamp,task_completion,device,web_experience,incidence,q1,q2,q3,q4,q5,q6,q7,q8,q9,q10,comment
+P01,2026-09-19T16:42:47-05:00,yes,Teléfono,Básica,"Es muy lento, para realizar alguna acción se tarda mucho en cargar.",3,4,5,3,4,1,5,4,3,1,Ninguno
+P02,2026-09-19T16:54:40-05:00,yes,Teléfono,Básica,Muchos pedidos al querer adquirir,4,4,4,4,5,4,4,5,4,4,Ninguno
+P03,2026-09-19T17:59:40-05:00,partial,Teléfono,Básica,Al momento de cambiar de módulo demora en cargar,3,3,1,1,3,3,3,3,3,5,TA bonito
+P04,2026-09-19T18:11:53-05:00,yes,Teléfono,Avanzada,Sin comentarios,5,5,5,5,5,5,5,5,5,5,Sin comentarios
+P05,2026-09-19T18:31:40-05:00,yes,Teléfono,Intermedia,"En la versión Mobil no se encuentra el inicio de sesión directo pero si se puede acceder igualmente al crear la cuenta fue ese detalle que en PC está perfectamente el inicio de sesión directo aún así se completó todo sin dificultad",4,2,4,2,3,1,5,1,3,1,Ajustar el inicio de sesión en la versión móvil
+P06,2026-09-19T18:45:32-05:00,yes,Teléfono,Avanzada,Normal,3,3,5,5,4,5,5,5,4,4,No
+P07,2026-09-19T19:07:59-05:00,yes,Teléfono,Intermedia,Nada grave solo tardo un poco en iniciar sesión y interartuar en algunas opciones,4,1,3,1,3,3,4,1,3,1,Estubo normal sin muchas complicaciones
+P08,2026-09-19T19:13:23-05:00,partial,Computadora,Básica,Perdido entre los módulos,5,4,5,5,3,3,3,4,3,3,Buen sistema pero te falta pelado IA
+P09,2026-09-19T19:24:40-05:00,yes,Tableta,Básica,"La página se tarda demasiado en cargar tras cada búsqueda o acción. Y aunque probablemente los libros sólo eran una prueba, no encontré ninguno de los libros que busqué, por lo que al final simplemente abrí uno de los primeros que aparecían en el catálogo. Para poder desconectarme, fui instintivamente a la esquina superior derecha, que fue donde inicié sesión al principio. Creo que para mejorar el diseño de la página debería estar en el mismo lugar la opción de desconectarse.",3,1,4,1,4,2,4,1,4,1,
+P10,2026-09-19T19:32:24-05:00,yes,Teléfono,Avanzada,Todo bien durante mi experiencia,5,2,5,1,5,1,5,1,4,1,Probablemente mover el icono de asistente a la barra de tareas para que no interfiera con el contenido
+P11,2026-09-19T19:41:21-05:00,yes,Computadora,Avanzada,Demora un poco al ingresar en la pagina,3,2,5,1,4,3,4,2,3,1,Hacer que la pagina sea mas rápida al cargar
+P12,2026-09-19T19:58:15-05:00,yes,Computadora,Intermedia,Me fue confusa la parte para buscar un libro por su nombre.,4,2,4,1,4,1,4,1,4,1,Un poco más de distinción en los cuadros de búsqueda por nombres.
+P13,2026-09-19T20:18:51-05:00,yes,Computadora,Avanzada,"El inicio de sesión no está visible directamente desde la portada. Fue necesario seleccionar “crear cuenta” y después encontrar el enlace “iniciar sesión”. Además la búsqueda no se aplicó inmediatamente al escribir, fue necesario presionar enter. El resto del recorrido, incluida la disponibilidad, el detalle, la opción de reserva, la navegación principal y el cierre de sesión, funcionaron correctamente.",4,2,4,2,4,2,4,2,4,2,
+P14,2026-09-19T20:25:32-05:00,yes,Teléfono,Intermedia,,3,1,5,4,3,2,5,4,4,4,"Optimizar la web, El ux esta bien pero la optimizacion de las acciones dentro de ella hace que el uso sea engorroso."
+P15,2026-09-19T20:43:47-05:00,yes,Computadora,Básica,Ninguno,3,3,3,3,3,3,3,3,3,3,Excelente

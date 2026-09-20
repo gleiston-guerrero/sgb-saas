@@ -588,38 +588,66 @@ Usability Scale (SUS)?
 \textbf{Métrica.} Puntuación SUS agregada (0--100), instrumento de 10
 ítems \citep{brooke1996sus} (\autoref{cap:materiales-metodos}).
 
-\textbf{Datos crudos.} Ninguno todavía: $N=0$ de los $N\geq15$
-participantes que exige la guía. La corrida SUS previa queda retirada
-como evidencia empírica por falta de trazabilidad a un export crudo del
-instrumento y por ausencia de consentimientos versionables/verificables
-sin exponer datos personales. Por esa razón, este informe no publica
-ningún archivo de respuestas, cifra agregada, tabla descriptiva ni figura
-derivada de SUS; solo conserva el protocolo y el instrumento para una
-corrida futura.
+\textbf{Datos crudos.} La corrida del 19 de septiembre de 2026 contiene
+$N=15$ respuestas anónimas en
+\texttt{docs/mediciones/sus/sus.csv}. El instrumento aplicado, el
+manifiesto de consentimientos y las reglas de acceso están versionados en
+la misma carpeta. La hoja original con nombres, correos y firmas queda
+bajo custodia privada; el manifiesto vincula cada código P01--P15 con su
+registro fuente sin publicar PII. La fuente tuvo 17 envíos: se excluyeron
+antes del análisis una persona que indicó no poder participar por edad y
+un registro con correo de demostración/no verificable. Ninguna exclusión
+dependió del puntaje.
 
-\textbf{Estadística descriptiva.} Sin datos no hay estadística que
-reportar: la tabla, el intervalo de confianza y la clasificación
-Bangor de la versión anterior de este bloque quedan retirados junto
-con la corrida. Se conserva el método para la corrida futura: puntuación
-SUS agregada 0--100 por participante con la fórmula de Brooke, media,
-mediana, DT, IC~95\,\% con $t$ de Student ($df=N-1$, dado $N<30$) y
-clasificación en la escala de adjetivos de Bangor frente al umbral de
-aceptabilidad de 68 puntos; desglose por ítem Q1--Q10 en escala
-Likert 1--5 más los ítems suplementarios I1/I2 del instrumento local.
+\textbf{Estadística descriptiva.} La puntuación Brooke recalculada da
+media 66,00, mediana 67,50, DT 16,33, mínimo 45,00 y máximo 95,00; el
+IC~95\,\% con $t$ de Student ($df=14$) es [56,95; 75,05]. Trece personas
+reportaron completar las tareas y dos las completaron parcialmente. La
+muestra es por conveniencia, por lo que describe esta corrida y no permite
+generalizar a una población. El valor no se presenta como una etiqueta de
+aceptabilidad: queda por debajo de la referencia descriptiva de 68 y debe
+interpretarse junto con la dispersión y los comentarios anonimizados.
 
-\textbf{Protocolo (permanente, ya versionado).}
-Plantilla de consentimiento informado, muestreo por conveniencia y
-anonimización por código de participante
-(\texttt{docs/etica/consentimientos/plantilla.md},
-\autoref{cap:materiales-metodos}).
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}lrrrrrrrrrr@{}}
+\toprule
+Ítem & Q1 & Q2 & Q3 & Q4 & Q5 & Q6 & Q7 & Q8 & Q9 & Q10 \\
+\midrule
+Media Likert & 3,73 & 2,60 & 4,13 & 2,60 & 3,80 & 2,60 & 4,20 & 2,80 & 3,60 & 2,47 \\
+\bottomrule
+\end{tabular}
+\caption{Mean raw Likert response by SUS item; negative items retain their original direction.}
+\label{tab:res-sus-items}
+\end{table}
 
-\textbf{Estado real.} \textbf{Pendiente / retirado como resultado.} La
-toma de datos con usuarios y el protocolo SUS se difieren formalmente
-como trabajo futuro para la fase de despliegue en producción
-(\autoref{sec:tf-sus}). Documentado como reabierto en \texttt{OBS-08} de
-\texttt{docs/observaciones/OBSERVACIONES.md}. Este bloque queda cerrado
-sin evidencia SUS evaluable: no hay consentimientos firmados versionados,
-no hay export crudo del instrumento y no hay conclusión de usabilidad.
+Como muestran \autoref{fig:res-sus-scores} y
+\autoref{fig:res-sus-items}, los resultados varían de forma sustancial
+entre participantes. Los textos libres señalan como temas de mejora la
+lentitud de carga, la visibilidad del inicio/cierre de sesión y la
+búsqueda del catálogo; son observaciones cualitativas, no incidencias
+reproducidas por el equipo.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\textwidth]{mediciones/sus/sus-score-boxplot.pdf}
+\caption{Distribution of individual SUS scores from 15 anonymized participants.}
+\label{fig:res-sus-scores}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\textwidth]{mediciones/sus/sus-item-means.pdf}
+\caption{Mean response by SUS item; error bars show sample standard deviation.}
+\label{fig:res-sus-items}
+\end{figure}
+
+\textbf{Estado real.} \textbf{Completo como evidencia P3.} El
+instrumento de Brooke, las 15 respuestas anónimas, el manifiesto de
+custodia por código y el recálculo están disponibles y son comprobados por
+\texttt{scripts/verify-p3-sus.py}. La custodia privada de los
+consentimientos protege la identidad sin impedir una revisión docente.
 
 \section{Resumen de bloques}
 
@@ -634,18 +662,14 @@ Bloque & Estado & Completo/ Parcial/ Pendiente & Umbral cumplido \\
 2. Seguridad (OWASP) & 6/6 controles con resultado cerrado (A02 incluido, HSTS verificado en producción); ZAP ejecutado (0 High en producción, 2 High en local explicados) & \textbf{Completo} & Sí \\
 3. Cobertura (JaCoCo) & Medición vigente de cierre: 86,30\,\% de líneas (2337/2708) y 74,53\,\% de ramas (594/797), respaldada por el XML versionado; cumple el objetivo interno de 70\,\% en líneas y ramas, con servicios (87,55\,\%/77,31\,\%) y controladores (96,54\,\%/75,51\,\%) sobre el umbral & \textbf{Completo} & Sí \\
 4. Calidad web (Lighthouse) & 12 corridas reales de producción (2 rondas $\times$ 2 perfiles $\times$ 3), umbral cumplido en las 6 corridas post-fix; defecto real de CLS encontrado y corregido, verificado antes/después en producción & \textbf{Completo} & Sí \\
-5. Usabilidad (SUS) & $N=0$ de $N\geq15$ exigidos; protocolo y pipeline listos, corrida diferida a despliegue & \textbf{Pendiente} & No \\
+5. Usabilidad (SUS) & $N=15$ anónimo; instrumento, manifiesto de custodia y recálculo Brooke versionados; media 66,00 e IC~95\,\% [56,95; 75,05] & \textbf{Completo} & Sí \\
 \bottomrule
 \end{tabularx}
 \caption{Estado real de cada bloque de evaluación empírica al cierre de este capítulo}
 \label{tab:res-resumen}
 \end{table}
 
-De los cinco bloques exigidos por la guía, cuatro están completos con
-umbral cumplido (rendimiento, seguridad, cobertura, calidad web) y uno
-(usabilidad) queda pendiente con $N=0$. Esta distribución de ``4 de 5
-completos'' es el estado real del proyecto al momento de escribir este
-capítulo: la corrida SUS declarada anteriormente se retiró por falta de
-trazabilidad (ver \texttt{OBS-08} en
-\texttt{docs/observaciones/OBSERVACIONES.md}) y la toma de datos con
-usuarios se difiere formalmente a la fase de despliegue en producción.
+Los cinco bloques exigidos por la guía cuentan con evidencia versionada.
+En usabilidad, la evidencia corresponde a una sola muestra de conveniencia
+y conserva sus limitaciones metodológicas; su cierre documental no implica
+que las oportunidades de mejora observadas se hayan corregido ya.

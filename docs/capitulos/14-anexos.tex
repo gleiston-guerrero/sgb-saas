@@ -5,8 +5,8 @@
 
 Este capítulo reúne el material suplementario exigido por la guía
 (Bloque~B.17): la cadena de búsqueda bibliográfica ya documentada en el
-\autoref{cap:trabajos-relacionados}, el protocolo del instrumento SUS
-(aún sin ejecutar), el placeholder del pipeline CI/CD pendiente de
+\autoref{cap:trabajos-relacionados}, el instrumento SUS y su ejecución
+anonimizada, el placeholder del pipeline CI/CD pendiente de
 captura manual, el checklist completo de Ralph et~al.\ (2021) verificado
 contra \texttt{docs/checklists/ralph2021-engineering-research.md}, y la
 matriz de trazabilidad de requisitos parseada desde
@@ -40,12 +40,13 @@ selección adaptado de PRISMA~2020 aparece en la
 
 \section{Protocolo SUS (System Usability Scale)}
 
-Este anexo documenta únicamente el \textbf{protocolo y el cuestionario}
-del instrumento System Usability Scale \citep{brooke1996sus}.
-\textbf{No se reportan resultados ni datos de participantes}: al momento
-de redactar este documento, $N=0$ de los $N\geq15$ participantes exigidos
-por la guía, verificado en la \autoref{sec:res-usabilidad} del
-\autoref{cap:resultados} (``Datos crudos. Ninguno todavía.'').
+Este anexo documenta el \textbf{protocolo, cuestionario y resultado}
+del instrumento System Usability Scale \citep{brooke1996sus}. La ejecución
+cerrada contiene $N=15$ participantes adultos y un export anonimizado;
+las identidades y consentimientos originales permanecen privados. La
+\autoref{sec:res-usabilidad} reporta media $66{,}00$ e IC95\%
+$56{,}95$--$75{,}05$, sin presentar la muestra por conveniencia como
+representativa de una población.
 
 \subsection{Protocolo de aplicación}
 
@@ -69,10 +70,11 @@ por la guía, verificado en la \autoref{sec:res-usabilidad} del
     ítems de Brooke (1996) en español, con escala Likert de 1 a 5
     (abajo). Duración estimada total de la sesión: 15--20 minutos
     (según la plantilla de consentimiento).
-  \item \textbf{Puntuación (cuando existan datos).} La fórmula estándar
+  \item \textbf{Puntuación.} La fórmula estándar
     del instrumento produce una puntuación agregada 0--100 por
-    participante. \textbf{Aquí no se aplica}: no hay respuestas que
-    puntuar.
+    participante. En esta ejecución se recalculó cada puntuación desde
+    \texttt{docs/mediciones/sus/sus.csv} con
+    \texttt{scripts/analyze-sus.py}.
 \end{enumerate}
 
 \subsection{Cuestionario SUS -- 10 ítems originales de Brooke (1996) en español}
@@ -125,8 +127,8 @@ en la escala de 1 a 5.
 
 Los ítems impares son afirmaciones positivas y los pares negativas, según
 el diseño original del instrumento \citep{brooke1996sus}. La puntuación
-agregada, cuando existan respuestas reales, se calculará con la fórmula
-estándar de Brooke; \textbf{no se inventa aquí ninguna puntuación}.
+agregada se recalcula con la fórmula estándar de Brooke; no se introducen
+puntuaciones manuales.
 
 \section{Pipeline CI/CD}
 
@@ -257,7 +259,7 @@ D4 & Provee argumentos de corrección para las contribuciones analíticas y teó
 \hline
 D5 & Incluye uno o más ejemplos funcionando para ilustrar el artefacto & \textbf{Cumple} & \texttt{docs/postman/coleccion.json} (66 peticiones HTTP reales); listados de código real en el Cap.\ 7 (Implementación). \\
 \hline
-D6 & Evalúa el artefacto en un contexto relevante para la industria (p.\ ej.\ proyectos de código abierto ampliamente usados, programadores profesionales) & \textbf{No cumple} & SGB-SaaS no tiene todavía un despliegue público ni usuarios reales evaluándolo --- toda la evaluación empírica del Cap.\ 8 se ejecutó en el entorno de desarrollo del propio equipo (\texttt{docker compose}), no en un contexto de uso real. Coincide con $N=0$ en SUS. \\
+D6 & Evalúa el artefacto en un contexto relevante para la industria (p.\ ej.\ proyectos de código abierto ampliamente usados, programadores profesionales) & \textbf{Parcial} & SGB-SaaS cuenta con una prueba SUS de $N=15$ participantes sobre el despliegue público, pero la muestra es por conveniencia y no demuestra adopción industrial ni representatividad de la población objetivo. \\
 \hline
 \end{longtable}
 \end{center}
@@ -328,7 +330,7 @@ Sobreestimar la novedad de la contribución & \textbf{Evitado} & Cap.\ 3, §Brec
 \hline
 Omitir detalles conceptuales clave centrándose solo en aspectos incidentales de implementación & \textbf{Evitado} & Cap.\ 4 (Marco Teórico) y Cap.\ 6 (Diseño) cubren extensamente el ``por qué'' antes que el ``cómo''. \\
 \hline
-La evaluación consiste únicamente en recoger opiniones de usuarios & \textbf{Evitado} & $N=0$ en SUS --- no hay ninguna opinión de usuario recogida todavía; el resto de la evaluación (k6, JaCoCo, OWASP, Lighthouse) es técnica. \\
+La evaluación consiste únicamente en recoger opiniones de usuarios & \textbf{Evitado} & SUS aporta $N=15$ opiniones anonimizadas, complementadas por evaluación técnica (k6, JaCoCo, OWASP y Lighthouse). \\
 \hline
 La evaluación consiste únicamente en datos de rendimiento cuantitativos no comparados contra \emph{benchmarks} o alternativas establecidas & \textbf{Riesgo parcial} & El bloque de rendimiento (k6) compara dos escenarios internos del propio SGB-SaaS, no contra un sistema alternativo externo ni contra un \emph{benchmark} de la industria --- coincide con el gap de E7. \\
 \hline
@@ -531,16 +533,15 @@ no los presenta como cifras alternativas de cierre. Esto evita que una
 lectura automática o una búsqueda literal confunda una retractación con
 un resultado vigente.
 
-El bloque de usabilidad se declara con \textbf{$N=0$}. La muestra real
-queda pendiente hasta disponer de participantes, consentimiento
-informado trazable y export crudo del instrumento. No se conserva ningún
-archivo de respuestas, figura ni cifra SUS como evidencia empírica de
-usuarios reales.
+El bloque de usabilidad se declara con \textbf{$N=15$}. Se conserva un
+export de respuestas anonimizado, sus figuras derivadas y la estadística
+recalculable; las identidades y consentimientos originales no se publican.
+La autorización adicional para publicar las filas anonimizadas se documenta
+como confirmación oral grupal, no como una segunda firma escrita.
 
 Las figuras evaluables del informe quedan rotuladas en inglés: los tres
-diagramas C4, el DER y el gráfico de rendimiento p95 usan labels/captions
-en inglés; las figuras SUS anteriores se retiraron junto con los datos no
-trazables.
+diagramas C4, el DER, el gráfico de rendimiento p95 y las dos figuras SUS
+usan labels/captions en inglés.
 
 La documentación Javadoc del backend queda respaldada por una auditoría
 reproducible versionada en

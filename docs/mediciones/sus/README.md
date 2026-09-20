@@ -1,42 +1,26 @@
-# SUS — System Usability Scale (estado del dataset)
+# SUS — System Usability Scale, corrida 2026-09-19
 
-Resumen ejecutivo: el equipo no presenta evidencia SUS válida en este
-entregable. El bloque SUS queda en **N = 0** en todas las secciones
-relevantes del informe. No se fabricará evidencia.
+La evidencia vigente contiene $N=15$ respuestas reales, anónimas y completas
+de una prueba voluntaria de usabilidad. La fuente privada tuvo 17 envíos:
+dos se excluyeron antes del análisis por elegibilidad/trazabilidad, no por
+su puntaje. El instrumento, el CSV anónimo, el manifiesto de
+consentimientos y el cálculo están versionados en esta carpeta.
 
-Qué contiene esta carpeta:
+| Artefacto | Propósito |
+|---|---|
+| `instrumento/SUS-BROOKE-2026-09-19.md` | Enunciados, escala, tareas y tratamiento de datos del formulario aplicado. |
+| `sus.csv` | 15 filas anónimas con fecha, tarea, dispositivo, experiencia, incidencia, Q1--Q10 y comentario. |
+| `consents-manifest.md` | Cruce P01--P15 hacia consentimientos privados, sin PII pública. |
+| `sus-statistics.json` | Resultado regenerado desde el CSV, incluida su huella SHA-256. |
+| `sus-score-boxplot.*`, `sus-item-means.*` | Figuras derivadas por `scripts/analyze-sus.py`. |
 
-- `README.md` — este archivo (estado honesto del bloque).
-- `CONSENT.md` — política de consentimientos y motivo técnico del retiro.
+La media calculada es 66,00/100 con IC 95 % t de [56,95; 75,05]. Es un
+resultado descriptivo de una muestra de conveniencia; no se generaliza a
+una población y no se etiqueta como aceptable por encima de su evidencia.
 
-Qué NO contiene el árbol evaluado (retirado en Fase 0.1):
+Para reproducir el análisis:
 
-- No hay `sus.csv`: el dataset previo de 15 respuestas aparentes se
-  retiró del árbol por falta de trazabilidad e indicios de no
-  independencia (detalle en `CONSENT.md`). Permanece únicamente en el
-  historial Git; el commit/tag evaluado no lo contiene.
-- No hay figuras `sus_boxplot.*` ni `sus_items_breakdown.*`: eran
-  derivados del dataset retirado.
-- No hay instrumento versionado con respuestas ni consentimientos
-  firmados publicables/verificables en el repositorio.
-
-Por qué se retiró el dataset (resumen):
-
-- Se detectaron patrones incompatibles con respuestas independientes
-  (ítems con varianza cero, alternancia sistemática de sexo, patrón del
-  dispositivo) y ausencia de trazabilidad hacia el commit de origen
-  citado en la traza de procedencia. Estas inconsistencias impiden
-  aceptar el dataset como evidencia reproducible.
-
-Qué hacer si el equipo obtiene evidencia válida (Camino A):
-
-1. Versionar el instrumento original (formato markdown o PDF) en
-   `docs/mediciones/sus/instrumento/` con su propio manifiesto.
-2. Versionar los consentimientos firmados en un depósito controlado o
-   publicar solo un manifiesto con metadatos y referencia externa segura.
-3. Actualizar `docs/mediciones/DATA-PROVENANCE.md` y este README con el
-   N real de la corrida.
-4. Ejecutar `scripts/sus-analysis.ipynb` sobre la corrida real.
-
-Mientras no se cumplan esos pasos, el bloque SUS permanece en estado
-"retirado — N=0" en todo el entregable.
+```powershell
+python scripts/analyze-sus.py --input docs/mediciones/sus/sus.csv --consents docs/mediciones/sus/consents-manifest.md --output docs/mediciones/sus
+python scripts/verify-p3-sus.py
+```

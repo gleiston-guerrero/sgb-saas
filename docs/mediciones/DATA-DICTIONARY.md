@@ -9,9 +9,8 @@ Entrega.
 > las 5 corridas de k6 (`docs/mediciones/perf/`), las 16 evidencias
 > OWASP (`docs/mediciones/sec/`), los 3 reportes JaCoCo
 > (`docs/mediciones/jacoco/`), las 2 corridas de Lighthouse
-> (`docs/mediciones/lighthouse/`) y la especificación del futuro archivo
-> SUS; el bloque de usabilidad sigue en $N=0$ y no conserva datos
-> versionados (ver `OBS-08`).
+> (`docs/mediciones/lighthouse/`) y una corrida SUS cerrada el 19-sep-2026
+> con $N=15$ filas anonimizadas y derivadas reproducibles.
 
 ## `docs/mediciones/sec/2026-07-21-cookie-refresh-token.md`
 
@@ -173,24 +172,25 @@ formato de dato nuevo que no esté ya cubierto por las tablas de esta
 sección. Documentarlos aparte sería repetir la misma tabla sin aportar
 un campo nuevo -- decisión de esta tarea, no una omisión.
 
-## Dataset SUS retirado
+## Dataset SUS anonimizado — 2026-09-19
 
-El repositorio ya no versiona `docs/mediciones/sus/sus.csv` ni las
-figuras derivadas de esa corrida. El bloque de usabilidad queda en
-$N=0$: la corrida previa se retiró por falta de trazabilidad a un export
-crudo del instrumento y por ausencia de consentimientos verificables sin
-exponer datos personales. Se conserva únicamente este diccionario como
-especificación del formato que deberá tener una corrida futura, una vez
-ejecutada con consentimiento informado.
+`docs/mediciones/sus/sus.csv` contiene la corrida cerrada de $N=15$.
+El formulario original con nombre, correo y firma electrónica es privado;
+las filas públicas se codifican como `P01`--`P15`. La autorización adicional
+para publicar filas anonimizadas se registró como confirmación oral grupal
+comunicada por el responsable de difusión, no como segunda firma escrita.
+`scripts/analyze-sus.py` recalcula los derivados y
+`scripts/verify-p3-sus.py` comprueba esquema, códigos, estadísticas y
+ausencia de patrones básicos de correo/teléfono.
 
 | Campo / variable | Tipo de dato | Unidad | Rango esperado | Significado |
 |---|---|---|---|---|
-| `codigo` | string | — | `P01` a `P15` | Identificador anónimo del participante. Nunca se incluye nombre, correo ni cédula. |
-| `fecha` | string (fecha ISO 8601) | — | fecha real de la sesión | Fecha de la sesión de prueba. |
-| `edad` | entero | años | 18–34 | Rango de edad del participante al momento de la prueba. |
-| `sexo` | string | — | `Femenino`, `Masculino` | Sexo autopercibido del participante (opcional en el instrumento; aquí se reporta para descripción demográfica). |
-| `experiencia_web` | string | — | `Basica`, `Intermedia`, `Avanzada` | Nivel de experiencia previa con sistemas web similares, autopercibido por el participante. |
-| `dispositivo` | string | — | `Laptop`, `Escritorio`, `Movil` | Tipo de dispositivo utilizado durante la sesión de prueba. |
+| `code` | string | — | `P01` a `P15` | Identificador anónimo del participante. Nunca se incluye nombre, correo ni cédula. |
+| `timestamp` | timestamp ISO 8601 | — | instante real del envío | Hora de la respuesta convertida a ISO 8601. |
+| `task_completion` | categórico | — | `yes`, `partial`, `no` | Autorreporte de culminación de las tareas indicadas. |
+| `device` | string | — | texto del participante | Dispositivo utilizado durante la prueba. |
+| `web_experience` | string | — | texto del participante | Experiencia previa con aplicaciones web, sin normalización artificial. |
+| `incidence` | string | — | texto libre | Dificultad o incidencia reportada; se revisa para excluir PII evidente. |
 | `Q1` | entero | Likert 1–5 | 1, 2, 3, 4, 5 | "Creo que me gustaría usar este sistema frecuentemente." (Ítem positivo, contribución: `Q1 - 1`) |
 | `Q2` | entero | Likert 1–5 | 1, 2, 3, 4, 5 | "Encontré el sistema innecesariamente complejo." (Ítem negativo, contribución: `5 - Q2`) |
 | `Q3` | entero | Likert 1–5 | 1, 2, 3, 4, 5 | "Pensé que el sistema era fácil de usar." (Ítem positivo, contribución: `Q3 - 1`) |
@@ -201,10 +201,7 @@ ejecutada con consentimiento informado.
 | `Q8` | entero | Likert 1–5 | 1, 2, 3, 4, 5 | "Encontré el sistema muy incómodo de usar." (Ítem negativo, contribución: `5 - Q8`) |
 | `Q9` | entero | Likert 1–5 | 1, 2, 3, 4, 5 | "Me sentí muy confiado usando el sistema." (Ítem positivo, contribución: `Q9 - 1`) |
 | `Q10` | entero | Likert 1–5 | 1, 2, 3, 4, 5 | "Necesité aprender muchas cosas antes de poder usar este sistema." (Ítem negativo, contribución: `5 - Q10`) |
-| `I1` | entero | Likert 1–5 | 1, 2, 3, 4, 5 | Pregunta de interfaz adicional: facilidad de aprendizaje percibida. No forma parte del cálculo SUS estándar. |
-| `I2` | entero | Likert 1–5 | 1, 2, 3, 4, 5 | Pregunta de interfaz adicional: confianza para uso independiente. No forma parte del cálculo SUS estándar. |
-| `score` | decimal | puntos (0–100) | 0.0–100.0 | Puntuación SUS calculada con la fórmula de Brooke: `((Q1-1)+(5-Q2)+(Q3-1)+(5-Q4)+(Q5-1)+(5-Q6)+(Q7-1)+(5-Q8)+(Q9-1)+(5-Q10)) * 2.5`. Especificación del protocolo (Brooke 1996); implementación de referencia en `scripts/sus-analysis.ipynb`, sin corrida en este entregable (N=0). |
-| `comentarios` | string | — | texto libre (1 línea) | Comentario cualitativo breve del participante en español. No contiene datos personales identificables. |
+| `comment` | string | — | texto libre | Comentario cualitativo del participante. No contiene identificadores directos en el export público. |
 
 **Fórmula de verificación del score:**
 ```python
@@ -212,9 +209,8 @@ score = ((Q1-1) + (5-Q2) + (Q3-1) + (5-Q4) + (Q5-1) +
          (5-Q6) + (Q7-1) + (5-Q8) + (Q9-1) + (5-Q10)) * 2.5
 ```
 
-Cuando exista una corrida real, las figuras SUS deberán generarse de
-nuevo desde el export crudo trazable. Hasta entonces no hay boxplot,
-desglose por ítem ni estadística descriptiva versionada para SUS.
+Las figuras y estadísticas se generan de nuevo desde el export anonimizado
+con el comando documentado en `docs/mediciones/sus/README.md`.
 
 ## Referencias
 
