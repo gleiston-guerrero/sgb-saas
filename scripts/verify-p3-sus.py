@@ -43,6 +43,13 @@ EMAIL = re.compile(r"(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b")
 PHONE = re.compile(r"(?<!\d)(?:\+?\d[\s-]?){8,15}(?!\d)")
 
 
+def canonical_csv_sha256(path: Path) -> str:
+    """Return a content hash independent of CRLF/LF checkout conversion."""
+    text = path.read_text(encoding="utf-8-sig")
+    canonical = text.replace("\r\n", "\n").replace("\r", "\n")
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest().upper()
+
+
 def fail(message: str) -> int:
     print(f"verify-p3: FALLA: {message}", file=sys.stderr)
     return 1
@@ -172,7 +179,7 @@ def main() -> int:
         data = json.loads(STATS.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         return fail(f"estadísticas ilegibles: {exc}")
-    digest = hashlib.sha256(CSV_PATH.read_bytes()).hexdigest().upper()
+    digest = canonical_csv_sha256(CSV_PATH)
     if data.get("input_sha256") != digest:
         return fail("SHA-256 de sus.csv no coincide con sus-statistics.json")
     for key, value in expected(rows).items():

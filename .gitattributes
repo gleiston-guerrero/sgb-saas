@@ -13,3 +13,8 @@
 # volteados a CRLF en el worktree a las 21:38, blobs intactos). -text
 # fija bytes identicos en checkout/add en cualquier OS.
 docs/mediciones/perf/k6-run*.json -text -diff
+
+# El CSV SUS publica un SHA-256 de contenido canónico. Se fija LF para
+# preservar los mismos bytes en checkout y el verificador además normaliza
+# CRLF/LF para que la evidencia sea reproducible aun con autocrlf activo.
+docs/mediciones/sus/sus.csv text eol=lf

@@ -26,6 +26,13 @@ REQUIRED = {"code", "timestamp", "task_completion", "device",
 CODE = re.compile(r"P\d{2,}")
 
 
+def canonical_csv_sha256(path: Path) -> str:
+    """Return a content hash independent of CRLF/LF checkout conversion."""
+    text = path.read_text(encoding="utf-8-sig")
+    canonical = text.replace("\r\n", "\n").replace("\r", "\n")
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest().upper()
+
+
 def fail(message: str) -> int:
     print(f"analyze-sus: FAIL: {message}", file=sys.stderr)
     return 1
@@ -170,7 +177,7 @@ def main() -> int:
     task_counts = {state: sum(row["task_completion"] == state for row in rows)
                    for state in ("yes", "partial", "no")}
     result = {"analysis": "Brooke SUS (1996)",
-              "input_sha256": hashlib.sha256(args.input.read_bytes()).hexdigest().upper(),
+              "input_sha256": canonical_csv_sha256(args.input),
               "n": n, "scores": scores, "mean": mean,
               "median": statistics.median(scores), "stddev": stddev,
               "min": min(scores), "max": max(scores),
