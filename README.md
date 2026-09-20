@@ -342,8 +342,10 @@ make verify   # = scripts/verify-all.py: P1-P12 + javadoc en un solo comando
 - **Notebooks con outputs archivados**: `scripts/perf-analysis.ipynb`
   (análisis de rendimiento, invoca `scripts/perf-analysis.py` — una sola
   fuente de verdad, no duplica lógica) y `scripts/sus-analysis.ipynb`
-  (SUS con la corrida anónima real de N=15; el cálculo canónico vive en
-  `scripts/analyze-sus.py`).
+  (cuaderno histórico de la fase en que SUS estaba en modo `N=0`; no es la
+  fuente de resultados vigente). La corrida real anónima de `N=15` se
+  calcula de forma canónica con `scripts/analyze-sus.py` a partir de
+  `docs/mediciones/sus/sus.csv`.
 - **Semillas fijas (D.2)**: toda aleatoriedad del pipeline usa semilla
   explícita, no el default no determinista del lenguaje — el PRNG
   `mulberry32` de `k6/libros-listado-test.js` y el bootstrap del IC 95% del
@@ -362,8 +364,8 @@ make verify   # = scripts/verify-all.py: P1-P12 + javadoc en un solo comando
 
 ## Integridad del entregable
 
-Digest SHA256 de `docs/informe-final.pdf` (regenerado 2026-09-19, 110 páginas):
+Digest SHA256 de `docs/informe-final.pdf` (regenerado 2026-09-20, 110 páginas):
 
 ```
-41C5BF4CCBF57977C80E03D1C3EA431F17DDED5ECEA6CBFE5F15847A97BED924
+D5C1E2DE63EE88584EA3C2B1C4BFBADE9894FB46D23BBB446E2B52C1FA9E171B
 ```

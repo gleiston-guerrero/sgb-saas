@@ -283,6 +283,11 @@ original bajo custodia privada y cálculo de Brooke reproducible. La
 autorización adicional de publicación de filas anonimizadas fue oral y
 grupal según el responsable de difusión; no se presenta como consentimiento
 escrito individual adicional. La media es 66,00 (IC95%: 56,95--75,05).
+El export original de 17 registros permanece privado por contener PII; su
+preservación el 20-sep-2026 a las 16:12 y su SHA-256 constan en
+`docs/mediciones/sus/RAW-EXPORT-ATTESTATION.md`. La confirmación de esta
+evidencia se realiza mediante contraste privado solicitado por el docente,
+no mediante publicación del export identificable.
 
 ---
 
